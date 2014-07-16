@@ -52,7 +52,7 @@ def dbsearch(query):
    connection.close()
 
    # exit the program
-   sys.exit()
+   #sys.exit()
 
 #creates list of fields to be searched
 #field_list = []

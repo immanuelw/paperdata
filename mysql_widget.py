@@ -70,7 +70,7 @@ def fetch(entries):
             else:
                query += ' AND (%s > %s AND %s < %s)' %(table, vtext[field], ltext,vtext[field], rtext)
 #   execute other script to query mysql
-   os.system('python /data2/home/immwa/scripts/paper/pysql.py "%s"' %(query))
+   os.system('python /data2/home/immwa/scripts/paper/db_query.py "%s"' %(query))
 
 #create form
 def makeform(root, fields, mins, maxs):

@@ -10,7 +10,12 @@ import getpass
 datab = raw_input('Database:')
 table = raw_input('Update data in table named:')
 pswd = getpass.getpass('Password:')
-qry = sys.argv[1]
+
+compressed = 'compressed'
+obsnum_string = 'obsnum'
+
+#need way to get compr_value and obsnum from paperdistiller 
+
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
 connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = datab, local_infile=True)
@@ -18,13 +23,12 @@ connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = datab, loca
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
 
-print sys.argv[1]
 # execute the SQL query using execute() method.
-cursor.execute('''USE paperdata;
+cursor.execute('''
 UPDATE %s
 SET %s = %s
-WHERE %s = %s;
-'''%(table, compressed, compr_value, obs_string, obsnum)) 
+WHERE %s = %d;
+'''%(table, compressed, compr_value, obsnum_string, obsnum)) 
 ###change so %d if number or %s if string entry!!!
 print 'Table data updated.'
 

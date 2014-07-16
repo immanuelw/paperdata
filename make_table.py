@@ -28,6 +28,7 @@ julian_day INT DEFAULT NULL,
 julian_date DECIMAL(12,5) DEFAULT NULL,
 polarization CHAR(2) DEFAULT NULL,
 data_length VARCHAR(10) DEFAULT NULL,
+compressed BOOLEAN DEFAULT FALSE,
 raw_location VARCHAR(100) DEFAULT NULL,
 cal_location VARCHAR(100) DEFAULT NULL,
 file_size VARCHAR(15) DEFAULT NULL);''' %(table))
