@@ -19,8 +19,42 @@ maxs = 'N/A', 'N/A', 'max', 'max', 'max', 'max', 'N/A', 'max', 'N/A', 'N/A', 'N/
 
 vtext = {fields[0]:'filename', fields[1]:'location', fields[2]:'antennas', fields[3]:'obsnum', fields[4]:'julian_day', fields[5]:'julian_date', fields[6]:'polarization', fields[7]:'data_length', fields[8]:'raw_location', fields[9]:'cal_location', fields[10]:'file_size'}
 
-#allows user to input table queried
+#allows user to input database and table queried
+datab = raw_input('Database:')
 table = raw_input('Search table named:') 
+pswd = getpass.getpass('Password:')
+
+def dbsearch(query):
+
+   # open a database connection
+   # be sure to change the host IP address, username, password and database name to match your own
+   connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = datab, local_infile=True)
+
+   # prepare a cursor object using cursor() method
+   cursor = connection.cursor()
+
+   # execute the SQL query using execute() method.
+   cursor.execute('%s'%(query))
+
+   #finds all rows outputted by query, prints them
+   results = cursor.fetchall()
+   print results
+   #complete
+   print 'Query Complete'
+
+   # close the cursor object
+   cursor.close()
+
+   #save changes to database
+   connection.commit()
+
+   # close the connection
+   connection.close()
+
+   # exit the program
+   sys.exit()
+
+
 
 #perform action: print all non-empty fields and concatenate into mysql string
 def fetch(entries):
@@ -62,7 +96,6 @@ def fetch(entries):
             else:
                query += ' AND (%s > %s AND %s < %s)' %(table, vtext[field], ltext,vtext[field], rtext)
 #   execute other script to query mysql
-   #os.system('python /data2/home/immwa/scripts/paper/pysql.py "%s"' %(query))
    dbsearch(query)
 
 
@@ -112,36 +145,4 @@ if __name__ == '__main__':
    b2 = Button(root, text='Quit', command=root.quit)
    b2.pack(side=LEFT, padx=5, pady=5)
    root.mainloop()
-
-def dbsearch(query)
-   datab = raw_input('Database:')
-   pswd = getpass.getpass('Password:')
-
-   # open a database connection
-   # be sure to change the host IP address, username, password and database name to match your own
-   connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = datab, local_infile=True)
-
-   # prepare a cursor object using cursor() method
-   cursor = connection.cursor()
-
-   # execute the SQL query using execute() method.
-   cursor.execute('%s'%(query))
-
-   #finds all rows outputted by query, prints them
-   results = cursor.fetchall()
-   print results
-   #complete
-   print 'Query Complete'
-
-   # close the cursor object
-   cursor.close()
-
-   #save changes to database
-   connection.commit()
-
-   # close the connection
-   connection.close()
-
-   # exit the program
-   sys.exit()
 
