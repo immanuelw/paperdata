@@ -17,6 +17,17 @@ vtext = {fields[0]:'filename', fields[1]:'location', fields[2]:'antennas', field
 #allows user to input table queried
 table = raw_input('Search table named:') 
 
+#creates list of fields to be searched
+#field_list = []
+#while True:
+#   field_name = raw_input('Input field name:')
+#   if field_name == ''
+#      break
+#   field_list.append(field_name)
+
+#make field_list into string
+#field_string = str(field_list).strip('[]')
+
 #perform action: print all non-empty fields and concatenate into mysql string
 def fetch(entries):
    query = 'SELECT '
@@ -34,6 +45,8 @@ def fetch(entries):
          if ltext == '' and rtext == '':
             text = '%' + text + '%'
             if counter == 0:
+               #instead of * can create string from list created by loop
+               #query += '%s FROM %s WHERE %s LIKE \'%s\'' %(field_string, table, vtext[field], text)
                query += '* FROM %s WHERE %s LIKE \'%s\'' %(table, vtext[field], text)
                counter += 1
             else:
