@@ -11,7 +11,7 @@ import os
 
 #initalize lists to create gui with
 
-fields = 'file name', 'location', 'antennas', 'obsnum', 'Julian Day', 'Julian Date', 'polarization', 'Length of data', 'raw location', 'Calibrate file', 'file size'
+fields = 'filename', 'location', 'antennas', 'obsnum', 'Julian Day', 'Julian Date', 'polarization', 'Length of data', 'raw location', 'Calibrate file', 'file size'
 
 mins = 'N/A', 'N/A', 'min', 'min', 'min', 'min', 'N/A', 'min', 'N/A', 'N/A', 'N/A'
 
@@ -54,7 +54,16 @@ def dbsearch(query):
    # exit the program
    sys.exit()
 
+#creates list of fields to be searched
+#field_list = []
+#while True:
+# field_name = raw_input('Input field name:')
+# if field_name == ''
+# break
+# field_list.append(field_name)
 
+#make field_list into string
+#field_string = str(field_list).strip('[]')
 
 #perform action: print all non-empty fields and concatenate into mysql string
 def fetch(entries):
@@ -62,7 +71,7 @@ def fetch(entries):
    counter = 0
    for entry in entries:
       field = entry[0]
-      text  = entry[1].get()
+      text = entry[1].get()
       if len(entry) > 2:
          ltext = entry[2].get()
          rtext = entry[3].get()
@@ -73,6 +82,8 @@ def fetch(entries):
          if ltext == '' and rtext == '':
             text = '%' + text + '%'
             if counter == 0:
+               #instead of * can create string from list created by loop
+               #query += '%s FROM %s WHERE %s LIKE \'%s\'' %(field_string, table, vtext[field], text)
                query += '* FROM %s WHERE %s LIKE \'%s\'' %(table, vtext[field], text)
                counter += 1
             else:
