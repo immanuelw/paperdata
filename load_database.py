@@ -141,14 +141,20 @@ for root, dirs, files in os.walk(datanum):
 				#gives each file unique id FIX WITH OBSNUM!
 				obsnum = jdpol2obsnum(jdate,polarization,length)
 
+				#location of raw files
+				raw_location = 'NULL' #do not know where they are for any of them yet
+
 				#location of calibrate files
                                 if datanum == data32:
 					cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
                                 elif datanum == data64:
 					cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
 
+				#vairable indicating if all files have been successfully compressed in one day
+				ready_to_tape = False
+
 				#create list of important data and open csv file
-				databs = [[filename,location,antennas,obsnum,jday,jdate,polarization,length,cal_location,str(sz)]]
+				databs = [[filename,location,antennas,obsnum,jday,jdate,polarization,length,raw_location,cal_location,str(sz),ready_to_tape]]
 			#	datab = [[filename,location,antennas,id,jday,jdate,cal_location,str(sz)]]
 				print databs 
 
