@@ -21,7 +21,7 @@ count_complete = 0
 jday_results = []
 
 #checks if files of the same Julian Date have all completed compression
-def complete_check(count_jday, count_complete):
+def complete_check(count_jday, count_complete, jday_results):
         if count_jday == count_complete and not count_jday == 0:
                 ready_to_tape = True
                 for items in jday_results:
@@ -92,7 +92,7 @@ while True:
 			'''%(table, compressed, compr_value, obsnum_string, obsnum)) 
 			###change so %d if number or %s if string entry!!!
 		else:
-			complete_check(count_jday, count_complete)	
+			complete_check(count_jday, count_complete, jday_results)	
 			jday_results = []
 			jday_results.append(items)
 			julian_day = j_day
