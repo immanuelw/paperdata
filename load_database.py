@@ -156,8 +156,8 @@ for root, dirs, files in os.walk(datanum):
 					wr.writerow(item)
 
 #Load data
-table = raw_input('Load data into table named:')
 datab = raw_input('Database:')
+table = raw_input('Load data into table named:')
 pswd = getpass.getpass('Password:')
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
