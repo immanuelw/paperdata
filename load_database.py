@@ -30,10 +30,11 @@ def sizeof_fmt(num):
 		num /= 1024.0
 	return "%3.1f%s" % (num, 'TB')
 
-db = raw_input('32 or 64?: ')
+db = raw_input('32, 64, or 128?: ')
 
 data32 = '/data4/raw_data/'
 data64 = '/data4/paper/2012EoR/psa_live/'
+data128 = ''
 
 db32 = '/data2/home/immwa/scripts/paper_output/db_output32.csv'
 db64 = '/data2/home/immwa/scripts/paper_output/db_output64.csv'
@@ -46,6 +47,9 @@ if db == '32':
 elif db == '64':
 	datanum = data64
 	dbnum = db64
+elif db == '128':
+	datanum = data128
+	dbnum = db128
 
 resultFile = open(dbnum,'wb')
 
@@ -54,15 +58,15 @@ wr = csv.writer(resultFile, dialect='excel')
 
 #create function to uniquely identify files
 def jdpol2obsnum(jd,pol,djd):
-    """
-    input: julian date float, pol string. and length of obs in fraction of julian date
-    output: a unique index
-    """
-    dublinjd = jd - 2415020  #use Dublin Julian Date
-    obsint = int(dublinjd/djd)  #divide up by length of obs
-    polnum = A.miriad.str2pol[pol]+10
-    assert(obsint < 2**31)
-    return int(obsint + polnum*(2**32))
+	"""
+	input: julian date float, pol string. and length of obs in fraction of julian date
+	output: a unique index
+	"""
+	dublinjd = jd - 2415020  #use Dublin Julian Date
+	obsint = int(dublinjd/djd)  #divide up by length of obs
+	polnum = A.miriad.str2pol[pol]+10
+	assert(obsint < 2**31)
+	return int(obsint + polnum*(2**32))
 
 
 #iterates through directories, listing information about each one
@@ -72,6 +76,10 @@ for root, dirs, files in os.walk(datanum):
 		datatruth = len(root) > 26 and len(root) < 34 and root[16] =='p'
 	elif db == '64':
 		datatruth = len(root) > 36 and len(root) < 64 and root[30] == 'p'
+	elif db == '128':
+		#need to change to 128 specifications
+		datatruth = len(root) > 36 and len(root) < 64 and root[30] == 'p'
+
 	if datatruth:
 		for dir in dirs:
 			#if filename ends with uvcRRE, record into file
