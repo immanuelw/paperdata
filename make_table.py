@@ -31,7 +31,8 @@ data_length VARCHAR(10) DEFAULT NULL,
 compressed BOOLEAN DEFAULT FALSE,
 raw_location VARCHAR(100) DEFAULT NULL,
 cal_location VARCHAR(100) DEFAULT NULL,
-file_size VARCHAR(15) DEFAULT NULL);''' %(table))
+file_size VARCHAR(15) DEFAULT NULL)
+ready_to_tape BOOLEAN DEFAULT FALSE;''' %(table))
 
 # fetch a single row using fetchone() method.
 row = cursor.fetchone()
