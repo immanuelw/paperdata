@@ -132,7 +132,8 @@ for root, dirs, files in os.walk(datanum):
 					elif uv['pol'] == -8:
 						polarization = 'yx' 
 				elif uv['npol'] == 4:
-					polarization = 'all'
+				#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
+				polarization = 'yy'
 
 				#indicates length of information in file
 				length = uv['inttime'] 
@@ -156,7 +157,8 @@ for root, dirs, files in os.walk(datanum):
 					wr.writerow(item)
 
 #Load data
-datab = raw_input('Database:')
+#datab = raw_input('Database:')
+datab = 'paperdata'
 table = raw_input('Load data into table named:')
 pswd = getpass.getpass('Password:')
 # open a database connection
