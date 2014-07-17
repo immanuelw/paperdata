@@ -23,7 +23,7 @@ cursor.execute('''CREATE TABLE %s (
 filename VARCHAR(100) DEFAULT NULL,
 location VARCHAR(100) DEFAULT NULL,
 antennas INT DEFAULT NULL,
-obsnum INT DEFAULT NULL,
+obsnum BIGINT(20) DEFAULT NULL,
 julian_day INT DEFAULT NULL,
 julian_date DECIMAL(16,8) DEFAULT NULL,
 polarization VARCHAR(4) DEFAULT NULL,
