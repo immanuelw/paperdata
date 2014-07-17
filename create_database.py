@@ -100,9 +100,9 @@ for root, dirs, files in os.walk(datanum):
 
 				#indicates julian day
 				if datanum == data32:
-					jday = location[-28:-25]
+					jday = int(str(jdate)[4:7])
 				elif datanum == data64:
-					jday = location[-29:-25]
+					jday = int(str(jdate)[3:7])
 
 				#indicates set of data used
 				if datanum == data32:
