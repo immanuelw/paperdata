@@ -10,7 +10,7 @@ import getpass
 table = raw_input('Create table named:')
 datab = raw_input('Database:')
 pswd = getpass.getpass('Password:')
-qry = sys.argv[1]
+
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
 connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = datab, local_infile=True)
