@@ -7,8 +7,10 @@ import MySQLdb
 import sys
 import getpass
 
+
+#datab = raw_input('Database:')
+datab = 'paperdata'
 table = raw_input('Create table named:')
-datab = raw_input('Database:')
 pswd = getpass.getpass('Password:')
 
 # open a database connection
