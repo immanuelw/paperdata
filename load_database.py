@@ -133,7 +133,7 @@ for root, dirs, files in os.walk(datanum):
 						polarization = 'yx' 
 				elif uv['npol'] == 4:
 				#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
-				polarization = 'yy'
+					polarization = 'yy'
 
 				#indicates length of information in file
 				length = uv['inttime'] 
