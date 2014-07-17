@@ -60,6 +60,8 @@ cursor = connection.cursor()
 
 #results is a list of lists
 for items in results:
+
+	count_jday = len(jday_results)
 	#sets value of initial julian day found
 	if count_jday == 0:
 		julian_day = int(str(items[2])[3:7]) #error if psa32
@@ -70,7 +72,6 @@ for items in results:
 
 	#counts amount of files with same Julian Day
 	if j_day == julian_day:
-		count_jday += 1
 		jday_results.append(items)
 		#checks if file is done compression
 	        if items[1] == 'COMPLETE':
@@ -92,7 +93,7 @@ for items in results:
 		jday_results = []
 		jday_results.append(items)
 		julian_day = j_day
-		count_jday = 1
+		count_jday = 0
 		count_complete = 0
 		items[1] == 'COMPLETE':
                         compr_value = True
