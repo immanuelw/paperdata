@@ -138,8 +138,11 @@ for root, dirs, files in os.walk(datanum):
 				#indicates length of information in file
 				length = uv['inttime'] 
 
+				#variable to input into jdpol2obsnum
+				divided_jdate = length/jdate
+
 				#gives each file unique id FIX WITH OBSNUM!
-				obsnum = jdpol2obsnum(jdate,polarization,length)
+				obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
 
 				#location of raw files
 				raw_location = 'NULL' #do not know where they are for any of them yet
