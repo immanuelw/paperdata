@@ -32,6 +32,10 @@ def sizeof_fmt(num):
 
 db = raw_input('32, 64, or 128?: ')
 
+datab = 'paperdata'
+#table = raw_input('Load data into table named:')
+pswd = getpass.getpass('Password:')
+
 data32 = '/data4/raw_data/'
 data64 = '/data4/paper/2012EoR/psa_live/'
 data128 = ''
@@ -44,12 +48,15 @@ db128 = '/data2/home/immwa/scripts/paper_output/db_output128.csv'
 if db == '32':
 	datanum = data32
 	dbnum = db32
+	table_name = 'psa32'
 elif db == '64':
 	datanum = data64
 	dbnum = db64
+	table_name = 'psa64'
 elif db == '128':
 	datanum = data128
 	dbnum = db128
+	table_name = 'psa128'
 
 resultFile = open(dbnum,'wb')
 
@@ -139,7 +146,7 @@ for root, dirs, files in os.walk(datanum):
 				length = uv['inttime'] 
 
 				#variable to input into jdpol2obsnum
-				divided_jdate = length/jdate
+				divided_jdate = length
 
 				#gives each file unique id FIX WITH OBSNUM!
 				obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
@@ -167,9 +174,9 @@ for root, dirs, files in os.walk(datanum):
 
 #Load data
 #datab = raw_input('Database:')
-datab = 'paperdata'
-table = raw_input('Load data into table named:')
-pswd = getpass.getpass('Password:')
+#datab = 'paperdata'
+#table = raw_input('Load data into table named:')
+#pswd = getpass.getpass('Password:')
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
 connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = datab, local_infile=True)
@@ -177,12 +184,12 @@ connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = datab, loca
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
 
-print resultFile 
+print dbnum 
 # execute the SQL query using execute() method.
 cursor.execute('''USE paperdata;
 LOAD DATA LOCAL INFILE '%s' INTO TABLE %s
 COLUMNS TERMINATED BY ','
-LINES TERMINATED BY '\n' '''%(resultFile, table))
+LINES TERMINATED BY '\n' '''%(dbnum, table_name))
 
 print 'Table data loaded.'
 
