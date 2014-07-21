@@ -163,7 +163,7 @@ for root, dirs, files in os.walk(datanum):
 				#variable to input into jdpol2obsnum
 				divided_jdate = length
 
-				#gives each file unique id FIX WITH OBSNUM!
+				#gives each file unique id
 				obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
 
 				#location of raw files

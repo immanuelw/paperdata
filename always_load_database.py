@@ -14,6 +14,10 @@ import aipy as A
 
 #WILL NOT WORK UNLESS AIPY.MIRIAD.STR2POL ALTERED OR FILE ALREADY SEPARATED BY POLARIZATION
 
+t_min = 0
+t_max = 0
+n_times = 0
+c_time = 0
 
 def get_size(start_path):
 	total_size = 0
@@ -140,9 +144,21 @@ while True:
 						polarization = 'all'
 
 					#indicates length of information in file
-					length = uv['inttime'] 
+					#length = uv['inttime'] 
 
-					#gives each file unique id FIX WITH OBSNUM!
+					for (uvw, t, (i,j)),d in uv.all():
+                                        if t_min == 0 or t < t_min:
+                                                t_min = t
+                                        if t_max == 0 or t > t_max:
+                                                t_max = t
+                                        if c_time != t:
+                                                c_time = t
+                                                n_times += 1
+
+	                                dt = (t_min - t_max)/(n_times - 1)
+	                                length = n_times * dt
+
+					#gives each file unique id
 					obsnum = jdpol2obsnum(jdate,polarization,length)
 
 					#location of calibrate files
