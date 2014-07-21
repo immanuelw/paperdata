@@ -14,6 +14,10 @@ import aipy as A
 
 #WILL NOT WORK UNLESS AIPY.MIRIAD.STR2POL ALTERED OR FILE ALREADY SEPARATED BY POLARIZATION
 
+t_min = 0
+t_max = 0
+n_times = 0
+c_time = 0
 
 def get_size(start_path):
 	total_size = 0
@@ -143,7 +147,18 @@ for root, dirs, files in os.walk(datanum):
 					polarization = 'yy'
 
 				#indicates length of information in file
-				length = uv['inttime'] 
+				#length = uv['inttime'] 
+				for (uvw, t (i,j)),d in uv.all():
+					if t_min == 0 or t < t_min:
+						t_min = t
+					if t_max == 0 or t > t_max:
+                                                t_max = t
+					if c_time != t:
+						c_time = t
+						n_times += 1
+
+				dt = (t_min - t_max)/(n_times - 1)
+				length = n_times * dt
 
 				#variable to input into jdpol2obsnum
 				divided_jdate = length
