@@ -146,6 +146,11 @@ while True:
 					#indicates length of information in file
 					#length = uv['inttime'] 
 
+					t_min = 0
+					t_max = 0
+					n_times = 0
+					c_time = 0
+
 					for (uvw, t, (i,j)),d in uv.all():
                                         if t_min == 0 or t < t_min:
                                                 t_min = t
