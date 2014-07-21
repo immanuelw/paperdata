@@ -163,7 +163,7 @@ for root, dirs, files in os.walk(datanum):
 						c_time = t
 						n_times += 1
 
-				dt = (t_min - t_max)/(n_times - 1)
+				dt = -(t_min - t_max)/(n_times - 1)
 				length = n_times * dt
 
 				#variable to input into jdpol2obsnum
