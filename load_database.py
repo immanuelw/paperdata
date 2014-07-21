@@ -148,7 +148,7 @@ for root, dirs, files in os.walk(datanum):
 
 				#indicates length of information in file
 				#length = uv['inttime'] 
-				for (uvw, t (i,j)),d in uv.all():
+				for (uvw, t, (i,j)),d in uv.all():
 					if t_min == 0 or t < t_min:
 						t_min = t
 					if t_max == 0 or t > t_max:
