@@ -163,14 +163,21 @@ for root, dirs, files in os.walk(datanum):
 						c_time = t
 						n_times += 1
 
-				dt = -(t_min - t_max)/(n_times - 1)
+				if n_times > 1:
+					dt = -(t_min - t_max)/(n_times - 1)
+				else:
+					dt = -(t_min - t_max)/(n_times)
+
 				length = n_times * dt
 
 				#variable to input into jdpol2obsnum
 				divided_jdate = length
 
 				#gives each file unique id
-				obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
+				if length > 0:
+					obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
+				else:
+					obsnum = 0
 
 				#location of raw files
 				raw_location = 'NULL' #do not know where they are for any of them yet
