@@ -99,6 +99,7 @@ for root, dirs, files in os.walk(datanum):
 				#rt = root[0:24]
 
 				location = os.path.join(root, dir)
+				print location
 
 				#indicates size of file
 				sz = sizeof_fmt(get_size(location))
