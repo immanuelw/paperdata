@@ -42,7 +42,7 @@ pswd = getpass.getpass('Password:')
 
 data32 = '/data4/raw_data/'
 data64 = '/data4/paper/2012EoR/psa_live/'
-data128 = ''
+data128 = '/data4/paper/128_sim_data'
 
 db32 = '/data2/home/immwa/scripts/paper_output/db_output32.csv'
 db64 = '/data2/home/immwa/scripts/paper_output/db_output64.csv'
@@ -89,7 +89,8 @@ for root, dirs, files in os.walk(datanum):
 		datatruth = len(root) > 36 and len(root) < 64 and root[30] == 'p'
 	elif db == '128':
 		#need to change to 128 specifications
-		datatruth = len(root) > 36 and len(root) < 64 and root[30] == 'p'
+		#datatruth = len(root) > 36 and len(root) < 64 and root[30] == 'p'
+		datatruth = len(root) >	15
 
 	if datatruth:
 		for dir in dirs:
@@ -123,12 +124,16 @@ for root, dirs, files in os.walk(datanum):
 					jday = int(str(jdate)[4:7])
 				elif datanum == data64:
 					jday = int(str(jdate)[3:7])
+				elif datanum == data128:
+					jday = int(str(jdate)[3:7])	
 
 				#indicates set of data used
 				if datanum == data32:
 					antennas = 32
 				elif datanum == data64:
 					antennas = 64
+				elif datanum == data128:
+					antennas = 128
 
 				#indicates name of file to be used
 				filename = dir
@@ -188,6 +193,8 @@ for root, dirs, files in os.walk(datanum):
 					cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
                                 elif datanum == data64:
 					cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
+				elif datanum == data128:
+					cal_location = 'NULL'
 
 				#vairable indicating if all files have been successfully compressed in one day
 				ready_to_tape = False
