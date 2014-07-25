@@ -175,6 +175,8 @@ for root, dirs, files in os.walk(datanum):
 					dt = -(t_min - t_max)/(n_times)
 
 				length = n_times * dt
+				#round so fits obsnum
+				length = round(length, 5)
 
 				#variable to input into jdpol2obsnum
 				divided_jdate = length
