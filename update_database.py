@@ -7,7 +7,6 @@ import MySQLdb
 import sys
 import getpass
 
-datab = raw_input('Database:')
 table = raw_input('Update data in table named:')
 pswd = getpass.getpass('Password:')
 
@@ -26,6 +25,7 @@ def complete_check(count_jday, count_complete, jday_results):
                 ready_to_tape = True
                 for items in jday_results:
                         obsnum = items[0]
+			print ready_to_tape
                         # execute the SQL query using execute() method.
                         cursor.execute('''
                         UPDATE %s
@@ -36,12 +36,12 @@ def complete_check(count_jday, count_complete, jday_results):
 #need way to get compr_value and obsnum from paperdistiller 
 
 # open a database connection
-connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = 'paperdistiller', local_infile=True)
+connection = MySQLdb.connect (host = 'shredder', user = 'jaguirre', passwd = pswd, db = 'paperdistiller', local_infile=True)
 
 cursor = connection.cursor()
 
 # execute the SQL query using execute() method.
-cursor.execute('SELECT obsnum, status, julian_date from observations order by julian_date')
+cursor.execute('SELECT obsnum, status, julian_date from observation order by julian_date')
 
 #collects information from query
 results = cursor.fetchall()
@@ -53,7 +53,7 @@ connection.close()
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = datab, local_infile=True)
+connection = MySQLdb.connect (host = 'shredder', user = 'jaguirre', passwd = pswd, db = 'paperdata', local_infile=True)
 
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
@@ -65,7 +65,7 @@ for items in results:
 	#sets value of initial julian day found
 	if count_jday == 0:
 		julian_day = int(str(items[2])[3:7]) #error if psa32
-	
+		
         obsnum = items[0]
 
 	j_day = int(str(items[2])[3:7])
@@ -76,6 +76,7 @@ for items in results:
 		#checks if file is done compression
 	        if items[1] == 'COMPLETE':
 	                compr_value = True
+			#print compr_value
 			#counts amount of files complete
 			count_complete += 1
 	        else:
@@ -95,7 +96,7 @@ for items in results:
 		julian_day = j_day
 		count_jday = 0
 		count_complete = 0
-		items[1] == 'COMPLETE':
+		if items[1] == 'COMPLETE':
                         compr_value = True
                         count_complete += 1
                 else:
@@ -107,6 +108,7 @@ for items in results:
                 WHERE %s = %d;
                 '''%(table, compressed, compr_value, obsnum_string, obsnum))
 
+complete_check(count_jday, count_complete, jday_results)
 print 'Table data updated.'
 
 # close the cursor object
