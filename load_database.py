@@ -48,6 +48,8 @@ db32 = '/data2/home/immwa/scripts/paper_output/db_output32.csv'
 db64 = '/data2/home/immwa/scripts/paper_output/db_output64.csv'
 db128 = '/data2/home/immwa/scripts/paper_output/db_output128.csv'
 
+host = 'folio'
+
 #searches for only particular files
 if db == '32':
 	datanum = data32
@@ -85,7 +87,7 @@ def jdpol2obsnum(jd,pol,djd):
 
 #iterates through directories, listing information about each one
 for root, dirs, files in os.walk(datanum):
-	#newname indicates directory right before filename
+	#brute force check to avoid other files within searched directories
 	if db =='32':
 		datatruth = len(root) > 26 and len(root) < 34 and root[16] =='p'
 	elif db == '64':
@@ -100,10 +102,8 @@ for root, dirs, files in os.walk(datanum):
 			#if filename ends with uvcRRE, record into file
 			if dir[-6:] == 'uvcRRE' and len(dir) > 6:
 				#indicates name of full directory
-				#rt = root[0:24]
-
-				location = os.path.join(root, dir)
-				print location
+				path = os.path.join(root, dir)
+				print path
 
 				#indicates size of file
 				sz = sizeof_fmt(get_size(location))
@@ -132,14 +132,14 @@ for root, dirs, files in os.walk(datanum):
 
 				#indicates set of data used
 				if datanum == data32:
-					antennas = 32
+					era = 32
 				elif datanum == data64:
-					antennas = 64
+					era = 64
 				elif datanum == data128:
-					antennas = 128
+					era = 128
 
 				#indicates name of file to be used
-				filename = dir
+				#filename = dir
 
 				#assign letters to each polarization
 				if uv['npol'] == 1:
@@ -201,12 +201,17 @@ for root, dirs, files in os.walk(datanum):
 				elif datanum == data128:
 					cal_location = 'NULL'
 
-				#vairable indicating if all files have been successfully compressed in one day
+				#indicates if file is compressed
+				compressed = True
+
+				#variable indicating if all files have been successfully compressed in one day
 				ready_to_tape = False
 
+				#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
+				ready_to_delete = False
+
 				#create list of important data and open csv file
-				databs = [[filename,location,antennas,obsnum,jday,jdate,polarization,length,raw_location,cal_location,str(sz),ready_to_tape]]
-			#	datab = [[filename,location,antennas,id,jday,jdate,cal_location,str(sz)]]
+				databs = [[host,path,era,obsnum,jday,jdate,polarization,length,raw_location,cal_location,str(sz),ready_to_tape]]
 				print databs 
 
 				#write to csv file by item in list
