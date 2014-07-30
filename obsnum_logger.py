@@ -8,8 +8,8 @@ import sys
 import getpass
 import csv
 
-#table = 'paperdata'
-table = raw_input('Input table name: ')
+table = 'paperdata'
+#table = raw_input('Input table name: ')
 usrnm = raw_input('Root username: ')
 pswd = getpass.getpass('Root password: ')
 
@@ -17,8 +17,8 @@ raw = 'raw_location'
 obsnum_string = 'obsnum'
 delt = 'ready_to_delete'
 
-#filename = '/data2/home/immwa/scripts/paper/jd_obsnum.csv'
-filename = '/data2/home/immwa/scripts/paper/jd_obsnum_%s.csv'%(table)
+filename = '/data2/home/immwa/scripts/paper/jd_obsnum.csv'
+#filename = '/data2/home/immwa/scripts/paper/jd_obsnum_%s.csv'%(table)
 
 resultFile = open(filename,'wb')
 wr = csv.writer(resultFile, dialect='excel')
@@ -31,9 +31,9 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 cursor = connection.cursor()
 
 #execute MySQL query
-#cursor.execute('SELECT julian_date, obsnum from paperdata order by julian_day')
+cursor.execute('SELECT julian_date, obsnum from paperdata order by julian_day')
 
-cursor.execute('SELECT julian_date, obsnum from %s order by julian_date' %(table))
+#cursor.execute('SELECT julian_date, obsnum from %s order by julian_date' %(table))
 
 #collects information from query
 results = cursor.fetchall()
