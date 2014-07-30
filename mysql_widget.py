@@ -6,13 +6,13 @@ import os
 
 #initalize lists to create gui with
 
-fields = 'file name', 'location', 'antennas', 'obsnum', 'Julian Day', 'Julian Date', 'polarization', 'Length of data', 'raw location', 'Calibrate file', 'file size'
+fields = 'host', 'path', 'era', 'obsnum', 'Julian Day', 'Julian Date', 'polarization', 'Length of data', 'raw location', 'Calibrate file', 'file size'
 
 mins = 'N/A', 'N/A', 'min', 'min', 'min', 'min', 'N/A', 'min', 'N/A', 'N/A', 'N/A'
 
 maxs = 'N/A', 'N/A', 'max', 'max', 'max', 'max', 'N/A', 'max', 'N/A', 'N/A', 'N/A'
 
-vtext = {fields[0]:'filename', fields[1]:'location', fields[2]:'antennas', fields[3]:'obsnum', fields[4]:'julian_day', fields[5]:'julian_date', fields[6]:'polarization', fields[7]:'data_length', fields[8]:'raw_location', fields[9]:'cal_location', fields[10]:'file_size'}
+vtext = {fields[0]:'host', fields[1]:'path', fields[2]:'era', fields[3]:'obsnum', fields[4]:'julian_day', fields[5]:'julian_date', fields[6]:'polarization', fields[7]:'data_length', fields[8]:'raw_location', fields[9]:'cal_location', fields[10]:'file_size'}
 
 #allows user to input table queried
 table = raw_input('Search table named:') 
