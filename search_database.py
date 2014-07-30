@@ -11,13 +11,13 @@ import os
 
 #initalize lists to create gui with
 
-fields = 'filename', 'location', 'antennas', 'obsnum', 'Julian Day', 'Julian Date', 'polarization', 'Length of data', 'raw location', 'Calibrate file', 'file size'
+fields = 'host', 'path', 'era', 'obsnum', 'Julian Day', 'Julian Date', 'polarization', 'Length of data', 'raw location', 'Calibrate file', 'file size'
 
 mins = 'N/A', 'N/A', 'min', 'min', 'min', 'min', 'N/A', 'min', 'N/A', 'N/A', 'N/A'
 
 maxs = 'N/A', 'N/A', 'max', 'max', 'max', 'max', 'N/A', 'max', 'N/A', 'N/A', 'N/A'
 
-vtext = {fields[0]:'filename', fields[1]:'location', fields[2]:'antennas', fields[3]:'obsnum', fields[4]:'julian_day', fields[5]:'julian_date', fields[6]:'polarization', fields[7]:'data_length', fields[8]:'raw_location', fields[9]:'cal_location', fields[10]:'file_size'}
+vtext = {fields[0]:'host', fields[1]:'path', fields[2]:'era', fields[3]:'obsnum', fields[4]:'julian_day', fields[5]:'julian_date', fields[6]:'polarization', fields[7]:'data_length', fields[8]:'raw_location', fields[9]:'cal_location', fields[10]:'file_size'}
 
 #allows user to input database and table queried
 datab = raw_input('Database:')
@@ -53,17 +53,6 @@ def dbsearch(query):
 
    # exit the program
    #sys.exit()
-
-#creates list of fields to be searched
-#field_list = []
-#while True:
-# field_name = raw_input('Input field name:')
-# if field_name == ''
-# break
-# field_list.append(field_name)
-
-#make field_list into string
-#field_string = str(field_list).strip('[]')
 
 #perform action: print all non-empty fields and concatenate into mysql string
 def fetch(entries):
