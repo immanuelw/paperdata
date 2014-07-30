@@ -138,6 +138,9 @@ for root, dirs, files in os.walk(datanum):
 				elif datanum == data128:
 					era = 128
 
+				#indicates type of file in era
+				era_type = 'NULL'
+
 				#indicates name of file to be used
 				#filename = dir
 
@@ -211,7 +214,7 @@ for root, dirs, files in os.walk(datanum):
 				ready_to_delete = False
 
 				#create list of important data and open csv file
-				databs = [[host,path,era,obsnum,jday,jdate,polarization,length,raw_location,cal_location,str(sz),ready_to_tape]]
+				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,str(sz),ready_to_tape]]
 				print databs 
 
 				#write to csv file by item in list
