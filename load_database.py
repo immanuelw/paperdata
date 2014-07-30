@@ -11,14 +11,13 @@ import inspect
 import csv
 import aipy as A
 
-
-#WILL NOT WORK UNLESS AIPY.MIRIAD.STR2POL ALTERED OR FILE ALREADY SEPARATED BY POLARIZATION
-
+#counting variables
 t_min = 0
 t_max = 0
 n_times = 0
 c_time = 0
 
+#Functions which simply find the file size of the .uvcRRE files
 def get_size(start_path):
 	total_size = 0
 	for dirpath, dirnames, filenames in os.walk(start_path):
@@ -34,11 +33,12 @@ def sizeof_fmt(num):
 		num /= 1024.0
 	return "%3.1f%s" % (num, 'TB')
 
+#User input information
 db = raw_input('32, 64, or 128?: ')
 
 datab = 'paperdata'
-#table = raw_input('Load data into table named:')
-pswd = getpass.getpass('Password:')
+usrnm = raw_input('Username: ')
+pswd = getpass.getpass('Password: ')
 
 data32 = '/data4/raw_data/'
 data64 = '/data4/paper/2012EoR/psa_live/'
@@ -52,15 +52,18 @@ db128 = '/data2/home/immwa/scripts/paper_output/db_output128.csv'
 if db == '32':
 	datanum = data32
 	dbnum = db32
-	table_name = 'psa32'
+	#table_name = 'psa32'
 elif db == '64':
 	datanum = data64
 	dbnum = db64
-	table_name = 'psa64'
+	#table_name = 'psa64'
 elif db == '128':
 	datanum = data128
 	dbnum = db128
-	table_name = 'psa128'
+	#table_name = 'psa128'
+
+#combined all eras into one table
+table_name = 'paperdata'
 
 resultFile = open(dbnum,'wb')
 
@@ -210,14 +213,11 @@ for root, dirs, files in os.walk(datanum):
 				for item in databs:
 					wr.writerow(item)
 
-#Load data
-#datab = raw_input('Database:')
-#datab = 'paperdata'
-#table = raw_input('Load data into table named:')
-#pswd = getpass.getpass('Password:')
+#Load data into named database and table
+
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = datab, local_infile=True)
+connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = datab, local_infile=True)
 
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
