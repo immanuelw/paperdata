@@ -6,7 +6,7 @@
 import MySQLdb
 import sys
 import getpass
-import shutil
+import csv
 
 table = 'paperdata'
 usrnm = raw_input('Root username: ')
@@ -14,10 +14,10 @@ pswd = getpass.getpass('Root password: ')
 
 raw = 'raw_location'
 obsnum_string = 'obsnum'
-delt = 'delete_file'
+delt = 'ready_to_delete'
 
-raw_value = 'NULL'
-deletion = []
+resultFile = open('/data2/home/immwa/scripts/paper/jd_obsnum.csv' ,'wb')
+wr = csv.writer(resultFile, dialect='excel')
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
@@ -27,30 +27,15 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 cursor = connection.cursor()
 
 #execute MySQL query
-cursor.execute('SELECT julian_day, obsnum, raw_location, tape_location, ready_to_delete from paperdata order by julian_day')
+cursor.execute('SELECT julian_day, obsnum from paperdata order by julian_day')
 
 #collects information from query
 results = cursor.fetchall()
 
 #results is a list of lists
 for items in results:
-	obsnum = items[1]
-	if items[4] == True and not items[3] == 'NULL' and not items[2] == 'NULL':
-		deletion.append(items[2])
-		del_value = False
-
-		# execute the SQL query using execute() method.
-		cursor.execute('''
-		UPDATE %s
-		SET %s = %s, %s = %s
-		WHERE %s = %d;
-		'''%(table, delt, del_value, raw, raw_value, obsnum_string, obsnum)) 
-
-#loops through list and deletes raw files scheduled for deletion
-for item in deletion:
-	shutil.rmtree(item)
-
-print 'Table data updated.'
+	wr.writerow(items)
+print 'Obsnums logged'
 
 # close the cursor object
 cursor.close()
