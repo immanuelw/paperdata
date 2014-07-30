@@ -7,7 +7,7 @@ import MySQLdb
 import sys
 import getpass
 
-table = raw_input('Update data in table named:')
+table = 'paperdata'
 usrnm = raw_input('Root username: ')
 pswd = getpass.getpass('Root password: ')
 

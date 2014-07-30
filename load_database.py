@@ -207,6 +207,9 @@ for root, dirs, files in os.walk(datanum):
 				#indicates if file is compressed
 				compressed = True
 
+				#shows location of raw data on tape
+				tape_location = 'NULL'
+
 				#variable indicating if all files have been successfully compressed in one day
 				ready_to_tape = False
 
@@ -214,7 +217,7 @@ for root, dirs, files in os.walk(datanum):
 				ready_to_delete = False
 
 				#create list of important data and open csv file
-				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,str(sz),ready_to_tape]]
+				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,compressed,str(sz),ready_to_tape,ready_to_delete]]
 				print databs 
 
 				#write to csv file by item in list
