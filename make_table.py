@@ -35,7 +35,7 @@ data_length DECIMAL(20,15) DEFAULT NULL,
 raw_location VARCHAR(100) DEFAULT NULL,
 cal_location VARCHAR(100) DEFAULT NULL,
 file_size VARCHAR(15) DEFAULT NULL,
-compressed BOOLEAN DEFAULT NULL,
+compressed BOOLEAN DEFAULT FALSE,
 ready_to_tape BOOLEAN DEFAULT FALSE,
 delete_file BOOLEAN DEFAULT FALSE);''' %(table))
 
