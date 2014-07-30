@@ -214,10 +214,10 @@ for root, dirs, files in os.walk(datanum):
 				ready_to_tape = False
 
 				#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
-				ready_to_delete = False
+				delete_file = False
 
 				#create list of important data and open csv file
-				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,compressed,str(sz),ready_to_tape,ready_to_delete]]
+				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,compressed,str(sz),ready_to_tape,delete_file]]
 				print databs 
 
 				#write to csv file by item in list
