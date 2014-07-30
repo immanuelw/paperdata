@@ -8,7 +8,8 @@ import sys
 import getpass
 
 table = raw_input('Update data in table named:')
-pswd = getpass.getpass('Password:')
+usrnm = raw_input('Root username: ')
+pswd = getpass.getpass('Root password: ')
 
 compressed = 'compressed'
 obsnum_string = 'obsnum'
@@ -36,7 +37,7 @@ def complete_check(count_jday, count_complete, jday_results):
 #need way to get compr_value and obsnum from paperdistiller 
 
 # open a database connection
-connection = MySQLdb.connect (host = 'shredder', user = 'jaguirre', passwd = pswd, db = 'paperdistiller', local_infile=True)
+connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdistiller', local_infile=True)
 
 cursor = connection.cursor()
 
@@ -53,7 +54,7 @@ connection.close()
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = 'jaguirre', passwd = pswd, db = 'paperdata', local_infile=True)
+connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
