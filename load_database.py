@@ -106,15 +106,15 @@ for root, dirs, files in os.walk(datanum):
 				print path
 
 				#indicates size of file
-				sz = sizeof_fmt(get_size(location))
+				sz = sizeof_fmt(get_size(path))
 
-				visdata = os.path.join(location, 'visdata')
+				visdata = os.path.join(path, 'visdata')
 				if not os.path.isfile(visdata):
 					continue
 
                                 #allows uv access
 				try:
-	                               uv = A.miriad.UV(location)
+	                               uv = A.miriad.UV(path)
 				except:
 					continue	
 
@@ -217,7 +217,7 @@ for root, dirs, files in os.walk(datanum):
 				delete_file = False
 
 				#create list of important data and open csv file
-				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,compressed,str(sz),ready_to_tape,delete_file]]
+				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,str(sz),compressed,ready_to_tape,delete_file]]
 				print databs 
 
 				#write to csv file by item in list

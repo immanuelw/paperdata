@@ -29,7 +29,7 @@ cursor = connection.cursor()
 #execute MySQL query
 #cursor.execute('SELECT julian_date, data_length from paperdata order by julian_day')
 
-cursor.execute('SELECT julian_date, data_length from %s order by julian_date' %(table))
+cursor.execute('SELECT location, data_length from %s order by julian_date' %(table))
 
 #collects information from query
 results = cursor.fetchall()
@@ -37,7 +37,7 @@ results = cursor.fetchall()
 #results is a list of lists
 for items in results:
 	wr.writerow(items)
-print 'Obsnums logged'
+print 'Lengths logged'
 
 # close the cursor object
 cursor.close()

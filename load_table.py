@@ -23,7 +23,7 @@ print sys.argv[1]
 cursor.execute('''USE paperdata;
 LOAD DATA LOCAL INFILE '%s' INTO TABLE %s
 COLUMNS TERMINATED BY ','
-LINES TERMINATED BY '\n' '''%(sys.argv[1], table]))
+LINES TERMINATED BY '\n' '''%(sys.argv[1], table))
 
 print 'Table data loaded.'
 

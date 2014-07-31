@@ -11,12 +11,6 @@ import inspect
 import csv
 import aipy as A
 
-#counting variables
-t_min = 0
-t_max = 0
-n_times = 0
-c_time = 0
-
 #Functions which simply find the file size of the .uvcRRE files
 def get_size(start_path):
 	total_size = 0
@@ -73,14 +67,22 @@ resultFile = open(dbnum,'wb')
 wr = csv.writer(resultFile, dialect='excel')
 
 table = raw_input('Information from table: ')
+
+jdict = {}
+jlen = {}
+
 #read in csv file to create fast dictionary of obsnum files
 with open('/data2/home/immwa/scripts/paper/jd_obsnum_%s.csv'%(table), mode='r') as infile:
 	reader = csv.reader(infile,)
-	jdict = {rows[0]:rows[1] for rows in reader if len(rows) == 2}
+	for rows in reader:
+		if len(rows) == 2:
+			jdict.update({rows[0]:rows[1]})
 
 with open('/data2/home/immwa/scripts/paper/jd_length_%s.csv'%(table), mode='r') as infile:
         reader = csv.reader(infile,)
-        jlen = {rows[0]:rows[1] for rows in reader if len(rows) == 2}
+	for rows in reader:
+		if len(rows) == 2:
+		        jlen.update({rows[0]:rows[1]})
 
 #create function to uniquely identify files
 def jdpol2obsnum(jd,pol,djd):
@@ -116,15 +118,15 @@ for root, dirs, files in os.walk(datanum):
 				print path
 
 				#indicates size of file
-				sz = sizeof_fmt(get_size(location))
+				sz = sizeof_fmt(get_size(path))
 
-				visdata = os.path.join(location, 'visdata')
+				visdata = os.path.join(path, 'visdata')
 				if not os.path.isfile(visdata):
 					continue
 
                                 #allows uv access
 				try:
-	                               uv = A.miriad.UV(location)
+	                               uv = A.miriad.UV(path)
 				except:
 					continue	
 
@@ -151,9 +153,6 @@ for root, dirs, files in os.walk(datanum):
 				#indicates type of file in era
 				era_type = 'NULL'
 
-				#indicates name of file to be used
-				#filename = dir
-
 				#assign letters to each polarization
 				if uv['npol'] == 1:
 					if uv['pol'] == -5:
@@ -168,30 +167,11 @@ for root, dirs, files in os.walk(datanum):
 				#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
 					polarization = 'yy'
 
-				#indicates length of information in file
-				#length = uv['inttime'] 
+				#print jdate
+				#print round(jdate,5)
 
-				t_min = 0
-				t_max = 0
-				n_times = 0
-				c_time = 0
-
-				for (uvw, t, (i,j)),d in uv.all():
-					if t_min == 0 or t < t_min:
-						t_min = t
-					if t_max == 0 or t > t_max:
-                                                t_max = t
-					if c_time != t:
-						c_time = t
-						n_times += 1
-
-				if n_times > 1:
-					dt = -(t_min - t_max)/(n_times - 1)
-				else:
-					dt = -(t_min - t_max)/(n_times)
-
-				length = n_times * dt
 				#round so fits obsnum
+				length = float(jlen[path])
 				length = round(length, 5)
 
 				#variable to input into jdpol2obsnum
@@ -202,6 +182,9 @@ for root, dirs, files in os.walk(datanum):
 					obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
 				else:
 					obsnum = 0
+
+				print jdict[path]
+				print obsnum
 
 				#location of raw files
 				raw_location = 'NULL' #do not know where they are for any of them yet
@@ -227,7 +210,7 @@ for root, dirs, files in os.walk(datanum):
 				delete_file = False
 
 				#create list of important data and open csv file
-				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,compressed,str(sz),ready_to_tape,delete_file]]
+				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,str(sz),compressed,ready_to_tape,delete_file]]
 				print databs 
 
 				#write to csv file by item in list
