@@ -205,16 +205,16 @@ for root, dirs, files in os.walk(datanum):
 					cal_location = 'NULL'
 
 				#indicates if file is compressed
-				compressed = True
+				compressed = 1
 
 				#shows location of raw data on tape
 				tape_location = 'NULL'
 
 				#variable indicating if all files have been successfully compressed in one day
-				ready_to_tape = False
+				ready_to_tape = 0
 
 				#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
-				delete_file = False
+				delete_file = 0 
 
 				#create list of important data and open csv file
 				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,str(sz),compressed,ready_to_tape,delete_file]]
