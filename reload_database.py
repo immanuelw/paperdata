@@ -36,7 +36,7 @@ pswd = getpass.getpass('Password: ')
 
 data32 = '/data4/raw_data/'
 data64 = '/data4/paper/2012EoR/psa_live/'
-data128 = '/data4/paper/128_sim_data'
+data128 = '/data4/paper/still_raw_data_test/'
 
 db32 = '/data2/home/immwa/scripts/paper_output/db_output32.csv'
 db64 = '/data2/home/immwa/scripts/paper_output/db_output64.csv'
@@ -48,15 +48,12 @@ host = 'folio'
 if db == '32':
 	datanum = data32
 	dbnum = db32
-	#table_name = 'psa32'
 elif db == '64':
 	datanum = data64
 	dbnum = db64
-	#table_name = 'psa64'
 elif db == '128':
 	datanum = data128
 	dbnum = db128
-	#table_name = 'psa128'
 
 #combined all eras into one table
 table_name = 'paperdata'
@@ -166,9 +163,6 @@ for root, dirs, files in os.walk(datanum):
 				elif uv['npol'] == 4:
 				#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
 					polarization = 'yy'
-
-				#print jdate
-				#print round(jdate,5)
 
 				#round so fits obsnum
 				length = float(jlen[path])

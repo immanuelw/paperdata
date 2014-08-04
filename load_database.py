@@ -42,7 +42,7 @@ pswd = getpass.getpass('Password: ')
 
 data32 = '/data4/raw_data/'
 data64 = '/data4/paper/2012EoR/psa_live/'
-data128 = '/data4/paper/still_raw_data_test/psa6678/'
+data128 = '/data4/paper/still_raw_data_test/'
 
 db32 = '/data2/home/immwa/scripts/paper_output/db_output32.csv'
 db64 = '/data2/home/immwa/scripts/paper_output/db_output64.csv'
