@@ -11,6 +11,7 @@ import inspect
 import csv
 import aipy as A
 
+
 #counting variables
 t_min = 0
 t_max = 0
@@ -69,6 +70,10 @@ resultFile = open(dbnum,'wb')
 #create 'writer' object
 wr = csv.writer(resultFile, dialect='excel')
 
+#create csv file to log bad files
+error_file = open('/data2/home/immwa/scripts/paper_output/', 'a')
+ewr = csv.writer(error_file, dialect='excel')
+
 #create function to uniquely identify files
 def jdpol2obsnum(jd,pol,djd):
 	"""
@@ -105,14 +110,21 @@ for root, dirs, files in os.walk(datanum):
 				#indicates size of file
 				sz = sizeof_fmt(get_size(path))
 
+				#checks a .uv file for data
 				visdata = os.path.join(path, 'visdata')
 				if not os.path.isfile(visdata):
+					error_list = [[path,'No visdata']]
+					for item in error_list:
+						ewr.writerow(item)
 					continue
 
                                 #allows uv access
 				try:
 	                               uv = A.miriad.UV(path)
 				except:
+					error_list = [[path,'Cannot access .uv file']]
+                                        for item in error_list:
+                                                ewr.writerow(item)
 					continue	
 
 				#indicates julian date
@@ -137,9 +149,6 @@ for root, dirs, files in os.walk(datanum):
 
 				#indicates type of file in era
 				era_type = 'NULL'
-
-				#indicates name of file to be used
-				#filename = dir
 
 				#assign letters to each polarization
 				if uv['npol'] == 1:
