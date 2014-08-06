@@ -16,7 +16,7 @@ raw = 'raw_location'
 obsnum_string = 'obsnum'
 delt = 'delete_file'
 
-raw_value = 'NULL'
+raw_value = 'ON TAPE'
 deletion = []
 
 # open a database connection
@@ -35,9 +35,9 @@ results = cursor.fetchall()
 #results is a list of lists
 for items in results:
 	obsnum = items[1]
-	if items[4] == True and not items[3] == 'NULL' and not items[2] == 'NULL':
+	if items[4] == 1 and not items[3] == 'NULL' and not items[2] == 'NULL':
 		deletion.append(items[2])
-		del_value = False
+		del_value = 0
 
 		# execute the SQL query using execute() method.
 		cursor.execute('''
@@ -49,6 +49,10 @@ for items in results:
 #loops through list and deletes raw files scheduled for deletion
 for item in deletion:
 	shutil.rmtree(item)
+	if os.path.isfile(item):
+		continue
+	else:
+		print 'ERROR: File not removed'
 
 print 'Table data updated.'
 
