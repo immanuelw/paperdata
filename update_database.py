@@ -14,26 +14,11 @@ pswd = getpass.getpass('Root password: ')
 compressed = 'compressed'
 obsnum_string = 'obsnum'
 tape = 'ready_to_tape'
+j_day = 'julian_day'
 
-count_jday = 0
-count_complete = 0
-
-jday_results = []
+res = {}
 
 #checks if files of the same Julian Date have all completed compression
-def complete_check(count_jday, count_complete, jday_results):
-        if count_jday == count_complete and not count_jday == 0:
-                ready_to_tape = True
-                for items in jday_results:
-                        obsnum = items[0]
-			print ready_to_tape
-                        # execute the SQL query using execute() method.
-                        cursor.execute('''
-                        UPDATE %s
-                        SET %s = %s
-                        WHERE %s = %d;
-                        '''%(table, tape, ready_to_tape, obsnum_string, obsnum))
-
 #need way to get compr_value and obsnum from paperdistiller 
 
 # open a database connection
@@ -42,15 +27,21 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 cursor = connection.cursor()
 
 # execute the SQL query using execute() method.
-cursor.execute('SELECT obsnum, status, julian_date from observation order by julian_date')
+cursor.execute('SELECT obsnum, status from observation order by julian_date')
 
 #collects information from query
 results = cursor.fetchall()
+
+zer_results = {}
+
+for item in results:
+	zer_results.update(item[0]:item[1])
 
 #close, save and end connection
 cursor.close()
 connection.commit()
 connection.close()
+
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
@@ -59,57 +50,51 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
 
-#results is a list of lists
-for items in results:
+#set value to compressed files
 
-	count_jday = len(jday_results)
-	#sets value of initial julian day found
-	if count_jday == 0:
-		julian_day = int(str(items[2])[3:7]) #error if psa32
-		
-        obsnum = items[0]
+cursor.execute('SELECT obsnum, path, tape_location FROM paperdata WHERE era = 128 ORDER BY julian_date')
+fir_results = cursor.fetchall()
 
-	j_day = int(str(items[2])[3:7])
-
-	#counts amount of files with same Julian Day
-	if j_day == julian_day:
-		jday_results.append(items)
-		#checks if file is done compression
-	        if items[1] == 'COMPLETE':
-	                compr_value = True
-			#print compr_value
-			#counts amount of files complete
-			count_complete += 1
-	        else:
-	                compr_value = False
-
-		# execute the SQL query using execute() method.
+#check if compressed file exists, if so set compr_value = 1
+for item in fir_results:
+	if item[2] == 'NULL':
+		obsnum = item[0]
+		if zer_results[item[0]] == 'COMPLETE':
+			compr_value = 1
+		elif os.path.isfile(item[1]):
+			compr_value = 1
+		else:
+			compr_value = 0
 		cursor.execute('''
 		UPDATE %s
-		SET %s = %s
+		SET %s = %d
 		WHERE %s = %d;
-		'''%(table, compressed, compr_value, obsnum_string, obsnum)) 
-		###change so %d if number or %s if string entry!!!
-	else:
-		complete_check(count_jday, count_complete, jday_results)	
-		jday_results = []
-		jday_results.append(items)
-		julian_day = j_day
-		count_jday = 0
-		count_complete = 0
-		if items[1] == 'COMPLETE':
-                        compr_value = True
-                        count_complete += 1
-                else:
-                        compr_value = False
+		'''%(table, compressed, compr_value, obsnum_string, obsnum)
 
-                cursor.execute('''
-                UPDATE %s
-                SET %s = %s
-                WHERE %s = %d;
-                '''%(table, compressed, compr_value, obsnum_string, obsnum))
+#counting the amount of files in each day
+cursor.execute('SELECT julian_day, COUNT(*) FROM paperdata WHERE era = 128 GROUP BY julian_day')
+sec_results = cursor.fetchall()
 
-complete_check(count_jday, count_complete, jday_results)
+#counting the amount of compressed files in each day
+cursor.execute('SELECT julian_day, COUNT(*), tape_location FROM paperdata WHERE era = 128 and compressed = 1 GROUP BY julian_day')
+thr_results = cursor.fetchall()
+
+#create dictionary with julian_day as key, count as value
+for item in sec_results:
+	res.update(item[0]:item[1])
+
+#testing if same amount in each day, updating if so
+for item in thr_results:
+	j_value = item[0]
+	if item[2] == 'NULL':
+		if res[item[0]] == item[1]:
+			ready_to_tape = 1
+			cursor.execute('''
+	                UPDATE %s
+	                SET %s = %d
+	                WHERE %s = %d;
+	                '''%(table, tape, ready_to_tape, j_day, j_value))
+
 print 'Table data updated.'
 
 # close the cursor object

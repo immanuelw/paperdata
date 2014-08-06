@@ -86,14 +86,16 @@ print item
 #results list of lists should contain path, obsnum, julian_date, polarization string, and length
 
 for item in results:
-	#indicates location of raw file (usually same directory as compressed) FIX TO MAKE COMPRESSED	
-	path = results[0]
+	#indicates location of raw file (usually same directory as compressed)	
+	path_raw = results[0]
+	
+	path = results[0] + 'cRRE'
 
 	#indicates size of file
 	sz = sizeof_fmt(get_size(path))
 
 	#checks if any data is in file
-	visdata = os.path.join(path, 'visdata')
+	visdata = os.path.join(path_raw, 'visdata')
 	if not os.path.isfile(visdata):
 		continue
 
@@ -131,7 +133,10 @@ for item in results:
 	cal_location = 'NULL'
 
 	#indicates if file is compressed
-	compressed = 1
+	if os.path.isfile(path):
+		compressed = 1
+	else:
+		compressed = 0
 
 	#shows location of raw data on tape
 	tape_location = 'NULL'
