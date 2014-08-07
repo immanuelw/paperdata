@@ -7,10 +7,10 @@ beg = 'zen'
 dot = '.'
 
 #location of directory searched
-data = '/data4/paper/file_renaming_test'
+data = '/mnt/USB/0/D40P01/Good/FOUND.ODR/Orphan9/'
 
-#location of fdirectoty to move to
-datashift = 'data4/paper/file_renaming_test_output'
+#location of directory to move to
+datashift = '/data4/paper/file_renaming_test_output'
 
 #loop over files/folders to look through
 for root, dirs, files in os.walk(data):
@@ -37,4 +37,4 @@ for root, dirs, files in os.walk(data):
 		newfile = os.path.join(datashift, newdir)	
 		print newfile
 		#copy data from one file to the other
-		#os.system('cp -r %s/*.uv %s' %(file, newfile))
+		os.system('cp -r %s/*.uv %s' %(file, newfile))
