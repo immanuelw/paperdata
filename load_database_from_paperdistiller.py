@@ -127,7 +127,7 @@ for item in results:
 	obsnum = results[1]
 
 	#location of raw files
-	raw_location = path #do not know where they are for any of them yet
+	raw_location = path_raw #do not know where they are for any of them yet
 
 	#location of calibrate files
 	cal_location = 'NULL'
