@@ -16,6 +16,9 @@ obsnum_string = 'obsnum'
 tape = 'ready_to_tape'
 j_day = 'julian_day'
 
+era = raw_input('32, 64, or 128?: ')
+era = int(era)
+
 res = {}
 
 #checks if files of the same Julian Date have all completed compression
@@ -29,7 +32,7 @@ cursor = connection.cursor()
 
 #set value to compressed files
 
-cursor.execute('SELECT obsnum, path, tape_location, raw_location FROM paperdata WHERE era = 128 ORDER BY julian_date')
+cursor.execute('SELECT obsnum, path, tape_location, raw_location FROM paperdata WHERE era = %d ORDER BY julian_date'%(era))
 fir_results = cursor.fetchall()
 
 #check if compressed file exists, if so set compr_value = 1
@@ -45,13 +48,21 @@ for item in fir_results:
 		SET %s = %d
 		WHERE %s = %d;
 		'''%(table, compressed, compr_value, obsnum_string, obsnum))
+	elif item[3] == 'NULL':
+		obsnum = item[0]
+		compr_value = 0
+		cursor.execute('''
+                UPDATE %s
+                SET %s = %d
+                WHERE %s = %d;
+                '''%(table, compressed, compr_value, obsnum_string, obsnum))
 
 #counting the amount of files in each day
-cursor.execute('SELECT julian_day, COUNT(*) FROM paperdata WHERE era = 128 GROUP BY julian_day')
+cursor.execute('SELECT julian_day, COUNT(*) FROM paperdata WHERE era = %d GROUP BY julian_day'%(era))
 sec_results = cursor.fetchall()
 
 #counting the amount of compressed files in each day
-cursor.execute('SELECT julian_day, COUNT(*), tape_location FROM paperdata WHERE era = 128 and compressed = 1 GROUP BY julian_day')
+cursor.execute('SELECT julian_day, COUNT(*), tape_location FROM paperdata WHERE era = %d and compressed = 1 GROUP BY julian_day'%(era))
 thr_results = cursor.fetchall()
 
 #create dictionary with julian_day as key, count as value
