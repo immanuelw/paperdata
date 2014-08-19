@@ -57,7 +57,7 @@ fir_results = cursor.fetchall()
 
 #check if compressed file exists, if so set compr_value = 1
 for item in fir_results:
-	if item[2] == 'NULL' and raw_location != 'NULL':
+	if item[2] == 'NULL' and item[3] != 'NULL':
 		obsnum = item[0]
 		if zer_results[item[0]] == 'COMPLETE':
 			compr_value = 1
@@ -69,7 +69,7 @@ for item in fir_results:
 		UPDATE %s
 		SET %s = %d
 		WHERE %s = %d;
-		'''%(table, compressed, compr_value, obsnum_string, obsnum)
+		'''%(table, compressed, compr_value, obsnum_string, obsnum))
 
 #counting the amount of files in each day
 cursor.execute('SELECT julian_day, COUNT(*) FROM paperdata WHERE era = 128 GROUP BY julian_day')

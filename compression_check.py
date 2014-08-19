@@ -19,29 +19,6 @@ j_day = 'julian_day'
 res = {}
 
 #checks if files of the same Julian Date have all completed compression
-#need way to get compr_value and obsnum from paperdistiller 
-
-# open a database connection
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdistiller', local_infile=True)
-
-cursor = connection.cursor()
-
-# execute the SQL query using execute() method.
-cursor.execute('SELECT obsnum, status from observation order by julian_date')
-
-#collects information from query
-results = cursor.fetchall()
-
-zer_results = {}
-
-for item in results:
-	zer_results.update(item[0]:item[1])
-
-#close, save and end connection
-cursor.close()
-connection.commit()
-connection.close()
-
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
@@ -52,16 +29,14 @@ cursor = connection.cursor()
 
 #set value to compressed files
 
-cursor.execute('SELECT obsnum, path, tape_location FROM paperdata WHERE era = 128 ORDER BY julian_date')
+cursor.execute('SELECT obsnum, path, tape_location, raw_location FROM paperdata WHERE era = 128 ORDER BY julian_date')
 fir_results = cursor.fetchall()
 
 #check if compressed file exists, if so set compr_value = 1
 for item in fir_results:
-	if item[2] == 'NULL':
+	if item[2] == 'NULL' and item[3] != 'NULL':
 		obsnum = item[0]
-		if zer_results[item[0]] == 'COMPLETE':
-			compr_value = 1
-		elif os.path.isfile(item[1]):
+		if os.path.isfile(item[1]):
 			compr_value = 1
 		else:
 			compr_value = 0
@@ -69,7 +44,7 @@ for item in fir_results:
 		UPDATE %s
 		SET %s = %d
 		WHERE %s = %d;
-		'''%(table, compressed, compr_value, obsnum_string, obsnum)
+		'''%(table, compressed, compr_value, obsnum_string, obsnum))
 
 #counting the amount of files in each day
 cursor.execute('SELECT julian_day, COUNT(*) FROM paperdata WHERE era = 128 GROUP BY julian_day')
