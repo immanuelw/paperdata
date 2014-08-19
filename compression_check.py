@@ -6,6 +6,7 @@
 import MySQLdb
 import sys
 import getpass
+import os
 
 table = 'paperdata'
 usrnm = raw_input('Root username: ')
