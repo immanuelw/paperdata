@@ -56,7 +56,7 @@ thr_results = cursor.fetchall()
 
 #create dictionary with julian_day as key, count as value
 for item in sec_results:
-	res.update(item[0]:item[1])
+	res.update({item[0]:item[1]})
 
 #testing if same amount in each day, updating if so
 for item in thr_results:

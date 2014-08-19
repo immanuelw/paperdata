@@ -35,7 +35,7 @@ results = cursor.fetchall()
 zer_results = {}
 
 for item in results:
-	zer_results.update(item[0]:item[1])
+	zer_results.update({item[0]:item[1]})
 
 #close, save and end connection
 cursor.close()
@@ -81,7 +81,7 @@ thr_results = cursor.fetchall()
 
 #create dictionary with julian_day as key, count as value
 for item in sec_results:
-	res.update(item[0]:item[1])
+	res.update({item[0]:item[1]})
 
 #testing if same amount in each day, updating if so
 for item in thr_results:
