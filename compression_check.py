@@ -40,7 +40,7 @@ fir_results = cursor.fetchall()
 for item in fir_results:
 	if item[2] == 'NULL' and item[3] != 'NULL':
 		obsnum = item[0]
-		if os.path.isfile(item[1]):
+		if os.path.isdir(item[1]):
 			compr_value = 1
 		else:
 			compr_value = 0

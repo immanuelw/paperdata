@@ -61,7 +61,7 @@ for item in fir_results:
 		obsnum = item[0]
 		if zer_results[item[0]] == 'COMPLETE':
 			compr_value = 1
-		elif os.path.isfile(item[1]):
+		elif os.path.isdir(item[1]):
 			compr_value = 1
 		else:
 			compr_value = 0
