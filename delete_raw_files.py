@@ -35,14 +35,14 @@ results = cursor.fetchall()
 #results is a list of lists
 for items in results:
 	obsnum = items[1]
-	if items[4] == 1 and not items[3] == 'NULL' and not items[2] == 'NULL':
+	if items[4] == 1 and not items[3] == 'NULL' and items[2] == 'ON TAPE':
 		deletion.append(items[2])
 		del_value = 0
 
 		# execute the SQL query using execute() method.
 		cursor.execute('''
 		UPDATE %s
-		SET %s = %s, %s = %s
+		SET %s = '%s', %s = '%s'
 		WHERE %s = %d;
 		'''%(table, delt, del_value, raw, raw_value, obsnum_string, obsnum)) 
 
