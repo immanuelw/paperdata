@@ -1,6 +1,3 @@
-### Script to Automate data compression
-### Empties paperdistiller, adds in new files, runs scheduler
-
 #!/usr/bin/python
 import xml.dom.minidom
 import os
@@ -8,6 +5,12 @@ import sys
 import string
 import MySQLdb
 #import re
+
+### Script to Automate data compression
+### Empties paperdistiller, adds in new files, runs scheduler
+
+### Author: Immanuel Washington
+### Date: 8-20-14
 
 usrnm = raw_input('Root User: ')
 pswd = getpass.getpass('Root Password: ')
