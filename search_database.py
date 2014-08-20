@@ -11,24 +11,25 @@ import os
 
 #initalize lists to create gui with
 
-fields = 'host', 'path', 'era', 'obsnum', 'Julian Day', 'Julian Date', 'polarization', 'Length of data', 'raw location', 'Calibrate file', 'file size'
+fields = 'host', 'path', 'era', 'era type', 'obsnum', 'Julian Day', 'Julian Date', 'polarization', 'Length of data', 'raw location', 'Calibrate file', 'tape location', 'file size', 'Compressed', 'Ready to Tape', 'Ready for deletion'
 
-mins = 'N/A', 'N/A', 'min', 'min', 'min', 'min', 'N/A', 'min', 'N/A', 'N/A', 'N/A'
+mins = 'N/A', 'N/A', 'min', 'N/A', 'min', 'min', 'min', 'N/A', 'min', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'
 
-maxs = 'N/A', 'N/A', 'max', 'max', 'max', 'max', 'N/A', 'max', 'N/A', 'N/A', 'N/A'
+maxs = 'N/A', 'N/A', 'max', 'N/A', 'max', 'max', 'max', 'N/A', 'max', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A', 'N/A'
 
-vtext = {fields[0]:'host', fields[1]:'path', fields[2]:'era', fields[3]:'obsnum', fields[4]:'julian_day', fields[5]:'julian_date', fields[6]:'polarization', fields[7]:'data_length', fields[8]:'raw_location', fields[9]:'cal_location', fields[10]:'file_size'}
+vtext = {fields[0]:'host', fields[1]:'path', fields[2]:'era', fields[3]:'era_type', fields[4]:'obsnum', fields[5]:'julian_day', fields[6]:'julian_date', fields[7]:'polarization', fields[8]:'data_length', fields[9]:'raw_location', fields[10]:'cal_location', fields[11]:'tape_location', fields[12]:'file_size', fields[13]:'compressed', fields[14]:'ready_to_tape', fields[15]:'delete_file'}
 
 #allows user to input database and table queried
-datab = raw_input('Database:')
-table = raw_input('Search table named:') 
-pswd = getpass.getpass('Password:')
+
+usrnm = raw_input('Username: ')
+table = 'paperdata' 
+pswd = getpass.getpass('Password: ')
 
 def dbsearch(query):
 
    # open a database connection
    # be sure to change the host IP address, username, password and database name to match your own
-   connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = datab, local_infile=True)
+   connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
    # prepare a cursor object using cursor() method
    cursor = connection.cursor()
@@ -104,7 +105,7 @@ def makeform(root, fields, mins, maxs):
    entries = []
 #   for field in fields:
    for i in range(len(fields)):
-      if i in [2,3,4,5,7]:
+      if i in [2,4,5,6,8]:
          row = Frame(root)
          lab = Label(row, width=15, text=fields[i], anchor='w')
          lab2 = Label(row, width=5, text=mins[i], anchor='e')
