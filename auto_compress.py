@@ -70,7 +70,7 @@ nodenum = fakeqstat(runjobs)
 #use dummy variable and list to set up taskserver string
 fakenum = 0
 task_string = ''
-for i in nodenum:
+for item in nodenum:
 	if fakenum % 2= 0:
 		port_num = 14204
 	else:
@@ -78,9 +78,9 @@ for i in nodenum:
 	fakenum += 1
 
 	if fakenum < 4:
-		task_string += '%s:%d,' %(i,port_num)
+		task_string += '%s:%d,' %(item,port_num)
 	else:
-		task_string += '%s:%d' %(i,port_num)
+		task_string += '%s:%d' %(item,port_num)
 
 #os.popen('add_observations.py /data4/paper/styll_raw_data_Test/psa6678/*.uv')
 #os.popen('qmaster_scheduler.py' --taskservers='%s' %(task_string))
