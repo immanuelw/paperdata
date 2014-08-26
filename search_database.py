@@ -9,6 +9,12 @@ import getpass
 from Tkinter import *
 import os
 
+### Script to create GUI to easily search paperdata database
+### Has fields to enter to search for any and all which match certain parameters
+
+### Author: Immanuel Washington
+### Date: 8-20-14
+
 #initalize lists to create gui with
 
 fields = 'host', 'path', 'era', 'era type', 'obsnum', 'Julian Day', 'Julian Date', 'polarization', 'Length of data', 'raw location', 'Calibrate file', 'tape location', 'file size', 'Compressed', 'Ready to Tape', 'Ready for deletion'

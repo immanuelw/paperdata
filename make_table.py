@@ -7,6 +7,11 @@ import MySQLdb
 import sys
 import getpass
 
+### Script to recreate paperdata table format
+### Opens MySQL through module, creates table through input name
+
+### Author: Immanuel Washington
+### Date: 8-20-14
 
 #inputs for user to access database
 table = raw_input('Create table named: ')

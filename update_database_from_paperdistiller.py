@@ -7,6 +7,12 @@ import MySQLdb
 import sys
 import getpass
 
+### Script to update paperdata database from full paperdistiller database
+### Searches paperdistiller for relevant fields to update compression field in paperdata
+
+### Author: Immanuel Washington
+### Date: 8-20-14
+
 table = 'paperdata'
 usrnm = raw_input('Root username: ')
 pswd = getpass.getpass('Root password: ')

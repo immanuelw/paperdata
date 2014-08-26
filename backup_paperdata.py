@@ -9,6 +9,12 @@ import getpass
 import time
 import csv
 
+### Script to Backup paperdata database
+### Finds time and date and writes table into .csv file
+
+### Author: Immanuel Washington
+### Date: 8-20-14
+
 datab = 'paperdata'
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')

@@ -11,6 +11,11 @@ import inspect
 import csv
 import aipy as A
 
+### Script to load data from folio into paperdata database
+### Crawls folio and reads through .uvcRRE files to generate all field information
+
+### Author: Immanuel Washington
+### Date: 8-20-14
 
 #counting variables
 t_min = 0

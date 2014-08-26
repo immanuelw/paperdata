@@ -10,6 +10,12 @@ import time
 import csv
 import shutil
 
+### Script to move and update paperdata database
+### Moves .uvcRRE directory and updates path field in paperdata
+
+### Author: Immanuel Washington
+### Date: 8-20-14
+
 datab = 'paperdata'
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')

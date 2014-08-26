@@ -8,6 +8,12 @@ import sys
 import getpass
 import shutil
 
+### Script to delete files set by ISUS
+### Looks through database for delete_file marker, deletes every directory and file in list
+
+### Author: Immanuel Washington
+### Date: 8-20-14
+
 table = 'paperdata'
 usrnm = raw_input('Root username: ')
 pswd = getpass.getpass('Root password: ')

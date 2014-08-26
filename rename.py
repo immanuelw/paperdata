@@ -2,6 +2,12 @@ import aipy as A
 import sys
 import os
 
+### Script to move and rename .uv files with unknown names
+### Moves .uv files without names into new directories, creating names fro mreadign through file
+
+### Author: Immanuel Washington
+### Date: 8-20-14
+
 #beginning of filename
 beg = 'zen'
 dot = '.'

@@ -10,6 +10,12 @@ import os
 import inspect
 import csv
 
+### Script to load infromation quickly from paperdistiller database into paperdata
+### Queries paperdistiller for relevant information, loads paperdata with complete info
+
+### Author: Immanuel Washington
+### Date: 8-20-14
+
 #Functions which simply find the file size of the .uvcRRE files
 def get_size(start_path):
 	total_size = 0

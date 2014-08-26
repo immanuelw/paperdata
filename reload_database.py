@@ -11,6 +11,12 @@ import inspect
 import csv
 import aipy as A
 
+### Script to load paperdata with some already known information
+### pulls known information from relevant files and fills into paperdata fields
+
+### Author: Immanuel Washington
+### Date: 8-20-14
+
 #Functions which simply find the file size of the .uvcRRE files
 def get_size(start_path):
 	total_size = 0
