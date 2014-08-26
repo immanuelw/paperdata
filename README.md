@@ -27,7 +27,7 @@ Important scripts:
 		Used to check for any raw file if corresponding compressed file exists
 
 	compression_check.py:
-		Used to update database to see if tapign can be done through checking if all the raw and compressed files
+		Used to update database to see if taping can be done through checking if all the raw and compressed files
 		for any particular Julian Day all exist.
 
 	auto_compress.py:
