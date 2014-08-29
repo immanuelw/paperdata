@@ -22,7 +22,7 @@ pswd = getpass.getpass('Password: ')
 time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 
 table = 'paperdata' 
-dbnum = '/data2/home/immwa/scripts/paper_output/paperdata_backup_%s.csv'%(time_date)
+dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_backup_%s.csv'%(time_date)
 
 print dbnum
 resultFile = open(dbnum,'wb+')
