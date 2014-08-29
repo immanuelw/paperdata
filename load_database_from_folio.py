@@ -205,7 +205,7 @@ for root, dirs, files in os.walk(datanum):
 					obsnum = 0
 
 				#location of raw files
-				raw_location = 'NULL' #do not know where they are for any of them yet
+				raw_location = path[:-4] #assume in same directory
 
 				#location of calibrate files
                                 if datanum == data32:
