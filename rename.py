@@ -34,23 +34,24 @@ def get_size(start_path):
 
 #loop over files/folders to look through
 for root, dirs, files in os.walk(data):
-	for dir in dirs:
+	for file in files:
 		#print dir
-		file = os.path.join(root, dir)
+		dummy = os.path(root,dir)
+		data_file = os.path.join(dummy,file)
 
 		#check if file size is over 100MB, if not: skip
-		if get_size(file) < 104857600:
+		if get_size(data_file) < 104857600:
 			continue
 		#allows uv access
 		try:
-			uv = A.miriad.UV(file)
+			uv = A.miriad.UV(data_file)
 		except:
-			error_list = [[file,'Cannot access .uv file']]
+			error_list = [[data_file,'Cannot access .uv file']]
 			for item in error_list:
 				ewr.writerow(item)
 				continue
 
-		print file
+		print data_file
 		#find Julian Date
 		jdate = str(uv['time'])
 
@@ -70,4 +71,4 @@ for root, dirs, files in os.walk(data):
 		print newfile
 		
 		#copy data from one file to the other directory
-		shutil.copy(file,newfile)
+		shutil.copy(data_file,newfile)
