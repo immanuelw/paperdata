@@ -10,6 +10,7 @@ import os
 import inspect
 import csv
 import aipy as A
+import socket
 
 #User input information
 db = raw_input('32, 64, or 128?: ')
@@ -18,8 +19,14 @@ usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
 datab = 'paperdata'
 
+#checks if in correct node
+if socket.gethostname() == node16:
+	data64 = '/mnt/MartinVanBuren/'
+else:
+	data64 = '/data4/paper/2012EoR/'
+
 data32 = '/data4/raw_data/'
-data64 = '/mnt/MartinVanBuren/'
+#data64 = '/mnt/MartinVanBuren/'
 #data64 = '/mnt/MartinVanBuren/data/'
 data128 = '/data4/paper/still_raw_data_test/'
 
