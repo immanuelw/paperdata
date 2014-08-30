@@ -9,6 +9,9 @@ import getpass
 import os
 import inspect
 import csv
+import time
+import socket
+import filecmp
 
 ### Script to load infromation quickly from paperdistiller database into paperdata
 ### Queries paperdistiller for relevant information, loads paperdata with complete info
@@ -39,9 +42,15 @@ pswd = getpass.getpass('Password: ')
 
 paperd = 'paperdistiller'
 
-db128 = '/data2/home/immwa/scripts/paper_output/db_output128PD.csv'
+time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
+db128 = '/data2/home/immwa/scripts/paper_output/db_output128_%s.csv'%(time_date)
 
-host = 'folio'
+#check if paperdistiller has already been crawled
+crawl = raw_input('Check paperdistiller for deletion (d) or loading (l) ?: ')
+if crawl == 'd':
+	backup = raw_input('Insert path of last backup of paperdistiller: ')
+
+host = socket.gethostname()
 
 #searches for only particular files
 dbnum = db128
@@ -160,6 +169,14 @@ for item in results:
 	#write to csv file by item in list
 	for item in databs:
 		wr.writerow(item)
+
+#Don't load if paperdistiller can be deleted
+if crawl == 'd':
+	if filecmp.cmp(db128,backup):
+		sys.exit()
+	else:
+		print 'backups have different information'
+		sys.exit()
 
 #Load data into named database and table
 
