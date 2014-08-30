@@ -24,7 +24,7 @@ backup = raw_input('Insert backup manually or automatically? (m/a): ')
 if backup == 'm':
 	dbnum = raw_input('Insert path of backup: ')
 elif backup == 'a':
-	dbnum = '/data2/home/immwa/scripts/paper_output/paperdata_backup_07-08-2014_17:10:28.csv'
+	dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_backup_07-08-2014_17:10:28.csv'
 
 #Load data into named database and table
 
