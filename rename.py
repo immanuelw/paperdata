@@ -59,7 +59,7 @@ for root, dirs, files in os.walk(data):
 			jdate = str(uv['time'])
 
 			#assign letters to each polarization
-			if uv[npol] == 4:
+			if uv[npol] == 1:
 				if uv['pol'] == -5:
 					pol = 'xx'
 				elif uv['pol'] == -6:
