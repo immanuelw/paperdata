@@ -52,25 +52,32 @@ for root, dirs, files in os.walk(data):
 				error_list = [[data_file,'Cannot access .uv file']]
 				for item in error_list:
 					ewr.writerow(item)
-					continue
+				continue
 
 			print data_file
 			#find Julian Date
 			jdate = str(uv['time'])
 
 			#assign letters to each polarization
-			if uv['pol'] == -5:
-				pol = 'xx'
-			elif uv['pol'] == -6:
-				pol = 'yy'
-			elif uv['pol'] == -7:
-				pol = 'xy'
-			elif uv['pol'] == -8:
-				pol = 'yx'
+			if uv[npol] == 4:
+				if uv['pol'] == -5:
+					pol = 'xx'
+				elif uv['pol'] == -6:
+					pol = 'yy'
+				elif uv['pol'] == -7:
+					pol = 'xy'
+				elif uv['pol'] == -8:
+					pol = 'yx'
 
-			#create variable to indicate new directory
-			newdir = beg + dot + jdate + dot + pol + dot + 'uv'
-			newfile = os.path.join(datashift, newdir)	
+				#create variable to indicate new directory
+				newdir = beg + dot + jdate + dot + pol + dot + 'uv'
+				newfile = os.path.join(datashift, newdir)	
+
+			#if polarizations aren't separated
+			else:
+				newdir = beg + dot + jdate + dot + 'uv'
+				newfile = os.path.join(datashift, newdir)
+
 			print newfile
 		
 			#copy data from one file to the other directory
