@@ -8,6 +8,7 @@ import sys
 import getpass
 import time
 import csv
+import base64
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
@@ -16,8 +17,11 @@ import csv
 ### Date: 8-20-14
 
 datab = 'paperdata'
-usrnm = raw_input('Username: ')
-pswd = getpass.getpass('Password: ')
+#usrnm = raw_input('Username: ')
+#pswd = getpass.getpass('Password: ')
+
+usrnm = 'immwa'
+pswd = base64.b64decode('aW1td2EzOTc4')
 
 time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 
