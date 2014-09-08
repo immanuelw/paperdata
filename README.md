@@ -17,7 +17,7 @@ Important scripts:
 	move_uvcRRE.py:
 		Used to automatically update database with new location when moving .uvcRRE files
 
-	load_database.py:
+	load_database_from_folio.py:
 		Used to fill paperdata with information directly from folio. Slow.
 
 	load_database_from_paperdistiller:
@@ -41,3 +41,6 @@ Important scripts:
 
 	backup_paperdata.py:
 		Used to backup the paperdata database, saving to a .csv file to be easily reloaded.
+
+	log_errors_from_folio.py:
+		Used to check for unaccessible/incomplete .uvcRRE files within folio
