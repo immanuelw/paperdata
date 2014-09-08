@@ -58,9 +58,31 @@ version_still = raw_input('Use still.cfg? (y/n): ')
 if version_still == 'y':
 	#rewrite still.cfg 
 
-	#empty list to add lines to
-	still_list = []
+	#strings to add to list
+	a = '[dbinfo]'
+	b = 'username = jacobsda'
+	c = 'password = \x50\x39\x6c\x73\x34\x52\x2a\x40'
+	d = 'hostip   = shredder'
+	e = 'port     = 3306'
+	f = 'dbname   = paperdistiller'
+	g = '[scheduler]'
+	h = '//stills=still2,still3,still4,cask0'
+	i = 'stills=node02,node03,node04,node05'
+	j = 'ports=14204,14204,14204,14204'
+	k = 'actions_per_still=1'
+	l = 'block_size=10'
+	m = 'timeout=2700'
+	n = 'sleeptime=1'
 
+	#add strings to list
+	still_list = [a,b,c,d,e,f,g,h,i,j,k,l,m,n]
+
+	#open still.cfg and write to it
+	still_file = open('.ddr_compress/still.cfg', 'rw+')
+	still_file.writelines(still_list)
+
+	#close file
+	still_file.close()
 
 elif version_still == 'n':
 	#indicate amount of nodes used in compression
