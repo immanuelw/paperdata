@@ -97,10 +97,6 @@ for root, dirs, files in os.walk(datanum):
                 	                ewr.writerow(item)
 				continue	
 
-				#indicates julian date
-			#jdate = uv['time']
-			#print jdate
-
 			count += 1
 
 			file = os.path.join('/data4/paper/2012EoR/psa_live/',path[-28:])
