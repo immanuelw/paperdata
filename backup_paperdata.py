@@ -47,11 +47,6 @@ for item in results:
 	#write to csv file by item in list
 	wr.writerow(item)
 
-#cursor.execute('''SELECT * INTO OUTFILE '%s'
-#FIELDS TERMINATED BY ','
-#LINES TERMINATED BY '\n' 
-#FROM paperdata '''%(dbnum))
-
 print time_date
 print 'Table data backup saved'
 

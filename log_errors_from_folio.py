@@ -61,11 +61,6 @@ elif db == '128':
 #combined all eras into one table
 table_name = 'paperdata'
 
-#resultFile = open(dbnum,'wb')
-
-#create 'writer' object
-#wr = csv.writer(resultFile, dialect='excel')
-
 #create csv file to log bad files
 error_file = open('/data2/home/immwa/scripts/paper_output/error_%s.log'%(db), 'a')
 ewr = csv.writer(error_file, dialect='excel')
@@ -124,9 +119,5 @@ for root, dirs, files in os.walk(datanum):
                                                 ewr.writerow(item)
 						print error_list
 					continue	
-
-#				#write to csv file by item in list
-#				for item in databs:
-#					wr.writerow(item)
 
 sys.exit()
