@@ -11,6 +11,11 @@ import inspect
 import csv
 import aipy as A
 
+### Script to find errors of .uvcRRE files from folio
+### Crawls folio and reads through .uvcRRE files to find erros
+
+### Author: Immanuel Washington
+### Date: 8-20-14
 
 #counting variables
 t_min = 0
