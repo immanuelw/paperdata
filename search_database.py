@@ -143,7 +143,7 @@ def makeform(root, fields, mins, maxs):
 
 if __name__ == '__main__':
    root = Tk()
-   root.title('Folio MySQL query')
+   root.title('Paperdata Query')
    ents = makeform(root, fields, mins, maxs)
    root.bind('<Return>', (lambda event, e=ents: fetch(e)))
    b1 = Button(root, text='Show',
