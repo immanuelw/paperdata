@@ -125,7 +125,7 @@ for root, dirs, files in os.walk(datanum):
 
                                 #allows uv access
 				try:
-	                               uv = A.miriad.UV(path)
+					uv = A.miriad.UV(path)
 				except:
 					error_list = [[path,'Cannot access .uv file']]
                                         for item in error_list:
