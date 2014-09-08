@@ -84,6 +84,7 @@ for item in nodenum:
 	else:
 		task_string += '%s:%d' %(item,port_num)
 
-#os.popen('add_observations.py /data4/paper/still_raw_data_test/psa6678/*.uv')
+#uv_path = raw_input('Full path of .uv files: ')
+#os.popen('add_observations.py %s' %(uv_path))
 #os.popen('qmaster_scheduler.py' --taskservers='%s' %(task_string))
 #os.popen('monitor_still.py')
