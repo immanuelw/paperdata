@@ -33,7 +33,7 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 cursor = connection.cursor()
 
 #execute MySQL query
-cursor.execute('SELECT julian_day, obsnum, raw_location, tape_location, ready_to_delete from paperdata order by julian_day')
+cursor.execute('SELECT julian_day, obsnum, raw_location, tape_location, delete_file from paperdata order by julian_day')
 
 #collects information from query
 results = cursor.fetchall()
@@ -41,14 +41,14 @@ results = cursor.fetchall()
 #results is a list of lists
 for items in results:
 	obsnum = items[1]
-	if items[4] == 1 and not items[3] == 'NULL' and items[2] == 'ON TAPE':
+	if items[4] == 1 and not items[3] == 'NULL' and not items[2] == 'NULL':
 		deletion.append(items[2])
 		del_value = 0
 
 		# execute the SQL query using execute() method.
 		cursor.execute('''
 		UPDATE %s
-		SET %s = '%s', %s = '%s'
+		SET %s = %d, %s = '%s'
 		WHERE %s = %d;
 		'''%(table, delt, del_value, raw, raw_value, obsnum_string, obsnum)) 
 
@@ -58,7 +58,7 @@ for item in deletion:
 	if os.path.isfile(item):
 		continue
 	else:
-		print 'ERROR: File not removed'
+		print 'ERROR: uv file %s not removed' %(item)
 
 print 'Table data updated.'
 
