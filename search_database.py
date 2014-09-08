@@ -58,9 +58,6 @@ def dbsearch(query):
    # close the connection
    connection.close()
 
-   # exit the program
-   #sys.exit()
-
 #perform action: print all non-empty fields and concatenate into mysql string
 def fetch(entries):
    query = 'SELECT '
@@ -101,7 +98,7 @@ def fetch(entries):
                query += '* FROM %s WHERE (%s > %s AND %s < %s)' %(table, vtext[field], ltext, field, rtext)
                counter += 1
             else:
-               query += ' AND (%s > %s AND %s < %s)' %(table, vtext[field], ltext,vtext[field], rtext)
+               query += ' AND (%s > %s AND %s < %s)' %(table, vtext[field], ltext, vtext[field], rtext)
 #   execute other script to query mysql
    dbsearch(query)
 
