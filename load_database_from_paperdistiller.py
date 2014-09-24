@@ -76,7 +76,7 @@ cursor.execute('SELECT filename, obsnum from file order by obsnum')
 results = cursor.fetchall()
 
 for item in results:
-	cursor.execute('SELECT julian_date, pol, length where obsnum = %d'%(item[1])
+	cursor.execute('SELECT julian_date, pol, length from observation where obsnum = %d'%(item[1])
 
 sec_results = cursor.fetchall()
 # close the cursor object
