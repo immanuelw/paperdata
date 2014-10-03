@@ -7,6 +7,7 @@ import MySQLdb
 import sys
 import getpass
 import shutil
+import csv
 
 ### Script to delete files set by ISUS
 ### Looks through database for delete_file marker, deletes every directory and file in list
@@ -24,6 +25,12 @@ delt = 'delete_file'
 
 raw_value = 'ON TAPE'
 deletion = []
+
+failed_delete = '/data2/home/immwa/scripts/paperdata/failed_deletion.csv'
+del_file = open(failed_delete,'wb')
+
+#create 'writer' object
+fd = csv.writer(del_file, dialect='excel')
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
@@ -55,9 +62,10 @@ for items in results:
 #loops through list and deletes raw files scheduled for deletion
 for item in deletion:
 	shutil.rmtree(item)
-	if os.path.isfile(item):
+	if not os.path.isdir(item):
 		continue
 	else:
+		fd.writerow([item])
 		print 'ERROR: uv file %s not removed' %(item)
 
 print 'Table data updated.'
