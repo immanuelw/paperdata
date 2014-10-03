@@ -49,27 +49,26 @@ results = cursor.fetchall()
 for items in results:
 	obsnum = items[1]
 	if items[4] == 1 and not items[3] == 'NULL' and not items[2] == 'NULL':
-		deletion.append(items[2])
-		del_value = 0
-
-		# execute the SQL query using execute() method.
-		cursor.execute('''
-		UPDATE %s
-		SET %s = %d, %s = '%s'
-		WHERE %s = %d;
-		'''%(table, delt, del_value, raw, raw_value, obsnum_string, obsnum)) 
+		deletion.append([items[2],obsnum])
 
 #loops through list and deletes raw files scheduled for deletion
 confirm = raw_input('Are you sure you want to delete (yes/no) ?: ')
 
+#value to set delete_file to
+del_value = 0
 if confirm == 'yes':
 	for item in deletion:
-		shutil.rmtree(item)
-		if not os.path.isdir(item):
-			continue
+		obsnum = item[1]
+		shutil.rmtree(item[0])
+		if not os.path.isdir(item[0]):
+			cursor.execute('''
+			UPDATE %s
+			SET %s = %d, %s = '%s'
+			WHERE %s = %d;
+			'''%(table, delt, del_value, raw, raw_value, obsnum_string, obsnum)
 		else:
-			fd.writerow([item])
-			print 'ERROR: uv file %s not removed' %(item)
+			fd.writerow([item[0]])
+			print 'ERROR: uv file %s not removed' %(item[0])
 else:
 	sys.exit()
 
