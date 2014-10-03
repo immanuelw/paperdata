@@ -10,6 +10,7 @@ import os
 import inspect
 import csv
 import aipy as A
+import hashlib
 
 ### Script to load data from folio into paperdata database
 ### Crawls folio and reads through .uvcRRE files to generate all field information
@@ -91,6 +92,22 @@ def jdpol2obsnum(jd,pol,djd):
 	assert(obsint < 2**31)
 	return int(obsint + polnum*(2**32))
 
+def md5sum(fname):
+	"""
+	calculate the md5 checksum of a file whose filename entry is fname.
+	"""
+	fname = fname.split(':')[-1]
+	BLOCKSIZE = 65536
+	hasher = hashlib.md5()
+	try:
+		afile = open(fname, 'rb')
+	except(IOError):
+		afile = open("%s/visdata"%fname, 'rb')
+	buf = afile.read(BLOCKSIZE)
+	while len(buf) >0:
+		hasher.update(buf)
+		buf = afile.read(BLOCKSIZE)
+	return hasher.hexdigest()
 
 #iterates through directories, listing information about each one
 for root, dirs, files in os.walk(datanum):
