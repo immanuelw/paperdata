@@ -28,7 +28,6 @@ cursor = connection.cursor()
 # execute the SQL query using execute() method.
 # Builds table by fields including defaults
 cursor.execute('''CREATE TABLE %s (
-host VARCHAR(100) DEFAULT 'folio',
 path VARCHAR(100) DEFAULT NULL,
 era INT DEFAULT NULL,
 era_type VARCHAR(100) DEFAULT NULL,
@@ -40,7 +39,8 @@ data_length DECIMAL(20,15) DEFAULT NULL,
 raw_location VARCHAR(100) DEFAULT NULL,
 cal_location VARCHAR(100) DEFAULT NULL,
 tape_location VARCHAR(100) DEFAULT NULL,
-file_size VARCHAR(15) DEFAULT NULL,
+compr_file_size DECIMAL(6,2) DEFAULT NULL,
+raw_file_size DECIMAL(10,2) DEFAULT NULL,
 compressed BOOLEAN DEFAULT FALSE,
 ready_to_tape BOOLEAN DEFAULT FALSE,
 delete_file BOOLEAN DEFAULT FALSE);''' %(table))
