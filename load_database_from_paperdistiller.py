@@ -29,11 +29,12 @@ def get_size(start_path):
 	return total_size
 
 def sizeof_fmt(num):
-	for x in ['bytes','KB','MB','GB']:
+	for x in ['bytes','KB','MB']:
 		if num < 1024.0:
 			return "%3.1f%s" % (num, x)
 		num /= 1024.0
-	return "%3.1f%s" % (num, 'TB')
+	num *= 1024.0
+	return "%3.1f" % (num)
 
 #User input information
 datab = 'paperdata'
@@ -63,6 +64,9 @@ resultFile = open(dbnum,'wb')
 #create 'writer' object
 wr = csv.writer(resultFile, dialect='excel')
 
+#empty list to use later
+results = []
+
 #pulls all relevant information from full paperdistiller database
 
 connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdistiller', local_infile=True)
@@ -71,14 +75,17 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 cursor = connection.cursor()
 
 # execute the SQL query using execute() method.
-cursor.execute('SELECT filename, obsnum from file order by obsnum')
+cursor.execute('SELECT filename, obsnum, md5sum from file order by obsnum')
 
-results = cursor.fetchall()
+result = cursor.fetchall()
 
-for item in results:
+#gather all data to input into paperdata
+for item in result:
 	cursor.execute('SELECT julian_date, pol, length from observation where obsnum = %d'%(item[1])
+	sec_results = cursor.fetchall()
+	print item + sec_results
+	result.append(item + sec_results)	
 
-sec_results = cursor.fetchall()
 # close the cursor object
 cursor.close()
 
@@ -88,26 +95,20 @@ connection.commit()
 # close the connection
 connection.close()
 
-
-#gather all the the data to input into paperdata
-
-for item in results:
-	item += sec_results[0]
-	item += sec_results[1]
-	item += sec_results[2]
-
-print item
-
 #results list of lists should contain path, obsnum, julian_date, polarization string, and length
 
 for item in results:
 	#indicates location of raw file (usually same directory as compressed)	
+	###need to include host name in path_raw and path
 	path_raw = results[0]
 	
 	path = results[0] + 'cRRE'
 
-	#indicates size of file
+	#indicates size of compressed file MB
 	sz = sizeof_fmt(get_size(path))
+
+	#indicates size of raw file in MB
+	raw_sz = sizeof_fmt(get_size(path_raw))
 
 	#checks if any data is in file
 	visdata = os.path.join(path_raw, 'visdata')
@@ -121,7 +122,7 @@ for item in results:
 		continue	
 
 	#indicates julian date
-	jdate = results[2]
+	jdate = results[3]
 
 	#indicates julian day
 	jday = int(str(jdate)[3:7])	
@@ -133,13 +134,16 @@ for item in results:
 	era_type = 'NULL'
 
 	#assign letters to each polarization
-	polarization = results[3]
+	polarization = results[4]
 
 	#indicates length of information in file
-	length = results[4]
+	length = results[5]
 
 	#indicates obsnum
 	obsnum = results[1]
+
+	#indicates md5sum
+	md5sum = results[2]
 
 	#location of raw files
 	raw_location = path_raw #do not know where they are for any of them yet
@@ -148,7 +152,7 @@ for item in results:
 	cal_location = 'NULL'
 
 	#indicates if file is compressed
-	if os.path.isfile(path):
+	if os.path.isdir(path):
 		compressed = 1
 	else:
 		compressed = 0
@@ -163,7 +167,7 @@ for item in results:
 	delete_file = 0 
 
 	#create list of important data and open csv file
-	databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,str(sz),compressed,ready_to_tape,delete_file]]
+	databs = [[host,path,era,era_type,obsnum,md5sum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,sz,raw_sz,compressed,ready_to_tape,delete_file]]
 	print databs 
 
 	#write to csv file by item in list
