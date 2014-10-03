@@ -60,13 +60,18 @@ for items in results:
 		'''%(table, delt, del_value, raw, raw_value, obsnum_string, obsnum)) 
 
 #loops through list and deletes raw files scheduled for deletion
-for item in deletion:
-	shutil.rmtree(item)
-	if not os.path.isdir(item):
-		continue
-	else:
-		fd.writerow([item])
-		print 'ERROR: uv file %s not removed' %(item)
+confirm = raw_input('Are you sure you want to delete (yes/no) ?: ')
+
+if confirm == 'yes':
+	for item in deletion:
+		shutil.rmtree(item)
+		if not os.path.isdir(item):
+			continue
+		else:
+			fd.writerow([item])
+			print 'ERROR: uv file %s not removed' %(item)
+else:
+	sys.exit()
 
 print 'Table data updated.'
 
