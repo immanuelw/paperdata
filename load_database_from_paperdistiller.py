@@ -10,7 +10,6 @@ import os
 import inspect
 import csv
 import time
-import filecmp
 
 ### Script to load infromation quickly from paperdistiller database into paperdata
 ### Queries paperdistiller for relevant information, loads paperdata with complete info
@@ -50,9 +49,6 @@ host = socket.gethostname()
 #searches for only particular files
 dbnum = db128
 
-#combined all eras into one table
-table_name = 'paperdata'
-
 resultFile = open(dbnum,'wb')
 
 #create 'writer' object
@@ -77,21 +73,32 @@ result = cursor.fetchall()
 for item in result:
 	cursor.execute('SELECT julian_date, pol, length from observation where obsnum = %d'%(item[1])
 	sec_results = cursor.fetchall()
-	print item + sec_results
 	result.append(item + sec_results)	
 
-# close the cursor object
+#Close database connection and save changes
 cursor.close()
-
-#save changes to database
 connection.commit()
+connection.close()
 
-# close the connection
+#Create list of obsnums to check for duplicates
+connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+
+cursor = connection.cursor()
+
+cursor.execute('SELECT obsnum from paperdata')
+obs = cursor.fetchall()
+
+#Close db connection and save changes
+cursor.close()
+connection.commit()
 connection.close()
 
 #results list of lists should contain path, obsnum, julian_date, polarization string, and length
-
 for item in results:
+	#check for duplicate
+	if item[1] in obs:
+		continue
+
 	#indicates location of raw file (usually same directory as compressed)	
 	###need to include host name in path_raw and path
 	path_raw = item[0]
@@ -191,13 +198,9 @@ LINES TERMINATED BY '\n' '''%(dbnum))
 
 print 'Table data loaded.'
 
-# close the cursor object
+#Close db connection and save changes
 cursor.close()
-
-#save changes to database
 connection.commit()
-
-# close the connection
 connection.close()
 
 # exit the program
