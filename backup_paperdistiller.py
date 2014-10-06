@@ -90,13 +90,9 @@ for item in results:
 print time_date
 print 'Database backup saved'
 
-# close the cursor object
+# Close connectin to database and save all changes
 cursor.close()
-
-#save changes to database
 connection.commit()
-
-# close the connection
 connection.close()
 
 # exit the program
