@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Load data into MySQL table 
+# Backup data from MySQL table 
 
 # import the MySQLdb and sys modules
 import MySQLdb
@@ -21,18 +21,9 @@ usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
 
 
-time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
+time_date = time.strftime("%d-%m-%Y")
 
 table = 'paperdata' 
-
-back1 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_file_backup_%s.csv'%(time_date)
-back2 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_observation_backup_%s.csv'%(time_date)
-back3 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_neighbors_backup_%s.csv'%(time_date)
-back4 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_log_backup_%s.csv'%(time_date)
-
-resultFile = open(back1,'wb+')
-wr = csv.writer(resultFile, dialect='excel')
-
 #Load data into named database and table
 
 # open a database connection
@@ -43,6 +34,19 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 cursor = connection.cursor()
 
 # execute the SQL query using execute() method.
+cursor.execute('SELECT julian_date from observation')
+result = str(cursor.fetchone())
+j_day = result[3:7]
+
+#Instantiate file names
+back1 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_file_backup_%s_%s.csv'%(j_day,time_date)
+back2 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_observation_backup_%s_%s.csv'%(j_day,time_date)
+back3 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_neighbors_backup_%s_%s.csv'%(j_day,time_date)
+back4 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_log_backup_%s_%s.csv'%(j_day,time_date)
+
+resultFile = open(back1,'wb+')
+wr = csv.writer(resultFile, dialect='excel')
+
 cursor.execute('SELECT * FROM file')
 results = cursor.fetchall()
 
