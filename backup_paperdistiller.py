@@ -16,19 +16,16 @@ import base64
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-datab = 'paperdistiller'
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
 
-
 time_date = time.strftime("%d-%m-%Y")
 
-table = 'paperdata' 
 #Load data into named database and table
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = datab, local_infile=True)
+connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdistiller', local_infile=True)
 
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
