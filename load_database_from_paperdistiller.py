@@ -10,7 +10,6 @@ import os
 import inspect
 import csv
 import time
-import socket
 import filecmp
 
 ### Script to load infromation quickly from paperdistiller database into paperdata
@@ -45,11 +44,6 @@ paperd = 'paperdistiller'
 
 time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 db128 = '/data2/home/immwa/scripts/paper_output/db_output128_%s.csv'%(time_date)
-
-#check if paperdistiller has already been crawled
-crawl = raw_input('Check paperdistiller for deletion (d) or loading (l) ?: ')
-if crawl == 'd':
-	backup = raw_input('Insert path of last backup of paperdistiller: ')
 
 host = socket.gethostname()
 
@@ -100,9 +94,14 @@ connection.close()
 for item in results:
 	#indicates location of raw file (usually same directory as compressed)	
 	###need to include host name in path_raw and path
-	path_raw = results[0]
+	path_raw = item[0]
 	
-	path = results[0] + 'cRRE'
+	if item[0][-1] == 'v':
+		path = item[0] + 'cRRE'
+		compr_path = host + ':' + item[0] + 'cRRE'
+	elif item[0][-1] == '/':
+		path = item[0][:-1] + 'cRRE'
+		compr_path = host + ':' + item[0][:-1] + 'cRRE'
 
 	#indicates size of compressed file MB
 	sz = sizeof_fmt(get_size(path))
@@ -117,12 +116,12 @@ for item in results:
 
         #allows uv access
 	try:
-	        uv = A.miriad.UV(path)
+	        uv = A.miriad.UV(path_raw)
 	except:
 		continue	
 
 	#indicates julian date
-	jdate = results[3]
+	jdate = item[3]
 
 	#indicates julian day
 	jday = int(str(jdate)[3:7])	
@@ -134,19 +133,19 @@ for item in results:
 	era_type = 'NULL'
 
 	#assign letters to each polarization
-	polarization = results[4]
+	polarization = item[4]
 
 	#indicates length of information in file
-	length = results[5]
+	length = item[5]
 
 	#indicates obsnum
-	obsnum = results[1]
+	obsnum = item[1]
 
 	#indicates md5sum
-	md5sum = results[2]
+	md5sum = item[2]
 
 	#location of raw files
-	raw_location = path_raw #do not know where they are for any of them yet
+	raw_location = host + ':' + path_raw #do not know where they are for any of them yet
 
 	#location of calibrate files
 	cal_location = 'NULL'
@@ -167,20 +166,12 @@ for item in results:
 	delete_file = 0 
 
 	#create list of important data and open csv file
-	databs = [[host,path,era,era_type,obsnum,md5sum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,sz,raw_sz,compressed,ready_to_tape,delete_file]]
+	databs = [[compr_path,era,era_type,obsnum,md5sum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,sz,raw_sz,compressed,ready_to_tape,delete_file]]
 	print databs 
 
 	#write to csv file by item in list
 	for item in databs:
 		wr.writerow(item)
-
-#Don't load if paperdistiller can be deleted
-if crawl == 'd':
-	if filecmp.cmp(db128,backup):
-		sys.exit()
-	else:
-		print 'backups have different information'
-		sys.exit()
 
 #Load data into named database and table
 
