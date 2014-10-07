@@ -9,8 +9,6 @@ import getpass
 import os
 
 ### Script to check for all day data compression
-### Counts all files of same Julian Date, looks for compression
-### changes ready_to_tape field if all compressed
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
