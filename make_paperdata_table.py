@@ -14,7 +14,6 @@ import getpass
 ### Date: 8-20-14
 
 #inputs for user to access database
-table = raw_input('Create table named: ')
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
 
@@ -27,7 +26,7 @@ cursor = connection.cursor()
 
 # execute the SQL query using execute() method.
 # Builds table by fields including defaults
-cursor.execute('''CREATE TABLE %s (
+cursor.execute('''CREATE TABLE paperdata (
 path VARCHAR(100) DEFAULT NULL,
 era INT DEFAULT NULL,
 era_type VARCHAR(100) DEFAULT NULL,
@@ -40,16 +39,17 @@ data_length DECIMAL(20,15) DEFAULT NULL,
 raw_location VARCHAR(100) DEFAULT NULL,
 cal_location VARCHAR(100) DEFAULT NULL,
 tape_location VARCHAR(100) DEFAULT NULL,
-compr_file_size(MB) DECIMAL(6,2) DEFAULT NULL,
-raw_file_size(MB) DECIMAL(10,2) DEFAULT NULL,
+compr_file_size_MB DECIMAL(6,2) DEFAULT NULL,
+raw_file_size_MB DECIMAL(10,2) DEFAULT NULL,
 compressed BOOLEAN DEFAULT FALSE,
 ready_to_tape BOOLEAN DEFAULT FALSE,
-delete_file BOOLEAN DEFAULT FALSE);''' %(table))
+delete_file BOOLEAN DEFAULT FALSE,
+restore_history VARCHAR(255) DEFAULT NULL);''')
 
 # fetch a single row using fetchone() method.
 row = cursor.fetchone()
 
-print 'Table %s created' %(table)
+print 'Table paperdata created'
 
 # close the cursor object
 cursor.close()
