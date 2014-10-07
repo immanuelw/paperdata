@@ -18,9 +18,6 @@ import os
 usrnm = raw_input('Root username: ')
 pswd = getpass.getpass('Root password: ')
 
-compressed = 'compressed'
-obsnum_string = 'obsnum'
-
 era = raw_input('32, 64, or 128?: ')
 era = int(era)
 
