@@ -38,7 +38,7 @@ fir_results = cursor.fetchall()
 #check if compressed file exists, if so set compr_value = 1
 for item in fir_results:
 	obsnum = item[0]
-	if os.path.isdir(item[1]):
+	if os.path.isdir(item[1].split(':')[1]):
 		compr_value = 1
 	else:
 		compr_value = 0
