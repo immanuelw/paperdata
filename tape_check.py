@@ -15,14 +15,8 @@ import os
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-table = 'paperdata'
 usrnm = raw_input('Root username: ')
 pswd = getpass.getpass('Root password: ')
-
-compressed = 'compressed'
-obsnum_string = 'obsnum'
-tape = 'ready_to_tape'
-j_day = 'julian_day'
 
 era = raw_input('32, 64, or 128?: ')
 era = int(era)
@@ -57,10 +51,10 @@ for item in thr_results:
 		if res[item[0]] == item[1]:
 			ready_to_tape = 1
 			cursor.execute('''
-	                UPDATE %s
-	                SET %s = %d
-	                WHERE %s = %d;
-	                '''%(table, tape, ready_to_tape, j_day, j_value))
+	                UPDATE paperdata
+	                SET ready_to_tape = %d
+	                WHERE julian_day = %d;
+	                '''%(ready_to_tape, j_value))
 
 print 'Table data updated.'
 
