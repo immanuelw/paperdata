@@ -32,11 +32,11 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 cursor = connection.cursor()
 
 #counting the amount of files in each day
-cursor.execute('SELECT julian_day, COUNT(*) FROM paperdata WHERE era = %d GROUP BY julian_day'%(era))
+cursor.execute('''SELECT julian_day, COUNT(*) FROM paperdata WHERE era = %d GROUP BY julian_day'''%(era))
 sec_results = cursor.fetchall()
 
 #counting the amount of compressed files in each day
-cursor.execute('''SELECT julian_day, COUNT(*), tape_location FROM paperdata WHERE era = %d and compressed = 1 and raw_location != 'NULL' GROUP BY julian_day'''%(era))
+cursor.execute('''SELECT julian_day, COUNT(*), tape_location, raw_location FROM paperdata WHERE era = %d and compressed = 1 and raw_location != 'NULL' GROUP BY julian_day'''%(era))
 thr_results = cursor.fetchall()
 
 #create dictionary with julian_day as key, count as value
@@ -46,7 +46,7 @@ for item in sec_results:
 #testing if same amount in each day, updating if so
 for item in thr_results:
 	j_value = item[0]
-	if item[2] == 'NULL':
+	if item[2] == 'NULL' and item[3] != 'ON TAPE':
 		if res[item[0]] == item[1]:
 			ready_to_tape = 1
 			cursor.execute('''
