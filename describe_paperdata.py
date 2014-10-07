@@ -32,8 +32,19 @@ cursor.execute('DESC paperdata')
 
 results = cursor.fetchall()
 
+header = []
+for i in cursor.description:
+	header.append(i[0])
+
+result = []
 for item in results:
-	pd.writeline(item)	
+	result.append(list(item))
+
+result.insert(0,header)
+
+for item in result:
+	pd.write(' \t\t'.join(str(s) for s in item) + '\n')
+#pd.writelines(result)
 
 # Close and save all changes to database
 cursor.close()
