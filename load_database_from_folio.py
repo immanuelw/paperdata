@@ -7,10 +7,12 @@ import MySQLdb
 import sys
 import getpass
 import os
-import inspect
 import csv
 import aipy as A
 import hashlib
+import glob
+import socket
+import decimal
 
 ### Script to load data from folio into paperdata database
 ### Crawls folio and reads through .uvcRRE files to generate all field information
@@ -34,11 +36,12 @@ def get_size(start_path):
 	return total_size
 
 def sizeof_fmt(num):
-	for x in ['bytes','KB','MB','GB']:
+	for x in ['bytes','KB','MB']:
 		if num < 1024.0:
 			return "%3.1f%s" % (num, x)
 		num /= 1024.0
-	return "%3.1f%s" % (num, 'TB')
+	num */ 1024.0
+	return "%3.1f" % (num)
 
 #User input information
 db = raw_input('32, 64, or 128?: ')
@@ -47,37 +50,19 @@ datab = 'paperdata'
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
 
-data32 = '/data4/raw_data/'
-data64 = '/data4/paper/2012EoR/psa_live/'
-data128 = '/data4/paper/still_raw_data_test/'
+datanum = raw_input('Input file path: ')
 
-db32 = '/data2/home/immwa/scripts/paper_output/db_output32.csv'
-db64 = '/data2/home/immwa/scripts/paper_output/db_output64.csv'
-db128 = '/data2/home/immwa/scripts/paper_output/db_output128.csv'
+dbo = '/data2/home/immwa/scripts/paper_output/db_out.csv'
 
-host = 'folio'
+host = socket.gethostname()
 
-#searches for only particular files
-if db == '32':
-	datanum = data32
-	dbnum = db32
-elif db == '64':
-	datanum = data64
-	dbnum = db64
-elif db == '128':
-	datanum = data128
-	dbnum = db128
-
-#combined all eras into one table
-table_name = 'paperdata'
-
-resultFile = open(dbnum,'wb')
+resultFile = open(dbo,'wb')
 
 #create 'writer' object
 wr = csv.writer(resultFile, dialect='excel')
 
 #create csv file to log bad files
-error_file = open('/data2/home/immwa/scripts/paper_output/', 'a')
+error_file = open('/data2/home/immwa/scripts/paper_output/false.csv', 'a')
 ewr = csv.writer(error_file, dialect='excel')
 
 #create function to uniquely identify files
@@ -109,174 +94,177 @@ def md5sum(fname):
 		buf = afile.read(BLOCKSIZE)
 	return hasher.hexdigest()
 
+decimal.getcontext().prec = 2
+
 #iterates through directories, listing information about each one
-for root, dirs, files in os.walk(datanum):
-	#brute force check to avoid other files within searched directories
-	if db =='32':
-		datatruth = len(root) > 26 and len(root) < 34 and root[16] =='p'
-	elif db == '64':
-		datatruth = len(root) > 36 and len(root) < 64 and root[30] == 'p'
-	elif db == '128':
-		#need to change to 128 specifications
-		#datatruth = len(root) > 36 and len(root) < 64 and root[30] == 'p'
-		datatruth = len(root) >	15
+dirs = glob.glob(datanum)
+	for dir in dirs:
+		#indicates name of full directory
+		compr_path = host + ':' + dir
+		path = path.split(':')[1]
 
-	if datatruth:
-		for dir in dirs:
-			#if filename ends with uvcRRE, record into file
-			if dir[-6:] == 'uvcRRE' and len(dir) > 6:
-				#indicates name of full directory
-				path = os.path.join(root, dir)
-				print path
+		#indicates size of compressed file, removing units
+		lil_byte = sizeof_fmt(get_size(path))
 
-				#indicates size of file
-				sz = sizeof_fmt(get_size(path))
+		if lil_byte[-1] == 'B':
+			compr_file_size = decimal.Decimal(lil_byte[:-2])
+		elif lil_byte[-1] == 's':
+			compr_file_size = decimal.Decimal(lil_byte[:-5])
+		else:
+			compr_file_size = decimal.Decimal(lil_byte)
 
-				#checks a .uv file for data
-				visdata = os.path.join(path, 'visdata')
-				if not os.path.isfile(visdata):
-					error_list = [[path,'No visdata']]
-					for item in error_list:
-						ewr.writerow(item)
-					continue
+		#checks a .uv file for data
+		visdata = os.path.join(path, 'visdata')
+		if not os.path.isfile(visdata):
+			error_list = [[path,'No visdata']]
+			for item in error_list:
+				ewr.writerow(item)
+			continue
 
-                                #allows uv access
-				try:
-					uv = A.miriad.UV(path)
-				except:
-					error_list = [[path,'Cannot access .uv file']]
-                                        for item in error_list:
-                                                ewr.writerow(item)
-					continue	
+		#allows uv access
+		try:
+			uv = A.miriad.UV(path)
+		except:
+			error_list = [[path,'Cannot access .uv file']]
+			for item in error_list:
+				ewr.writerow(item)
+			continue	
 
-				#indicates julian date
-				jdate = uv['time']
+		#indicates julian date
+		jdate = uv['time']
 
+		#indicates julian day and set of data
+		if jdate < 2456100:
+			jday = int(str(jdate)[4:7])
+			era = 32
+		else:
+			jday = int(str(jdate)[3:7])	
+			if jdate < 2456400:
+				era = 64
+			else:
+				era = 128
 
-				#indicates julian day
-				if datanum == data32:
-					jday = int(str(jdate)[4:7])
-				elif datanum == data64:
-					jday = int(str(jdate)[3:7])
-				elif datanum == data128:
-					jday = int(str(jdate)[3:7])	
+		#indicates type of file in era
+		era_type = 'NULL'
 
-				#indicates set of data used
-				if datanum == data32:
-					era = 32
-				elif datanum == data64:
-					era = 64
-				elif datanum == data128:
-					era = 128
+		#assign letters to each polarization
+		if uv['npol'] == 1:
+			if uv['pol'] == -5:
+				polarization = 'xx'
+			elif uv['pol'] == -6:
+				polarization = 'yy'
+			elif uv['pol'] == -7:
+				polarization = 'xy'
+			elif uv['pol'] == -8:
+				polarization = 'yx' 
+		elif uv['npol'] == 4:
+		#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
+			polarization = 'yy'
 
-				#indicates type of file in era
-				era_type = 'NULL'
+		t_min = 0
+		t_max = 0
+		n_times = 0
+		c_time = 0
 
-				#assign letters to each polarization
-				if uv['npol'] == 1:
-					if uv['pol'] == -5:
-						polarization = 'xx'
-					elif uv['pol'] == -6:
-						polarization = 'yy'
-					elif uv['pol'] == -7:
-						polarization = 'xy'
-					elif uv['pol'] == -8:
-						polarization = 'yx' 
-				elif uv['npol'] == 4:
-				#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
-					polarization = 'yy'
+		for (uvw, t, (i,j)),d in uv.all():
+			if t_min == 0 or t < t_min:
+				t_min = t
+			if t_max == 0 or t > t_max:
+				t_max = t
+			if c_time != t:
+				c_time = t
+				n_times += 1
 
-				#indicates length of information in file
-				#length = uv['inttime'] 
+		if n_times > 1:
+			dt = -(t_min - t_max)/(n_times - 1)
+		else:
+			dt = -(t_min - t_max)/(n_times)
 
-				t_min = 0
-				t_max = 0
-				n_times = 0
-				c_time = 0
+		length = n_times * dt
+		#round so fits obsnum
+		length = round(length, 5)
 
-				for (uvw, t, (i,j)),d in uv.all():
-					if t_min == 0 or t < t_min:
-						t_min = t
-					if t_max == 0 or t > t_max:
-                                                t_max = t
-					if c_time != t:
-						c_time = t
-						n_times += 1
+		#variable to input into jdpol2obsnum
+		divided_jdate = length
 
-				if n_times > 1:
-					dt = -(t_min - t_max)/(n_times - 1)
-				else:
-					dt = -(t_min - t_max)/(n_times)
+		#gives each file unique id
+		if length > 0:
+			obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
+		else:
+			obsnum = 0
 
-				length = n_times * dt
-				#round so fits obsnum
-				length = round(length, 5)
+		#location of raw files
+		raw_location = compr_path[:-4] #assume in same directory
+		if not os.path.isdir((raw_location.split(':')[1]):
+			raw_location = 'NULL'
 
-				#variable to input into jdpol2obsnum
-				divided_jdate = length
+		#gives each file more unique id
+			mdsum = md5sum(raw_location.split(':')[1])
 
-				#gives each file unique id
-				if length > 0:
-					obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
-				else:
-					obsnum = 0
+		#size of raw file, removing unit size
+		big_byte = sizeof_fmt(get_size(raw_location.split(':')[1]))
 
-				#location of raw files
-				raw_location = path[:-4] #assume in same directory
+		if big_byte[-1] == 'B':
+			raw_file_size = decimal.Decimal(big_byte[:-2])
+		elif big_byte[-1] == 's':
+			raw_file_size = decimal.Decimal(big_byte[:-5])
+		else:
+			raw_file_size = decimal.Decimal(big_byte)
 
-				#location of calibrate files
-                                if datanum == data32:
-					cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
-                                elif datanum == data64:
-					cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
-				elif datanum == data128:
-					cal_location = 'NULL'
+		#location of calibrate files
+		if era == 32:
+			cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
+		elif era == 64:
+			cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
+		elif era == 128:
+			cal_location = 'NULL'
 
-				#indicates if file is compressed
-				compressed = 1
+		#indicates if file is compressed
+		if os.path.isdir(path):
+			compressed = 1
+		else:
+			compressed = 0
 
-				#shows location of raw data on tape
-				tape_location = 'NULL'
+		#shows location of raw data on tape
+		tape_location = 'NULL'
 
-				#variable indicating if all files have been successfully compressed in one day
-				ready_to_tape = 0
+		#variable indicating if all files have been successfully compressed in one day
+		ready_to_tape = 0
 
-				#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
-				delete_file = 0 
+		#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
+		delete_file = 0 
 
-				#create list of important data and open csv file
-				databs = [[host,path,era,era_type,obsnum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,str(sz),compressed,ready_to_tape,delete_file]]
+		#indicates times the file has been restored
+		restore_history = 'NULL'
+
+		#create list of important data and open csv file
+		databs = [[compr_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,compr_file_size,raw_file_size,compressed,ready_to_tape,delete_file,restore_history]]
 				print databs 
 
-				#write to csv file by item in list
-				for item in databs:
-					wr.writerow(item)
+		#write to csv file by item in list
+		for item in databs:
+			wr.writerow(item)
 
 #Load data into named database and table
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = datab, local_infile=True)
+connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
 
 print dbnum 
 # execute the SQL query using execute() method.
-cursor.execute('''USE paperdata;
-LOAD DATA LOCAL INFILE '%s' INTO TABLE %s
+cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata
 COLUMNS TERMINATED BY ','
-LINES TERMINATED BY '\n' '''%(dbnum, table_name))
+LINES TERMINATED BY '\n' '''%(dbo))
 
 print 'Table data loaded.'
 
-# close the cursor object
+#Close and save changes to database
 cursor.close()
-
-#save changes to database
 connection.commit()
-
-# close the connection
 connection.close()
 
 # exit the program
