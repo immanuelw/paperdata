@@ -40,7 +40,7 @@ def sizeof_fmt(num):
 		if num < 1024.0:
 			return "%3.1f%s" % (num, x)
 		num /= 1024.0
-	num */ 1024.0
+	num *= 1024.0
 	return "%3.1f" % (num)
 
 #User input information
@@ -192,7 +192,7 @@ for dir in dirs:
 
 	#location of raw files
 	raw_location = compr_path[:-4] #assume in same directory
-	if not os.path.isdir((raw_location.split(':')[1]):
+	if not os.path.isdir(raw_location.split(':')[1]):
 		raw_location = 'NULL'
 
 	#gives each file more unique id

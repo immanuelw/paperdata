@@ -40,7 +40,7 @@ def sizeof_fmt(num):
 		if num < 1024.0:
 			return "%3.1f%s" % (num, x)
 		num /= 1024.0
-	num */ 1024.0
+	num *= 1024.0
 	return "%3.1f" % (num)
 
 #User input information
@@ -102,7 +102,7 @@ for dir in dirs:
 	#location of raw files
 	raw_path = host + ':' + dir
 	raw_location = dir
-	if not os.path.isdir((raw_location.split(':')[1])):
+	if not os.path.isdir(raw_location.split(':')[1]):
 		raw_location = 'NULL'
 
 	#allows uv access
@@ -153,7 +153,7 @@ for dir in dirs:
 	#location of raw files
 	raw_path = host + ':' + dir
 	raw_location = dir
-	if not os.path.isdir((raw_location.split(':')[1]):
+	if not os.path.isdir(raw_location.split(':')[1]):
 		raw_location = 'NULL'
 
 	#gives each file more unique id
@@ -194,12 +194,12 @@ for dir in dirs:
 
 	#create list of important data and open csv file
 	databs = [[compr_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_path,cal_location,tape_location,compr_file_size,raw_file_size,compressed,ready_to_tape,delete_file,restore_history]]
-				print databs 
+	print databs 
 
 	#write to csv file by item in list
 	for item in databs:
 		wr.writerow(item)
-
+"""
 #Load data into named database and table
 
 # open a database connection
@@ -224,3 +224,5 @@ connection.close()
 
 # exit the program
 sys.exit()
+'''
+"""
