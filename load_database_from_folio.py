@@ -46,7 +46,6 @@ def sizeof_fmt(num):
 #User input information
 db = raw_input('32, 64, or 128?: ')
 
-datab = 'paperdata'
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
 
