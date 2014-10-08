@@ -44,8 +44,6 @@ def sizeof_fmt(num):
 	return "%3.1f" % (num)
 
 #User input information
-db = raw_input('32, 64, or 128?: ')
-
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
 
@@ -97,152 +95,152 @@ decimal.getcontext().prec = 2
 
 #iterates through directories, listing information about each one
 dirs = glob.glob(datanum)
-	for dir in dirs:
-		#indicates name of full directory
-		compr_path = host + ':' + dir
-		path = path.split(':')[1]
+for dir in dirs:
+	#indicates name of full directory
+	compr_path = host + ':' + dir
+	path = path.split(':')[1]
 
-		#indicates size of compressed file, removing units
-		lil_byte = sizeof_fmt(get_size(path))
+	#indicates size of compressed file, removing units
+	lil_byte = sizeof_fmt(get_size(path))
 
-		if lil_byte[-1] == 'B':
-			compr_file_size = decimal.Decimal(lil_byte[:-2])
-		elif lil_byte[-1] == 's':
-			compr_file_size = decimal.Decimal(lil_byte[:-5])
+	if lil_byte[-1] == 'B':
+		compr_file_size = decimal.Decimal(lil_byte[:-2])
+	elif lil_byte[-1] == 's':
+		compr_file_size = decimal.Decimal(lil_byte[:-5])
+	else:
+		compr_file_size = decimal.Decimal(lil_byte)
+
+	#checks a .uv file for data
+	visdata = os.path.join(path, 'visdata')
+	if not os.path.isfile(visdata):
+		error_list = [[path,'No visdata']]
+		for item in error_list:
+			ewr.writerow(item)
+		continue
+
+	#allows uv access
+	try:
+		uv = A.miriad.UV(path)
+	except:
+		error_list = [[path,'Cannot access .uv file']]
+		for item in error_list:
+			ewr.writerow(item)
+		continue	
+
+	#indicates julian date
+	jdate = uv['time']
+
+	#indicates julian day and set of data
+	if jdate < 2456100:
+		jday = int(str(jdate)[4:7])
+		era = 32
+	else:
+		jday = int(str(jdate)[3:7])	
+		if jdate < 2456400:
+			era = 64
 		else:
-			compr_file_size = decimal.Decimal(lil_byte)
+			era = 128
 
-		#checks a .uv file for data
-		visdata = os.path.join(path, 'visdata')
-		if not os.path.isfile(visdata):
-			error_list = [[path,'No visdata']]
-			for item in error_list:
-				ewr.writerow(item)
-			continue
+	#indicates type of file in era
+	era_type = 'NULL'
 
-		#allows uv access
-		try:
-			uv = A.miriad.UV(path)
-		except:
-			error_list = [[path,'Cannot access .uv file']]
-			for item in error_list:
-				ewr.writerow(item)
-			continue	
-
-		#indicates julian date
-		jdate = uv['time']
-
-		#indicates julian day and set of data
-		if jdate < 2456100:
-			jday = int(str(jdate)[4:7])
-			era = 32
-		else:
-			jday = int(str(jdate)[3:7])	
-			if jdate < 2456400:
-				era = 64
-			else:
-				era = 128
-
-		#indicates type of file in era
-		era_type = 'NULL'
-
-		#assign letters to each polarization
-		if uv['npol'] == 1:
-			if uv['pol'] == -5:
-				polarization = 'xx'
-			elif uv['pol'] == -6:
-				polarization = 'yy'
-			elif uv['pol'] == -7:
-				polarization = 'xy'
-			elif uv['pol'] == -8:
-				polarization = 'yx' 
-		elif uv['npol'] == 4:
-		#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
+	#assign letters to each polarization
+	if uv['npol'] == 1:
+		if uv['pol'] == -5:
+			polarization = 'xx'
+		elif uv['pol'] == -6:
 			polarization = 'yy'
+		elif uv['pol'] == -7:
+			polarization = 'xy'
+		elif uv['pol'] == -8:
+			polarization = 'yx' 
+	elif uv['npol'] == 4:
+	#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
+		polarization = 'yy'
 
-		t_min = 0
-		t_max = 0
-		n_times = 0
-		c_time = 0
+	t_min = 0
+	t_max = 0
+	n_times = 0
+	c_time = 0
 
-		for (uvw, t, (i,j)),d in uv.all():
-			if t_min == 0 or t < t_min:
-				t_min = t
-			if t_max == 0 or t > t_max:
-				t_max = t
-			if c_time != t:
-				c_time = t
-				n_times += 1
+	for (uvw, t, (i,j)),d in uv.all():
+		if t_min == 0 or t < t_min:
+			t_min = t
+		if t_max == 0 or t > t_max:
+			t_max = t
+		if c_time != t:
+			c_time = t
+			n_times += 1
 
-		if n_times > 1:
-			dt = -(t_min - t_max)/(n_times - 1)
-		else:
-			dt = -(t_min - t_max)/(n_times)
+	if n_times > 1:
+		dt = -(t_min - t_max)/(n_times - 1)
+	else:
+		dt = -(t_min - t_max)/(n_times)
 
-		length = n_times * dt
-		#round so fits obsnum
-		length = round(length, 5)
+	length = n_times * dt
+	#round so fits obsnum
+	length = round(length, 5)
 
-		#variable to input into jdpol2obsnum
-		divided_jdate = length
+	#variable to input into jdpol2obsnum
+	divided_jdate = length
 
-		#gives each file unique id
-		if length > 0:
-			obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
-		else:
-			obsnum = 0
+	#gives each file unique id
+	if length > 0:
+		obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
+	else:
+		obsnum = 0
 
-		#location of raw files
-		raw_location = compr_path[:-4] #assume in same directory
-		if not os.path.isdir((raw_location.split(':')[1]):
-			raw_location = 'NULL'
+	#location of raw files
+	raw_location = compr_path[:-4] #assume in same directory
+	if not os.path.isdir((raw_location.split(':')[1]):
+		raw_location = 'NULL'
 
-		#gives each file more unique id
-			mdsum = md5sum(raw_location.split(':')[1])
+	#gives each file more unique id
+	mdsum = md5sum(raw_location.split(':')[1])
 
-		#size of raw file, removing unit size
-		big_byte = sizeof_fmt(get_size(raw_location.split(':')[1]))
+	#size of raw file, removing unit size
+	big_byte = sizeof_fmt(get_size(raw_location.split(':')[1]))
 
-		if big_byte[-1] == 'B':
-			raw_file_size = decimal.Decimal(big_byte[:-2])
-		elif big_byte[-1] == 's':
-			raw_file_size = decimal.Decimal(big_byte[:-5])
-		else:
-			raw_file_size = decimal.Decimal(big_byte)
+	if big_byte[-1] == 'B':
+		raw_file_size = decimal.Decimal(big_byte[:-2])
+	elif big_byte[-1] == 's':
+		raw_file_size = decimal.Decimal(big_byte[:-5])
+	else:
+		raw_file_size = decimal.Decimal(big_byte)
 
-		#location of calibrate files
-		if era == 32:
-			cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
-		elif era == 64:
-			cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
-		elif era == 128:
-			cal_location = 'NULL'
+	#location of calibrate files
+	if era == 32:
+		cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
+	elif era == 64:
+		cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
+	elif era == 128:
+		cal_location = 'NULL'
 
-		#indicates if file is compressed
-		if os.path.isdir(path):
-			compressed = 1
-		else:
-			compressed = 0
+	#indicates if file is compressed
+	if os.path.isdir(path):
+		compressed = 1
+	else:
+		compressed = 0
 
-		#shows location of raw data on tape
-		tape_location = 'NULL'
+	#shows location of raw data on tape
+	tape_location = 'NULL'
 
-		#variable indicating if all files have been successfully compressed in one day
-		ready_to_tape = 0
+	#variable indicating if all files have been successfully compressed in one day
+	ready_to_tape = 0
 
-		#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
-		delete_file = 0 
+	#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
+	delete_file = 0 
 
-		#indicates times the file has been restored
-		restore_history = 'NULL'
+	#indicates times the file has been restored
+	restore_history = 'NULL'
 
-		#create list of important data and open csv file
-		databs = [[compr_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,compr_file_size,raw_file_size,compressed,ready_to_tape,delete_file,restore_history]]
-				print databs 
+	#create list of important data and open csv file
+	databs = [[compr_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,compr_file_size,raw_file_size,compressed,ready_to_tape,delete_file,restore_history]]
+	print databs 
 
-		#write to csv file by item in list
-		for item in databs:
-			wr.writerow(item)
+	#write to csv file by item in list
+	for item in databs:
+		wr.writerow(item)
 
 #Load data into named database and table
 
