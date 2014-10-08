@@ -100,16 +100,16 @@ for dir in dirs:
 	compr_file_size = 0.0
 
 	#location of raw files
-	raw_path = host + ':' + dir
-	raw_location = dir
+	raw_path = dir
+	raw_location = host + ':' + dir
 	if not os.path.isdir(raw_location.split(':')[1]):
 		raw_location = 'NULL'
 
 	#allows uv access
 	try:
-		uv = A.miriad.UV(raw_location)
+		uv = A.miriad.UV(raw_path)
 	except:
-		error_list = [[path,'Cannot access .uv file']]
+		error_list = [[raw_path,'Cannot access .uv file']]
 		for item in error_list:
 			ewr.writerow(item)
 		continue	
@@ -150,12 +150,6 @@ for dir in dirs:
 	#gives each file unique id
 	obsnum = 0
 
-	#location of raw files
-	raw_path = host + ':' + dir
-	raw_location = dir
-	if not os.path.isdir(raw_location.split(':')[1]):
-		raw_location = 'NULL'
-
 	#gives each file more unique id
 	mdsum = md5sum(raw_location.split(':')[1])
 
@@ -193,7 +187,7 @@ for dir in dirs:
 	restore_history = 'NULL'
 
 	#create list of important data and open csv file
-	databs = [[compr_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_path,cal_location,tape_location,compr_file_size,raw_file_size,compressed,ready_to_tape,delete_file,restore_history]]
+	databs = [[compr_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,compr_file_size,raw_file_size,compressed,ready_to_tape,delete_file,restore_history]]
 	print databs 
 
 	#write to csv file by item in list
