@@ -44,6 +44,9 @@ Important scripts:
 	backup_paperdata.py:
 		Used to backup the paperdata database, saving to a .csv file to be easily reloaded.
 
+	load_database_from_backup.py:
+		Used to refill paperdata after backup due to error or changed fields.
+
 	backup_paperdistiller.py:
 		Used to backup the several tables of paperdistiller -- Used mostly for testing purposes.
 
