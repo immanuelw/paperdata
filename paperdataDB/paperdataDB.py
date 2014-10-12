@@ -63,7 +63,7 @@ def dict():
 	return paperdata_dict
 
 def options():
-	opt = {EXACT:'exact', MIN:'min', MAX:'max', RANGE:'range', NONE:'none'}
+	opt = {EXACT:'EXACT', MIN:'MIN', MAX:'NAX', RANGE:'RANGE', NONE:'NONE'}
 	return opt
 
 def dbsearch(query, pswd):
