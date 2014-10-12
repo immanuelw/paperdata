@@ -1,14 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Load data into MySQL table 
+# Move data on folio and update paperdata database with new location
 
 # import the MySQLdb and sys modules
 import MySQLdb
 import sys
 import getpass
-import time
-import csv
 import shutil
+import glob
 
 ### Script to move and update paperdata database
 ### Moves .uvcRRE directory and updates path field in paperdata
@@ -16,38 +15,36 @@ import shutil
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-datab = 'paperdata'
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
 
-table = 'paperdata' 
-
 infile = raw_input('Full input path: ')
 outfile = raw_input('Full output path: ')
+
+infile_list = glob.glob(infile)
 
 #Load data into named database and table
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = datab, local_infile=True)
+connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
 
-# execute the SQL query using execute() method, updates new location
-cursor.execute('UPDATE paperdata set path = %s where path = %s'%(outfile, infile))
+for infile in infile_list:
+	#moves file
+	try:
+		shutil.move(infile,outfile)
+	except:
+		continue
+	# execute the SQL query using execute() method, updates new location
+	cursor.execute('UPDATE paperdata set path = %s where path = %s'%(outfile, infile))
 
-#moves file
-shutil.move(infile,outfile)
-
-print 'File moved and updated'
-# close the cursor object
+print 'File(s) moved and updated'
+#Close database and save changes
 cursor.close()
-
-#save changes to database
 connection.commit()
-
-# close the connection
 connection.close()
 
 # exit the program
