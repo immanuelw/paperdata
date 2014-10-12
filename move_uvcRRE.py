@@ -8,6 +8,7 @@ import sys
 import getpass
 import shutil
 import glob
+import socket
 
 ### Script to move and update paperdata database
 ### Moves .uvcRRE directory and updates path field in paperdata
@@ -18,9 +19,12 @@ import glob
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
 
+#File information
+host = socket.gethostname()
 infile = raw_input('Full input path: ')
 outfile = raw_input('Full output path: ')
 
+#List of files in directory -- allowing mass movement of .uvcRRE files
 infile_list = glob.glob(infile)
 
 #Load data into named database and table
@@ -39,7 +43,9 @@ for infile in infile_list:
 	except:
 		continue
 	# execute the SQL query using execute() method, updates new location
-	cursor.execute('UPDATE paperdata set path = %s where path = %s'%(outfile, infile))
+	infile_path = host + ':' + infile
+	outfile_path = host + ':' + outfile
+	cursor.execute('UPDATE paperdata set path = %s where path = %s'%(outfile_path, infile_path))
 
 print 'File(s) moved and updated'
 #Close database and save changes
