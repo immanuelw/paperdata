@@ -134,12 +134,12 @@ def fetch(info_list):
 
 	for item in query:
 		if len(query) == 1:
-			dbstr = 'SELECT ' + item + 'FROM paperdata WHERE' + qsearch
+			dbstr = 'SELECT ' + item + ' FROM paperdata WHERE ' + qsearch
 		else:
 			if item == query[0]:
 				dbstr = 'SELECT ' + item + ','
 			elif item == query[-1]:
-				dbstr = dbstr + item + 'FROM paperdata WHERE' + qsearch
+				dbstr = dbstr + item + ' FROM paperdata WHERE ' + qsearch
 
 	return dbstr
 
