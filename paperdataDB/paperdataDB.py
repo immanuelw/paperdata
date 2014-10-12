@@ -121,7 +121,6 @@ def fetch(info_list):
 
 			#adding info to lists to generate strings later
 			query.append(field)
-			searchstr.append('%s LIKE %' %(field))
 
 		else:
 			sys.exit() #HOW SHOULD I THROW ERRORS?
