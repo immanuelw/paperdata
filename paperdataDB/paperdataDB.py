@@ -14,9 +14,9 @@ import getpass
 
 #for files do
 # import paperdataDB as pdb
-#files = pdb.dbsearch(pdb.fetch(list_of_info))
+#files = pdb.dbsearch(pdb.fetch(list_of_info), pswd)
 #OR combine dbsearch to include both
-#files = pdf.dbseach(list_of_info)
+#files = pdf.dbsearch(list_of_info, pswd)
 
 def fields():
 	field_list = ['path', 'era', 'era_type', 'obsnum', 'md5sum', 'julian_day', 'julian_date', 'polarization', 'data_length', 'raw_location', 'cal_location', 'tape_location', 'file_size_MB', 'raw_file_size_MB', 'compressed', 'ready_to_tape', 'delete_file', 'restore_history']
@@ -31,15 +31,10 @@ def options():
 	opt = ['exact', 'min', 'max', 'range', 'none']
 	return opt
 
-#allows user to input database and table queried
-
-usrnm = raw_input('Username: ')
-pswd = getpass.getpass('Password: ')
-
-def dbsearch(query):
+def dbsearch(query, pswd):
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = 'immwa', passwd = pswd, db = 'paperdata', local_infile=True)
 
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor()
@@ -146,5 +141,7 @@ def fetch(info_list):
 	return dbstr
 
 #Only do things if running this script, not importing
-#if __name__ == '__main__':
-#
+if __name__ == '__main__':
+	#allows user to input database and table queried
+	usrnm = raw_input('Username: ')
+	pswd = getpass.getpass('Password: ')
