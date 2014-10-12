@@ -133,10 +133,13 @@ def fetch(info_list):
 			qsearch = qsearch + ' and ' + item
 
 	for item in query:
-		if item == query[0]:
-			dbstr = 'SELECT ' + item + ','
-		elif item == query[-1]:
-			dbstr = dbstr + item + 'FROM paperdata WHERE' + qsearch
+		if len(query) == 1:
+			dbstr = 'SELECT ' + item + 'FROM paperdata WHERE' + qsearch
+		else:
+			if item == query[0]:
+				dbstr = 'SELECT ' + item + ','
+			elif item == query[-1]:
+				dbstr = dbstr + item + 'FROM paperdata WHERE' + qsearch
 
 	return dbstr
 
