@@ -121,7 +121,7 @@ def fetch(info_list):
 
 			#adding info to lists to generate strings later
 			query.append(field)
-			searchstr.append('')
+			searchstr.append('%')
 
 		else:
 			sys.exit() #HOW SHOULD I THROW ERRORS?
@@ -137,9 +137,11 @@ def fetch(info_list):
 			dbstr = 'SELECT ' + item + ' FROM paperdata WHERE ' + qsearch
 		else:
 			if item == query[0]:
-				dbstr = 'SELECT ' + item + ','
+				dbstr = 'SELECT ' + item + ', '
 			elif item == query[-1]:
 				dbstr = dbstr + item + ' FROM paperdata WHERE ' + qsearch
+			else:
+				dbstr = dbstr + item + ', '
 
 	return dbstr
 
