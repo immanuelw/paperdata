@@ -71,7 +71,7 @@ def fetch(info_list):
 
 		if item[1] == 'exact':
 			if len(item[2]) != 1:
-				print 'ERROR -- LIST %s does not have enough entries' %(item)
+				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
 			exact = item[2][0]
@@ -82,7 +82,7 @@ def fetch(info_list):
 
 		elif item[1] == 'min':
 			if len(item[2]) != 1:
-				print 'ERROR -- LIST %s does not have enough entries' %(item)
+				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
 			min = item[2][0]
@@ -93,7 +93,7 @@ def fetch(info_list):
 
 		elif item[1] == 'max':
 			if len(item[2]) != 1:
-				print 'ERROR -- LIST %s does not have enough entries' %(item) 
+				print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
 			max = item[2][0]
@@ -104,7 +104,7 @@ def fetch(info_list):
 
 		elif item[1] == 'range':
 			if len(item[2]) != 2:
-				print 'ERROR -- LIST %s does not have enough entries' %(item) 
+				print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
 			min = item[2][0]
@@ -115,8 +115,8 @@ def fetch(info_list):
 			searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
 
 		elif item[1] == 'none':
-			if len(item[2]) != 1:
-				print 'ERROR -- LIST %s does not have enough entries' %(item) 
+			if len(item[2]) != 0:
+				print 'ERROR -- LIST %s has too many entries' %(item) 
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
 			#adding info to lists to generate strings later
