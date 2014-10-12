@@ -13,19 +13,50 @@ import getpass
 #Input list which indicates certain aspects fo the query
 
 #for files do
-# import paperdataDB as pdb
+# import paperdataDB.paperdataDB as pdb
 #files = pdb.dbsearch(pdb.fetch(list_of_info), pswd)
 #OR combine dbsearch to include both
 #files = pdf.dbsearch(list_of_info, pswd)
+
+# config variables
+PATH = 0
+ERA = 1
+ERA_TYPE = 2
+OBSNUM = 3
+MD5SUM = 4
+JDAY = 5
+JDATE = 6
+POL = 7
+LENGTH = 8
+RAW_PATH = 9
+CAL_PATH = 10
+TAPE_PATH = 11
+COMPR_SIZE= 12
+RAW_SIZE= 13
+COMPRESSED= 14
+READY_TO_TAPE= 15
+DELETE_FILE = 16
+RESTORE= 17
+
+MIN = 20
+MAX = 21
+EXACT = 22 
+RANGE = 23
+NONE = 24
+
+SEARCH = 30
+NOSEARCH = 31
+
+paperdata_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_location', CAL_PATH:'cal_location', TAPE_PATH:'tape_location', COMPR_SIZE:'file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', READY_TO_TAPE:'ready_to_tape', DELETE_FILE:'delete_file', RESTORE:'restore_history'}
 
 def fields():
 	field_list = ['path', 'era', 'era_type', 'obsnum', 'md5sum', 'julian_day', 'julian_date', 'polarization', 'data_length', 'raw_location', 'cal_location', 'tape_location', 'file_size_MB', 'raw_file_size_MB', 'compressed', 'ready_to_tape', 'delete_file', 'restore_history']
 
 	return field_list
 
-#def dict():
-#	paperdata_dict = {}
-#	return paperdata_dict
+def dict():
+	paperdata_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_location', CAL_PATH:'cal_location', TAPE_PATH:'tape_location', COMPR_SIZE:'file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', READY_TO_TAPE:'ready_to_tape', DELETE_FILE:'delete_file', RESTORE:'restore_history'}
+	return paperdata_dict
 
 def options():
 	opt = ['exact', 'min', 'max', 'range', 'none']
