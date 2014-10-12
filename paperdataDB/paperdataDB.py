@@ -31,12 +31,12 @@ LENGTH = 8
 RAW_PATH = 9
 CAL_PATH = 10
 TAPE_PATH = 11
-COMPR_SIZE= 12
-RAW_SIZE= 13
-COMPRESSED= 14
+COMPR_SIZE = 12
+RAW_SIZE = 13
+COMPRESSED = 14
 READY_TO_TAPE= 15
 DELETE_FILE = 16
-RESTORE= 17
+RESTORE_HISTORY = 17
 
 MIN = 20
 MAX = 21
@@ -47,7 +47,11 @@ NONE = 24
 SEARCH = 30
 NOSEARCH = 31
 
-pd_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_location', CAL_PATH:'cal_location', TAPE_PATH:'tape_location', COMPR_SIZE:'file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', READY_TO_TAPE:'ready_to_tape', DELETE_FILE:'delete_file', RESTORE:'restore_history'}
+def constants():
+	const = {PATH:'PATH', ERA:'ERA', ERA_TYPE:'ERA_TYPE', OBSNUM:'OBSNUM', MD5SUM:'MS5SUM', JDAY:'JDAY', JDATE:'JDATE', POL:'POL', LENGTH:'LENGTH', RAW_PATH:'RAW_PATH', CAL_PATH:'CAL_PATH', TAPE_PATH:'TAPE_PATH', COMPR_SIZE:'COMPR_SIZE', RAW_SIZE:'RAW_SIZE', COMPRESSED:'COMPRESSED', READY_TO_TAPE:'READY_TO_TAPE', DELETE_FILE:'DELETE_FILE', RESTORE_HISTORY:'RESTORE_HISTORY', MIN:'MIN', MAX:'MAX', EXACT:'EXACT', RANGE:'RANGE', NONE:'NONE', SEARCH:'SEARCH', NOSEARCH:'NOSEARCH'}
+	return const
+
+pd_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_location', CAL_PATH:'cal_location', TAPE_PATH:'tape_location', COMPR_SIZE:'file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', READY_TO_TAPE:'ready_to_tape', DELETE_FILE:'delete_file', RESTORE_HISTORY:'restore_history'}
 
 def fields():
 	field_list = ['path', 'era', 'era_type', 'obsnum', 'md5sum', 'julian_day', 'julian_date', 'polarization', 'data_length', 'raw_location', 'cal_location', 'tape_location', 'file_size_MB', 'raw_file_size_MB', 'compressed', 'ready_to_tape', 'delete_file', 'restore_history']
@@ -59,7 +63,7 @@ def dict():
 	return paperdata_dict
 
 def options():
-	opt = ['exact', 'min', 'max', 'range', 'none']
+	opt = {EXACT:'exact', MIN:'min', MAX:'max', RANGE:'range', NONE:'none'}
 	return opt
 
 def dbsearch(query, pswd):
