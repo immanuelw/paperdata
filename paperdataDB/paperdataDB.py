@@ -59,68 +59,73 @@ def fetch(info_list):
 	query = []
 	searchstr = []
 
-	#info list should be [[field_name, option, [more_info]], 
-	#ex: [['era', 'exact', [32]], ['path', 'none', []], ['julian_day', 'range', [922, 935]]]
+	#info list should be [[field_name, search_field, option, [more_info]], 
+	#ex: [['era', 'nosearch', 'exact', [32]], ['path', 'search', 'none', []], ['julian_day', ' search', 'range', [922, 935]]]
 	for item in info_list:
-		if len(item) != 3:
+		if len(item) != 4:
 			print 'ERROR -- LIST %s does not have enough entries' %(item)
 			sys.exit() #HOW SHOULD I THROW ERRORS?
 
 		#instantiates field variable
 		field = item[0]
 
-		if item[1] == 'exact':
-			if len(item[2]) != 1:
+		if item[2] == 'exact':
+			if len(item[3]) != 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
-			exact = item[2][0]
+			exact = item[3][0]
 
 			#adding info to lists to generate strings later
-			query.append(field)
+			if item[1] == 'search':
+				query.append(field)
 			searchstr.append('%s = %d'%(field, exact))
 
-		elif item[1] == 'min':
-			if len(item[2]) != 1:
+		elif item[2] == 'min':
+			if len(item[3]) != 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
-			min = item[2][0]
+			min = item[3][0]
 
 			#adding info to lists to generate strings later
-			query.append(field)
+			if item[1] == 'search':
+				query.append(field)
 			searchstr.append('%s >= %d'%(field, min))
 
-		elif item[1] == 'max':
-			if len(item[2]) != 1:
+		elif item[2] == 'max':
+			if len(item[3]) != 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
-			max = item[2][0]
+			max = item[3][0]
 
 			#adding info to lists to generate strings later
-			query.append(field)
+			if item[1] == 'search':
+				query.append(field)
 			searchstr.append('%s <= %d'%(field, max))
 
-		elif item[1] == 'range':
-			if len(item[2]) != 2:
+		elif item[2] == 'range':
+			if len(item[3]) != 2:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
-			min = item[2][0]
-			max = item[2][1]
+			min = item[3][0]
+			max = item[3][1]
 
 			#adding info to lists to generate strings later
-			query.append(field)
+			if item[1] == 'search':
+				query.append(field)
 			searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
 
-		elif item[1] == 'none':
-			if len(item[2]) != 0:
+		elif item[2] == 'none':
+			if len(item[3]) != 0:
 				print 'ERROR -- LIST %s has too many entries' %(item) 
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
 			#adding info to lists to generate strings later
-			query.append(field)
+			if item[1] == 'search':
+				query.append(field)
 
 		else:
 			sys.exit() #HOW SHOULD I THROW ERRORS?
