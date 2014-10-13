@@ -89,7 +89,6 @@ print 'Database backup saved'
 
 # Close connectin to database and save all changes
 cursor.close()
-connection.commit()
 connection.close()
 
 # exit the program

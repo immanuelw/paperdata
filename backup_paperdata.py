@@ -54,13 +54,8 @@ for item in results:
 print time_date
 print 'Table data backup saved'
 
-# close the cursor object
+# Close the cursor object
 cursor.close()
-
-#save changes to database
-connection.commit()
-
-# close the connection
 connection.close()
 
 # exit the program

@@ -49,13 +49,8 @@ def dbsearch(query):
    #complete
    print 'Query Complete'
 
-   # close the cursor object
+   # Close the cursor object
    cursor.close()
-
-   #save changes to database
-   connection.commit()
-
-   # close the connection
    connection.close()
 
 #perform action: print all non-empty fields and concatenate into mysql string
