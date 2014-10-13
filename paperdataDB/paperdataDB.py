@@ -59,7 +59,7 @@ def fields():
 	return field_list
 
 def dict():
-	paperdata_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_location', CAL_PATH:'cal_location', TAPE_PATH:'tape_location', COMPR_SIZE:'file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', READY_TO_TAPE:'ready_to_tape', DELETE_FILE:'delete_file', RESTORE:'restore_history'}
+	paperdata_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_location', CAL_PATH:'cal_location', TAPE_PATH:'tape_location', COMPR_SIZE:'file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', READY_TO_TAPE:'ready_to_tape', DELETE_FILE:'delete_file', RESTORE_HISTORY:'restore_history'}
 	return paperdata_dict
 
 def options():
