@@ -8,7 +8,7 @@ Contains scripts which take in rows from paperdistiller database in order to pop
 
 Important scripts:
 
-	search_database.py:
+	paperdataDB module -- paperdataDB.py:
 		Used to search paperdata database. Can be incorporated into other scripts in order to do physics on list of files.
 
 	move_uvcRRE.py:
@@ -22,9 +22,6 @@ Important scripts:
 
 	load_raw_from_folio.py:
 		Used to load raw data information into paperdata without a corresponding compressed file
-
-	check_raw.py:
-		Used to check for any raw file if corresponding compressed file exists
 
 	compression_check.py:
 		Used to update database to check if a compressed file exists in indicated location.
@@ -65,3 +62,6 @@ Important scripts:
 
 	clear_paperdistiller.py:
 		Used to clear information from the paperdistiller database -- Used primarily in testing.
+
+	clear_paperdata.py:
+		Used to clear information from the paperdata database -- Used exclusively for rebuliding paperdata
