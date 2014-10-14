@@ -44,13 +44,9 @@ LINES TERMINATED BY '\n' '''%(dbnum))
 
 print 'Table data loaded.'
 
-# close the cursor object
+# Close database and save changes
 cursor.close()
-
-#save changes to database
 connection.commit()
-
-# close the connection
 connection.close()
 
 # exit the program
