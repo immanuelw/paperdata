@@ -102,7 +102,10 @@ def fetch(info_list):
 			sys.exit() #HOW SHOULD I THROW ERRORS?
 
 		#instantiates field variable
-		field = item[0]
+		if isinstance(item[0], str):
+			field = item[0]
+		elif isinstance(item[0], int):
+			field = pd_dict[item[0]]
 
 		if item[2] == EXACT:
 			if len(item[3]) != 1:
