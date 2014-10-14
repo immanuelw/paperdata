@@ -12,7 +12,7 @@ the main function of the module.
 EXAMPLE:
 >>> info_list = [['era', NOSEARCH, EXACT, [32]], ['path', SEARCH, NONE, []],
 ['julian_day', SEARCH, RANGE, [922, 935]]]
-
+OR
 >>> info_list = [[ERA, NOSEARCH, EXACT, [32]], [PATH, SEARCH, NONE, []],
 [JDAY, SEARCH, RANGE, [922, 935]]]
 
