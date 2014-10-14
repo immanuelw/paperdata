@@ -15,7 +15,6 @@ import csv
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-table = 'paperdata'
 usrnm = raw_input('Root username: ')
 pswd = getpass.getpass('Root password: ')
 
@@ -62,7 +61,7 @@ if confirm == 'yes':
 		shutil.rmtree(item[0])
 		if not os.path.isdir(item[0]):
 			cursor.execute('''
-			UPDATE %s
+			UPDATE paperdata
 			SET %s = %d, %s = '%s'
 			WHERE %s = %d;
 			'''%(table, delt, del_value, raw, raw_value, obsnum_string, obsnum)
@@ -74,13 +73,9 @@ else:
 
 print 'Table data updated.'
 
-# close the cursor object
+# Close and save changes to database
 cursor.close()
-
-#save changes to database
 connection.commit()
-
-# close the connection
 connection.close()
 
 # exit the program
