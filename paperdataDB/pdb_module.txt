@@ -25,9 +25,17 @@ paperdataDB.paperdataDB.dbsearch(query, password)
 
 
 >>> import paperdataDB.paperdataDB as pdb
->>> db_information = pdb.dbsearch(pdb.fetch(info_list), password)
+>>> db_query = pdb.fetch(info_list)
+>>> db_query
+SELECT path, julian_day from paperdata WHERE era = 32 and julian_day >= 922
+and julian_day <= 935
 
-With db_information being a list of all the information requested.
+>>> db_information = pdb.dbsearch(pdb.fetch(info_list), password)
+OR
+>>> db_information = pdb.dbsearch(db_query, password)
+
+With db_information being a list of all the information requested from the
+query.
 
 List of named constants and purpose:
 
