@@ -26,6 +26,9 @@ paperdataDB.paperdataDB.dbsearch(query, password)
 	Returns a list of information depending on the query input into the
 	function. Simple MySQLdb wrapper to only search queries.
 
+paperdataDB.paperdataDB.dbsearch(query, password)
+	Returns a dictionary with the field outputs as keys and the field data
+	as lists. Same as dbsearch but output as dict.
 
 >>> import paperdataDB.paperdataDB as pdb
 >>> db_query = pdb.fetch(info_list)
