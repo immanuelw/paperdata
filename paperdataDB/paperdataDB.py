@@ -7,8 +7,10 @@
 
 # import the MySQLdb and sys modules
 import MySQLdb
+import MySQLdb.cursors
 import sys
 import getpass
+import collections
 
 #Input list which indicates certain aspects fo the query
 
@@ -66,19 +68,29 @@ def options():
 	opt = {EXACT:'EXACT', MIN:'MIN', MAX:'NAX', RANGE:'RANGE', NONE:'NONE'}
 	return opt
 
-def dbsearch(query, pswd):
+def dbsearch_dict(query, pswd):
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
 	connection = MySQLdb.connect (host = 'shredder', user = 'immwa', passwd = pswd, db = 'paperdata', local_infile=True)
 
 	# prepare a cursor object using cursor() method
-	cursor = connection.cursor()
+	cursor = connection.cursor(cursorclass = MySQLdb.cursors.DictCursor)
 
 	# execute the SQL query using execute() method.
 	cursor.execute(query)
-
+	
 	#finds all rows outputted by query, prints them
 	results = cursor.fetchall()
+
+	#converts to dictionary
+	results = list(results)
+
+	result = collections.defaultdict(list)
+
+	for dic in results:
+		for key, value in dic.items():
+			result[key].append(value)
+
 	#complete
 	print 'Query Complete'
 
@@ -86,7 +98,31 @@ def dbsearch(query, pswd):
 	cursor.close()
 	connection.close()
 
-	return results
+	return result
+
+def dbsearch(query, pswd):
+        # open a database connection
+        # be sure to change the host IP address, username, password and database name to match your own
+        connection = MySQLdb.connect (host = 'shredder', user = 'immwa', passwd = pswd, db = 'paperdata', local_infile=True)
+
+        # prepare a cursor object using cursor() method
+        cursor = connection.cursor(cursorclass = MySQLdb.cursors.DictCursor)
+
+        # execute the SQL query using execute() method.
+        cursor.execute(query)
+
+        #finds all rows outputted by query, prints them
+        results = cursor.fetchall()
+
+        #complete
+        print 'Query Complete'
+
+        # Close connection to database
+        cursor.close()
+        connection.close()
+
+        return results
+
 
 #Generate strings to load into query 
 def fetch(info_list):
@@ -176,7 +212,10 @@ def fetch(info_list):
 
 	for item in query:
 		if len(query) == 1:
-			dbstr = 'SELECT ' + item + ' FROM paperdata WHERE ' + qsearch
+			if qsearch == '':
+				dbstr = 'SELECT ' + item + ' FROM paperdata'
+			else:
+				dbstr = 'SELECT ' + item + ' FROM paperdata WHERE ' + qsearch
 		else:
 			if item == query[0]:
 				dbstr = 'SELECT ' + item + ', '
