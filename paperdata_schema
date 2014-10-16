@@ -1,19 +1,19 @@
-Field 			Type 		Null 		Key 		Default 		Extra
-path 			varchar(100) 		YES 		 		None 		Path of compressed file (includes host)
-era 			int(11) 		YES 		 		None 		Era of data taken (32,64,128)
-era_type 		varchar(100) 		YES 		 		None 		Type of data taken (ex: dual pol)
-obsnum 			bigint(20) 		YES 		 		None 		Unique id related to julian date
-md5sum 			varchar(32) 		YES 		 		None 		Unique id related to raw file
-julian_day 		int(11) 		YES 		 		None 		
-julian_date 		decimal(16,8) 		YES 		 		None 		
-polarization 		varchar(4) 		YES 		 		None 		
-data_length 		decimal(20,15) 		YES 		 		None 		
-raw_location 		varchar(100) 		YES 		 		None 		Path of raw file (includes host)
-cal_location 		varchar(100) 		YES 		 		None 		Path of calibration file
-tape_location 		varchar(100) 		YES 		 		None 		Location of raw file on tape
-compr_file_size_MB 	decimal(6,2) 		YES 		 		None 		Size of compressed file in MB
-raw_file_size_MB 	decimal(10,2) 		YES 		 		None 		Size of raw file in MB
-compressed 		tinyint(1) 		YES 		 		0 		Checks if compressed file exists on folio
-ready_to_tape 		tinyint(1) 		YES 		 		0 		Value telling if raw file can be written to tape
-delete_file 		tinyint(1) 		YES 		 		0 		Value telling if file can be deleted
-restore_history 	varchar(255) 		YES 		 		None 		List indicating the dates the files restored
+Field 			Type 		Null 			Default 		Extra
+path 			varchar(100) 		YES 		None 		Path of compressed file (includes host)
+era 			int(11) 		YES 		None 		Era of data taken (32,64,128)
+era_type 		varchar(100) 		YES 		None 		Type of data taken (ex: dual pol)
+obsnum 			bigint(20) 		YES 		None 		Unique id related to julian date
+md5sum 			varchar(32) 		YES 		None 		Unique id related to raw file
+julian_day 		int(11) 		YES 		None 		
+julian_date 		decimal(16,8) 		YES 		None 		
+polarization 		varchar(4) 		YES 		None 		
+data_length 		decimal(20,15) 		YES 		None 		
+raw_location 		varchar(100) 		YES 		None 		Path of raw file (includes host)
+cal_location 		varchar(100) 		YES 		None 		Path of calibration file
+tape_location 		varchar(100) 		YES 		None 		Location of raw file on tape
+compr_file_size_MB 	decimal(6,2) 		YES 		None 		Size of compressed file in MB
+raw_file_size_MB 	decimal(10,2) 		YES 		None 		Size of raw file in MB
+compressed 		tinyint(1) 		YES 		0 		Checks if compressed file exists on folio
+ready_to_tape 		tinyint(1) 		YES 		0 		Value telling if raw file can be written to tape
+delete_file 		tinyint(1) 		YES 		0 		Value telling if file can be deleted
+restore_history 	varchar(255) 		YES 		None 		List indicating the dates the raw files  have been restored
