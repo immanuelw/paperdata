@@ -23,12 +23,15 @@ def makeform(root, fields):
 			var = IntVar()
 			row = Frame(root)
 			lab = Label(row, width=15, text=field, anchor='w')
-			ent = Entry(row)
-			c = Checkbutton(row, text="Search field", variable=var, onvalue = pdb.SEARCH, offvalue = pdb.NOSEARCH)
+			c = Checkbutton(row, text="Use field as output", variable=var, onvalue = pdb.SEARCH, offvalue = pdb.NOSEARCH)
 			c.var = var
 			row.pack(side=TOP, fill=X, padx=3, pady=3)
+
 			row2 = Frame(root)
 			row2.pack(side=TOP, fill=X, padx=3, pady=3)
+			ent = Entry(row2)
+			lab2 = Label(row2, width=10, text='Input range:', anchor='w')
+			lab2.pack(side=LEFT)		
 
 			ivar = IntVar()
 			ivar.set(pdb.NONE)
