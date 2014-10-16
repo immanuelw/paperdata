@@ -56,9 +56,10 @@ def convert(entries):
 		range_spec = entry[2].get()
 		range = entry[3].get()
 		#Need to parse range
-		if range == '':
+		if range_spec == pdb.NONE:
 			range = []
-		if range_spec == pdb.RANGE:
+
+		elif range_spec == pdb.RANGE:
 			ran = range
 			range = []
 			if len(ran.split('-')) == 2:
@@ -84,6 +85,12 @@ def convert(entries):
 					except ValueError:
 						it = decimal.Decimal(item)
 					range.append(it)
+
+		elif range_spec in [pdb.MIN, pdb.MAX, pdb.EXACT]:
+			try:
+				range = [int(range)]
+			except ValueError:
+				range = [decimal.Decimal(range)]
 
 		field_info = [field, search, range_spec, range]
 		info_list.append(field_info)
