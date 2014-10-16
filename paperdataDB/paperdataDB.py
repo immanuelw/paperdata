@@ -21,6 +21,7 @@ import collections
 #files = pdf.dbsearch(list_of_info, pswd)
 
 # config variables
+
 PATH = 0
 ERA = 1
 ERA_TYPE = 2
@@ -65,7 +66,7 @@ def dict():
 	return paperdata_dict
 
 def options():
-	opt = {EXACT:'EXACT', MIN:'MIN', MAX:'NAX', RANGE:'RANGE', NONE:'NONE'}
+	opt = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', NONE:'NONE'}
 	return opt
 
 def dbsearch_dict(query, pswd):
