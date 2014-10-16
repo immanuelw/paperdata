@@ -93,6 +93,11 @@ def md5sum(fname):
 
 decimal.getcontext().prec = 2
 
+in_era = raw_input('Era: ')
+et = raw_input('Era type: ')
+cl = raw_input('Calibrate location: ')
+
+
 #iterates through directories, listing information about each one
 dirs = glob.glob(datanum)
 for dir in dirs:
@@ -131,18 +136,29 @@ for dir in dirs:
 	jdate = uv['time']
 
 	#indicates julian day and set of data
-	if jdate < 2456100:
-		jday = int(str(jdate)[4:7])
-		era = 32
-	else:
-		jday = int(str(jdate)[3:7])	
-		if jdate < 2456400:
-			era = 64
+	
+	if in_era == '':
+		if jdate < 2456100:
+			jday = int(str(jdate)[4:7])
+			era = 32
 		else:
-			era = 128
+			jday = int(str(jdate)[3:7])	
+			if jdate < 2456400:
+				era = 64
+			else:
+				era = 128
+	else:
+		era = int(in_era)
+		if era == 64 or era == 128:
+			jday = int(str(jdate)[3:7])
+		elif era == 32:
+			jday = int(str(jdate)[4:7])
 
 	#indicates type of file in era
-	era_type = 'NULL'
+	if et == '':
+		era_type = 'NULL'
+	else:
+		era_type = et
 
 	#assign letters to each polarization
 	if uv['npol'] == 1:
@@ -209,12 +225,15 @@ for dir in dirs:
 		raw_file_size = decimal.Decimal(big_byte)
 
 	#location of calibrate files
-	if era == 32:
-		cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
-	elif era == 64:
-		cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
-	elif era == 128:
-		cal_location = 'NULL'
+	if cl == '':
+		if era == 32:
+			cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
+		elif era == 64:
+			cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
+		elif era == 128:
+			cal_location = 'NULL'
+	else:
+		cal_location = cl
 
 	#indicates if file is compressed
 	if os.path.isdir(path):
@@ -246,23 +265,23 @@ for dir in dirs:
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+#connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
 # prepare a cursor object using cursor() method
-cursor = connection.cursor()
+#cursor = connection.cursor()
 
-print dbnum 
+#print dbnum 
 # execute the SQL query using execute() method.
-cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata
-COLUMNS TERMINATED BY ','
-LINES TERMINATED BY '\n' '''%(dbo))
+#cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata
+#COLUMNS TERMINATED BY ','
+#LINES TERMINATED BY '\n' '''%(dbo))
 
-print 'Table data loaded.'
+#print 'Table data loaded.'
 
 #Close and save changes to database
-cursor.close()
-connection.commit()
-connection.close()
+#cursor.close()
+#connection.commit()
+#connection.close()
 
 # exit the program
-sys.exit()
+#sys.exit()
