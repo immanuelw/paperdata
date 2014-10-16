@@ -11,6 +11,7 @@
 from Tkinter import *
 #from paperdataDB.paperdataDB import *
 import paperdataDB.paperdataDB as pdb
+import decimal
 
 fields = pdb.fields()
 
@@ -43,11 +44,40 @@ def makeform(root, fields):
 			entries.append((field, c.var, a.var, ent))
 	return entries
 
+decimal.getcontext().prec = 5
+
 def convert(entries):
+	info_list = []
+
+	#Populate info_list with info that fits pdb module
 	for entry in entries:
-		print entry[1].get()
-		print entry[2].get()
-		print entry[3].get()
+		field = entry[0]
+		search = entry[1].get()
+		range_spec = entry[2].get()
+		range = entry[3].get()
+		#Need to parse range
+		if range == '':
+			range = []
+		elif len(range.split('-')) == 2:
+			try:
+				range_min = int(range.split('-')[0])
+			except ValueError:
+				range_min = decimal.Decimal(range.split('-')[0])
+			try:
+				range_max = int(range.split('-')[1])
+			except ValueError:
+				range_max = decimal.Decimal(range.split('-')[1])
+			range = [range_min, range_max]
+		elif len(range.split('-')) == 1:
+			try:
+				range = [int(range)]
+			except ValueError:
+				range = [decimal.Decimal(range)]
+
+		field_info = [field, search, range_spec, range]
+		info_list.append(field_info)
+	print info_list
+	return info_list
 
 if __name__ == '__main__':
 	root = Tk()
