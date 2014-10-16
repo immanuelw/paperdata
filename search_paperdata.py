@@ -30,7 +30,7 @@ def makeform(root, fields):
 			row2 = Frame(root)
 			row2.pack(side=TOP, fill=X, padx=3, pady=3)
 			ent = Entry(row2)
-			lab2 = Label(row2, width=10, text='Input:', anchor='w')
+			lab2 = Label(row2, width=5, text='Input:', anchor='w')
 			lab2.pack(side=LEFT)		
 
 			ivar = IntVar()
