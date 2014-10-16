@@ -51,13 +51,9 @@ row = cursor.fetchone()
 
 print 'Table paperdata created'
 
-# close the cursor object
+# Close and Save database connection
 cursor.close()
-
-#save changes to database
 connection.commit()
-
-# close the connection
 connection.close()
 
 # exit the program
