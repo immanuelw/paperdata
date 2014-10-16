@@ -46,7 +46,8 @@ MIN = 20
 MAX = 21
 EXACT = 22 
 RANGE = 23
-NONE = 24
+LIST = 24
+NONE = 25
 
 SEARCH = 30
 NOSEARCH = 31
@@ -67,7 +68,7 @@ def dict():
 	return paperdata_dict
 
 def options():
-	opt = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', NONE:'NONE'}
+	opt = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
 	return opt
 
 def dbsearch_dict(query, pswd):
@@ -108,7 +109,7 @@ def dbsearch(query, pswd):
         connection = MySQLdb.connect (host = 'shredder', user = 'immwa', passwd = pswd, db = 'paperdata', local_infile=True)
 
         # prepare a cursor object using cursor() method
-        cursor = connection.cursor(cursorclass = MySQLdb.cursors.DictCursor)
+        cursor = connection.cursor()
 
         # execute the SQL query using execute() method.
         cursor.execute(query)
@@ -205,6 +206,27 @@ def fetch(info_list):
 				searchstr.append('%s >= %.5f and %s <= %.5f'%(field, min, field, max))
 			else:
 				searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
+
+		elif item[2] == LIST:
+			if len(item[3].split(',')) == 1:
+				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
+				sys.exit() #HOW SHOULD I THROW ERRORS?
+
+			if item[1] == SEARCH:
+				query.append(field)
+			if field == 'julian_date':
+				for it in item[3].split(','):
+					if it == item[3].split(',')[0]:
+						list_str = '%s = %.5f' %(field, it)
+					else:
+						list_str = list_str + ' or %s = %.5f' %(field, it)
+			else:
+				for it in item[3].split(','):
+					if it == item[3]/split(',')[0]:
+						list_str = '%s = %d' %(field, it)
+					else:
+						list_str = list_str + ' or %s = %d' %(field, it)
+			searchstr.append(list_str)
 
 		elif item[2] == NONE:
 			if len(item[3]) != 0:
