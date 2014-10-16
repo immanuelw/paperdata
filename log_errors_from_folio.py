@@ -9,6 +9,7 @@ import os
 import csv
 import aipy as A
 import glob
+import time
 
 ### Script to find errors of .uvcRRE files from folio
 ### Crawls folio and reads through .uvcRRE files to find erros
@@ -35,7 +36,8 @@ datanum = raw_input('Full path of .uvcRRE files: ')
 #data128 = '/data4/paper/still_raw_data_test/psa*/zen.*.uvcRRE'
 
 #create csv file to log bad files
-error_file = open('/data2/home/immwa/scripts/paper_output/error_%s.log'%(db), 'a')
+tune = time.strftime("%d-%m-%Y")
+error_file = open('/data2/home/immwa/scripts/paper_output/error_%s.log'%(tune), 'a')
 ewr = csv.writer(error_file, dialect='excel')
 
 #iterates through directories, listing information about each one
