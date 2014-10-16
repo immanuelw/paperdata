@@ -58,25 +58,37 @@ def convert(entries):
 		#Need to parse range
 		if range == '':
 			range = []
-		elif len(range.split('-')) == 2:
-			try:
-				range_min = int(range.split('-')[0])
-			except ValueError:
-				range_min = decimal.Decimal(range.split('-')[0])
-			try:
-				range_max = int(range.split('-')[1])
-			except ValueError:
-				range_max = decimal.Decimal(range.split('-')[1])
-			range = [range_min, range_max]
-		elif len(range.split('-')) == 1:
-			try:
-				range = [int(range)]
-			except ValueError:
-				range = [decimal.Decimal(range)]
+		if range_spec == pdb.RANGE:
+			ran = range
+			range = []
+			if len(ran.split('-')) == 2:
+				for item in ran.split('-'):
+					try:
+						it = int(item)
+					except ValueError:
+						it = decimal.Decimal(item)
+					range.append(it)
+			elif len(range.split('-')) == 1:
+				try:
+					range = [int(range)]
+				except ValueError:
+					range = [decimal.Decimal(range)]
+
+		elif range_spec == pdb.LIST:
+			ran = range
+			range = []
+			if len(ran.split(',')) >= 2:
+				for item in ran.split(','):
+					try:
+						it = int(item)
+					except ValueError:
+						it = decimal.Decimal(item)
+					range.append(it)
 
 		field_info = [field, search, range_spec, range]
 		info_list.append(field_info)
-	print info_list
+
+	print pdb.fetch(info_list)
 	return info_list
 
 if __name__ == '__main__':
