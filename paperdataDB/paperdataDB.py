@@ -155,7 +155,10 @@ def fetch(info_list):
 			#adding info to lists to generate strings later
 			if item[1] == SEARCH:
 				query.append(field)
-			searchstr.append('%s = %d'%(field, exact))
+			if field == 'julian_date':
+				searchstr.append('%s <= %.5f'%(field, exact))
+			else:
+				searchstr.append('%s = %d'%(field, exact))
 
 		elif item[2] == MIN:
 			if len(item[3]) != 1:
@@ -167,7 +170,10 @@ def fetch(info_list):
 			#adding info to lists to generate strings later
 			if item[1] == SEARCH:
 				query.append(field)
-			searchstr.append('%s >= %d'%(field, min))
+			if field == 'julian_date':			
+				searchstr.append('%s <= %.5f'%(field, min))
+			else:
+				searchstr.append('%s >= %d'%(field, min))
 
 		elif item[2] == MAX:
 			if len(item[3]) != 1:
@@ -179,7 +185,10 @@ def fetch(info_list):
 			#adding info to lists to generate strings later
 			if item[1] == SEARCH:
 				query.append(field)
-			searchstr.append('%s <= %d'%(field, max))
+			if field == 'julian_date':
+				searchstr.append('%s <= %.5f'%(field, max))
+			else:
+				searchstr.append('%s <= %d'%(field, max))
 
 		elif item[2] == RANGE:
 			if len(item[3]) != 2:
@@ -192,7 +201,10 @@ def fetch(info_list):
 			#adding info to lists to generate strings later
 			if item[1] == SEARCH:
 				query.append(field)
-			searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
+			if field == 'julian_date':
+				searchstr.append('%s >= %.5f and %s <= %.5f'%(field, min, field, max))
+			else:
+				searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
 
 		elif item[2] == NONE:
 			if len(item[3]) != 0:
