@@ -11,6 +11,7 @@ import MySQLdb.cursors
 import sys
 import getpass
 import collections
+import decimal
 
 #Input list which indicates certain aspects fo the query
 
