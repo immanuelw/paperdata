@@ -20,12 +20,6 @@ import decimal
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-#counting variables
-t_min = 0
-t_max = 0
-n_times = 0
-c_time = 0
-
 #Functions which simply find the file size of the .uvcRRE files
 def get_size(start_path):
 	total_size = 0
@@ -62,18 +56,6 @@ wr = csv.writer(resultFile, dialect='excel')
 error_file = open('/data2/home/immwa/scripts/paper_output/false.csv', 'a')
 ewr = csv.writer(error_file, dialect='excel')
 
-#create function to uniquely identify files
-def jdpol2obsnum(jd,pol,djd):
-	"""
-	input: julian date float, pol string. and length of obs in fraction of julian date
-	output: a unique index
-	"""
-	dublinjd = jd - 2415020  #use Dublin Julian Date
-	obsint = int(dublinjd/djd)  #divide up by length of obs
-	polnum = A.miriad.str2pol[pol]+10
-	assert(obsint < 2**31)
-	return int(obsint + polnum*(2**32))
-
 def md5sum(fname):
 	"""
 	calculate the md5 checksum of a file whose filename entry is fname.
@@ -92,6 +74,10 @@ def md5sum(fname):
 	return hasher.hexdigest()
 
 decimal.getcontext().prec = 2
+
+in_era = raw_input('Input era: ')
+et = raw_input('Era type: ')
+cl = raw_input('Calibrate location: ')
 
 #iterates through directories, listing information about each one
 dirs = glob.glob(datanum)
@@ -118,18 +104,23 @@ for dir in dirs:
 	jdate = uv['time']
 
 	#indicates julian day and set of data
-	if jdate < 2456100:
+	era = int(in_era)
+	if era == 64 or era == 128:
+		jday = int(str(jdate)[3:7])
+	elif era == 32:
 		jday = int(str(jdate)[4:7])
-		era = 32
-	else:
-		jday = int(str(jdate)[3:7])	
-		if jdate < 2456400:
-			era = 64
-		else:
-			era = 128
+#	if jdate < 2456100:
+#		jday = int(str(jdate)[4:7])
+#		era = 32
+#	else:
+#		jday = int(str(jdate)[3:7])	
+#		if jdate < 2456400:
+#			era = 64
+#		else:
+#			era = 128
 
 	#indicates type of file in era
-	era_type = 'NULL'
+	era_type = et
 
 	#assign letters to each polarization
 	if uv['npol'] == 1:
@@ -164,12 +155,7 @@ for dir in dirs:
 		raw_file_size = decimal.Decimal(big_byte)
 
 	#location of calibrate files
-	if era == 32:
-		cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
-	elif era == 64:
-		cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
-	elif era == 128:
-		cal_location = 'NULL'
+	cal_location = cl
 
 	#indicates if file is compressed
 	compressed = 0
@@ -193,7 +179,7 @@ for dir in dirs:
 	#write to csv file by item in list
 	for item in databs:
 		wr.writerow(item)
-"""
+
 #Load data into named database and table
 
 # open a database connection
@@ -219,4 +205,4 @@ connection.close()
 # exit the program
 sys.exit()
 '''
-"""
+
