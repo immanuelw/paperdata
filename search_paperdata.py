@@ -59,7 +59,16 @@ def convert(entries):
 		range_spec = entry[2].get()
 		range = entry[3].get()
 		#Need to parse range
-		if range_spec == pdb.NONE:
+		if field == 'polarization':
+			if range_spec == pdb.LIST:
+				ran = range
+				range = []
+				if len(ran.split(',')) >= 2:
+					for item in ran.split(','):
+						range.append(item)
+			else:
+				range = [range]
+		elif range_spec == pdb.NONE:
 			range = []
 
 		elif range_spec == pdb.RANGE:
