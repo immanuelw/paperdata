@@ -157,7 +157,9 @@ def fetch(info_list):
 			if item[1] == SEARCH:
 				query.append(field)
 			if field == 'julian_date':
-				searchstr.append('%s <= %.5f'%(field, exact))
+				searchstr.append('%s = %.5f'%(field, exact))
+			elif field == 'polarization':
+				searchstr.append("%s = '%s'"%(field, exact))
 			else:
 				searchstr.append('%s = %d'%(field, exact))
 
@@ -172,7 +174,7 @@ def fetch(info_list):
 			if item[1] == SEARCH:
 				query.append(field)
 			if field == 'julian_date':			
-				searchstr.append('%s <= %.5f'%(field, min))
+				searchstr.append('%s >= %.5f'%(field, min))
 			else:
 				searchstr.append('%s >= %d'%(field, min))
 
@@ -204,6 +206,7 @@ def fetch(info_list):
 				query.append(field)
 			if field == 'julian_date':
 				searchstr.append('%s >= %.5f and %s <= %.5f'%(field, min, field, max))
+
 			else:
 				searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
 
@@ -222,6 +225,14 @@ def fetch(info_list):
 						list_str = list_str + ' or %s = %.5f)' %(field, it)
 					else:
 						list_str = list_str + ' or %s = %.5f' %(field, it)
+			elif field == 'polarization':
+				for it in item[3]:
+					if it == item[3][0]:
+						list_str = "(%s = '%s'" %(field, it)
+					elif it == item[3][-1]:
+						list_str = list_str + " or %s = '%s')" %(field, it)
+					else:
+						list_str = list_str + " or %s = '%s'" %(field, it)
 			else:
 				for it in item[3]:
 					if it == item[3][0]:
