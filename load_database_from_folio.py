@@ -98,7 +98,7 @@ dirs = glob.glob(datanum)
 for dir in dirs:
 	#indicates name of full directory
 	compr_path = host + ':' + dir
-	path = path.split(':')[1]
+	path = compr_path.split(':')[1]
 
 	#indicates size of compressed file, removing units
 	lil_byte = sizeof_fmt(get_size(path))
@@ -193,13 +193,18 @@ for dir in dirs:
 	#location of raw files
 	raw_location = compr_path[:-4] #assume in same directory
 	if not os.path.isdir(raw_location.split(':')[1]):
-		raw_location = 'NULL'
+		raw_path = 'NULL'
+	else:
+		raw_path = raw_location.split(':')[1]
 
 	#gives each file more unique id
-	mdsum = md5sum(raw_location.split(':')[1])
+	if raw_path == 'NULL':
+		mdsum = 0
+	else:
+		mdsum = md5sum(raw_path)
 
 	#size of raw file, removing unit size
-	big_byte = sizeof_fmt(get_size(raw_location.split(':')[1]))
+	big_byte = sizeof_fmt(get_size(raw_path))
 
 	if big_byte[-1] == 'B':
 		raw_file_size = decimal.Decimal(big_byte[:-2])
@@ -241,7 +246,7 @@ for dir in dirs:
 	#write to csv file by item in list
 	for item in databs:
 		wr.writerow(item)
-
+"""
 #Load data into named database and table
 
 # open a database connection
@@ -265,3 +270,4 @@ connection.close()
 
 # exit the program
 sys.exit()
+"""

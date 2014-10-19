@@ -208,22 +208,26 @@ def fetch(info_list):
 				searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
 
 		elif item[2] == LIST:
-			if len(item[3].split(',')) == 1:
+			if len(item[3]) <= 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
 				sys.exit() #HOW SHOULD I THROW ERRORS?
 
 			if item[1] == SEARCH:
 				query.append(field)
 			if field == 'julian_date':
-				for it in item[3].split(','):
-					if it == item[3].split(',')[0]:
-						list_str = '%s = %.5f' %(field, it)
+				for it in item[3]:
+					if it == item[3][0]:
+						list_str = '(%s = %.5f' %(field, it)
+					elif it == item[3][-1]:
+						list_str = list_str + ' or %s = %.5f)' %(field, it)
 					else:
 						list_str = list_str + ' or %s = %.5f' %(field, it)
 			else:
-				for it in item[3].split(','):
-					if it == item[3]/split(',')[0]:
-						list_str = '%s = %d' %(field, it)
+				for it in item[3]:
+					if it == item[3][0]:
+						list_str = '(%s = %d' %(field, it)
+					elif it == item[3][-1]:
+						list_str = list_str + ' or %s = %d)' %(field, it)
 					else:
 						list_str = list_str + ' or %s = %d' %(field, it)
 			searchstr.append(list_str)

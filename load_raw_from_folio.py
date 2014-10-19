@@ -73,8 +73,6 @@ def md5sum(fname):
 		buf = afile.read(BLOCKSIZE)
 	return hasher.hexdigest()
 
-decimal.getcontext().prec = 2
-
 in_era = raw_input('Input era: ')
 et = raw_input('Era type: ')
 cl = raw_input('Calibrate location: ')
@@ -100,6 +98,7 @@ for dir in dirs:
 			ewr.writerow(item)
 		continue	
 
+	decimal.getcontext().prec = 5
 	#indicates julian date
 	jdate = uv['time']
 
@@ -144,6 +143,7 @@ for dir in dirs:
 	#gives each file more unique id
 	mdsum = md5sum(raw_location.split(':')[1])
 
+	decimal.getcontext().prec = 2
 	#size of raw file, removing unit size
 	big_byte = sizeof_fmt(get_size(raw_location.split(':')[1]))
 
@@ -179,7 +179,7 @@ for dir in dirs:
 	#write to csv file by item in list
 	for item in databs:
 		wr.writerow(item)
-
+"""
 #Load data into named database and table
 
 # open a database connection
@@ -189,7 +189,6 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
 
-print dbnum 
 # execute the SQL query using execute() method.
 cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata
 COLUMNS TERMINATED BY ','
@@ -204,5 +203,4 @@ connection.close()
 
 # exit the program
 sys.exit()
-'''
-
+"""
