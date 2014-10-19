@@ -9,8 +9,8 @@
 ### Date: 8-20-14
 
 from Tkinter import *
-#from paperdataDB.paperdataDB import *
-import paperdataDB.paperdataDB as pdb
+#from paperdataDB import *
+import paperdataDB as pdb
 import decimal
 
 fields = pdb.fields()
