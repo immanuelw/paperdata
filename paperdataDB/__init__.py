@@ -16,10 +16,10 @@ import decimal
 #Input list which indicates certain aspects fo the query
 
 #for files do
-# import paperdataDB.paperdataDB as pdb
-#files = pdb.dbsearch(pdb.fetch(list_of_info), pswd)
+# import paperdataDB as pdb
+# files = pdb.dbsearch(pdb.fetch(list_of_info), pswd)
 #OR combine dbsearch to include both
-#files = pdf.dbsearch(list_of_info, pswd)
+# files = pdf.dbsearch(db_query, pswd)
 
 # config variables
 
