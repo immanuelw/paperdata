@@ -15,6 +15,11 @@ import decimal
 
 fields = pdb.fields()
 
+#options for printed output values
+sql_string = 1
+db_list = 2
+db_dict = 3
+
 #create form
 def makeform(root, fields):
 	entries = []
@@ -49,7 +54,7 @@ def makeform(root, fields):
 
 decimal.getcontext().prec = 5
 
-def convert(entries):
+def convert(entries, output):
 	info_list = []
 
 	#Populate info_list with info that fits pdb module
@@ -59,7 +64,7 @@ def convert(entries):
 		range_spec = entry[2].get()
 		range = entry[3].get()
 		#Need to parse range
-		if field == 'polarization':
+		if field == 'polarization' and range_spec != pdb.NONE:
 			if range_spec == pdb.LIST:
 				ran = range
 				range = []
@@ -68,6 +73,7 @@ def convert(entries):
 						range.append(item)
 			else:
 				range = [range]
+		
 		elif range_spec == pdb.NONE:
 			range = []
 
@@ -107,17 +113,31 @@ def convert(entries):
 		field_info = [field, search, range_spec, range]
 		info_list.append(field_info)
 
-	print pdb.fetch(info_list)
+	#Decides which output to show user
+	limit_query = pdb.fetch(info_list) + ' limit 20'
+	if output == sql_string:
+		print pdb.fetch(info_list)
+	elif output == db_list:
+		print pdb.dbsearch(limit_query, 'immwa3978')
+		print 'Output was limited to 20 entries'
+	elif output == db_dict:
+		print pdb.dbsearch_dict(limit_query, 'immwa3978')
+		print 'Output was limited to 20 entries'
+
 	return info_list
 
 if __name__ == '__main__':
 	root = Tk()
 	root.title('Paperdata Query')
 	ents = makeform(root, fields)
-	root.bind('<Return>', (lambda event, e=ents: convert(e)))
-	b1 = Button(root, text='Show', command=(lambda e=ents: convert(e)))
+	root.bind('<Return>', (lambda event, e=ents: convert(e, sql_string)))
+	b1 = Button(root, text='Output String', command=(lambda e=ents: convert(e, sql_string)))
+	b2 = Button(root, text='Output List', command=(lambda e=ents: convert(e, db_list)))
+	b3 = Button(root, text='Output Dict', command=(lambda e=ents: convert(e, db_dict)))
 	b1.pack(side=LEFT, padx=5, pady=5)
-	b2 = Button(root, text='Quit', command=root.quit)
 	b2.pack(side=LEFT, padx=5, pady=5)
+	b3.pack(side=LEFT, padx=5, pady=5)
+	b4 = Button(root, text='Quit', command=root.quit)
+	b4.pack(side=LEFT, padx=5, pady=5)
 	root.mainloop()
 
