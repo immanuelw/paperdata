@@ -16,21 +16,21 @@ OR
 >>> info_list = [[ERA, NOSEARCH, EXACT, [32]], [PATH, SEARCH, NONE, []],
 [JDAY, SEARCH, RANGE, [922, 935]]]
 
-Functions (must be paperdataDB.paperdataDB.function_name):
+Functions (must be paperdataDB.function_name):
 
-paperdataDB.paperdataDB.fetch(info_list)
+paperdataDB.fetch(info_list)
 	Returns a SQL string which can be used to find the information that is
 	being searched for in any MySQL module or program.
 
-paperdataDB.paperdataDB.dbsearch(query, password)
+paperdataDB.dbsearch(query, password)
 	Returns a list of information depending on the query input into the
 	function. Simple MySQLdb wrapper to only search queries.
 
-paperdataDB.paperdataDB.dbsearch(query, password)
+paperdataDB.dbsearch(query, password)
 	Returns a dictionary with the field outputs as keys and the field data
 	as lists. Same as dbsearch but output as dict.
 
->>> import paperdataDB.paperdataDB as pdb
+>>> import paperdataDB as pdb
 >>> db_query = pdb.fetch(info_list)
 >>> db_query
 SELECT path, julian_day from paperdata WHERE era = 32 and julian_day >= 922
