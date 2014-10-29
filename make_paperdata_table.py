@@ -42,6 +42,7 @@ tape_location VARCHAR(100) DEFAULT NULL,
 compr_file_size_MB DECIMAL(6,1) DEFAULT NULL,
 raw_file_size_MB DECIMAL(10,1) DEFAULT NULL,
 compressed BOOLEAN DEFAULT FALSE,
+edge BOOLEAN DEFAULT FALSE,
 ready_to_tape BOOLEAN DEFAULT FALSE,
 delete_file BOOLEAN DEFAULT FALSE,
 restore_history VARCHAR(255) DEFAULT NULL);''')
