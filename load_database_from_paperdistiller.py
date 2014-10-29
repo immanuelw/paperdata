@@ -166,14 +166,20 @@ for item in results:
 	#shows location of raw data on tape
 	tape_location = 'NULL'
 
+	#Show if file is edge file
+	edge = 0
+
 	#variable indicating if all files have been successfully compressed in one day
 	ready_to_tape = 0
 
 	#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
 	delete_file = 0 
 
+	#indicates when a file has been restored
+	restore_history = 'NULL'
+
 	#create list of important data and open csv file
-	databs = [[compr_path,era,era_type,obsnum,md5sum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,sz,raw_sz,compressed,ready_to_tape,delete_file]]
+	databs = [[compr_path,era,era_type,obsnum,md5sum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,sz,raw_sz,compressed,edge,ready_to_tape,delete_file,restore_history]]
 	print databs 
 
 	#write to csv file by item in list
