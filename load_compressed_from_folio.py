@@ -44,8 +44,8 @@ def sizeof_fmt(num):
 	return "%3.1f" % (num)
 
 #User input information
-usrnm = raw_input('Username: ')
-pswd = getpass.getpass('Password: ')
+#usrnm = raw_input('Username: ')
+#pswd = getpass.getpass('Password: ')
 
 datanum = raw_input('Input file path: ')
 
@@ -194,6 +194,7 @@ for dir in dirs:
 	raw_location = compr_path[:-4] #assume in same directory
 	if not os.path.isdir(raw_location.split(':')[1]):
 		raw_path = 'NULL'
+		raw_location = 'NULL'
 	else:
 		raw_path = raw_location.split(':')[1]
 
