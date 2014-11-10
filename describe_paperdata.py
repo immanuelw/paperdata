@@ -48,7 +48,6 @@ for item in result:
 
 # Close and save all changes to database
 cursor.close()
-connection.commit()
 connection.close()
 
 # exit the program
