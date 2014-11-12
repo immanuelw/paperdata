@@ -71,10 +71,10 @@ def options():
 	opt = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
 	return opt
 
-def dbsearch_dict(query, usrnm, pswd):
+def dbsearch_dict(query):
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
 
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor(cursorclass = MySQLdb.cursors.DictCursor)
@@ -103,10 +103,10 @@ def dbsearch_dict(query, usrnm, pswd):
 
 	return result
 
-def dbsearch(query, usrnm, pswd):
+def dbsearch(query):
         # open a database connection
         # be sure to change the host IP address, username, password and database name to match your own
-        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+        connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
 
         # prepare a cursor object using cursor() method
         cursor = connection.cursor()

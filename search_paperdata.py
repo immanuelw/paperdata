@@ -119,17 +119,15 @@ def convert(entries, output):
 	if output == sql_string:
 		print pdb.fetch(info_list)
 	elif output == db_list:
-		print pdb.dbsearch(limit_query, usrnm, pswd)
+		print pdb.dbsearch(limit_query)
 		print 'Output was limited to 20 entries'
 	elif output == db_dict:
-		print pdb.dbsearch_dict(limit_query, usrnm, pswd)
+		print pdb.dbsearch_dict(limit_query)
 		print 'Output was limited to 20 entries'
 
 	return info_list
 
 if __name__ == '__main__':
-	usrnm = raw_input('Username: ')
-	pswd = getpass.getpass('Password: ')
 	root = Tk()
 	root.title('Paperdata Query')
 	ents = makeform(root, fields)
