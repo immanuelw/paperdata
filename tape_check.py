@@ -59,11 +59,7 @@ print 'Table data updated.'
 
 # close the cursor object
 cursor.close()
-
-#save changes to database
 connection.commit()
-
-# close the connection
 connection.close()
 
 # exit the program
