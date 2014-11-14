@@ -8,20 +8,17 @@ Contains scripts which take in rows from paperdistiller database in order to pop
 
 Important scripts:
 
-	paperdataDB module -- paperdataDB.py:
+	paperdataDB module:
 		Used to search paperdata database. Can be incorporated into other scripts in order to do physics on list of files.
 
-	move_uvcRRE.py:
-		Used to automatically update database with new location when moving .uvcRRE files
-
-	load_database_from_folio.py:
-		Used to fill paperdata with information directly from folio. Slow.
+	move_data.py:
+		Used to automatically update database with new location when moving .uvcRRE or .uv files
 
 	load_database_from_paperdistiller.py:
 		Used to fill paperdata with information from paperdistiller database. Much faster than crawling though folio.
 
-	load_raw_from_folio.py:
-		Used to load raw data information into paperdata without a corresponding compressed file
+	load_paperdata.py:
+		Used to load raw and compressed data information into paperdata
 
 	compression_check.py:
 		Used to update database to check if a compressed file exists in indicated location.
@@ -48,7 +45,7 @@ Important scripts:
 		Used to backup the several tables of paperdistiller -- Used mostly for testing purposes.
 
 	log_errors_from_folio.py:
-		Used to check for unaccessible/incomplete .uvcRRE files within folio.
+		Used to check for unaccessible/incomplete .uvcRRE or .uv files within folio.
 
 	make_paperdata_table.py:
 		Used to create the base of the paperdata table -- includes field names and types.
