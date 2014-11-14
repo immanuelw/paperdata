@@ -44,7 +44,7 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 cursor = connection.cursor()
 
 # execute the SQL query using execute() method.
-cursor.execute('SELECT * FROM paperdata')
+cursor.execute('SELECT * FROM paperdata order by julian_date asc')
 results = cursor.fetchall()
 
 for item in results:
