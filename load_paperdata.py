@@ -280,12 +280,11 @@ for dir in dirs:
 	restore_history = 'NULL'
 
 	#create list of important data and open csv file
-	databs = [[compr_full_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_full_path,cal_location,tape_location,compr_file_size,raw_file_size,compressed,edge,ready_to_tape,delete_file,restore_history]]
-	print databs 
+	databs = [compr_full_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_full_path,cal_location,tape_location,compr_file_size,raw_file_size,compressed,edge,ready_to_tape,delete_file,restore_history]
+	print [databs]
 
-	#write to csv file by item in list
-	for item in databs:
-		wr.writerow(item)
+	#write to csv file
+	wr.writerow(databs)
 """
 #Load data into named database and table
 
