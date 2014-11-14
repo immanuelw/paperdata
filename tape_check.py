@@ -32,7 +32,7 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 cursor = connection.cursor()
 
 #counting the amount of files in each day
-cursor.execute('''SELECT julian_day, COUNT(*) FROM paperdata WHERE era = %d GROUP BY julian_day'''%(era))
+cursor.execute('''SELECT julian_day, COUNT(*) FROM paperdata WHERE era = %d and edge = 0 GROUP BY julian_day'''%(era))
 sec_results = cursor.fetchall()
 
 #counting the amount of compressed files in each day
