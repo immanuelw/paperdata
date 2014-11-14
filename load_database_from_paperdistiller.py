@@ -77,7 +77,6 @@ for item in result:
 
 #Close database connection and save changes
 cursor.close()
-connection.commit()
 connection.close()
 
 #Create list of obsnums to check for duplicates
@@ -90,7 +89,6 @@ obs = cursor.fetchall()
 
 #Close db connection and save changes
 cursor.close()
-connection.commit()
 connection.close()
 
 #results list of lists should contain path, obsnum, julian_date, polarization string, and length
@@ -103,10 +101,10 @@ for item in results:
 	###need to include host name in path_raw and path
 	path_raw = item[0]
 	
-	if item[0][-1] == 'v':
+	if item[0].split('.')[-1] == 'uv':
 		path = item[0] + 'cRRE'
 		compr_path = host + ':' + item[0] + 'cRRE'
-	elif item[0][-1] == '/':
+	elif item[0].split('.')[-1] == 'uv/':
 		path = item[0][:-1] + 'cRRE'
 		compr_path = host + ':' + item[0][:-1] + 'cRRE'
 
@@ -158,7 +156,8 @@ for item in results:
 	cal_location = 'NULL'
 
 	#indicates if file is compressed
-	if os.path.isdir(path):
+	compr_file = os.path.join(path,'visdata')
+	if os.path.isfile(compr_file):
 		compressed = 1
 	else:
 		compressed = 0
@@ -179,12 +178,11 @@ for item in results:
 	restore_history = 'NULL'
 
 	#create list of important data and open csv file
-	databs = [[compr_path,era,era_type,obsnum,md5sum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,sz,raw_sz,compressed,edge,ready_to_tape,delete_file,restore_history]]
-	print databs 
+	databs = [compr_path,era,era_type,obsnum,md5sum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,sz,raw_sz,compressed,edge,ready_to_tape,delete_file,restore_history]
+	print [databs] 
 
 	#write to csv file by item in list
-	for item in databs:
-		wr.writerow(item)
+	wr.writerow(databs)
 
 #Load data into named database and table
 
