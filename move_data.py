@@ -9,6 +9,7 @@ import getpass
 import shutil
 import glob
 import socket
+import csv
 
 ### Script to move and update paperdata database
 ### Moves .uvcRRE directory and updates path field in paperdata
@@ -18,6 +19,12 @@ import socket
 
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
+
+dbo = '/data2/home/immwa/scripts/paper_output/move_db.csv'
+resultFile = open(dbo,'wb')
+
+#create 'writer' object
+wr = csv.writer(resultFile, dialect='excel')
 
 #File information
 host = socket.gethostname()
@@ -40,6 +47,7 @@ for infile in infile_list:
 	#moves file
 	try:
 		shutil.move(infile,outfile)
+		wr.writerow([infile,outfile])
 	except:
 		continue
 	# execute the SQL query using execute() method, updates new location
