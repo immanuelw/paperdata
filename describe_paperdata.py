@@ -17,7 +17,7 @@ import getpass
 pswd = getpass.getpass('Password: ')
 
 #creates file to write to
-pd = open('/data2/home/immwa/scripts/paper/paperdata_schema', 'w')
+pd = open('/data2/home/immwa/scripts/paper/db_paperdata_schema', 'w')
 
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
