@@ -11,6 +11,10 @@ Important scripts:
 	paperdataDB module:
 		Used to search paperdata database. Can be incorporated into other scripts in order to do physics on list of files.
 
+	search_paperdata.py:
+		Used in conjunction with paperdataDB module to create a GUI which can search the paperdata database as well
+		as output an SQL string.
+
 	move_data.py:
 		Used to automatically update database with new location when moving .uvcRRE or .uv files
 
