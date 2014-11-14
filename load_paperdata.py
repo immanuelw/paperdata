@@ -101,9 +101,10 @@ for dir in dirs:
 		raw_full_path = compr_full_path[:-4]
 		raw_path = dir[:4]
 		raw_file = os.path.join(raw_path, 'visdata')
-		path = compr_path
+		path = raw_path
 		if not os.path.isfile(raw_file):
 			raw_full_path = 'NULL'
+			path = compr_path
 
 	elif dir.split('.')[-1] == 'uv':
 		#indicates name of full directory -- SHOULD I SET TO NULL? OR CHECK DATABASE EVERY TIME?
