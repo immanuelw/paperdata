@@ -4,6 +4,7 @@ import os
 import shutil
 import csv
 import glob
+import decimal
 
 ### Script to move and rename .uv files with unknown names
 ### Moves .uv files without names into new directories, creating names fro mreadign through file
@@ -11,12 +12,9 @@ import glob
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-#beginning of filename
-beg = 'zen'
-dot = '.'
-
 #location of directory searched
-data = '/mnt/USB/0/D40P01/Good/FOUND.ODR/Orphan9/'
+data = raw_input('Input directory path: ')
+#data = '/mnt/USB/0/D40P01/Good/FOUND.ODR/Orphan9/'
 #data = '/data4/paper/file_renaming_test_output/'
 
 #location of directory to move to
@@ -68,7 +66,8 @@ for dir in dirs:
 		continue
 
 	#find Julian Date
-	jdate = str(uv['time'])
+	decimal.getcontext().prec = 5
+	jdate = str(decimal.Decimal(uv['time']))
 
 	#assign letters to each polarization
 	if uv[npol] == 1:
@@ -82,12 +81,12 @@ for dir in dirs:
 			pol = 'yx'
 
 		#create variable to indicate new directory
-		newdir = beg + dot + jdate + dot + pol + dot + 'uv'
+		newdir = 'zen.' + jdate + '.' + pol + '.uv'
 		newfile = os.path.join(datashift, newdir)	
 
 	#if polarizations aren't separated
 	else:
-		newdir = beg + dot + jdate + dot + 'uv'
+		newdir = 'zen.' + jdate + '.uv'
 		newfile = os.path.join(datashift, newdir)
 
 	print newfile
