@@ -22,11 +22,11 @@ paperdataDB.fetch(info_list)
 	Returns a SQL string which can be used to find the information that is
 	being searched for in any MySQL module or program.
 
-paperdataDB.dbsearch(query, password)
+paperdataDB.dbsearch(query)
 	Returns a list of information depending on the query input into the
 	function. Simple MySQLdb wrapper to only search queries.
 
-paperdataDB.dbsearch(query, password)
+paperdataDB.dbsearch_dict(query)
 	Returns a dictionary with the field outputs as keys and the field data
 	as lists. Same as dbsearch but output as dict.
 
@@ -36,9 +36,9 @@ paperdataDB.dbsearch(query, password)
 SELECT path, julian_day from paperdata WHERE era = 32 and julian_day >= 922
 and julian_day <= 935
 
->>> db_information = pdb.dbsearch(pdb.fetch(info_list), password)
+>>> db_information = pdb.dbsearch(pdb.fetch(info_list))
 OR
->>> db_information = pdb.dbsearch(db_query, password)
+>>> db_information = pdb.dbsearch(db_query)
 
 With db_information being a list of all the information requested from the
 query.
