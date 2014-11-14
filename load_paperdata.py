@@ -15,7 +15,7 @@ import socket
 import decimal
 
 ### Script to load data from folio into paperdata database
-### Crawls folio and reads through .uvcRRE files to generate all field information
+### Crawls folio and reads through .uvcRRE or .uv files to generate all field information
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
