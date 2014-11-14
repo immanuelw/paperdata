@@ -31,10 +31,6 @@ datanum = raw_input('Full path of .uvcRRE files: ')
 
 #Former location of .uvcRRE files
 
-#data32 = '/data4/raw_data/psa*/psa*/zen.*.uvcRRE'
-#data64 = '/data4/paper/2012EoR/psa_live/psa*/zen.*.uvcRRE'
-#data128 = '/data4/paper/still_raw_data_test/psa*/zen.*.uvcRRE'
-
 #create csv file to log bad files
 tune = time.strftime("%d-%m-%Y")
 error_file = open('/data2/home/immwa/scripts/paper_output/error_%s.log'%(tune), 'a')
@@ -56,14 +52,35 @@ dirs = glob.glob(datanum)
 				ewr.writerow(item)
 				print error_list
 
-		#checks a .uv file for data
-		visdata = os.path.join(path, 'visdata')
-		if not os.path.isfile(visdata):
-			error_list = [[path,'No visdata']]
-			for item in error_list:
-				ewr.writerow(item)
-			print error_list
-			continue
+		#temp fix
+	        if dir == '/nas2/data/psa6668/zen.2456668.17386.yx.uvcRRE':
+	                error_list = [[path,'Unknown error']]
+	                for item in error_list:
+	                        ewr.writerow(item)
+	                continue
+
+	        #checks a .uv file for data
+	        visdata = os.path.join(path, 'visdata')
+	        if not os.path.isfile(visdata):
+	                error_list = [[path,'No visdata']]
+	                for item in error_list:
+	                        ewr.writerow(item)
+	                continue
+
+	        #checks a .uv file for vartable
+	        vartable = os.path.join(path, 'vartable')
+	        if not os.path.isfile(vartable):
+	                error_list = [[path,'No vartable']]
+	                for item in error_list:
+	                        ewr.writerow(item)
+	                continue
+
+	        #checks a .uv file for header
+	        header = os.path.join(path, 'header')
+	        if not os.path.isfile(header):
+	                error_list = [[path,'No header']]
+	                for item in error_list:
+	                        ewr.writerow(item)
 
 		#allows uv access
 		try:
