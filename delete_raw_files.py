@@ -18,10 +18,6 @@ import csv
 usrnm = raw_input('Root username: ')
 pswd = getpass.getpass('Root password: ')
 
-raw = 'raw_location'
-obsnum_string = 'obsnum'
-delt = 'delete_file'
-
 raw_value = 'ON TAPE'
 deletion = []
 
@@ -39,7 +35,7 @@ connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db
 cursor = connection.cursor()
 
 #execute MySQL query
-cursor.execute('SELECT julian_day, obsnum, raw_location, tape_location, delete_file from paperdata order by julian_day')
+cursor.execute('SELECT julian_day, obsnum, raw_location, tape_location, delete_file from paperdata where delete_file = 1 order by julian_day asc')
 
 #collects information from query
 results = cursor.fetchall()
@@ -51,20 +47,26 @@ for items in results:
 		deletion.append([items[2],obsnum])
 
 #loops through list and deletes raw files scheduled for deletion
-confirm = raw_input('Are you sure you want to delete (yes/no) ?: ')
+confirm = raw_input('Are you sure you want to delete (y/n) ?: ')
 
 #value to set delete_file to
 del_value = 0
-if confirm == 'yes':
+if confirm == 'y':
 	for item in deletion:
 		obsnum = item[1]
-		shutil.rmtree(item[0])
+		try:
+			shutil.rmtree(item[0])
+		except:
+			fd.writerow([item[0]])
+			print 'ERROR: uv file %s not removed' %(item[0])
+			continue
+
 		if not os.path.isdir(item[0]):
 			cursor.execute('''
 			UPDATE paperdata
-			SET %s = %d, %s = '%s'
-			WHERE %s = %d;
-			'''%(table, delt, del_value, raw, raw_value, obsnum_string, obsnum)
+			SET delete_file = %d, raw_location = '%s'
+			WHERE obsnum = %d;
+			'''%(del_value, raw_value, obsnum)
 		else:
 			fd.writerow([item[0]])
 			print 'ERROR: uv file %s not removed' %(item[0])
