@@ -108,7 +108,7 @@ for dir in dirs:
 
 	elif dir.split('.')[-1] == 'uv':
 		#indicates name of full directory -- SHOULD I SET TO NULL? OR CHECK DATABASE EVERY TIME?
-		raw_location = host + ':' + dir
+		raw_full_path = host + ':' + dir
 		raw_path = dir
 		compr_full_path = host + ':' + dir + 'cRRE'
 		compr_path = dir[:-4] + 'cRRE'
