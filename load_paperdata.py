@@ -191,7 +191,7 @@ for dir in dirs:
                 mdsum = 'NULL'
 
 	#indicates julian date
-	jdate = uv['time']
+	jdate = round(uv['time'], 5)
 
 	#indicates julian day and set of data
 	if jdate < 2456100:
