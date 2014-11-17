@@ -286,6 +286,20 @@ for dir in dirs:
 
 	#write to csv file
 	wr.writerow(databs)
+
+	#Remove corresponding file from list
+	if dir.split('.')[-1] == 'uvcRRE':
+	try:
+		dirs.remove(dir[:4])
+	except:
+		continue		
+
+	if dir.split('.')[-1] == 'uv':
+	try:
+		dirs.remove(dir + 'cRRE')
+	except:
+		continue
+
 """
 #Load data into named database and table
 
