@@ -123,41 +123,37 @@ for dir in dirs:
 
 	#temp fix
 	if dir == '/nas2/data/psa6668/zen.2456668.17386.yx.uvcRRE':
-		error_list = [[path,'Unknown error']]
-		for item in error_list:
-			ewr.writerow(item)
+		item = [path,'Unknown error']
+		ewr.writerow(item)
 		continue
 
 	#checks a .uv file for data
 	visdata = os.path.join(path, 'visdata')
 	if not os.path.isfile(visdata):
-		error_list = [[path,'No visdata']]
-		for item in error_list:
-			ewr.writerow(item)
+		item = [path,'No visdata']
+		ewr.writerow(item)
 		continue
 
 	#checks a .uv file for vartable
 	vartable = os.path.join(path, 'vartable')
 	if not os.path.isfile(vartable):
-		error_list = [[path,'No vartable']]
-		for item in error_list:
-			ewr.writerow(item)
+		item = [path,'No vartable']
+		ewr.writerow(item)
 		continue
+
 	#checks a .uv file for header
 	header = os.path.join(path, 'header')
 	if not os.path.isfile(header):
-		error_list = [[path,'No header']]
-		for item in error_list:
-			ewr.writerow(item)
+		item = [path,'No header']
+		ewr.writerow(item)
 		continue
 
 	#allows uv access
 	try:
 		uv = A.miriad.UV(path)
 	except:
-		error_list = [[path,'Cannot access .uv file']]
-		for item in error_list:
-			ewr.writerow(item)
+		item = [path,'Cannot access .uv file']
+		ewr.writerow(item)
 		continue	
 
 	#indicates size of compressed file, removing units
@@ -229,14 +225,19 @@ for dir in dirs:
 	n_times = 0
 	c_time = 0
 
-	for (uvw, t, (i,j)),d in uv.all():
-		if t_min == 0 or t < t_min:
-			t_min = t
-		if t_max == 0 or t > t_max:
-			t_max = t
-		if c_time != t:
-			c_time = t
-			n_times += 1
+	try:
+		for (uvw, t, (i,j)),d in uv.all():
+			if t_min == 0 or t < t_min:
+				t_min = t
+			if t_max == 0 or t > t_max:
+				t_max = t
+			if c_time != t:
+				c_time = t
+				n_times += 1
+	except:
+		item = [path, 'Cannot read through .uv file']
+		ewr.writerow(item)
+		continue
 
 	if n_times > 1:
 		dt = -(t_min - t_max)/(n_times - 1)
