@@ -91,10 +91,10 @@ decimal.getcontext().prec = 2
 dirs = glob.glob(datanum)
 dirs.sort()
 for dir in dirs:
-	print dir
 
 	#checks if file loaded in is raw or compressed - makes changes to compensate
 	if dir.split('.')[-1] == 'uvcRRE':
+		print dir
 		#indicates name of full directory
 		compr_full_path = host + ':' + dir
 		compr_path = compr_full_path.split(':')[1]
@@ -107,6 +107,7 @@ for dir in dirs:
 			path = compr_path
 
 	elif dir.split('.')[-1] == 'uv':
+		print dir
 		#indicates name of full directory -- SHOULD I SET TO NULL? OR CHECK DATABASE EVERY TIME?
 		raw_full_path = host + ':' + dir
 		raw_path = dir
@@ -289,16 +290,16 @@ for dir in dirs:
 
 	#Remove corresponding file from list
 	if dir.split('.')[-1] == 'uvcRRE':
-	try:
-		dirs.remove(dir[:4])
-	except:
-		continue		
+		try:
+			dirs.remove(dir[:4])
+		except:
+			continue		
 
 	if dir.split('.')[-1] == 'uv':
-	try:
-		dirs.remove(dir + 'cRRE')
-	except:
-		continue
+		try:
+			dirs.remove(dir + 'cRRE')
+		except:
+			continue
 
 """
 #Load data into named database and table
