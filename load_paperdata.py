@@ -38,8 +38,8 @@ def sizeof_fmt(num):
 	return "%3.1f" % (num)
 
 #User input information
-#usrnm = raw_input('Username: ')
-#pswd = getpass.getpass('Password: ')
+usrnm = 'paperboy'
+pswd = 'paperboy'
 
 datanum = raw_input('Input file path: ')
 
@@ -89,6 +89,34 @@ decimal.getcontext().prec = 2
 
 #iterates through directories, listing information about each one
 dirs = glob.glob(datanum)
+
+#Removes all files from list that already exist in the database
+connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+
+cursor = connection.cursor()
+
+cursor.execute('''SELECT path, raw_location from paperdata''')
+results = cursor.fetchall()
+cursor.close()
+connection.close()
+
+for res in results:
+	if res[0] != 'NULL':
+		folderC = res[0].split(':')[1]
+	else:
+		folderC = 'NULL'
+	if res[1] != 'NULL':
+		folderR = res[1].split(':')[1]
+	else:
+		folderR = 'NULL'
+	try:
+		dirs.remove(folderR)
+	except:
+		try:
+			dirs.remove(folderC)
+		except:
+			continue
+
 dirs.sort()
 for dir in dirs:
 
