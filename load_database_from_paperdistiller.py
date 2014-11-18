@@ -29,7 +29,7 @@ def get_size(start_path):
 def sizeof_fmt(num):
 	for x in ['bytes','KB','MB']:
 		if num < 1024.0:
-			return "%3.1f%s" % (num, x)
+			return "%3.1f" % (num)
 		num /= 1024.0
 	num *= 1024.0
 	return "%3.1f" % (num)
@@ -179,7 +179,7 @@ for item in results:
 
 	#create list of important data and open csv file
 	databs = [compr_path,era,era_type,obsnum,md5sum,jday,jdate,polarization,length,raw_location,cal_location,tape_location,sz,raw_sz,compressed,edge,ready_to_tape,delete_file,restore_history]
-	print [databs] 
+	print databs 
 
 	#write to csv file by item in list
 	wr.writerow(databs)
@@ -195,10 +195,7 @@ cursor = connection.cursor()
 
 print dbnum 
 # execute the SQL query using execute() method.
-cursor.execute('''USE paperdata;
-LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata
-COLUMNS TERMINATED BY ','
-LINES TERMINATED BY '\n' '''%(dbnum))
+cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbnum))
 
 print 'Table data loaded.'
 
