@@ -32,7 +32,7 @@ def get_size(start_path):
 def sizeof_fmt(num):
 	for x in ['bytes','KB','MB']:
 		if num < 1024.0:
-			return "%3.1f%s" % (num, x)
+			return "%3.1f" % (num)
 		num /= 1024.0
 	num *= 1024.0
 	return "%3.1f" % (num)
@@ -127,7 +127,7 @@ for dir in dirs:
 		compr_full_path = host + ':' + dir
 		compr_path = compr_full_path.split(':')[1]
 		raw_full_path = compr_full_path[:-4]
-		raw_path = dir[:4]
+		raw_path = dir[:-4]
 		raw_file = os.path.join(raw_path, 'visdata')
 		path = raw_path
 		if not os.path.isfile(raw_file):
@@ -140,7 +140,7 @@ for dir in dirs:
 		raw_full_path = host + ':' + dir
 		raw_path = dir
 		compr_full_path = host + ':' + dir + 'cRRE'
-		compr_path = dir[:-4] + 'cRRE'
+		compr_path = dir + 'cRRE'
 		compr_file = os.path.join(compr_path, 'visdata')
 		path = raw_path
 		if not os.path.isfile(compr_file):
@@ -188,13 +188,7 @@ for dir in dirs:
 	#indicates size of compressed file, removing units
         if compr_full_path != 'NULL':
                 lil_byte = sizeof_fmt(get_size(compr_path))
-
-                if lil_byte[-1] == 'B':
-                        compr_file_size = decimal.Decimal(lil_byte[:-2])
-                elif lil_byte[-1] == 's':
-                        compr_file_size = decimal.Decimal(lil_byte[:-5])
-                else:
-                        compr_file_size = decimal.Decimal(lil_byte)
+                compr_file_size = round(float(lil_byte), 1)
 
                 compressed = 1
 
@@ -205,13 +199,7 @@ for dir in dirs:
         #indicates size of raw file, removing units
         if raw_full_path != 'NULL':
                 lil_byte = sizeof_fmt(get_size(raw_path))
-
-                if lil_byte[-1] == 'B': 
-                        raw_file_size = decimal.Decimal(lil_byte[:-2])
-                elif lil_byte[-1] == 's':
-                        raw_file_size = decimal.Decimal(lil_byte[:-5])
-                else:
-                        raw_file_size = decimal.Decimal(lil_byte)
+                raw_file_size = round(float(lil_byte), 1)
 
                 #calculate md5sum
                 mdsum = md5sum(raw_path)
@@ -311,7 +299,7 @@ for dir in dirs:
 
 	#create list of important data and open csv file
 	databs = [compr_full_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_full_path,cal_location,tape_location,compr_file_size,raw_file_size,compressed,edge,ready_to_tape,delete_file,restore_history]
-	print [databs]
+	print databs
 
 	#write to csv file
 	wr.writerow(databs)
