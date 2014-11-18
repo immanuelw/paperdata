@@ -118,6 +118,11 @@ for res in results:
 		except:
 			continue
 
+	try:
+		dirs.remove(folderC)
+	except:
+		continue
+
 auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
 
 dirs.sort()
