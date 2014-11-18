@@ -109,6 +109,7 @@ for res in results:
 		folderR = res[1].split(':')[1]
 	else:
 		folderR = 'NULL'
+
 	try:
 		dirs.remove(folderR)
 	except:
@@ -116,6 +117,8 @@ for res in results:
 			dirs.remove(folderC)
 		except:
 			continue
+
+auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
 
 dirs.sort()
 for dir in dirs:
@@ -317,28 +320,28 @@ for dir in dirs:
 		except:
 			continue
 
-"""
-#Load data into named database and table
+#save into file and close it
+resultFile.close()
 
-# open a database connection
-# be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+if auto_update == 'y':
 
-# prepare a cursor object using cursor() method
-cursor = connection.cursor()
+	#Load data into named database and table
+	# open a database connection
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
-#execute the SQL query using execute() method.
-cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata
-COLUMNS TERMINATED BY ','
-LINES TERMINATED BY '\n' '''%(dbo))
+	# prepare a cursor object using cursor() method
+	cursor = connection.cursor()
 
-print 'Table data loaded.'
+	#execute the SQL query using execute() method.
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbo))
 
-#Close and save changes to database
-cursor.close()
-connection.commit()
-connection.close()
+	print 'Table data loaded.'
+
+	#Close and save changes to database
+	cursor.close()
+	connection.commit()
+	connection.close()
 
 # exit the program
 sys.exit()
-"""
+
