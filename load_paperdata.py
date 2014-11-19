@@ -66,7 +66,7 @@ def md5sum(fname):
 		buf = afile.read(BLOCKSIZE)
 	return hasher.hexdigest()
 
-def load_db(dbo):
+def load_db(dbo, usrnm, pswd):
 	#Load data into named database and table
 	# open a database connection
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
@@ -86,7 +86,7 @@ def load_db(dbo):
 
 	return None
 
-def gen_paperdata(dirs):
+def gen_paperdata(dirs, wr, ewr):
 	full_info = []
 	for dir in dirs:
 
@@ -352,8 +352,8 @@ if __name__ == '__main__':
         auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
 
         dirs.sort()
-        gen_paperdata(dirs)
+        gen_paperdata(dirs, wr, ewr)
 
 	if auto_update == 'y':
-		load_db(dbo)
+		load_db(dbo, usrnm, pswd)
 		sys.exit()
