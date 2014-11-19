@@ -62,10 +62,12 @@ resC = []
 resR = []
 
 for item in resA:
-	resC.append(item[0].split(':')[1])
+	if item[0] != 'NULL':
+		resC.append(item[0].split(':')[1])
 
 for item in resB:
-	resR.append(item[0].split(':')[1])
+	if item[0] != 'NULL':
+		resR.append(item[0].split(':')[1])
 
 #empty list to add new files to
 new_data = []
@@ -119,6 +121,9 @@ for file in infile_list:
 
 #Load into db
 for infile in infile_list:
+	if infile.split('.')[-1] != 'uv'and infile.split('.')[-1] != 'uvcRRE':
+		print 'Invalid file type'
+		sys.exit()
 	outfile = o_dict[infile]
 	#moves file
 	try:
