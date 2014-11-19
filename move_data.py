@@ -11,12 +11,17 @@ import glob
 import socket
 import csv
 import os
+import time
 
 ### Script to move and update paperdata database
-### Moves .uvcRRE directory and updates path field in paperdata
+### Moves .uvcRRE or .uv directory and updates path field in paperdata
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
+
+#output file
+time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
+move_data = 'moved_data_%s.csv'%(time_date)
 
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
@@ -26,15 +31,64 @@ host = socket.gethostname()
 infile = raw_input('Full input path: ')
 outfile = raw_input('Output directory: ')
 
-#dbo = '/data2/home/immwa/scripts/paper_output/move_db.csv'
-dbo = os.path.join(outfile,'moved_data.csv')
+#checks to see that output dir is valid
+if not os.path.isdir(outfile):
+	print 'Output directory does not exist'
+	sys.exit()
+
+#checks for input file type
+file_type = raw_input('uv, uvcRRE, or both?: ')
+
+if not file_type in ['uv','uvcRRE','both']:
+	print 'Invalid file type'
+	sys.exit()
+
+#List of files in directory -- allowing mass movement of .uvcRRE files
+infile_list = glob.glob(infile)
+
+#Load data into named database and table
+connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+cursor = connection.cursor()
+
+#Check if input file is in paperdata database
+cursor.execute('''SELECT path from paperdata''')
+resA = cursor.fetchall()
+cursor.execute('''SELECT raw_location from paperdata''')
+resB = cursor.fetchall()
+
+#convert tuples into list
+resC = []
+resR = []
+
+for item in resA:
+	resC.append(item[0].split(':')[1])
+
+for item in resB:
+	resR.append(item[0].split(':')[1])
+
+
+#Checks if file in database
+for item in infile_list :
+	if item in resC or item in resR:
+		continue
+	else:
+		print item
+		nonDB_file = raw_input('File not in paperdata--Add file(a), Skip file(s), or Exit script(e)?: ')
+		if nonDB_file == 's':
+			nonDB_file = ''
+			continue
+		elif nonDB_file == 'a':
+			#load_paperdata.load_paperdata(item)
+		else:
+			print 'Exiting...'
+			sys.exit()
+	
+infile_dir = infile.split('z')[0]
+dbo = os.path.join(infile_dir, move_data)
 resultFile = open(dbo,'wb')
 
 #create 'writer' object
 wr = csv.writer(resultFile, dialect='excel')
-
-#List of files in directory -- allowing mass movement of .uvcRRE files
-infile_list = glob.glob(infile)
 
 o_dict = {}
 for file in infile_list:
@@ -42,15 +96,7 @@ for file in infile_list:
 	out = os.path.join(outfile,zen)
 	o_dict.update({file:out})
 
-#Load data into named database and table
-
-# open a database connection
-# be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-
-# prepare a cursor object using cursor() method
-cursor = connection.cursor()
-
+#Load into db
 for infile in infile_list:
 	outfile = o_dict[infile]
 	#moves file
