@@ -44,8 +44,23 @@ for dir in dirs:
 	#check if file size is over 100MB, if not: skip
 	if os.path.getsize(data_file) < 104857600:
 		continue
+
 	if not os.path.isdir('/data4/paper/file_renaming_test_output/%d.uv' %(count)):
-		os.makedirs('/data4/paper/file_renaming_test_output/%d.uv' %(count))
+		try:
+			os.makedirs('/data4/paper/file_renaming_test_output/%d.uv' %(count))
+		except:
+			print 'Error creating new directory for %s' %(dir)
+			continue
+		try:
+			for item in glob.glob('/data4/paper/test_rename/empty/*'):
+				shutil.copy(item, '/data4/paper/file_renaming_test_output/%d.uv' %(count))
+		except:
+			print 'Error copying filler data with %s' %(dir)
+			continue
+
+	if not os.path.isdir('/data4/paper/file_renaming_test_output/%d.uv' %(count)):
+		print 'No directory'
+		continue
 
 	#if over 100MB, copy over to folio/copy to new folder and rename
 	try:
@@ -67,18 +82,26 @@ for dir in dirs:
 		continue
 
 	#find Julian Date
-	jdate = str(round(uv['time'], 5))
+	try:
+		jdate = str(round(uv['time'], 5))
+	except:
+		print 'JDate error'
+		continue
 
 	#assign letters to each polarization
-	if uv['npol'] == 1:
-		if uv['pol'] == -5:
-			pol = 'xx'
-		elif uv['pol'] == -6:
-			pol = 'yy'
-		elif uv['pol'] == -7:
-			pol = 'xy'
-		elif uv['pol'] == -8:
-			pol = 'yx'
+	try:
+		if uv['npol'] == 1:
+			if uv['pol'] == -5:
+				pol = 'xx'
+			elif uv['pol'] == -6:
+				pol = 'yy'
+			elif uv['pol'] == -7:
+				pol = 'xy'
+			elif uv['pol'] == -8:
+				pol = 'yx'
+	except:
+		print 'Polarization Error'
+		continue
 
 		#create variable to indicate new directory
 		newdir = 'zen.' + jdate + '.' + pol + '.uv'
