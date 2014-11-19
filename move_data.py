@@ -78,7 +78,6 @@ for item in infile_list :
 		print item
 		nonDB_file = raw_input('File not in paperdata--Add file(a), Skip file(s), or Exit script(e)?: ')
 		if nonDB_file == 's':
-			nonDB_file = ''
 			continue
 		elif nonDB_file == 'a':
 			new_data.append(item)
