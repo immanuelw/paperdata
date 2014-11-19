@@ -37,25 +37,6 @@ def sizeof_fmt(num):
 	num *= 1024.0
 	return "%3.1f" % (num)
 
-#User input information
-usrnm = 'paperboy'
-pswd = 'paperboy'
-
-datanum = raw_input('Input file path: ')
-
-dbo = '/data2/home/immwa/scripts/paper_output/db_out.csv'
-
-host = socket.gethostname()
-
-resultFile = open(dbo,'wb')
-
-#create 'writer' object
-wr = csv.writer(resultFile, dialect='excel')
-
-#create csv file to log bad files
-error_file = open('/data2/home/immwa/scripts/paper_output/false.csv', 'a')
-ewr = csv.writer(error_file, dialect='excel')
-
 #create function to uniquely identify files
 def jdpol2obsnum(jd,pol,djd):
 	"""
@@ -85,268 +66,292 @@ def md5sum(fname):
 		buf = afile.read(BLOCKSIZE)
 	return hasher.hexdigest()
 
-decimal.getcontext().prec = 2
+full_info = []
+def gen_paperdata(dirs):
+	for dir in dirs:
 
-#iterates through directories, listing information about each one
-dirs = glob.glob(datanum)
+		#checks if file loaded in is raw or compressed - makes changes to compensate
+		if dir.split('.')[-1] == 'uvcRRE':
+			print dir
+			#indicates name of full directory
+			compr_full_path = host + ':' + dir
+			compr_path = compr_full_path.split(':')[1]
+			raw_full_path = compr_full_path[:-4]
+			raw_path = dir[:-4]
+			raw_file = os.path.join(raw_path, 'visdata')
+			path = raw_path
+			if not os.path.isfile(raw_file):
+				raw_full_path = 'NULL'
+				path = compr_path
 
-#Removes all files from list that already exist in the database
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-
-cursor = connection.cursor()
-
-cursor.execute('''SELECT path, raw_location from paperdata''')
-results = cursor.fetchall()
-cursor.close()
-connection.close()
-
-for res in results:
-	if res[0] != 'NULL':
-		folderC = res[0].split(':')[1]
-	else:
-		folderC = 'NULL'
-	if res[1] != 'NULL':
-		folderR = res[1].split(':')[1]
-	else:
-		folderR = 'NULL'
-
-	try:
-		dirs.remove(folderR)
-	except:
-		try:
-			dirs.remove(folderC)
-		except:
+		elif dir.split('.')[-1] == 'uv':
+			print dir
+			#indicates name of full directory -- SHOULD I SET TO NULL? OR CHECK DATABASE EVERY TIME?
+			raw_full_path = host + ':' + dir
+			raw_path = dir
+			compr_full_path = host + ':' + dir + 'cRRE'
+			compr_path = dir + 'cRRE'
+			compr_file = os.path.join(compr_path, 'visdata')
+			path = raw_path
+			if not os.path.isfile(compr_file):
+				compr_full_path = 'NULL'
+		else:
 			continue
 
-	try:
-		dirs.remove(folderC)
-	except:
-		continue
+		#checks to make sure file can be accessed
 
-auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
+		#temp fix
+		if dir == '/nas2/data/psa6668/zen.2456668.17386.yx.uvcRRE':
+			item = [path,'Unknown error']
+			ewr.writerow(item)
+			continue
 
-dirs.sort()
-for dir in dirs:
+		#checks a .uv file for data
+		visdata = os.path.join(path, 'visdata')
+		if not os.path.isfile(visdata):
+			item = [path,'No visdata']
+			ewr.writerow(item)
+			continue
 
-	#checks if file loaded in is raw or compressed - makes changes to compensate
-	if dir.split('.')[-1] == 'uvcRRE':
-		print dir
-		#indicates name of full directory
-		compr_full_path = host + ':' + dir
-		compr_path = compr_full_path.split(':')[1]
-		raw_full_path = compr_full_path[:-4]
-		raw_path = dir[:-4]
-		raw_file = os.path.join(raw_path, 'visdata')
-		path = raw_path
-		if not os.path.isfile(raw_file):
-			raw_full_path = 'NULL'
-			path = compr_path
+		#checks a .uv file for vartable
+		vartable = os.path.join(path, 'vartable')
+		if not os.path.isfile(vartable):
+			item = [path,'No vartable']
+			ewr.writerow(item)
+			continue
 
-	elif dir.split('.')[-1] == 'uv':
-		print dir
-		#indicates name of full directory -- SHOULD I SET TO NULL? OR CHECK DATABASE EVERY TIME?
-		raw_full_path = host + ':' + dir
-		raw_path = dir
-		compr_full_path = host + ':' + dir + 'cRRE'
-		compr_path = dir + 'cRRE'
-		compr_file = os.path.join(compr_path, 'visdata')
-		path = raw_path
-		if not os.path.isfile(compr_file):
-			compr_full_path = 'NULL'
-	else:
-		continue
+		#checks a .uv file for header
+		header = os.path.join(path, 'header')
+		if not os.path.isfile(header):
+			item = [path,'No header']
+			ewr.writerow(item)
+			continue
 
-	#checks to make sure file can be accessed
+		#allows uv access
+		try:
+			uv = A.miriad.UV(path)
+		except:
+			item = [path,'Cannot access .uv file']
+			ewr.writerow(item)
+			continue	
 
-	#temp fix
-	if dir == '/nas2/data/psa6668/zen.2456668.17386.yx.uvcRRE':
-		item = [path,'Unknown error']
-		ewr.writerow(item)
-		continue
+		#indicates size of compressed file, removing units
+	        if compr_full_path != 'NULL':
+	                lil_byte = sizeof_fmt(get_size(compr_path))
+	                compr_file_size = round(float(lil_byte), 1)
 
-	#checks a .uv file for data
-	visdata = os.path.join(path, 'visdata')
-	if not os.path.isfile(visdata):
-		item = [path,'No visdata']
-		ewr.writerow(item)
-		continue
+	                compressed = 1
 
-	#checks a .uv file for vartable
-	vartable = os.path.join(path, 'vartable')
-	if not os.path.isfile(vartable):
-		item = [path,'No vartable']
-		ewr.writerow(item)
-		continue
+	        else:
+	                compr_file_size = 0.0
+	                compressed = 0
 
-	#checks a .uv file for header
-	header = os.path.join(path, 'header')
-	if not os.path.isfile(header):
-		item = [path,'No header']
-		ewr.writerow(item)
-		continue
+	        #indicates size of raw file, removing units
+	        if raw_full_path != 'NULL':
+	                lil_byte = sizeof_fmt(get_size(raw_path))
+	                raw_file_size = round(float(lil_byte), 1)
 
-	#allows uv access
-	try:
-		uv = A.miriad.UV(path)
-	except:
-		item = [path,'Cannot access .uv file']
-		ewr.writerow(item)
-		continue	
+	                #calculate md5sum
+	                mdsum = md5sum(raw_path)
+	        else:
+	                raw_file_size = 0.0
+	                mdsum = 'NULL'
 
-	#indicates size of compressed file, removing units
-        if compr_full_path != 'NULL':
-                lil_byte = sizeof_fmt(get_size(compr_path))
-                compr_file_size = round(float(lil_byte), 1)
+		#indicates julian date
+		jdate = round(uv['time'], 5)
 
-                compressed = 1
+		#indicates julian day and set of data
+		if jdate < 2456100:
+			era = 32
+		elif jdate < 2456400:
+			era = 64
+		else:
+			era = 128
 
-        else:
-                compr_file_size = 0.0
-                compressed = 0
+		jday = int(str(jdate)[3:7])
 
-        #indicates size of raw file, removing units
-        if raw_full_path != 'NULL':
-                lil_byte = sizeof_fmt(get_size(raw_path))
-                raw_file_size = round(float(lil_byte), 1)
+		#indicates type of file in era
+		era_type = 'NULL'
 
-                #calculate md5sum
-                mdsum = md5sum(raw_path)
-        else:
-                raw_file_size = 0.0
-                mdsum = 'NULL'
-
-	#indicates julian date
-	jdate = round(uv['time'], 5)
-
-	#indicates julian day and set of data
-	if jdate < 2456100:
-		era = 32
-	elif jdate < 2456400:
-		era = 64
-	else:
-		era = 128
-
-	jday = int(str(jdate)[3:7])
-
-	#indicates type of file in era
-	era_type = 'NULL'
-
-	#assign letters to each polarization
-	if uv['npol'] == 1:
-		if uv['pol'] == -5:
-			polarization = 'xx'
-		elif uv['pol'] == -6:
+		#assign letters to each polarization
+		if uv['npol'] == 1:
+			if uv['pol'] == -5:
+				polarization = 'xx'
+			elif uv['pol'] == -6:
+				polarization = 'yy'
+			elif uv['pol'] == -7:
+				polarization = 'xy'
+			elif uv['pol'] == -8:
+				polarization = 'yx' 
+		elif uv['npol'] == 4:
+		#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
 			polarization = 'yy'
-		elif uv['pol'] == -7:
-			polarization = 'xy'
-		elif uv['pol'] == -8:
-			polarization = 'yx' 
-	elif uv['npol'] == 4:
-	#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
-		polarization = 'yy'
 
-	t_min = 0
-	t_max = 0
-	n_times = 0
-	c_time = 0
+		t_min = 0
+		t_max = 0
+		n_times = 0
+		c_time = 0
 
-	try:
-		for (uvw, t, (i,j)),d in uv.all():
-			if t_min == 0 or t < t_min:
-				t_min = t
-			if t_max == 0 or t > t_max:
-				t_max = t
-			if c_time != t:
-				c_time = t
-				n_times += 1
-	except:
-		item = [path, 'Cannot read through .uv file']
-		ewr.writerow(item)
-		continue
-
-	if n_times > 1:
-		dt = -(t_min - t_max)/(n_times - 1)
-	else:
-		dt = -(t_min - t_max)/(n_times)
-
-	length = n_times * dt
-	#round so fits obsnum
-	length = round(length, 5)
-
-	#variable to input into jdpol2obsnum
-	divided_jdate = length
-
-	#gives each file unique id
-	if length > 0:
-		obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
-	else:
-		obsnum = 0
-
-	#location of calibrate files
-	if era == 32:
-		cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
-	elif era == 64:
-		cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
-	elif era == 128:
-		cal_location = 'NULL'
-
-	#shows location of raw data on tape
-	tape_location = 'NULL'
-
-	#Shows if file is edge file
-	edge = 0
-
-	#variable indicating if all files have been successfully compressed in one day
-	ready_to_tape = 0
-
-	#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
-	delete_file = 0 
-
-	#indicates times the file has been restored
-	restore_history = 'NULL'
-
-	#create list of important data and open csv file
-	databs = [compr_full_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_full_path,cal_location,tape_location,compr_file_size,raw_file_size,compressed,edge,ready_to_tape,delete_file,restore_history]
-	print databs
-
-	#write to csv file
-	wr.writerow(databs)
-
-	#Remove corresponding file from list
-	if dir.split('.')[-1] == 'uvcRRE':
 		try:
-			dirs.remove(dir[:4])
+			for (uvw, t, (i,j)),d in uv.all():
+				if t_min == 0 or t < t_min:
+					t_min = t
+				if t_max == 0 or t > t_max:
+					t_max = t
+				if c_time != t:
+					c_time = t
+					n_times += 1
 		except:
-			continue		
-
-	if dir.split('.')[-1] == 'uv':
-		try:
-			dirs.remove(dir + 'cRRE')
-		except:
+			item = [path, 'Cannot read through .uv file']
+			ewr.writerow(item)
 			continue
 
-#save into file and close it
-resultFile.close()
+		if n_times > 1:
+			dt = -(t_min - t_max)/(n_times - 1)
+		else:
+			dt = -(t_min - t_max)/(n_times)
 
-if auto_update == 'y':
+		length = n_times * dt
+		#round so fits obsnum
+		length = round(length, 5)
 
-	#Load data into named database and table
-	# open a database connection
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+		#variable to input into jdpol2obsnum
+		divided_jdate = length
 
-	# prepare a cursor object using cursor() method
-	cursor = connection.cursor()
+		#gives each file unique id
+		if length > 0:
+			obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
+		else:
+			obsnum = 0
 
-	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbo))
+		#location of calibrate files
+		if era == 32:
+			cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
+		elif era == 64:
+			cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
+		elif era == 128:
+			cal_location = 'NULL'
 
-	print 'Table data loaded.'
+		#shows location of raw data on tape
+		tape_location = 'NULL'
 
-	#Close and save changes to database
-	cursor.close()
-	connection.commit()
-	connection.close()
+		#Shows if file is edge file
+		edge = 0
 
-# exit the program
-sys.exit()
+		#variable indicating if all files have been successfully compressed in one day
+		ready_to_tape = 0
 
+		#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
+		delete_file = 0 
+
+		#indicates times the file has been restored
+		restore_history = 'NULL'
+
+		#create list of important data and open csv file
+		databs = [compr_full_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_full_path,cal_location,tape_location,compr_file_size,raw_file_size,compressed,edge,ready_to_tape,delete_file,restore_history]
+		print databs
+
+		#write to csv file
+		wr.writerow(databs)
+		full_info.append(databs)
+
+		#Remove corresponding file from list
+		if dir.split('.')[-1] == 'uvcRRE':
+			try:
+				dirs.remove(dir[:4])
+			except:
+				continue		
+
+		if dir.split('.')[-1] == 'uv':
+			try:
+				dirs.remove(dir + 'cRRE')
+			except:
+				continue
+	return full_info
+
+	#save into file and close it
+	resultFile.close()
+
+	if auto_update == 'y':
+
+		#Load data into named database and table
+		# open a database connection
+		connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+
+		# prepare a cursor object using cursor() method
+		cursor = connection.cursor()
+
+		#execute the SQL query using execute() method.
+		cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbo))
+
+		print 'Table data loaded.'
+
+		#Close and save changes to database
+		cursor.close()
+		connection.commit()
+		connection.close()
+
+	# exit the program
+	sys.exit()
+
+if __name__ == '__main__':
+
+        #User input information
+        usrnm = 'paperboy'
+        pswd = 'paperboy'
+
+        datanum = raw_input('Input file path: ')
+
+        dbo = '/data2/home/immwa/scripts/paper_output/db_out.csv'
+
+        host = socket.gethostname()
+
+        resultFile = open(dbo,'wb')
+
+        #create 'writer' object
+        wr = csv.writer(resultFile, dialect='excel')
+
+        #create csv file to log bad files
+        error_file = open('/data2/home/immwa/scripts/paper_output/false.csv', 'a')
+        ewr = csv.writer(error_file, dialect='excel')
+
+        #iterates through directories, listing information about each one
+        dirs = glob.glob(datanum)
+
+        #Removes all files from list that already exist in the database
+        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+
+        cursor = connection.cursor()
+
+        cursor.execute('''SELECT path, raw_location from paperdata''')
+        results = cursor.fetchall()
+        cursor.close()
+        connection.close()
+
+        for res in results:
+                if res[0] != 'NULL':
+                        folderC = res[0].split(':')[1]
+                else:
+                        folderC = 'NULL'
+                if res[1] != 'NULL':
+                        folderR = res[1].split(':')[1]
+                else:
+                        folderR = 'NULL'
+
+                try:
+                        dirs.remove(folderR)
+                except:
+                        try:
+                                dirs.remove(folderC)
+                        except:
+                                continue
+
+                try:
+                        dirs.remove(folderC)
+                except:
+                        continue
+
+        auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
+
+        dirs.sort()
+        gen_paperdata(dirs)
