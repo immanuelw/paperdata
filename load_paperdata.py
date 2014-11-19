@@ -66,8 +66,28 @@ def md5sum(fname):
 		buf = afile.read(BLOCKSIZE)
 	return hasher.hexdigest()
 
-full_info = []
+def load_db(dbo):
+	#Load data into named database and table
+	# open a database connection
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+
+	# prepare a cursor object using cursor() method
+	cursor = connection.cursor()
+
+	#execute the SQL query using execute() method.
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbo))
+
+	print 'Table data loaded.'
+
+	#Close and save changes to database
+	cursor.close()
+	connection.commit()
+	connection.close()
+
+	return None
+
 def gen_paperdata(dirs):
+	full_info = []
 	for dir in dirs:
 
 		#checks if file loaded in is raw or compressed - makes changes to compensate
@@ -272,28 +292,6 @@ def gen_paperdata(dirs):
 	#save into file and close it
 	resultFile.close()
 
-	if auto_update == 'y':
-
-		#Load data into named database and table
-		# open a database connection
-		connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-
-		# prepare a cursor object using cursor() method
-		cursor = connection.cursor()
-
-		#execute the SQL query using execute() method.
-		cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbo))
-
-		print 'Table data loaded.'
-
-		#Close and save changes to database
-		cursor.close()
-		connection.commit()
-		connection.close()
-
-	# exit the program
-	sys.exit()
-
 if __name__ == '__main__':
 
         #User input information
@@ -355,3 +353,7 @@ if __name__ == '__main__':
 
         dirs.sort()
         gen_paperdata(dirs)
+
+	if auto_update == 'y':
+		load_db(dbo)
+		sys.exit()
