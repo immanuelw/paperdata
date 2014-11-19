@@ -12,6 +12,7 @@ import socket
 import csv
 import os
 import time
+import load_paperdata
 
 ### Script to move and update paperdata database
 ### Moves .uvcRRE or .uv directory and updates path field in paperdata
@@ -66,6 +67,8 @@ for item in resA:
 for item in resB:
 	resR.append(item[0].split(':')[1])
 
+#empty list to add new files to
+new_data = []
 
 #Checks if file in database
 for item in infile_list :
@@ -78,12 +81,31 @@ for item in infile_list :
 			nonDB_file = ''
 			continue
 		elif nonDB_file == 'a':
-			#load_paperdata.load_paperdata(item)
+			new_data.append(item)
 		else:
 			print 'Exiting...'
 			sys.exit()
-	
+
+#Directory of the infiles
 infile_dir = infile.split('z')[0]
+
+#If any new files exist
+if len(new_data) > 1:
+	new_file = os.path.join(infile_dir, 'new_data.csv')
+	newFile = open(new_file, 'wb')
+	dbr = csv.writer(newFile, dialect='excel')
+
+	false_file = os.path.join(infile_dir, 'false_data.csv')
+	falseFile =  open(false_file, 'wb')
+	dwr = csv.writer(falseFile, dialect='excel')
+
+	#writes to files with new information
+	load_paperdata.gen_paperdata(new_data, dbr, dwr)
+	newFile.close()
+	falseFile.close()
+
+	load_paperdata.load_db(new_file, usrnm, pswd)
+	
 dbo = os.path.join(infile_dir, move_data)
 resultFile = open(dbo,'wb')
 
