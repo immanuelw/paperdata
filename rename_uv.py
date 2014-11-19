@@ -13,12 +13,10 @@ import decimal
 ### Date: 8-20-14
 
 #location of directory searched
-data = raw_input('Input directory path: ')
-#data = '/mnt/USB/0/D40P01/Good/FOUND.ODR/Orphan9/'
-#data = '/data4/paper/file_renaming_test_output/'
+data = '/data4/paper/file_renaming_test/*'
 
 #location of directory to move to
-datashift = '/data4/paper/file_renaming_test_output_complete/'
+datashift = '/data4/paper/file_renaming_test_output/'
 
 #create csv file to log bad files
 error_file = open('/data2/home/immwa/scripts/paper_output/128error.csv', 'a')
@@ -41,20 +39,23 @@ dirs = glob.glob(data)
 for dir in dirs:
 	count += 1
 	#print dir
-	data_file = os.path.join(dummy,file)
+	data_file = dir
 
 	#check if file size is over 100MB, if not: skip
-	if get_size(data_file) < 104857600:
+	if os.path.getsize(data_file) < 104857600:
 		continue
+	if not os.path.isdir('/data4/paper/file_renaming_test_output/%d.uv' %(count)):
+		os.makedirs('/data4/paper/file_renaming_test_output/%d.uv' %(count))
 
 	#if over 100MB, copy over to folio/copy to new folder and rename
 	try:
-		shutil.copy(data_file, '/data4/paper/file_renaming_test_output/%d/visdata' %(count))
+		shutil.copy(data_file, '/data4/paper/file_renaming_test_output/%d.uv/visdata' %(count))
 	except:
-		print 'Directory /data4/paper/file_renaming_test_output/%d/ doesnt exist' %(count)
+		print 'Directory /data4/paper/file_renaming_test_output/%d.uv/ doesnt exist' %(count)
+		continue
 
 	#set string to location of new .uv file
-	newUV = '/data4/paper/file_renaming_test_output/%d' %(count)
+	newUV = '/data4/paper/file_renaming_test_output/%d.uv' %(count)
 
 	#allows uv access
 	try:
@@ -66,11 +67,10 @@ for dir in dirs:
 		continue
 
 	#find Julian Date
-	decimal.getcontext().prec = 5
-	jdate = str(decimal.Decimal(uv['time']))
+	jdate = str(round(uv['time'], 5))
 
 	#assign letters to each polarization
-	if uv[npol] == 1:
+	if uv['npol'] == 1:
 		if uv['pol'] == -5:
 			pol = 'xx'
 		elif uv['pol'] == -6:
