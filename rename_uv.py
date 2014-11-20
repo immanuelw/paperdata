@@ -81,7 +81,7 @@ for dir in dirs:
 		uv = A.miriad.UV(newUV)
 		print 'uv Success'
 	except:
-		item = [newUV,'Cannot access .uv file']
+		item = [newUV, dir,'Cannot access .uv file']
 		ewr.writerow(item)
 		error_file.close()
 		print 'UV Error'
@@ -127,6 +127,6 @@ for dir in dirs:
 	try:
 		shutil.move(newUV,newfile)
 	except:
-		item = [newfile,'''Couldn't move file''']
+		item = [newfile, dir, '''Couldn't move file''']
 		ewr.writerow(item)
 		error_file.close()
