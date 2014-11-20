@@ -38,10 +38,13 @@ for dir in dirs:
 	#check if file size is over 500MB, if not: skip
 	if data_size > 3832908476:
 		filler_dir = '/data4/paper/test_rename/empty2/*'
+		file_type = '.uv'
 	elif data_size > 524288000:
 		filler_dir = '/data4/paper/test_rename/empty/*'
+		file_type = '.uv'
 	elif data_size < 524288000 and data_size > 104857600:
 		filler_dir = '/data4/paper/test_rename/empty3/*'
+		file_type = '.uvcRRE'
 	elif data_size < 104857600:	
 		continue
 
@@ -109,12 +112,12 @@ for dir in dirs:
 				pol = 'yx'
 
 			#create variable to indicate new directory
-			newdir = 'zen.' + jdate + '.' + pol + '.uv'
+			newdir = 'zen.' + jdate + '.' + pol + file_type
 			newfile = os.path.join(datashift, newdir)	
 
 		#if polarizations aren't separated
 		if uv['npol'] == 4:
-			newdir = 'zen.' + jdate + '.uv'
+			newdir = 'zen.' + jdate + file_type
 			newfile = os.path.join(datashift, newdir)
 
 	except:
