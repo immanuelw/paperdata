@@ -88,6 +88,9 @@ def load_db(dbo, usrnm, pswd):
 
 def gen_paperdata(dirs, wr, ewr):
 	full_info = []
+	#Dictionary of polarizations
+	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
+
 	for dir in dirs:
 
 		#checks if file loaded in is raw or compressed - makes changes to compensate
@@ -195,14 +198,7 @@ def gen_paperdata(dirs, wr, ewr):
 
 		#assign letters to each polarization
 		if uv['npol'] == 1:
-			if uv['pol'] == -5:
-				polarization = 'xx'
-			elif uv['pol'] == -6:
-				polarization = 'yy'
-			elif uv['pol'] == -7:
-				polarization = 'xy'
-			elif uv['pol'] == -8:
-				polarization = 'yx' 
+			polarization = pol_dict[uv['pol']]
 		elif uv['npol'] == 4:
 		#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
 			polarization = 'yy'
