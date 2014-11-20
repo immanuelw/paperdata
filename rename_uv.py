@@ -4,7 +4,6 @@ import os
 import shutil
 import csv
 import glob
-import decimal
 
 ### Script to move and rename .uv files with unknown names
 ### Moves .uv files without names into new directories, creating names fro mreadign through file
@@ -17,15 +16,6 @@ data = '/data4/paper/file_renaming_test/*'
 
 #location of directory to move to
 datashift = '/data4/paper/file_renaming_test_output/'
-
-#indicates size of directory or file
-def get_size(start_path):
-        total_size = 0
-        for dirpath, dirnames, filenames in os.walk(start_path):
-                for f in filenames:
-                        fp = os.path.join(dirpath, f)
-                        total_size += os.path.getsize(fp)
-        return total_size
 
 #dummy count variable
 count = 0
@@ -42,9 +32,19 @@ for dir in dirs:
 	#print dir
 	data_file = dir
 
+	#Find size of file
+	data_size = os.path.getsize(data_file)
+
 	#check if file size is over 500MB, if not: skip
-	if os.path.getsize(data_file) < 524288000:
+	if data_size > 3832908476:
+		filler_dir = '/data4/paper/test_rename/empty2/*'
+	elif data_size > 524288000:
+		filler_dir = '/data4/paper/test_rename/empty/*'
+	elif data_size < 524288000 and data_size > 104857600:
+		filler_dir = '/data4/paper/test_rename/empty3/*'
+	elif data_size < 104857600:	
 		continue
+
 
 	if not os.path.isdir('/data4/paper/file_renaming_test_output/%d.uv' %(count)):
 		try:
@@ -53,7 +53,7 @@ for dir in dirs:
 			print 'Error creating new directory for %s' %(dir)
 			continue
 		try:
-			for item in glob.glob('/data4/paper/test_rename/empty/*'):
+			for item in glob.glob(filler_dir):
 				shutil.copy(item, '/data4/paper/file_renaming_test_output/%d.uv' %(count))
 		except:
 			print 'Error copying filler data with %s' %(dir)
