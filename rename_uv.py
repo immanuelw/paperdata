@@ -20,6 +20,9 @@ datashift = '/data4/paper/file_renaming_test_output/'
 #dummy count variable
 count = 0
 
+#polarization dictionary
+pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
+
 #loop over files/folders to look through
 dirs = glob.glob(data)
 for dir in dirs:
@@ -102,14 +105,7 @@ for dir in dirs:
 	#assign letters to each polarization
 	try:
 		if uv['npol'] == 1:
-			if uv['pol'] == -5:
-				pol = 'xx'
-			elif uv['pol'] == -6:
-				pol = 'yy'
-			elif uv['pol'] == -7:
-				pol = 'xy'
-			elif uv['pol'] == -8:
-				pol = 'yx'
+			pol = pol_dict[uv['pol']]
 
 			#create variable to indicate new directory
 			newdir = 'zen.' + jdate + '.' + pol + file_type
