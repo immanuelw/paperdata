@@ -19,7 +19,7 @@ data = '/data4/paper/file_renaming_test/*'
 datashift = '/data4/paper/file_renaming_test_output/'
 
 #create csv file to log bad files
-error_file = open('/data2/home/immwa/scripts/paper_output/128error.csv', 'a')
+error_file = open('/data4/paper/file_renaming_test_output/128error.csv', 'a')
 ewr = csv.writer(error_file, dialect='excel')
 
 #indicates size of directory or file
@@ -38,11 +38,12 @@ count = 0
 dirs = glob.glob(data)
 for dir in dirs:
 	count += 1
+
 	#print dir
 	data_file = dir
 
-	#check if file size is over 100MB, if not: skip
-	if os.path.getsize(data_file) < 104857600:
+	#check if file size is over 500MB, if not: skip
+	if os.path.getsize(data_file) < 524288000:
 		continue
 
 	if not os.path.isdir('/data4/paper/file_renaming_test_output/%d.uv' %(count)):
@@ -74,13 +75,19 @@ for dir in dirs:
 
 	#allows uv access
 	try:
+		print 'Accessing uv...'
+		#Fixes random fatal error
+		uv = 0
 		uv = A.miriad.UV(newUV)
+		print 'uv Success'
 	except:
 		error_list = [[newUV,'Cannot access .uv file']]
 		for item in error_list:
 			ewr.writerow(item)
+		print 'UV Error'
 		continue
 
+	print 'jd...'
 	#find Julian Date
 	try:
 		jdate = str(round(uv['time'], 5))
@@ -88,6 +95,7 @@ for dir in dirs:
 		print 'JDate error'
 		continue
 
+	print 'pol...'
 	#assign letters to each polarization
 	try:
 		if uv['npol'] == 1:
@@ -99,18 +107,19 @@ for dir in dirs:
 				pol = 'xy'
 			elif uv['pol'] == -8:
 				pol = 'yx'
+
+			#create variable to indicate new directory
+			newdir = 'zen.' + jdate + '.' + pol + '.uv'
+			newfile = os.path.join(datashift, newdir)	
+
+		#if polarizations aren't separated
+		if uv['npol'] == 4:
+			newdir = 'zen.' + jdate + '.uv'
+			newfile = os.path.join(datashift, newdir)
+
 	except:
 		print 'Polarization Error'
 		continue
-
-		#create variable to indicate new directory
-		newdir = 'zen.' + jdate + '.' + pol + '.uv'
-		newfile = os.path.join(datashift, newdir)	
-
-	#if polarizations aren't separated
-	else:
-		newdir = 'zen.' + jdate + '.uv'
-		newfile = os.path.join(datashift, newdir)
 
 	print newfile
 		
