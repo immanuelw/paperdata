@@ -18,10 +18,6 @@ data = '/data4/paper/file_renaming_test/*'
 #location of directory to move to
 datashift = '/data4/paper/file_renaming_test_output/'
 
-#create csv file to log bad files
-error_file = open('/data4/paper/file_renaming_test_output/128error.csv', 'a')
-ewr = csv.writer(error_file, dialect='excel')
-
 #indicates size of directory or file
 def get_size(start_path):
         total_size = 0
@@ -37,6 +33,10 @@ count = 0
 #loop over files/folders to look through
 dirs = glob.glob(data)
 for dir in dirs:
+	#create csv file to log bad files
+	error_file = open('/data4/paper/file_renaming_test_output/128error.csv', 'a')
+	ewr = csv.writer(error_file, dialect='excel')
+
 	count += 1
 
 	#print dir
@@ -81,9 +81,9 @@ for dir in dirs:
 		uv = A.miriad.UV(newUV)
 		print 'uv Success'
 	except:
-		error_list = [[newUV,'Cannot access .uv file']]
-		for item in error_list:
-			ewr.writerow(item)
+		item = [newUV,'Cannot access .uv file']
+		ewr.writerow(item)
+		error_file.close()
 		print 'UV Error'
 		continue
 
@@ -127,6 +127,6 @@ for dir in dirs:
 	try:
 		shutil.move(newUV,newfile)
 	except:
-		error_list = [[newfile,'''Couldn't move file''']]
-		for item in error_list:
-			ewr.writerow(item)
+		item = [newfile,'''Couldn't move file''']
+		ewr.writerow(item)
+		error_file.close()
