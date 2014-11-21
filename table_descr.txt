@@ -551,8 +551,8 @@ Era	Julian Day	Raw Path					Path					Type of File(C/R/B)	Amount
 128	6632		folio:/nas1/data/psa6632/			folio:/data4/paper/2013EoR/psa6632/		B		58
 128	6632		folio:/nas1/data/psa6632/			NULL						R		230
 128	6632		NULL						folio:/data4/paper/2013EoR/psa6632/		C		58
-128	6636		folio:/nas1/data/psa6636/			folio:/data4/paper/2013EoR/psa6636/		B		47
-128	6636		folio:/nas1/data/psa6636/			NULL						R		133
+128	6636		folio:/nas1/data/psa6636/			folio:/data4/paper/2013EoR/psa6636/		B		46
+128	6636		folio:/nas1/data/psa6636/			NULL						R		134
 128	6636		NULL						folio:/data4/paper/2013EoR/psa6636/		C		47
 128	6638		folio:/nas1/data/psa6638/			NULL						R		288
 128	6640		folio:/nas1/data/psa6640/			NULL						R		288
