@@ -40,14 +40,15 @@ for dir in dirs:
 
 	#check if file size is over 500MB, if not: skip
 	if data_size > 3832908476:
-		filler_dir = '/data4/paper/test_rename/empty2/*'
+		filler_dir = '/data4/paper/test_rename/64R/*'
 		file_type = '.uv'
 	elif data_size > 524288000:
-		filler_dir = '/data4/paper/test_rename/empty/*'
+		filler_dir = '/data4/paper/test_rename/128R/*'
 		file_type = '.uv'
 	elif data_size < 524288000 and data_size > 104857600:
-		filler_dir = '/data4/paper/test_rename/empty3/*'
-		file_type = '.uvcRRE'
+		#filler_dir = '/data4/paper/test_rename/128C/*'
+		#file_type = '.uvcRRE'
+		continue
 	elif data_size < 104857600:	
 		continue
 
