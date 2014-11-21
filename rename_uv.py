@@ -101,6 +101,17 @@ for dir in dirs:
 		print 'JDate error'
 		continue
 
+	print 'nchan...'
+	try:
+		nchan = uv['nchan']
+		if nchan < 1000:
+			file_type = '.uv'
+		else:
+			file_type = '.uvcRRE'
+	except:
+		print 'NChan Error'
+		continue
+
 	print 'pol...'
 	#assign letters to each polarization
 	try:
