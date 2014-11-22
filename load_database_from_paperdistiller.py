@@ -59,9 +59,45 @@ result = cursor.fetchall()
 #gather all data to input into paperdata
 results = []
 for item in result:
-	cursor.execute('SELECT julian_date, pol, length from observation where obsnum = %d'%(item[1])
+	cursor.execute('''SELECT julian_date, pol, length, status, substring(julian_date, 4, 4) from observation where obsnum = %d '''%(int(item[1])))
 	sec_results = cursor.fetchall()
 	results.append(item + sec_results[0])	
+
+#results is list of tuples of filename[0], obsnum[1], md5sum[2], julian_date[3], pol[4], length[5], status[6], julian_day[7]
+
+#Make unique list of julian days
+cursor.execute('''SELECT substring(julian_date, 4, 4), count(*) from observation group by substring(julian_date, 4, 4)''')
+unique_jday = cursor.fetchall()
+
+#Make dict of the amount of each jday
+count_jday = {}
+for jday in unique_jday:
+	count_jday.update({jday[0]:jday[1]})
+
+#Find all complete days in observation
+completed_days = []
+
+cursor.execute('''SELECT substring(julian_date, 4, 4), status, count(*) from observation group by substring(julian_date, 4, 4), status ''')
+completion = cursor.fetchall()
+for entry in completion:
+	jday = entry[0]
+	status = entry[1]
+	count = entry[2]
+	if status == 'COMPLETE':
+		if count == count_jday[jday]:
+			completed_days.append(jday)
+		else:
+			print jday ' is incomplete'
+	else:
+		print jday ' is incomplete'
+
+
+#Remove all non-complete days
+for res in results:
+	if res[7] not in completed_days:
+		results.remove(res)
+
+#Results should be list of days that have been completed for all files
 
 #Create list of obsnums to check for duplicates
 cursor.execute('SELECT obsnum from paperdata')
@@ -145,7 +181,7 @@ for item in results:
 	jdate = round(float(item[3]), 5)
 
 	#indicates julian day
-	jday = int(str(jdate)[3:7])	
+	jday = int(item[7])	
 
 	#indicates set of data used
 	if jdate < 2456100:
