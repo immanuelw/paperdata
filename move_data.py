@@ -130,7 +130,7 @@ def move_files(infile, infile_list, move_data, usrnm, pswd):
 		if infile.split('.')[-1] == 'uvcRRE':
 			cursor.execute('''UPDATE paperdata set path = '%s' where path = '%s' '''%(outfile_path, infile_path))
 		elif infile.split('.')[-1] == 'uv':
-			cursor.execute('''UPDATE paperdata set raw_location = '%s' where raw_location = '%s' '''%(outfile_path, infile_path))
+			cursor.execute('''UPDATE paperdata set raw_location = '%s', ready_to_tape = 1 where raw_location = '%s' '''%(outfile_path, infile_path))
 
 	print 'File(s) moved and updated'
 
