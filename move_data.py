@@ -84,9 +84,9 @@ def load_new_data(infile, new_data):
 
 	return None
 
-def move_files(infile, infile_list, move_data, usrnm, pswd):
+def move_files(infile_list, move_data, usrnm, pswd):
 	#Directory of the infiles
-	infile_dir = infile.split('z')[0]
+	infile_dir = infile_list[0].split('z')[0]
 
 	#create file to log movement data	
 	dbo = os.path.join(infile_dir, move_data)
@@ -176,4 +176,4 @@ if __name__ == '__main__':
 	load_new_data(infile, new_data)
 
 	#Moves files and updates their location
-	move_files(infile, infile_list, move_data, usrnm, pswd)
+	move_files(infile_list, move_data, usrnm, pswd)
