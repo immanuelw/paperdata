@@ -97,7 +97,7 @@ def gen_paperdata(dirs, dbo, dbe):
 	#Dictionary of polarizations
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
 
-	for dir in dirs:
+	for dir in dirs[:]:
 
 		#create csv file to log data
 		data_file = open(dbo,'a')
