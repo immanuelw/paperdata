@@ -100,7 +100,11 @@ def gen_data_list(usrnm, pswd):
 	cursor.close()
 	connection.close()
 
-	return [results, obsnums]
+	filenames = []
+	for file in results:
+		filenames.append(file[0])
+
+	return [results, obsnums, filenames]
 
 def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 	host = socket.gethostname()
@@ -122,8 +126,6 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		wr = csv.writer(data_file, dialect='excel')
 
 		#indicates location of raw file (usually same directory as compressed)	
-		###need to include host name in path_raw and path
-	
 		if item[0].split('.')[-1] == 'uv':
 			raw_path = item[0]
 			raw_full_path = host + ':' + raw_path
@@ -243,7 +245,7 @@ if __name__ == '__main__':
 	dbe = '/data4/paper/paperdistiller_output/paperdistiller_error_%s.csv'%(time_date)
 
 	#Pull information from paperdistiler
-	results, obsnums = gen_data_list(usrnm,pswd)
+	results, obsnums, filenames = gen_data_list(usrnm,pswd)
 
 	#Generate data from info pulled
 	gen_data_from_paperdistiller(results, obsnums, dbnum, dbe)
