@@ -89,19 +89,23 @@ def load_db(dbo, usrnm, pswd):
 def gen_paperdata(dirs, dbo, dbe):
 	host = socket.gethostname()
 
-        #create 'writer' object
-        data_file = open(dbo,'a')
-        wr = csv.writer(data_file, dialect='excel')
-
-        #create csv file to log bad files
-        error_file = open(dbe, 'a')
-        ewr = csv.writer(error_file, dialect='excel')
+        #Erase former data file
+        data_file = open(dbo,'w')
+	data_file.close()
 
 	full_info = []
 	#Dictionary of polarizations
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
 
 	for dir in dirs:
+
+		#create csv file to log data
+		data_file = open(dbo,'a')
+		wr = csv.writer(data_file, dialect='excel')
+
+		#create csv file to log bad files
+		error_file = open(dbe, 'a')
+		ewr = csv.writer(error_file, dialect='excel')
 
 		#checks if file loaded in is raw or compressed - makes changes to compensate
 		if dir.split('.')[-1] == 'uvcRRE':
@@ -350,10 +354,6 @@ if __name__ == '__main__':
 
         dbo = '/data2/home/immwa/scripts/paper_output/db_out.csv'
 	dbe = '/data2/home/immwa/scripts/paper_output/false.csv'
-
-	#Erase former data file
-	data_file = open(dbo,'wb')
-	data_file.close()
 
         #iterates through directories, listing information about each one
         dirs_all = glob.glob(datanum)
