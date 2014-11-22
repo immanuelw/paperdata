@@ -86,7 +86,18 @@ def load_db(dbo, usrnm, pswd):
 
 	return None
 
-def gen_paperdata(dirs, wr, ewr):
+def gen_paperdata(dirs, dbo, dbe):
+
+	host = socket.gethostname()
+
+        #create 'writer' object
+        data_file = open(dbo,'a')
+        wr = csv.writer(data_file, dialect='excel')
+
+        #create csv file to log bad files
+        error_file = open(dbe, 'a')
+        ewr = csv.writer(error_file, dialect='excel')
+
 	full_info = []
 	#Dictionary of polarizations
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
@@ -283,36 +294,13 @@ def gen_paperdata(dirs, wr, ewr):
 				dirs.remove(dir + 'cRRE')
 			except:
 				continue
+	#save into file and close it
+	data_file.close()
+
 	return full_info
 
-	#save into file and close it
-	resultFile.close()
-
-if __name__ == '__main__':
-
-        #User input information
-        usrnm = 'paperboy'
-        pswd = 'paperboy'
-
-        datanum = raw_input('Input file path: ')
-
-        dbo = '/data2/home/immwa/scripts/paper_output/db_out.csv'
-
-        host = socket.gethostname()
-
-        resultFile = open(dbo,'wb')
-
-        #create 'writer' object
-        wr = csv.writer(resultFile, dialect='excel')
-
-        #create csv file to log bad files
-        error_file = open('/data2/home/immwa/scripts/paper_output/false.csv', 'a')
-        ewr = csv.writer(error_file, dialect='excel')
-
-        #iterates through directories, listing information about each one
-        dirs = glob.glob(datanum)
-
-        #Removes all files from list that already exist in the database
+def remove_duplicates(dirs_all, usrnm, pswd):
+	#Removes all files from list that already exist in the database
         connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
         cursor = connection.cursor()
@@ -333,23 +321,44 @@ if __name__ == '__main__':
                         folderR = 'NULL'
 
                 try:
-                        dirs.remove(folderR)
+                        dirs_all.remove(folderR)
                 except:
                         try:
-                                dirs.remove(folderC)
+                                dirs_all.remove(folderC)
                         except:
                                 continue
 
                 try:
-                        dirs.remove(folderC)
+                        dirs_all.remove(folderC)
                 except:
                         continue
+
+	return dirs_all
+
+if __name__ == '__main__':
+
+        #User input information
+        usrnm = 'paperboy'
+        pswd = 'paperboy'
+
+        datanum = raw_input('Input file path: ')
+
+        dbo = '/data2/home/immwa/scripts/paper_output/db_out.csv'
+	dbe = '/data2/home/immwa/scripts/paper_output/false.csv'
+
+        #iterates through directories, listing information about each one
+        dirs_all = glob.glob(datanum)
+
+	#removes duplicate entries from directory
+	dirs = remove_duplicates(dirs_all, usrnm, pswd)
 
         auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
 
         dirs.sort()
-        gen_paperdata(dirs, wr, ewr)
+        gen_paperdata(dirs, dbo, dbe)
 
 	if auto_update == 'y':
-		load_db(dbo, usrnm, pswd)
+		usrnm2 = raw_input('Input username with edit privileges: ')
+		pswd2 = raw_input('Input password: ')
+		load_db(dbo, usrnm2, pswd2)
 		sys.exit()
