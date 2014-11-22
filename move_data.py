@@ -20,132 +20,160 @@ import load_paperdata
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-#output file
-time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-move_data = 'moved_data_%s.csv'%(time_date)
+def dupe_check(infile_list):
+	#Load data into named database and table
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
 
-usrnm = raw_input('Username: ')
-pswd = getpass.getpass('Password: ')
+	#Check if input file is in paperdata database
+	cursor.execute('''SELECT path from paperdata''')
+	resA = cursor.fetchall()
+	cursor.execute('''SELECT raw_location from paperdata''')
+	resB = cursor.fetchall()
 
-#File information
-host = socket.gethostname()
-infile = raw_input('Full input path: ')
-outfile = raw_input('Output directory: ')
+	#convert tuples into list
+	resC = []
+	resR = []
 
-#checks to see that output dir is valid
-if not os.path.isdir(outfile):
-	print 'Output directory does not exist'
-	sys.exit()
+	for item in resA:
+		if item[0] != 'NULL':
+			resC.append(item[0].split(':')[1])
 
-#checks for input file type
-file_type = raw_input('uv, uvcRRE, or both?: ')
+	for item in resB:
+		if item[0] != 'NULL':
+			resR.append(item[0].split(':')[1])
 
-if not file_type in ['uv','uvcRRE','both']:
-	print 'Invalid file type'
-	sys.exit()
+	#empty list to add new files to
+	new_data = []
 
-#List of files in directory -- allowing mass movement of .uvcRRE files
-infile_list = glob.glob(infile)
-
-#Load data into named database and table
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-cursor = connection.cursor()
-
-#Check if input file is in paperdata database
-cursor.execute('''SELECT path from paperdata''')
-resA = cursor.fetchall()
-cursor.execute('''SELECT raw_location from paperdata''')
-resB = cursor.fetchall()
-
-#convert tuples into list
-resC = []
-resR = []
-
-for item in resA:
-	if item[0] != 'NULL':
-		resC.append(item[0].split(':')[1])
-
-for item in resB:
-	if item[0] != 'NULL':
-		resR.append(item[0].split(':')[1])
-
-#empty list to add new files to
-new_data = []
-
-#Checks if file in database
-for item in infile_list :
-	if item in resC or item in resR:
-		continue
-	else:
-		print item
-		nonDB_file = raw_input('File not in paperdata--Add file(a), Skip file(s), or Exit script(e)?: ')
-		if nonDB_file == 's':
+	#Checks if file in database
+	for item in infile_list:
+		if item in resC or item in resR:
 			continue
-		elif nonDB_file == 'a':
-			new_data.append(item)
 		else:
-			print 'Exiting...'
+			print item
+			nonDB_file = raw_input('File not in paperdata--Add file(a), Skip file(s), or Exit script(e)?: ')
+			if nonDB_file == 's':
+				continue
+			elif nonDB_file == 'a':
+				new_data.append(item)
+			else:
+				print 'Exiting...'
+				sys.exit()
+
+	cursor.close()
+	connection.commit()
+	connection.close()
+
+	return new_data
+
+def load_new_data(infile, new_data):
+	#Directory of the infiles
+	infile_dir = infile.split('z')[0]
+
+	#If any new files exist
+	if len(new_data) > 1:
+		dbn = os.path.join(infile_dir, 'new_data.csv')
+		dbf = os.path.join(infile_dir, 'false_data.csv')
+
+		#writes to files with new information
+		load_paperdata.gen_paperdata(new_data, dbn, dbf)
+
+		#Loads new data into paperdata
+		load_paperdata.load_db(dbn, usrnm, pswd)
+
+	return None
+
+def move_files(infile, infile_list, move_data, usrnm, pswd):
+	#Directory of the infiles
+	infile_dir = infile.split('z')[0]
+
+	#create file to log movement data	
+	dbo = os.path.join(infile_dir, move_data)
+	dbr = open(dbo,'wb')
+	dbr.close()
+
+	o_dict = {}
+	for file in infile_list:
+		zen = file.split('/')[-1]
+		out = os.path.join(outfile,zen)
+		o_dict.update({file:out})
+
+	#Load data into named database and table
+        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+        cursor = connection.cursor()
+
+	#Load into db
+	for infile in infile_list:
+		if infile.split('.')[-1] != 'uv'and infile.split('.')[-1] != 'uvcRRE':
+			print 'Invalid file type'
 			sys.exit()
 
-#Directory of the infiles
-infile_dir = infile.split('z')[0]
+		outfile = o_dict[infile]
 
-#If any new files exist
-if len(new_data) > 1:
-	new_file = os.path.join(infile_dir, 'new_data.csv')
-	newFile = open(new_file, 'wb')
-	dbr = csv.writer(newFile, dialect='excel')
+		#Opens file to append to
+		dbr = open(dbo, 'a')
+		wr = csv.writer(dbr, dialect='excel')
 
-	false_file = os.path.join(infile_dir, 'false_data.csv')
-	falseFile =  open(false_file, 'wb')
-	dwr = csv.writer(falseFile, dialect='excel')
+		#moves file
+		try:
+			shutil.move(infile,outfile)
+			wr.writerow([infile,outfile])
+			print infile, outfile
+			dbr.close()
+		except:
+			dbr.close()
+			continue
+		# execute the SQL query using execute() method, updates new location
+		infile_path = host + ':' + infile
+		outfile_path = host + ':' + outfile
+		if infile.split('.')[-1] == 'uvcRRE':
+			cursor.execute('''UPDATE paperdata set path = '%s' where path = '%s' '''%(outfile_path, infile_path))
+		elif infile.split('.')[-1] == 'uv':
+			cursor.execute('''UPDATE paperdata set raw_location = '%s' where raw_location = '%s' '''%(outfile_path, infile_path))
 
-	#writes to files with new information
-	load_paperdata.gen_paperdata(new_data, dbr, dwr)
-	newFile.close()
-	falseFile.close()
+	print 'File(s) moved and updated'
 
-	load_paperdata.load_db(new_file, usrnm, pswd)
-	
-dbo = os.path.join(infile_dir, move_data)
-resultFile = open(dbo,'wb')
+	#Close database and save changes
+	cursor.close()
+	connection.commit()
+	connection.close()
 
-#create 'writer' object
-wr = csv.writer(resultFile, dialect='excel')
+	return None
 
-o_dict = {}
-for file in infile_list:
-	zen = file.split('/')[-1]
-	out = os.path.join(outfile,zen)
-	o_dict.update({file:out})
+if __name__ == '__main__':
+	#output file
+	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
+	move_data = 'moved_data_%s.csv'%(time_date)
 
-#Load into db
-for infile in infile_list:
-	if infile.split('.')[-1] != 'uv'and infile.split('.')[-1] != 'uvcRRE':
-		print 'Invalid file type'
-		sys.exit()
-	outfile = o_dict[infile]
-	#moves file
-	try:
-		shutil.move(infile,outfile)
-		wr.writerow([infile,outfile])
-		print infile, outfile
+	usrnm = raw_input('Username: ')
+	pswd = getpass.getpass('Password: ')
 
-	except:
-		continue
-	# execute the SQL query using execute() method, updates new location
-	infile_path = host + ':' + infile
-	outfile_path = host + ':' + outfile
-	if infile.split('.')[-1] == 'uvcRRE':
-		cursor.execute('''UPDATE paperdata set path = '%s' where path = '%s' '''%(outfile_path, infile_path))
-	elif infile.split('.')[-1] == 'uv':
-		cursor.execute('''UPDATE paperdata set raw_location = '%s' where raw_location = '%s' '''%(outfile_path, infile_path))
+	#File information
+	host = socket.gethostname()
+	infile = raw_input('Full input path: ')
+	outfile = raw_input('Output directory: ')
 
-print 'File(s) moved and updated'
-#Close database and save changes
-cursor.close()
-connection.commit()
-connection.close()
+	#checks to see that output dir is valid
+	if not os.path.isdir(outfile):
+	        print 'Output directory does not exist'
+	        sys.exit()
 
-# exit the program
-sys.exit()
+	#checks for input file type
+	file_type = raw_input('uv, uvcRRE, or both?: ')
+
+	if not file_type in ['uv','uvcRRE','both']:
+	        print 'Invalid file type'
+	        sys.exit()
+
+	#List of files in directory -- allowing mass movement of .uvcRRE and .uv files
+	infile_list = glob.glob(infile)
+
+	#Check for copies of files in database
+	new_data = dupe_check(infile_list)
+
+	#Loads new data into paperdata	
+	load_new_data(infile, new_data)
+
+	#Moves files and updates their location
+	move_files(infile, infile_list, move_data, usrnm, pswd)
