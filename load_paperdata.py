@@ -87,7 +87,6 @@ def load_db(dbo, usrnm, pswd):
 	return None
 
 def gen_paperdata(dirs, dbo, dbe):
-
 	host = socket.gethostname()
 
         #create 'writer' object
@@ -138,6 +137,7 @@ def gen_paperdata(dirs, dbo, dbe):
 		if dir == '/nas2/data/psa6668/zen.2456668.17386.yx.uvcRRE':
 			item = [path,'Unknown error']
 			ewr.writerow(item)
+			error_file.close()
 			continue
 
 		#checks a .uv file for data
@@ -145,6 +145,7 @@ def gen_paperdata(dirs, dbo, dbe):
 		if not os.path.isfile(visdata):
 			item = [path,'No visdata']
 			ewr.writerow(item)
+			error_file.close()
 			continue
 
 		#checks a .uv file for vartable
@@ -152,6 +153,7 @@ def gen_paperdata(dirs, dbo, dbe):
 		if not os.path.isfile(vartable):
 			item = [path,'No vartable']
 			ewr.writerow(item)
+			error_file.close()
 			continue
 
 		#checks a .uv file for header
@@ -159,6 +161,7 @@ def gen_paperdata(dirs, dbo, dbe):
 		if not os.path.isfile(header):
 			item = [path,'No header']
 			ewr.writerow(item)
+			error_file.close()
 			continue
 
 		#allows uv access
@@ -167,6 +170,7 @@ def gen_paperdata(dirs, dbo, dbe):
 		except:
 			item = [path,'Cannot access .uv file']
 			ewr.writerow(item)
+			error_file.close()
 			continue	
 
 		#indicates size of compressed file, removing units
@@ -231,6 +235,7 @@ def gen_paperdata(dirs, dbo, dbe):
 		except:
 			item = [path, 'Cannot read through .uv file']
 			ewr.writerow(item)
+			error_file.close()
 			continue
 
 		if n_times > 1:
@@ -294,8 +299,8 @@ def gen_paperdata(dirs, dbo, dbe):
 				dirs.remove(dir + 'cRRE')
 			except:
 				continue
-	#save into file and close it
-	data_file.close()
+		#save into file and close it
+		data_file.close()
 
 	return full_info
 
@@ -345,6 +350,10 @@ if __name__ == '__main__':
 
         dbo = '/data2/home/immwa/scripts/paper_output/db_out.csv'
 	dbe = '/data2/home/immwa/scripts/paper_output/false.csv'
+
+	#Erase former data file
+	data_file = open(dbo,'wb')
+	data_file.close()
 
         #iterates through directories, listing information about each one
         dirs_all = glob.glob(datanum)
