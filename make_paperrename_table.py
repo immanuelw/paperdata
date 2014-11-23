@@ -26,14 +26,14 @@ cursor = connection.cursor()
 
 # execute the SQL query using execute() method.
 # Builds table by fields including defaults
-cursor.execute('''CREATE TABLE paper_rename (
+cursor.execute('''CREATE TABLE paperrename (
 raw_path VARCHAR(100) DEFAULT NULL,
 julian_day INT DEFAULT 0,
 actual_amount INT DEFAULT 0,
 expected_amount INT DEFAULT 288,
 moved tinyint(1) DEFAULT 0);''')
 
-print 'Table paper_rename created'
+print 'Table paperrename created'
 
 # Close and Save database connection
 cursor.close()
