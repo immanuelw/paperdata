@@ -84,7 +84,8 @@ def load_new_data(infile, new_data):
 
 	return None
 
-def move_files(infile_list, move_data, usrnm, pswd):
+def move_files(infile_list, outfile, move_data, usrnm, pswd):
+	host = socket.gethostname()
 	#Directory of the infiles
 	infile_dir = infile_list[0].split('z')[0]
 
@@ -150,7 +151,6 @@ if __name__ == '__main__':
 	pswd = getpass.getpass('Password: ')
 
 	#File information
-	host = socket.gethostname()
 	infile = raw_input('Full input path: ')
 	outfile = raw_input('Output directory: ')
 
@@ -176,4 +176,4 @@ if __name__ == '__main__':
 	load_new_data(infile, new_data)
 
 	#Moves files and updates their location
-	move_files(infile_list, move_data, usrnm, pswd)
+	move_files(infile_list, outfile, move_data, usrnm, pswd)

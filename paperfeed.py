@@ -54,19 +54,21 @@ def find_data(usrnm, pswd):
 
 	return file_paths
 
-def move_files(infile_list, move_data, usrnm, pswd):
+def move_files(infile_list, outfile, move_data, usrnm, pswd):
+	host = socket.gethostname()
+
         #Directory of the infiles
         infile_dir = infile_list[0].split('z')[0]
 
         #create file to log movement data       
-        dbo = os.path.join(infile_dir, move_data)
+        dbo = os.path.join('/data4/paper/', move_data)
         dbr = open(dbo,'wb')
         dbr.close()
 
         o_dict = {}
         for file in infile_list:
                 zen = file.split('/')[-1]
-                out = os.path.join(outfile,zen)
+                out = host + ':' + os.path.join(outfile,zen)
                 o_dict.update({file:out})
 
         #Load data into named database and table
@@ -75,7 +77,7 @@ def move_files(infile_list, move_data, usrnm, pswd):
 
         #Load into db
         for infile in infile_list:
-                if infile.split('.')[-1] != 'uv'and infile.split('.')[-1] != 'uvcRRE':
+                if infile.split('.')[-1] != 'uv':
                         print 'Invalid file type'
                         sys.exit()
 
@@ -85,9 +87,10 @@ def move_files(infile_list, move_data, usrnm, pswd):
                 dbr = open(dbo, 'a')
                 wr = csv.writer(dbr, dialect='excel')
 
-                #moves file
+                #"moves" file
                 try:
-                        shutil.move(infile,outfile)
+			#scp infile, outfile
+			os.popen('''scp -r %s %s''' %(infile, outfile))
                         wr.writerow([infile,outfile])
                         print infile, outfile
                         dbr.close()
@@ -95,8 +98,8 @@ def move_files(infile_list, move_data, usrnm, pswd):
                         dbr.close()
                         continue
                 # execute the SQL query using execute() method, updates new location
-                infile_path = host + ':' + infile
-                outfile_path = host + ':' + outfile
+                infile_path = infile
+                outfile_path = outfile
                 if infile.split('.')[-1] == 'uv':
                         cursor.execute('''UPDATE paperfeed set raw_path = '%s', moved = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
 
@@ -107,7 +110,9 @@ def move_files(infile_list, move_data, usrnm, pswd):
         connection.commit()
         connection.close()
 
-	outfile_list = o_dict.values()
+	outfile_list = []
+	for path in o_dict.values():
+		outfile_list.append(path.split(':')[1])
 
         return outfile_list
 
@@ -131,8 +136,11 @@ if __name__ == '__main__':
 	if free_space > required_space:
 		#FIND DATA
 		infile_list = find_data(usrnm, pswd)
+		#create directory to output to
+		output_subdir = infile_list[0].split('/')[-2]
+		outfile = os.path.join('/data4/paper/', output_subdir)
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
-		outfile_list = move_files(infile_list, move_data, usrnm, pswd)
+		outfile_list = move_files(infile_list, outfile, move_data, usrnm, pswd)
 		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
 		for outfile in outfile_list:
 			os.popen('''add_observations.py %s'''%(outfile)) 
