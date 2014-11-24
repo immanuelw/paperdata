@@ -65,7 +65,7 @@ def rename_uv(dirs, datashift, dbe):
 
 		#if over 100MB, copy over to folio/copy to new folder and rename
 		try:
-			shutil.copy(data_file, '/data4/paper/file_renaming_test_output/%d.uv/visdata' %(count))
+			shutil.move(data_file, '/data4/paper/file_renaming_test_output/%d.uv/visdata' %(count))
 		except:
 			print 'Directory /data4/paper/file_renaming_test_output/%d.uv/ doesnt exist' %(count)
 			continue
