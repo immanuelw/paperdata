@@ -99,68 +99,19 @@ def update_paperrename(usrnm, pswd):
 
         return None
 
-def move_files(infile_list, outfile, move_data, usrnm, pswd):
-	host = socket.gethostname()
-
-        #Directory of the infiles
-        infile_dir = infile_list[0].split('z')[0]
-
-        #create file to log movement data       
-        dbo = os.path.join('/data4/paper/', move_data)
-        dbr = open(dbo,'wb')
-        dbr.close()
-
-        o_dict = {}
-        for file in infile_list:
-                zen = file.split('/')[-1]
-                out = host + ':' + os.path.join(outfile,zen)
-                o_dict.update({file:out})
-
-        #Load data into named database and table
+def update_paperjunk(infile_list, usrnm, pswd):
         connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
         cursor = connection.cursor()
 
-        #Load into db
-        for infile in infile_list:
-                if infile.split('.')[-1] != 'uv':
-                        print 'Invalid file type'
-                        sys.exit()
+	for infile in infile_list:
+        	cursor.execute('''UPDATE paperjunk SET renamed = 1 where folio_path = '%s' ''' %(infile))
 
-                outfile = o_dict[infile]
-
-                #Opens file to append to
-                dbr = open(dbo, 'a')
-                wr = csv.writer(dbr, dialect='excel')
-
-                #"moves" file
-                try:
-			#scp infile, outfile
-			inner = 'obs@' + infile
-			os.popen('''scp -r %s %s''' %(inner, outfile))
-                        wr.writerow([infile,outfile])
-                        print infile, outfile
-                        dbr.close()
-                except:
-                        dbr.close()
-                        continue
-                # execute the SQL query using execute() method, updates new location
-                infile_path = infile
-                outfile_path = o_dict[infile]
-                if infile.split('.')[-1] == 'uv':
-                        cursor.execute('''UPDATE paperrename set raw_path = '%s', moved = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
-
-        print 'File(s) moved and updated'
-
-        #Close database and save changes
+        #Close and save database
         cursor.close()
         connection.commit()
         connection.close()
 
-	outfile_list = []
-	for path in o_dict.values():
-		outfile_list.append(path.split(':')[1])
-
-        return outfile_list
+        return None
 
 if __name__ == '__main__':
 	#Create output file
@@ -170,7 +121,6 @@ if __name__ == '__main__':
 	#Credentials
 	usrnm = raw_input('Username: ')
         pswd = getpass.getpass('Password: ')
-
 
         #location of directory to move to
         datashift = '/data4/paper/file_renaming_test_output/'
@@ -186,23 +136,25 @@ if __name__ == '__main__':
 	dir = '/*'
 	free_space = calculate_free_space(dir)
 
-	#Amount of free space needed -- ~4.1TB
-	required_space = 4402341478
+	#Amount of free space needed -- one file of 3.6 GB ~10GB for safety
+	required_space = 10485760
 
 	#Move if there is enough free space
 	if free_space > required_space:
-		#COPY FILES FROM 1 USB INTO FOLIO
-		outfile_list = move_files(infile_list, outfile, move_data, usrnm, pswd)
+		#GET LIST OF FILES
+		junk_dir = '/data4/paper/file_renaming_test/'
+		infile_list = glob.glob(junk_dir)
 		#RENAME FILES
-		rename_uv.rename_uv(outfile_list, datashift, dbrn)
+		rename_uv.rename_uv(infile_list, datashift, dbrn)
 		#LOAD INTO PAPERRENAME
 		new_dir = os.path,join(datashift, '*')
 		dirs_all = glob.glob(new_dir)
 		dirs = load_paperrename.remove_duplicates(dirs_all, usrnm, pswd)
 		dirs.sort()
 		load_paperrename.load_db(dirs, dbo, dbe)
-		#UPDATE PAPERRENAME
+		#UPDATE PAPERRENAME AND PAPERJUNK
 		update_paperrename(usrnm, pswd)
+		update_paperjunk(infile_list, usrnm, pswd)
 		#SCAN PAPERRENAME
 		files_info, complete_info = check_data(usrnm,pswd)
 		#SEND EMAIL OF WHICH DAYS ARE COMPLETE AND WHICH DAYS ARE NOT COMPLETE

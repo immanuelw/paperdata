@@ -94,20 +94,6 @@ def remove_duplicates(dirs_all, usrnm, pswd):
 
 	return dirs_all
 
-def update_db(file_dict):
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-
-        cursor = connection.cursor()
-
-	for key, value in file_dict.items():
-		cursor.execute('''UPDATE paperjunk set folio_path = '%s' where junk_path = '%s' ''' %(value,key))
-
-	cursor.close()
-	connection.commit()
-        connection.close()
-
-	return None
-
 if __name__ == '__main__':
 
         #User input information
