@@ -117,14 +117,18 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
         return outfile_list
 
-if __name__ == '__main__':
+def paperfeed(auto)
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
         move_data = 'moved_data_%s.csv'%(time_date)
 
 	#Credentials
-	usrnm = raw_input('Username: ')
-        pswd = getpass.getpass('Password: ')
+	if auto != 'y':
+		usrnm = raw_input('Username: ')
+        	pswd = getpass.getpass('Password: ')
+	else:
+		usrnm = 'immwa'
+		pswd = 'immwa3978'
 
 	#Checks all filesystems
 	dir = '/*'
@@ -146,3 +150,9 @@ if __name__ == '__main__':
 		for outfiles in outfile_list:
 			os.popen('''add_observations.py %s'''%(outfiles)) 
 		#AUTO_COMPRESS.PY?
+
+	return None
+
+if __name__ == '__main__':
+	auto = 'n'
+	paperfeed(auto)

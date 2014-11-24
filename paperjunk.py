@@ -109,33 +109,44 @@ def check_paperjunk(usb):
 
 	return junk_list
 
-if __name__ == '__main__':
+def paperjunk(auto):
 	#Create output file
-	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
+        time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
         move_data = 'moved_data_%s.csv'%(time_date)
 
-	#Credentials
-	usrnm = raw_input('Username: ')
-        pswd = getpass.getpass('Password: ')
+        #Credentials
+	if auto != 'y':
+        	usrnm = raw_input('Username: ')
+        	pswd = getpass.getpass('Password: ')
 
-	#Files to temporarily store information about renamed files
-	dbo = '/data2/home/immwa/scripts/paper_output/paperjunk_out.csv'
+	else:
+		usrnm = 'immwa'
+		pswd = 'immwa3978'
 
-	outfile = '/data4/paper/file_renaming_test'
+        #Files to temporarily store information about renamed files
+        dbo = '/data2/home/immwa/scripts/paper_output/paperjunk_out.csv'
 
-	#Checks all filesystems
-	dir = '/*'
-	free_space = calculate_free_space(dir)
+        outfile = '/data4/paper/file_renaming_test'
 
-	#Amount of free space needed -- ~4.1TB
-	required_space = 4402341478
+        #Checks all filesystems
+        dir = '/*'
+        free_space = calculate_free_space(dir)
 
-	#Move if there is enough free space
-	if free_space > required_space:
-		#Try to find usb to move
-		for usb in range(8):
-			infile_list = check_paperjunk(usb)
-			if len(infile_list) > 0:
-				break
-		#COPY FILES FROM 1 USB INTO FOLIO
-		outfile_dict move_files(infile_list, outfile, move_data, usrnm, pswd)
+        #Amount of free space needed -- ~4.1TB
+        required_space = 4402341478
+
+        #Move if there is enough free space
+        if free_space > required_space:
+                #Try to find usb to move
+                for usb in range(8):
+                        infile_list = check_paperjunk(usb)
+                        if len(infile_list) > 0:
+                                break
+                #COPY FILES FROM 1 USB INTO FOLIO
+                outfile_dict move_files(infile_list, outfile, move_data, usrnm, pswd)
+
+	return None
+
+if __name__ == '__main__':
+	auto = 'n'
+	paperjunk(auto)

@@ -113,14 +113,19 @@ def update_paperjunk(infile_list, usrnm, pswd):
 
         return None
 
-if __name__ == '__main__':
+def paperrename(auto):
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
         move_data = 'moved_data_%s.csv'%(time_date)
 
 	#Credentials
-	usrnm = raw_input('Username: ')
-        pswd = getpass.getpass('Password: ')
+	if auto != 'y':
+		usrnm = raw_input('Username: ')
+	        pswd = getpass.getpass('Password: ')
+
+	else:
+		usrnm = 'immwa'
+		pswd = 'immwa3978'
 
         #location of directory to move to
         datashift = '/data4/paper/file_renaming_test_output/'
@@ -173,6 +178,17 @@ if __name__ == '__main__':
 		dirs2.sort()
 		load_paperfeed.gen_paperfeed(dirs2, dbo2, dbe2)
 
-		usrnm2 = raw_input('Input username with edit privileges: ')
-		pswd2 = raw_input('Input password: ')
-		load_paperfeed.load_db(dbo2, usrnm2, pswd2)	
+		if auto != 'y':
+			usrnm2 = raw_input('Input username with edit privileges: ')
+			pswd2 = raw_input('Input password: ')
+		else:
+			usrnm2 = 'immwa'
+			pswd2 = 'immwa3978'
+
+		load_paperfeed.load_db(dbo2, usrnm2, pswd2)
+
+	return None
+
+if __name__ == '__main__':
+	auto = 'n'
+	paperrename(auto)	
