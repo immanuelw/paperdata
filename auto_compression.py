@@ -23,4 +23,4 @@ if __name__ == '__main__':
 	time.sleep(1800)
 
 	#Attempt to load paperdata from information in paperdistiller
-	paperbridge(auto)
+	paperbridge.paperbridge(auto)
