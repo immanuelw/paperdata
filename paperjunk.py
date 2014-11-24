@@ -12,9 +12,13 @@ import glob
 import socket
 import time
 import subprocess
+import smtplib
+import rename_uv
+import load_paperrename
+import load_paperfeed
 
-### Script to load paperdistiller with files from the paperfeed table
-### Checks /data4 for space, moves entire days of data, then loads into paperdistiller
+### Script to load paperfeed with files from the paperrename table
+### Checks /data4 for space, moves entire days of data, renames them the correct names, then loads into paperfeed
 
 ### Author: Immanuel Washington
 ### Date: 11-23-14
@@ -32,28 +36,6 @@ def calculate_free_space(dir):
 			free_space = int(output.split(' ')[-4])
 	return free_space
 
-def find_data(usrnm, pswd):
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-	cursor = connection.cursor()
-
-	cursor.execute('''SELECT julian_day, moved from paperfeed where moved = 0 group by julian_day, moved''')
-	jdays_to_be_moved = cursor.fetchall()
-	#NEED HIGHER LEVEL CHECK TO MAKE SURE EACH DAY IS COMPLETE
-	jday = int(jdays_to_be_moved[0][0])
-
-	cursor.execute('''SELECT raw_path, julian_day from paperfeed where moved = 0 and julian_day = %d'''%(jday))
-	results = cursor.fetchall()
-
-	#Close database
-	cursor.close()
-	connection.close()
-
-	file_paths = []
-	for item in results:
-		file_paths.append(item[0])
-
-	return file_paths
-
 def move_files(infile_list, outfile, move_data, usrnm, pswd):
 	host = socket.gethostname()
 
@@ -61,7 +43,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         infile_dir = infile_list[0].split('z')[0]
 
         #create file to log movement data       
-        dbo = os.path.join('/data4/paper/', move_data)
+        dbo = os.path.join('/data4/paper/file_renaming_test', move_data)
         dbr = open(dbo,'wb')
         dbr.close()
 
@@ -89,8 +71,8 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
                 #"moves" file
                 try:
-			inner = 'obs@' + infile
 			#scp infile, outfile
+			inner = 'obs@' + infile
 			os.popen('''scp -r %s %s''' %(inner, outfile))
                         wr.writerow([infile,outfile])
                         print infile, outfile
@@ -101,8 +83,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                 # execute the SQL query using execute() method, updates new location
                 infile_path = infile
                 outfile_path = o_dict[infile]
-                if infile.split('.')[-1] == 'uv':
-                        cursor.execute('''UPDATE paperfeed set raw_path = '%s', moved = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
+                cursor.execute('''UPDATE paperjunk set folio_path = '%s' where junk_path = '%s' '''%(outfile_path, infile_path))
 
         print 'File(s) moved and updated'
 
@@ -111,11 +92,22 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         connection.commit()
         connection.close()
 
-	outfile_list = []
-	for path in o_dict.values():
-		outfile_list.append(path.split(':')[1])
+        return o_dict
 
-        return outfile_list
+def check_paperjunk(usb):
+	#Load data into named database and table
+        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+        cursor = connection.cursor()
+
+	cursor.execute('''SELECT junk_path from paperjunk where usb_number = %d and folio_path == 'NULL' ''' %(usb))
+	results = cursor.fetchall()
+
+	junk_list = []
+
+	for item in results:
+		junk_list.append(item[0])
+
+	return junk_list
 
 if __name__ == '__main__':
 	#Create output file
@@ -126,23 +118,24 @@ if __name__ == '__main__':
 	usrnm = raw_input('Username: ')
         pswd = getpass.getpass('Password: ')
 
+	#Files to temporarily store information about renamed files
+	dbo = '/data2/home/immwa/scripts/paper_output/paperjunk_out.csv'
+
+	outfile = '/data4/paper/file_renaming_test'
+
 	#Checks all filesystems
 	dir = '/*'
 	free_space = calculate_free_space(dir)
 
-	#Amount of free space needed -- ~3.1TB
-	required_space = 3328599654
+	#Amount of free space needed -- ~4.1TB
+	required_space = 4402341478
 
 	#Move if there is enough free space
 	if free_space > required_space:
-		#FIND DATA
-		infile_list = find_data(usrnm, pswd)
-		#create directory to output to
-		output_subdir = infile_list[0].split('/')[-2]
-		outfile = os.path.join('/data4/paper/', output_subdir)
-		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
-		outfile_list = move_files(infile_list, outfile, move_data, usrnm, pswd)
-		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
-		for outfiles in outfile_list:
-			os.popen('''add_observations.py %s'''%(outfiles)) 
-		#AUTO_COMPRESS.PY?
+		#Try to find usb to move
+		for usb in range(8):
+			infile_list = check_paperjunk(usb)
+			if len(infile_list) > 0:
+				break
+		#COPY FILES FROM 1 USB INTO FOLIO
+		outfile_dict move_files(infile_list, outfile, move_data, usrnm, pswd)

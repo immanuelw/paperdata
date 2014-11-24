@@ -84,13 +84,13 @@ def update_paperrename(usrnm, pswd):
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
         cursor = connection.cursor()
 
-	cursor.execute('''SELECT julian_day, count(*) from paperrename where''')
+	cursor.execute('''SELECT julian_day, count(*) from paperrename group by julian_day''')
 	results = cursor.fetchall()
 
 	for item in results:
 		jday = int(item[0])
 		actual = int(item[1])
-	cursor.execute('''UPDATE paperrename SET actual_amount = %d  WHERE julian_day = %d''' %(actual, jday))
+		cursor.execute('''UPDATE paperrename SET actual_amount = %d WHERE julian_day = %d''' %(actual, jday))
 
         #Close and save database
         cursor.close()
@@ -135,7 +135,8 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                 #"moves" file
                 try:
 			#scp infile, outfile
-			os.popen('''scp -r %s %s''' %(infile, outfile))
+			inner = 'obs@' + infile
+			os.popen('''scp -r %s %s''' %(inner, outfile))
                         wr.writerow([infile,outfile])
                         print infile, outfile
                         dbr.close()
@@ -144,7 +145,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                         continue
                 # execute the SQL query using execute() method, updates new location
                 infile_path = infile
-                outfile_path = outfile
+                outfile_path = o_dict[infile]
                 if infile.split('.')[-1] == 'uv':
                         cursor.execute('''UPDATE paperrename set raw_path = '%s', moved = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
 
