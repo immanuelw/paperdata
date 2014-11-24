@@ -233,12 +233,18 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 
 	return None
 
-if __name__ == '__main__':
+def paperbridge(auto)
 	#User input information
-	usrnm = raw_input('Username: ')
-	pswd = getpass.getpass('Password: ')
+	if auto != 'y':
+		usrnm = raw_input('Username: ')
+		pswd = getpass.getpass('Password: ')
 
-	auto_load = raw_input('Automatically load into paperdata? (y/n): ')
+		auto_load = raw_input('Automatically load into paperdata? (y/n): ')
+
+	else:
+		usrnm = 'immwa'
+		pswd = 'immwa3978'
+		auto_load = 'y'
 
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 	dbnum = '/data4/paper/paperdistiller_output/paperdistiller_output_%s.csv'%(time_date)
@@ -256,3 +262,9 @@ if __name__ == '__main__':
 		load_paperdata.load_db(dbnum, usrnm, pswd)
 	else:
 		print '''Information logged into '%s' ''' %(dbnum)
+
+	return None
+
+if __name__ == '__main__':
+	auto = 'n'
+	paperbridge(auto)
