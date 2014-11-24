@@ -149,17 +149,17 @@ def paperrename(auto):
 		#GET LIST OF FILES
 		junk_dir = '/data4/paper/file_renaming_test/'
 		infile_list = glob.glob(junk_dir)
-		#RENAME FILES
+		#RENAME FILES AND UPDATE PAPERJUNK
 		rename_uv.rename_uv(infile_list, datashift, dbrn)
+		update_paperjunk(infile_list, usrnm, pswd)
 		#LOAD INTO PAPERRENAME
 		new_dir = os.path,join(datashift, '*')
 		dirs_all = glob.glob(new_dir)
 		dirs = load_paperrename.remove_duplicates(dirs_all, usrnm, pswd)
 		dirs.sort()
 		load_paperrename.load_db(dirs, dbo, dbe)
-		#UPDATE PAPERRENAME AND PAPERJUNK
+		#UPDATE PAPERRENAME
 		update_paperrename(usrnm, pswd)
-		update_paperjunk(infile_list, usrnm, pswd)
 		#SCAN PAPERRENAME
 		files_info, complete_info = check_data(usrnm,pswd)
 		#SEND EMAIL OF WHICH DAYS ARE COMPLETE AND WHICH DAYS ARE NOT COMPLETE
