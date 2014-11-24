@@ -344,8 +344,7 @@ def remove_duplicates(dirs_all, usrnm, pswd):
 
 	return dirs_all
 
-if __name__ == '__main__':
-
+def load_paperdata(auto)
         #User input information
         usrnm = 'paperboy'
         pswd = 'paperboy'
@@ -361,13 +360,19 @@ if __name__ == '__main__':
 	#removes duplicate entries from directory
 	dirs = remove_duplicates(dirs_all, usrnm, pswd)
 
-        auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
-
         dirs.sort()
         gen_paperdata(dirs, dbo, dbe)
 
+	if auto != 'y':
+        	auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
 	if auto_update == 'y':
 		usrnm2 = raw_input('Input username with edit privileges: ')
 		pswd2 = raw_input('Input password: ')
 		load_db(dbo, usrnm2, pswd2)
 		sys.exit()
+
+	return None
+
+if __name__ == '__main__':
+	auto = 'n'
+	load_paperdata(auto)
