@@ -57,6 +57,7 @@ def email_paperrename(files)
 		msgs = msgs + msg
 
 	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
+	#server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
 
 	return None
 
