@@ -142,6 +142,6 @@ if __name__ == '__main__':
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
 		outfile_list = move_files(infile_list, outfile, move_data, usrnm, pswd)
 		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
-		for outfile in outfile_list:
-			os.popen('''add_observations.py %s'''%(outfile)) 
+		for outfiles in outfile_list:
+			os.popen('''add_observations.py %s'''%(outfiles)) 
 		#AUTO_COMPRESS.PY?
