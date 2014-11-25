@@ -253,6 +253,98 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 
 	return None
 
+def calculate_free_space(dir):
+        #Calculates the free space left on input dir
+        folio = subprocess.check_output(['du -s ', dir], shell=True)
+        #Amount of available bytes should be free_space
+
+        #Do not surpass this amount ~1.2TiB
+        max_space = 1319413953331
+
+        for output in folio.split('\n'):
+                subdir = output.split('\t')[-1]
+                if subdir == dir:
+                        total_space = int(output.split('\t')[0])
+        free_space = max_space - total_space
+
+        return free_space
+
+def email_space(table)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+
+        #Next, log in to the server
+        server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+
+        #Send the mail
+        msgs = '\nNot enough space for ' + table + ' on folio'
+
+        server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+
+        return None
+
+def move_files(infile_list, outfile, move_data, usrnm, pswd):
+        host = socket.gethostname()
+
+        #Directory of the infiles
+        infile_dir = infile_list[0].split('z')[0]
+
+        #create file to log movement data       
+        dbo = os.path.join('/data4/paper/raw_to_tape', move_data)
+        dbr = open(dbo,'wb')
+        dbr.close()
+
+        o_dict = {}
+        for file in infile_list:
+                zen = file.split('/')[-1]
+                out = host + ':' + os.path.join(outfile,zen)
+                o_dict.update({file:out})
+
+        #Load data into named database and table
+        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+        cursor = connection.cursor()
+
+        #Load into db
+        for infile in infile_list:
+                if infile.split('.')[-1] != 'uv':
+                        print 'Invalid file type'
+                        sys.exit()
+
+                outfile = o_dict[infile]
+
+                #Opens file to append to
+                dbr = open(dbo, 'a')
+                wr = csv.writer(dbr, dialect='excel')
+
+                #"moves" file
+                try:
+                        shutil.move(infile, outfile)
+                        wr.writerow([infile,outfile])
+                        print infile, outfile
+                        dbr.close()
+                except:
+                        dbr.close()
+                        continue
+                # execute the SQL query using execute() method, updates new location
+                infile_path = infile
+                outfile_path = o_dict[infile]
+                if infile.split('.')[-1] == 'uv':
+                        cursor.execute('''UPDATE paperdata set raw_path = '%s', ready_to_tape = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
+
+        print 'File(s) moved and updated'
+
+        #Close database and save changes
+        cursor.close()
+        connection.commit()
+        connection.close()
+
+        outfile_list = []
+        for path in o_dict.values():
+                outfile_list.append(path.split(':')[1])
+
+        return outfile_list
+
 def paperbridge(auto)
 	#User input information
 	if auto != 'y':
@@ -270,18 +362,29 @@ def paperbridge(auto)
 	dbnum = '/data4/paper/paperdistiller_output/paperdistiller_output_%s.csv'%(time_date)
 	dbe = '/data4/paper/paperdistiller_output/paperdistiller_error_%s.csv'%(time_date)
 
-	#Pull information from paperdistiler
-	results, obsnums, filenames = gen_data_list(usrnm,pswd)
+	#Calculate amount of space needed to move a day ~1.1TB
+	required_space = 1112661213184
 
-	#Generate data from info pulled
-	gen_data_from_paperdistiller(results, obsnums, dbnum, dbe)
+	#Amount of space free in directory
+	free_space = calculate_free_space('/data4/paper/raw_to_tape/')
 
-	#check if auto-loading
-	if auto_load == 'y':
-		#Load information into paperdata
-		load_paperdata.load_db(dbnum, usrnm, pswd)
-	else:
-		print '''Information logged into '%s' ''' %(dbnum)
+	if free_space > required_space:
+		#Pull information from paperdistiler
+		results, obsnums, filenames = gen_data_list(usrnm,pswd)
+
+		#Generate data from info pulled
+		gen_data_from_paperdistiller(results, obsnums, dbnum, dbe)
+
+		#check if auto-loading
+		if auto_load == 'y':
+			#Load information into paperdata
+			load_paperdata.load_db(dbnum, usrnm, pswd)
+			#Update paperdata and move data
+			move_data = 'moved_data_%s.csv'%(time_date)	
+			outfile = '/data4/paper/raw_to_tape'
+			move_files(filenames, outfile, move_data, usrnm, pswd)
+		else:
+			print '''Information logged into '%s' ''' %(dbnum)
 
 	return None
 
