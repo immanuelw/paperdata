@@ -107,7 +107,7 @@ def gen_data_list(usrnm, pswd):
 	print completed_days
 	#Remove all non-complete days
 	for res in results[:]:
-		if res[7] in completed_days:
+		if res[7] not in completed_days:
 			results.remove(res)
 
 	print len(results)
