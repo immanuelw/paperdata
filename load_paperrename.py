@@ -158,8 +158,21 @@ def remove_duplicates(dirs_all, usrnm, pswd):
 
 	return dirs_all
 
-if __name__ == '__main__':
+def update_paperrename(jday, expected, usrnm, pswd):
+        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+        cursor = connection.cursor()
 
+        cursor.execute('''UPDATE paperrename SET expected_amount = %d WHERE julian_day = %d''' %(expected, jday))
+
+	print str(jday) + ' now expects ' str(expected) + ' amount of files.'
+        #Close and save database
+        cursor.close()
+        connection.commit()
+        connection.close()
+
+        return None
+
+def load_paperrename(auto):
         #User input information
         usrnm = 'paperboy'
         pswd = 'paperboy'
@@ -174,14 +187,26 @@ if __name__ == '__main__':
 
 	#removes duplicate entries from directory
 	dirs = remove_duplicates(dirs_all, usrnm, pswd)
-
-        auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
-
         dirs.sort()
         gen_paperrename(dirs, dbo, dbe)
 
-	if auto_update == 'y':
-		usrnm2 = raw_input('Input username with edit privileges: ')
-		pswd2 = raw_input('Input password: ')
-		load_db(dbo, usrnm2, pswd2)
-		sys.exit()
+	if auto != 'y':
+        	auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
+		if auto_update == 'y':		
+			usrnm2 = raw_input('Input username with edit privileges: ')
+			pswd2 = raw_input('Input password: ')
+			load_db(dbo, usrnm2, pswd2)
+			sys.exit()
+
+	return None
+if __name__ == '__main__':
+	expectation = raw_input('Change expected amount in a day?(y/n) :')
+	if expectation == 'y':
+		usrnm = raw_input('Input username with edit privileges: ')
+                pswd = raw_input('Input password: ')
+		jday = int(raw_input('Input julian day: '))
+		expected = int(raw_input('Input expected amount of files: '))		
+		update_paperrename(jday, expected, usrnm, pswd)
+	else:
+		auto = 'n'
+		load_paperrename(auto)
