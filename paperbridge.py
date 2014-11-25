@@ -15,6 +15,7 @@ import smtplib
 import shutil
 import socket
 import aipy as A
+import hashlib
 
 ### Script to load infromation quickly from paperdistiller database into paperdata
 ### Queries paperdistiller for relevant information, loads paperdata with complete info
@@ -103,11 +104,13 @@ def gen_data_list(usrnm, pswd):
 			print jday + ' is incomplete'
 
 
+	print completed_days
 	#Remove all non-complete days
-	for res in results:
-		if res[7] not in completed_days:
+	for res in results[:]:
+		if res[7] in completed_days:
 			results.remove(res)
 
+	print len(results)
 	#Close database and save changes
         cursor.close()
         connection.close()
@@ -235,8 +238,11 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		obsnum = int(item[1])
 
 		#indicates md5sum -- SHOULD BE GENERATED BEFORE COMPRESSION
-		if item[2] == 'NULL':
-			md5 = md5sum(raw_path)
+		if item[2] == 'NULL' or item[2] is None:
+			try:
+				md5 = md5sum(raw_path)
+			except:
+				md5 = 'NULL'
 		else:
 			md5 = item[2]
 
@@ -264,6 +270,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 
 		#write to csv file by item in list
 		wr.writerow(databs)
+		error_file.close()
 		data_file.close()
 
 	return None
