@@ -26,7 +26,7 @@ import load_paperfeed
 
 def calculate_free_space(dir):
 	#Calculates the free space left on input dir
-	folio = subprocess.check_output(['df', dir], shell=True)
+	folio = subprocess.check_output(['df', '-B', '1', dir], shell=True)
 	#/data4 should be filesystem
 	#Amount of available bytes should be free_space
 
@@ -94,18 +94,24 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
         return o_dict
 
-def check_paperjunk(usb):
+def check_paperjunk(max)
 	#Load data into named database and table
         connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
         cursor = connection.cursor()
 
-	cursor.execute('''SELECT junk_path from paperjunk where usb_number = %d and folio_path == 'NULL' ''' %(usb))
+	cursor.execute('''SELECT junk_path, junk_size_bytes from paperjunk where folio_path == 'NULL' and junk_size_bytes > 524288000''')
 	results = cursor.fetchall()
 
+	junk_size_total = 0
 	junk_list = []
-
 	for item in results:
-		junk_list.append(item[0])
+		#checks if space is available
+		if junk_size_total < max - 3832908476:
+			junk_size = int(item[1])
+			junk_file = item[0]
+
+			junk_size_total += junk_size
+			junk_list.append(item[0])
 
 	return junk_list
 
@@ -133,17 +139,15 @@ def paperjunk(auto):
         free_space = calculate_free_space(dir)
 
         #Amount of free space needed -- ~4.1TB
-        required_space = 4402341478
+        required_space = 4507997673881
 
         #Move if there is enough free space
         if free_space > required_space:
-                #Try to find usb to move
-                for usb in range(8):
-                        infile_list = check_paperjunk(usb)
-                        if len(infile_list) > 0:
-                                break
+		#move files that haven't been moved
+		maximum = free_space - required_space
+                infile_list = check_paperjunk(maximum)
                 #COPY FILES FROM 1 USB INTO FOLIO
-                outfile_dict move_files(infile_list, outfile, move_data, usrnm, pswd)
+                outfile_dict = move_files(infile_list, outfile, move_data, usrnm, pswd)
 
 	return None
 

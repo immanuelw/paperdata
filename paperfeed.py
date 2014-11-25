@@ -22,7 +22,7 @@ import subprocess
 
 def calculate_free_space(dir):
 	#Calculates the free space left on input dir
-	folio = subprocess.check_output(['df', dir], shell=True)
+	folio = subprocess.check_output(['df', 'B', '1', dir], shell=True)
 	#/data4 should be filesystem
 	#Amount of available bytes should be free_space
 
@@ -135,7 +135,7 @@ def paperfeed(auto)
 	free_space = calculate_free_space(dir)
 
 	#Amount of free space needed -- ~3.1TB
-	required_space = 3328599654
+	required_space = 3408486046105
 
 	#Move if there is enough free space
 	if free_space > required_space:
