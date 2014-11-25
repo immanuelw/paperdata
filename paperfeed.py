@@ -186,7 +186,6 @@ def paperfeed(auto)
 		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
 		for outfiles in outfile_list:
 			os.popen('''add_observations.py %s'''%(outfiles)) 
-	
 	else:
 		table = 'paperfeed'
 		email_space(table)
