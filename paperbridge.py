@@ -34,6 +34,23 @@ def sizeof_fmt(num):
 	num *= 1024.0
 	return "%3.1f" % (num)
 
+def md5sum(fname):
+        """
+        calculate the md5 checksum of a file whose filename entry is fname.
+        """
+        fname = fname.split(':')[-1]
+        BLOCKSIZE = 65536
+        hasher = hashlib.md5()
+        try:
+                afile = open(fname, 'rb')
+        except(IOError):
+                afile = open("%s/visdata"%fname, 'rb')
+        buf = afile.read(BLOCKSIZE)
+        while len(buf) >0:
+                hasher.update(buf)
+                buf = afile.read(BLOCKSIZE)
+        return hasher.hexdigest()
+
 def gen_data_list(usrnm, pswd):
 	#pulls all relevant information from full paperdistiller database
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdistiller', local_infile=True)
@@ -203,7 +220,10 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		obsnum = int(item[1])
 
 		#indicates md5sum -- SHOULD BE GENERATED BEFORE COMPRESSION
-		md5sum = item[2]
+		if item[2] == 'NULL':
+			md5 = md5sum(raw_path)
+		else:
+			md5 = item[2]
 
 		#location of calibrate files
 		cal_location = 'NULL'
@@ -224,7 +244,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		restore_history = 'NULL'
 
 		#create list of important data and open csv file
-		databs = [compr_full_path,era,era_type,obsnum,md5sum,jday,jdate,polarization,length,raw_full_path,cal_location,tape_location,compr_sz,raw_sz,compressed,edge,ready_to_tape,delete_file,restore_history]
+		databs = [compr_full_path,era,era_type,obsnum,md5,jday,jdate,polarization,length,raw_full_path,cal_location,tape_location,compr_sz,raw_sz,compressed,edge,ready_to_tape,delete_file,restore_history]
 		print databs 
 
 		#write to csv file by item in list
