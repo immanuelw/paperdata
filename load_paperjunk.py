@@ -55,10 +55,11 @@ def gen_paperjunk(dirs, dbo):
 
 		junk_path = host + ':' + dir
 		folio_path = 'NULL'
+		junk_size = os.path.getsize(dir)
 		USB = int(dir.split('/')[3])
 		renamed = 0
 
-		databs = [junk_path, folio_path, USB, renamed]
+		databs = [junk_path, folio_path, junk_size, USB, renamed]
 		print databs
 
 		#write to csv file
