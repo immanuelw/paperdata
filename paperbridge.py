@@ -294,6 +294,8 @@ def calculate_free_space(dir):
 
 def email_space(table):
         server = smtplib.SMTP('smtp.gmail.com', 587)
+	server.ehlo()
+	server.starttls()
 
         #Next, log in to the server
         server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
@@ -304,6 +306,8 @@ def email_space(table):
         server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
         server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
         server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+
+	server.quit()
 
         return None
 
