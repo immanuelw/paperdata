@@ -39,7 +39,7 @@ def load_db(dbo, usrnm, pswd):
 	return None
 
 def gen_paperfeed(dirs, dbo, dbe):
-	host = socket.gethostname()
+	host = 'folio'
 
         #Erase former data file
         data_file = open(dbo,'w')
