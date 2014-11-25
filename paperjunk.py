@@ -23,18 +23,33 @@ import load_paperfeed
 ### Author: Immanuel Washington
 ### Date: 11-23-14
 
-
-def calculate_free_space(dir):
+def calculate_folio_space(dir):
 	#Calculates the free space left on input dir
-	folio = subprocess.check_output(['df', '-B', '1', dir], shell=True)
+	folio = subprocess.check_output(['df -B 1 ', dir], shell=True)
 	#/data4 should be filesystem
 	#Amount of available bytes should be free_space
 
 	for output in folio.split('\n'):
 	        filesystem = output.split(' ')[-1]
 	        if filesystem == '/data4':
-			free_space = int(output.split(' ')[-4])
-	return free_space
+			folio_space = int(output.split(' ')[-4])
+	return folio_space
+
+def calculate_free_space(dir):
+        #Calculates the free space left on input dir
+        folio = subprocess.check_output(['du -s ', dir], shell=True)
+        #Amount of available bytes should be free_space
+
+        #Do not surpass this amount ~1TiB
+        max_space = 1099511627776
+
+        for output in folio.split('\n'):
+                subdir = output.split('\t')[-1]
+                if subdir == dir:
+                        total_space = int(output.split('\t')[0])
+        free_space = max_space - total_space
+
+        return free_space
 
 def move_files(infile_list, outfile, move_data, usrnm, pswd):
 	host = socket.gethostname()
@@ -136,13 +151,17 @@ def paperjunk(auto):
 
         #Checks all filesystems
         dir = '/*'
+	folio_space = calculate_folio_space(dir)
+	dir = '/data4/paper/file_renaming_test/'
         free_space = calculate_free_space(dir)
 
         #Amount of free space needed -- ~4.1TB
-        required_space = 4507997673881
+        required_folio_space = 4507997673881
+	#~4GB
+	required_space = 4294967296
 
         #Move if there is enough free space
-        if free_space > required_space:
+        if folio_space >= required_folio_space:
 		#move files that haven't been moved
 		maximum = free_space - required_space
                 infile_list = check_paperjunk(maximum)

@@ -26,14 +26,18 @@ import load_paperfeed
 
 def calculate_free_space(dir):
 	#Calculates the free space left on input dir
-	folio = subprocess.check_output(['df', '-B', '1', dir], shell=True)
-	#/data4 should be filesystem
+	folio = subprocess.check_output(['du -s ', dir], shell=True)
 	#Amount of available bytes should be free_space
 
+	#Do not surpass this amount ~1TiB
+	max_space = 1099511627776 
+
 	for output in folio.split('\n'):
-	        filesystem = output.split(' ')[-1]
-	        if filesystem == '/data4':
-			free_space = int(output.split(' ')[-4])
+	        subdir = output.split('\t')[-1]
+	        if subdir == dir:
+			total_space = int(output.split('\t')[0])
+	free_space = max_space - total_space
+
 	return free_space
 
 def email_paperrename(files)
@@ -137,15 +141,15 @@ def paperrename(auto):
 	dbo = '/data2/home/immwa/scripts/paper_output/paperrename_out.csv'
         dbe = '/data2/home/immwa/scripts/paper_output/false_paperrename.csv'
 
-	#Checks all filesystems
-	dir = '/*'
+	#Checks output dir
+	dir = '/data4/paper/file_renaming_test/'
 	free_space = calculate_free_space(dir)
 
 	#Amount of free space needed -- one file of 3.6 GB ~10GB for safety
-	required_space = 1073741824
+	required_space = 10737418240
 
 	#Move if there is enough free space
-	if free_space > required_space:
+	if free_space >= required_space:
 		#GET LIST OF FILES
 		junk_dir = '/data4/paper/file_renaming_test/'
 		infile_list = glob.glob(junk_dir)
