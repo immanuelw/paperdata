@@ -10,10 +10,11 @@ import os
 import csv
 import glob
 import socket
+import shutil
+import aipy as A
 import time
 import subprocess
 import smtplib
-import rename_uv
 import load_paperrename
 import load_paperfeed
 
@@ -141,6 +142,107 @@ def update_paperjunk(infile_list, usrnm, pswd):
 
         return None
 
+def rename_uv(dirs, datashift, dbe):
+        #Dummy variable
+        count = 0
+
+        #polarization dictionary
+        pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
+
+        for data_file in dirs:
+                count += 1
+                #create csv file to log bad files
+                error_file = open(dbe, 'a')
+                ewr = csv.writer(error_file, dialect='excel')
+
+                #Find size of file
+                data_size = os.path.getsize(data_file)
+
+                #check if file size is over 500MB, if not: skip
+                if data_size > 3832908476:
+                        filler_dir = '/data4/paper/test_rename/64R/*'
+                        file_type = '.uv'
+                elif data_size > 524288000:
+                        filler_dir = '/data4/paper/test_rename/128R/*'
+                        file_type = '.uv'
+                elif data_size < 524288000:
+                        continue
+
+                if not os.path.isdir('/data4/paper/file_renaming_test_output/%d.uv' %(count)):
+                        try:
+                                os.makedirs('/data4/paper/file_renaming_test_output/%d.uv' %(count))
+                        except:
+                                print 'Error creating new directory for %s' %(dir)
+                                continue
+                        try:
+                                for item in glob.glob(filler_dir):
+                                        shutil.copy(item, '/data4/paper/file_renaming_test_output/%d.uv' %(count))
+                        except:
+                                print 'Error copying filler data with %s' %(dir)
+                                continue
+
+                #if over 100MB, copy over to folio/copy to new folder and rename
+                try:
+                        shutil.move(data_file, '/data4/paper/file_renaming_test_output/%d.uv/visdata' %(count))
+                except:
+                        print 'Directory /data4/paper/file_renaming_test_output/%d.uv/ doesnt exist' %(count)
+                        continue
+
+                #set string to location of new .uv file
+                newUV = '/data4/paper/file_renaming_test_output/%d.uv' %(count)
+
+                #allows uv access
+                try:
+                        print 'Accessing uv...'
+                        #Fixes random fatal error
+                        uv = 0
+                        uv = A.miriad.UV(newUV)
+                        print 'uv Success'
+                except:
+                        item = [newUV, dir,'Cannot access .uv file']
+                        ewr.writerow(item)
+                        error_file.close()
+                        print 'UV Error'
+                        continue
+
+                print 'jd...'
+                #find Julian Date
+                jdate = str(round(uv['time'], 5))
+
+                print 'nchan...'
+                nchan = uv['nchan']
+                if nchan < 1000:
+                        file_type = '.uv'
+                else:
+                        file_type = '.uvcRRE'
+
+                print 'pol...'
+                #assign letters to each polarization
+                if uv['npol'] == 1:
+                        pol = pol_dict[uv['pol']]
+
+                        #create variable to indicate new directory
+                        newdir = 'zen.' + jdate + '.' + pol + file_type
+                        newfile = os.path.join(datashift, newdir)
+
+                #if polarizations aren't separated
+                if uv['npol'] == 4:
+                        newdir = 'zen.' + jdate + file_type
+                        newfile = os.path.join(datashift, newdir)
+
+                print newfile
+
+                #copy data from one file to the other directory
+                try:
+                        shutil.move(newUV,newfile)
+                except:
+                        item = [newfile, dir, '''Couldn't move file''']
+                        ewr.writerow(item)
+                        error_file.close()
+			continue
+
+        return None
+
 def paperrename(auto):
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
@@ -178,7 +280,7 @@ def paperrename(auto):
 		junk_dir = '/data4/paper/file_renaming_test/'
 		infile_list = glob.glob(junk_dir)
 		#RENAME FILES AND UPDATE PAPERJUNK
-		rename_uv.rename_uv(infile_list, datashift, dbrn)
+		rename_uv(infile_list, datashift, dbrn)
 		update_paperjunk(infile_list, usrnm, pswd)
 		#LOAD INTO PAPERRENAME
 		new_dir = os.path,join(datashift, '*')
