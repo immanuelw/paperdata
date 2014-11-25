@@ -199,6 +199,7 @@ def paperjunk(auto):
 	else:
 		table = 'paperjunk'
 		email_space(table)
+		time.sleep(21600)
 
 	return None
 

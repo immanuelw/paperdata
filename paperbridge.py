@@ -427,6 +427,7 @@ def paperbridge(auto):
 #	else:
 #		table = 'paperdistiller'
 #		email_space(table)
+#		time.sleep(14400)
 
 	return None
 

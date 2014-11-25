@@ -208,6 +208,7 @@ def paperfeed(auto):
 	else:
 		table = 'paperfeed'
 		email_space(table)
+		time.sleep(21600)
 
 	return None
 
