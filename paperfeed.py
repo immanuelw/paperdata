@@ -12,6 +12,7 @@ import glob
 import socket
 import time
 import subprocess
+import smtplib
 
 ### Script to load paperdistiller with files from the paperfeed table
 ### Checks /data4 for space, moves entire days of data, then loads into paperdistiller
@@ -120,6 +121,22 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
         return outfile_list
 
+def email_paperfeed(files)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+
+        #Next, log in to the server
+        server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+
+        msgs = ''
+        #Send the mail
+        for file in files:
+		msg = '\n' + file  ' is being moved.\n'
+                msgs = msgs + msg
+
+        server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+
 def paperfeed(auto)
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
@@ -149,6 +166,8 @@ def paperfeed(auto)
 		outfile = os.path.join('/data4/paper/', output_subdir)
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
 		outfile_list = move_files(infile_list, outfile, move_data, usrnm, pswd)
+		#EMAIL PEOPLE THAT DATA IS BEING MOVED AND LOADED
+		email_paperfeed(outfile_list)
 		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
 		for outfiles in outfile_list:
 			os.popen('''add_observations.py %s'''%(outfiles)) 
