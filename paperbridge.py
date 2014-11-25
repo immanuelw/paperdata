@@ -325,7 +325,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         o_dict = {}
         for file in infile_list:
                 zen = file.split('/')[-1]
-                out = host + ':' + os.path.join(outfile,zen)
+                out = os.path.join(outfile,zen)
                 o_dict.update({file:out})
 
         #Load data into named database and table
@@ -346,7 +346,8 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
                 #"moves" file
                 try:
-                        shutil.move(infile, outfile)
+			inner = infile.split(':')[1]
+                        shutil.move(inner, outfile)
                         wr.writerow([infile,outfile])
                         print infile, outfile
                         dbr.close()
@@ -355,7 +356,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                         continue
                 # execute the SQL query using execute() method, updates new location
                 infile_path = infile
-                outfile_path = o_dict[infile]
+                outfile_path = host + ':' + o_dict[infile]
                 if infile.split('.')[-1] == 'uv':
                         cursor.execute('''UPDATE paperdata set raw_path = '%s', ready_to_tape = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
 
