@@ -38,7 +38,7 @@ def calculate_folio_space(dir):
 
 def calculate_free_space(dir):
         #Calculates the free space left on input dir
-        folio = subprocess.check_output(['du -s ', dir], shell=True)
+        folio = subprocess.check_output(['du -bs ', dir], shell=True)
         #Amount of available bytes should be free_space
 
         #Do not surpass this amount ~1TiB

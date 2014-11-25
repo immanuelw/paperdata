@@ -22,7 +22,7 @@ import smtplib
 
 def calculate_free_space(dir):
         #Calculates the free space left on input dir
-        folio = subprocess.check_output(['du -s ', dir], shell=True)
+        folio = subprocess.check_output(['du -bs ', dir], shell=True)
         #Amount of available bytes should be free_space
 
         #Do not surpass this amount ~3.1TiB
@@ -189,7 +189,7 @@ def paperfeed(auto):
 	free_space = calculate_free_space(dir)
 
 	#Minimum amount of space to move a day ~3.1TiB
-	required_space = 3408486046105
+	required_space = 1112373311360
 
 	#Move if there is enough free space
 	if free_space >= required_space:
