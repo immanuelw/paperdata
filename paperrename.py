@@ -23,7 +23,6 @@ import load_paperfeed
 ### Author: Immanuel Washington
 ### Date: 11-23-14
 
-
 def calculate_free_space(dir):
 	#Calculates the free space left on input dir
 	folio = subprocess.check_output(['du -s ', dir], shell=True)
@@ -65,6 +64,21 @@ def email_paperrename(files)
 	#server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
 	
 	return None
+
+def email_space(table)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+
+        #Next, log in to the server
+        server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+
+        #Send the mail
+        msgs = '\nNot enough space for ' + table + ' on folio'
+
+        server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+
+        return None
 
 def check_data(usrnm, pswd):
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
@@ -191,6 +205,9 @@ def paperrename(auto):
 			pswd2 = 'immwa3978'
 
 		load_paperfeed.load_db(dbo2, usrnm2, pswd2)
+	else:
+		table = 'paperrename'
+		email_space(table)
 
 	return None
 

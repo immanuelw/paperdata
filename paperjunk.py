@@ -130,6 +130,21 @@ def check_paperjunk(max)
 
 	return junk_list
 
+def email_space(table)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+
+        #Next, log in to the server
+        server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+
+        #Send the mail
+        msgs = '\nNot enough space for ' + table + ' on folio'
+
+        server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+
+        return None
+
 def paperjunk(auto):
 	#Create output file
         time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
@@ -167,6 +182,9 @@ def paperjunk(auto):
                 infile_list = check_paperjunk(maximum)
                 #COPY FILES FROM 1 USB INTO FOLIO
                 outfile_dict = move_files(infile_list, outfile, move_data, usrnm, pswd)
+	else:
+		table = 'paperjunk'
+		email_space(table)
 
 	return None
 

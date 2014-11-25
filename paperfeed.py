@@ -139,6 +139,21 @@ def email_paperfeed(files)
 
 	return None
 
+def email_space(table)
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+
+        #Next, log in to the server
+        server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+
+        #Send the mail
+        msgs = '\nNot enough space for ' + table + ' on folio'
+
+        server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+
+        return None
+
 def paperfeed(auto)
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
@@ -173,7 +188,10 @@ def paperfeed(auto)
 		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
 		for outfiles in outfile_list:
 			os.popen('''add_observations.py %s'''%(outfiles)) 
-		#AUTO_COMPRESS.PY?
+	
+	else:
+		table = 'paperfeed'
+		email_space(table)
 
 	return None
 
