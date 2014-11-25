@@ -203,8 +203,13 @@ def paperfeed(auto):
 		#EMAIL PEOPLE THAT DATA IS BEING MOVED AND LOADED
 		email_paperfeed(outfile_list)
 		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
+		outfile_dirs = []
 		for outfiles in outfile_list:
-			os.popen('''add_observations.py %s'''%(outfiles)) 
+			if outfile.split('z')[0] not in outfile_dirs:
+				outfile_dirs.append(outfile.split('z')[0])
+		for out_direc in outfile_dirs:
+			out_dir = os.path.join(out_direc,'zen.*.uv')
+			os.popen('''add_observations.py %s'''%(out_dir)) 
 	else:
 		table = 'paperfeed'
 		email_space(table)
