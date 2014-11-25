@@ -366,7 +366,8 @@ def paperbridge(auto)
 	required_space = 1112661213184
 
 	#Amount of space free in directory
-	free_space = calculate_free_space('/data4/paper/raw_to_tape/')
+	dir = '/data4/paper/raw_to_tape/'
+	free_space = calculate_free_space(dir)
 
 	if free_space >= required_space:
 		#Pull information from paperdistiler
