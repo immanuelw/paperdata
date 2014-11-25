@@ -344,7 +344,7 @@ def remove_duplicates(dirs_all, usrnm, pswd):
 
 	return dirs_all
 
-def load_paperdata(auto)
+def load_paperdata(auto):
         #User input information
         usrnm = 'paperboy'
         pswd = 'paperboy'

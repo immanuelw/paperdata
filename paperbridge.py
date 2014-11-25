@@ -10,6 +10,11 @@ import os
 import csv
 import time
 import load_paperdata
+import subprocess
+import smtplib
+import shutil
+import socket
+import aipy as A
 
 ### Script to load infromation quickly from paperdistiller database into paperdata
 ### Queries paperdistiller for relevant information, loads paperdata with complete info
@@ -93,9 +98,9 @@ def gen_data_list(usrnm, pswd):
 			if count == count_jday[jday]:
 				completed_days.append(jday)
 			else:
-				print jday ' is incomplete'
+				print jday + ' is incomplete'
 		else:
-			print jday ' is incomplete'
+			print jday + ' is incomplete'
 
 
 	#Remove all non-complete days
@@ -103,7 +108,17 @@ def gen_data_list(usrnm, pswd):
 		if res[7] not in completed_days:
 			results.remove(res)
 
+	#Close database and save changes
+        cursor.close()
+        connection.close()
+
 	#Results should be list of days that have been completed for all files
+
+	#pulls all relevant information from full paperdistiller database
+        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+
+	# prepare a cursor object using cursor() method
+        cursor = connection.cursor()
 
 	#Create list of obsnums to check for duplicates
 	cursor.execute('SELECT obsnum from paperdata')
@@ -163,7 +178,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		#indicates size of compressed file MB
 		compr_file = os.path.join(compr_path, 'visdata')
 		if os.path.isfile(compr_file):
-			compr_sz = round(sizeof_fmt(get_size(compr_path)), 1)
+			compr_sz = round(float(sizeof_fmt(get_size(compr_path))), 1)
 			compressed = 1
 		else:
 			compr_sz = 0.0
@@ -177,7 +192,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		#indicates size of raw file in MB
 		raw_file = os.path.join(raw_path, 'visdata')
 		if os.path.isfile(raw_file):
-			raw_sz = sizeof_fmt(get_size(raw_path))
+			raw_sz = round(float(sizeof_fmt(get_size(raw_path))), 1)
 		else:
 			err = [item, 'No .uv file']
 			ewr.writerow(err)
@@ -261,6 +276,7 @@ def calculate_free_space(dir):
         #Do not surpass this amount ~1.2TiB
         max_space = 1319413953331
 
+	total_space = 0
         for output in folio.split('\n'):
                 subdir = output.split('\t')[-1]
                 if subdir == dir:
@@ -269,7 +285,7 @@ def calculate_free_space(dir):
 
         return free_space
 
-def email_space(table)
+def email_space(table):
         server = smtplib.SMTP('smtp.gmail.com', 587)
 
         #Next, log in to the server
@@ -345,7 +361,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
         return outfile_list
 
-def paperbridge(auto)
+def paperbridge(auto):
 	#User input information
 	if auto != 'y':
 		usrnm = raw_input('Username: ')
@@ -377,15 +393,19 @@ def paperbridge(auto)
 		gen_data_from_paperdistiller(results, obsnums, dbnum, dbe)
 
 		#check if auto-loading
-		if auto_load == 'y':
+		#if auto_load == 'y':
 			#Load information into paperdata
-			load_paperdata.load_db(dbnum, usrnm, pswd)
+			#load_paperdata.load_db(dbnum, usrnm, pswd)
 			#Update paperdata and move data
-			move_data = 'moved_data_%s.csv'%(time_date)	
-			outfile = '/data4/paper/raw_to_tape'
-			move_files(filenames, outfile, move_data, usrnm, pswd)
-		else:
-			print '''Information logged into '%s' ''' %(dbnum)
+			#move_data = 'moved_data_%s.csv'%(time_date)	
+			#outfile = '/data4/paper/raw_to_tape'
+			#move_files(filenames, outfile, move_data, usrnm, pswd)
+		#else:
+		#	print '''Information logged into '%s' ''' %(dbnum)
+
+#	else:
+#		table = 'paperdistiller'
+#		email_space(table)
 
 	return None
 

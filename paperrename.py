@@ -31,6 +31,7 @@ def calculate_free_space(dir):
 	#Do not surpass this amount ~1TiB
 	max_space = 1099511627776 
 
+	total_space = 0
 	for output in folio.split('\n'):
 	        subdir = output.split('\t')[-1]
 	        if subdir == dir:
@@ -39,7 +40,7 @@ def calculate_free_space(dir):
 
 	return free_space
 
-def email_paperrename(files)
+def email_paperrename(files):
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 
 	#Next, log in to the server
@@ -65,7 +66,7 @@ def email_paperrename(files)
 	
 	return None
 
-def email_space(table)
+def email_space(table):
         server = smtplib.SMTP('smtp.gmail.com', 587)
 
         #Next, log in to the server

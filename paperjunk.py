@@ -29,6 +29,7 @@ def calculate_folio_space(dir):
 	#/data4 should be filesystem
 	#Amount of available bytes should be free_space
 
+	folio_space = 0
 	for output in folio.split('\n'):
 	        filesystem = output.split(' ')[-1]
 	        if filesystem == '/data4':
@@ -43,6 +44,7 @@ def calculate_free_space(dir):
         #Do not surpass this amount ~1TiB
         max_space = 1099511627776
 
+	total_space = 0
         for output in folio.split('\n'):
                 subdir = output.split('\t')[-1]
                 if subdir == dir:
@@ -109,7 +111,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
         return o_dict
 
-def check_paperjunk(max)
+def check_paperjunk(max):
 	#Load data into named database and table
         connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
         cursor = connection.cursor()
@@ -130,7 +132,7 @@ def check_paperjunk(max)
 
 	return junk_list
 
-def email_space(table)
+def email_space(table):
         server = smtplib.SMTP('smtp.gmail.com', 587)
 
         #Next, log in to the server

@@ -28,6 +28,7 @@ def calculate_free_space(dir):
         #Do not surpass this amount ~3.1TiB
         max_space = 3408486046105
 
+	total_space = 0
         for output in folio.split('\n'):
                 subdir = output.split('\t')[-1]
                 if subdir == dir:
@@ -119,7 +120,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
         return outfile_list
 
-def email_paperfeed(files)
+def email_paperfeed(files):
         server = smtplib.SMTP('smtp.gmail.com', 587)
 
         #Next, log in to the server
@@ -137,7 +138,7 @@ def email_paperfeed(files)
 
 	return None
 
-def email_space(table)
+def email_space(table):
         server = smtplib.SMTP('smtp.gmail.com', 587)
 
         #Next, log in to the server
@@ -152,7 +153,7 @@ def email_space(table)
 
         return None
 
-def paperfeed(auto)
+def paperfeed(auto):
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
         move_data = 'moved_data_%s.csv'%(time_date)
