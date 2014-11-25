@@ -137,6 +137,8 @@ def email_paperfeed(files)
         server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
         server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
 
+	return None
+
 def paperfeed(auto)
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
