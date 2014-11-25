@@ -54,7 +54,7 @@ def calculate_free_space(dir):
         return free_space
 
 def move_files(infile_list, outfile, move_data, usrnm, pswd):
-	host = socket.gethostname()
+	host = 'folio'
 
         #Directory of the infiles
         infile_dir = infile_list[0].split('z')[0]
@@ -67,7 +67,15 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         o_dict = {}
         for file in infile_list:
                 zen = file.split('/')[-1]
-                out = os.path.join(outfile,zen)
+		psa = infile.split('.')[-3]
+
+		subdir = os.path.join(psa,zen)
+		outdir = os.path.join(outfile,psa)
+
+		if not os.path.isdir(outdir):
+			os.mkdir(outdir)
+
+                out = os.path.join(outfile,subdir)
                 o_dict.update({file:out})
 
         #Load data into named database and table

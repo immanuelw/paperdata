@@ -142,7 +142,7 @@ def gen_data_list(usrnm, pswd):
 	return [results, obsnums, filenames]
 
 def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
-	host = socket.gethostname()
+	host = 'folio'
 	#results list of lists should contain path, obsnum, julian_date, polarization string, length of data, and julian_day
 	for item in results:
 		#Opens error logging file
@@ -312,7 +312,7 @@ def email_space(table):
         return None
 
 def move_files(infile_list, outfile, move_data, usrnm, pswd):
-        host = socket.gethostname()
+        host = 'folio'
 
         #Directory of the infiles
         infile_dir = infile_list[0].split('z')[0]
@@ -325,7 +325,16 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         o_dict = {}
         for file in infile_list:
                 zen = file.split('/')[-1]
-                out = os.path.join(outfile,zen)
+		psa = infile.split('.')[-3]
+
+                subdir = os.path.join(psa,zen)
+                outdir = os.path.join(outfile,psa)
+
+                if not os.path.isdir(outdir):
+                        os.mkdir(outdir)
+
+                out = os.path.join(outfile,subdir)
+
                 o_dict.update({file:out})
 
         #Load data into named database and table
