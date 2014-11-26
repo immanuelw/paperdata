@@ -277,7 +277,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 
 def calculate_free_space(dir):
         #Calculates the free space left on input dir
-        folio = subprocess.check_output(['du -s ', dir], shell=True)
+        folio = subprocess.check_output(['du', '-bs', dir])
         #Amount of available bytes should be free_space
 
         #Do not surpass this amount ~1.2TiB
@@ -304,8 +304,8 @@ def email_space(table):
         msgs = '\nNot enough space for ' + table + ' on folio'
 
         server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
-        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+        #server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+        #server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
 
 	server.quit()
 
@@ -427,7 +427,7 @@ def paperbridge(auto):
 	else:
 		table = 'paperdistiller'
 		email_space(table)
-		time.sleep(14400)
+		#time.sleep(14400)
 
 	return None
 

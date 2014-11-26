@@ -25,7 +25,7 @@ import load_paperfeed
 
 def calculate_folio_space(dir):
 	#Calculates the free space left on input dir
-	folio = subprocess.check_output(['df -B 1 ', dir], shell=True)
+	folio = subprocess.check_output(['df', '-B', '1'])
 	#/data4 should be filesystem
 	#Amount of available bytes should be free_space
 
@@ -38,7 +38,7 @@ def calculate_folio_space(dir):
 
 def calculate_free_space(dir):
         #Calculates the free space left on input dir
-        folio = subprocess.check_output(['du -bs ', dir], shell=True)
+        folio = subprocess.check_output(['du', '-bs', dir])
         #Amount of available bytes should be free_space
 
         #Do not surpass this amount ~1TiB
