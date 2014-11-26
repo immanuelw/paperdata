@@ -123,8 +123,8 @@ def gen_data_list(usrnm, pswd):
 	# prepare a cursor object using cursor() method
         cursor = connection.cursor()
 
-	#Create list of obsnums to check for duplicates
-	cursor.execute('SELECT obsnum from paperdata')
+	#Create list of obsnums to check for duplicates-- only adds files that have not been compressed
+	cursor.execute('''SELECT obsnum from paperdata where path != 'NULL' ''')
 	obs = cursor.fetchall()
 
 	obsnums = []
@@ -414,20 +414,20 @@ def paperbridge(auto):
 		gen_data_from_paperdistiller(results, obsnums, dbnum, dbe)
 
 		#check if auto-loading
-		#if auto_load == 'y':
+		if auto_load == 'y':
 			#Load information into paperdata
-			#load_paperdata.load_db(dbnum, usrnm, pswd)
+			load_paperdata.load_db(dbnum, usrnm, pswd)
 			#Update paperdata and move data
-			#move_data = 'moved_data_%s.csv'%(time_date)	
-			#outfile = '/data4/paper/raw_to_tape'
-			#move_files(filenames, outfile, move_data, usrnm, pswd)
-		#else:
-		#	print '''Information logged into '%s' ''' %(dbnum)
+			move_data = 'moved_data_%s.csv'%(time_date)	
+			outfile = '/data4/paper/raw_to_tape'
+			move_files(filenames, outfile, move_data, usrnm, pswd)
+		else:
+			print '''Information logged into '%s' ''' %(dbnum)
 
-#	else:
-#		table = 'paperdistiller'
-#		email_space(table)
-#		time.sleep(14400)
+	else:
+		table = 'paperdistiller'
+		email_space(table)
+		time.sleep(14400)
 
 	return None
 
