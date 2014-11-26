@@ -91,7 +91,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                 try:
 			#scp infile, outfile
 			inner = 'obs@' + infile
-			os.popen('''scp -r %s %s''' %(inner, outfile))
+			subprocess.call('scp -r %s %s' %(inner, outfile))
                         wr.writerow([infile,outfile])
                         print infile, outfile
                         dbr.close()
