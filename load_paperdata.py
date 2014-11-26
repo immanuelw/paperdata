@@ -354,6 +354,10 @@ def load_paperdata(auto):
         dbo = '/data2/home/immwa/scripts/paper_output/db_out.csv'
 	dbe = '/data2/home/immwa/scripts/paper_output/false.csv'
 
+	if auto != 'y':
+        	auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
+	else:
+		auto_update == 'y'
         #iterates through directories, listing information about each one
         dirs_all = glob.glob(datanum)
 
@@ -363,8 +367,6 @@ def load_paperdata(auto):
         dirs.sort()
         gen_paperdata(dirs, dbo, dbe)
 
-	if auto != 'y':
-        	auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
 	if auto_update == 'y':
 		usrnm2 = raw_input('Input username with edit privileges: ')
 		pswd2 = raw_input('Input password: ')
