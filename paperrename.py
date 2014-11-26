@@ -319,7 +319,8 @@ def paperrename(auto):
 	else:
 		table = 'paperrename'
 		email_space(table)
-		time.sleep(21600)
+		if auto == 'y':
+			time.sleep(21600)
 
 	return None
 

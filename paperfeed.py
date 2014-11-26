@@ -213,7 +213,8 @@ def paperfeed(auto):
 	else:
 		table = 'paperfeed'
 		email_space(table)
-		time.sleep(21600)
+		if auto == 'y':
+			time.sleep(21600)
 
 	return None
 
