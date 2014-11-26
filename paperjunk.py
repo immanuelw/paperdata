@@ -67,15 +67,8 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         o_dict = {}
         for file in infile_list:
                 zen = file.split('/')[-1]
-		psa = infile.split('.')[-3]
+		out = os.path.join(outfile,psa)
 
-		subdir = os.path.join(psa,zen)
-		outdir = os.path.join(outfile,psa)
-
-		if not os.path.isdir(outdir):
-			os.mkdir(outdir)
-
-                out = os.path.join(outfile,subdir)
                 o_dict.update({file:out})
 
         #Load data into named database and table
@@ -174,8 +167,6 @@ def paperjunk(auto):
 		pswd = 'immwa3978'
 
         #Files to temporarily store information about renamed files
-        dbo = '/data2/home/immwa/scripts/paper_output/paperjunk_out.csv'
-
         outfile = '/data4/paper/file_renaming_test'
 
         #Checks all filesystems
