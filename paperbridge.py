@@ -16,6 +16,7 @@ import shutil
 import socket
 import aipy as A
 import hashlib
+import base64
 
 ### Script to load infromation quickly from paperdistiller database into paperdata
 ### Queries paperdistiller for relevant information, loads paperdata with complete info
@@ -304,8 +305,8 @@ def email_space(table):
         msgs = '\nNot enough space for ' + table + ' on folio'
 
         server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
-        #server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-        #server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
 
 	server.quit()
 
@@ -391,8 +392,8 @@ def paperbridge(auto):
 		auto_load = raw_input('Automatically load into paperdata? (y/n): ')
 
 	else:
-		usrnm = 'immwa'
-		pswd = 'immwa3978'
+		usrnm = 'jaguirre'
+		pswd = base64.b64decode('amFndWlycmU2OTE5')
 		auto_load = 'y'
 
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
@@ -427,7 +428,7 @@ def paperbridge(auto):
 	else:
 		table = 'paperdistiller'
 		email_space(table)
-		#time.sleep(14400)
+		time.sleep(14400)
 
 	return None
 
