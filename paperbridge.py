@@ -124,7 +124,7 @@ def gen_data_list(usrnm, pswd):
         cursor = connection.cursor()
 
 	#Create list of obsnums to check for duplicates-- only adds files that have not been compressed
-	cursor.execute('''SELECT obsnum from paperdata where path != 'NULL' ''')
+	cursor.execute('''SELECT obsnum from paperdata where compressed = 1''')
 	obs = cursor.fetchall()
 
 	obsnums = []
