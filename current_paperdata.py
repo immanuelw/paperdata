@@ -57,9 +57,9 @@ class TableFormatter:
             self.rowData.append(data_row + [None] * (self.columns - data_size))
         else:
             self.rowData.append(data_row)
-        self.column_size= self.MAX(len(max(data_row)), self.column_size)
+        #self.column_size= self.MAX(len(max(data_row)), self.column_size)
 	#self.column_size = self.column_size 
-        #self.column_size = len(max(data_row))
+        self.column_size = len(max(data_row))
 	
     def addDataColumns(self, data_rows):
         for data_row in data_rows:
@@ -71,8 +71,8 @@ class TableFormatter:
                 self.rowData.append(list(data_row) + [None] * (self.columns - data_size))
             else:
                 self.rowData.append(data_row)
-            self.column_size= self.MAX(len(max(data_row)), self.column_size)
-            #self.column_size = len(max(data_row))
+            #self.column_size= self.MAX(len(max(data_row)), self.column_size)
+            self.column_size = len(max(data_row))
             #self.column_size = self.column_size 
 
     def __str__(self):
