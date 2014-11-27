@@ -1466,7 +1466,7 @@ def main():
     cursor.close()
     connection.close()
 
-    x = PrettyTable(["Era", "Julian Day", "Raw Path", "Compressed Path", "Amount"])
+    x = PrettyTable(["Era", "Julian Day", "Raw Path", "Compressed Path", "Type(R/C/B)", "Amount"])
     #x.sortby = "Population"
     #x.reversesort = True
     #x.int_format["Area"] = "04d"
@@ -1475,7 +1475,14 @@ def main():
     #x.add_row(["Perth", 5386, 1554769, 869.4])
     #print(x)
     for item in results:
-        x.add_row(item)
+        if item[2] != 'NULL' and item[3] == 'NULL':
+            file_type = 'R'
+        elif item[3] != 'NULL' and item[2] == 'NULL':
+            file_type = 'C'
+        elif item[2] != 'NULL' and item[3] != 'NULL':
+            file_type = 'B'
+        full_item = item[:4] + (file_type, item[4])
+        x.add_row(full_item)
     stuff = x.get_string()
     with open('/data2/home/immwa/scripts/paper/table_descr.txt', 'w') as df:
         df.write(stuff)
