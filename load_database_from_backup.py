@@ -15,7 +15,6 @@ import os
 ### Date: 8-20-14
 
 #User input information
-datab = 'paperdata'
 usrnm = raw_input('Username: ')
 pswd = getpass.getpass('Password: ')
 
@@ -24,7 +23,7 @@ backup = raw_input('Insert backup manually or automatically? (m/a): ')
 if backup == 'm':
 	dbnum = raw_input('Insert path of backup: ')
 elif backup == 'a':
-	dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_backup_07-08-2014_17:10:28.csv'
+	dbnum = '/data2/home/immwa/scripts/paperdata/backups/version4_11-27-2014.csv'
 
 #Load data into named database and table
 
@@ -37,10 +36,7 @@ cursor = connection.cursor()
 
 print dbnum 
 # execute the SQL query using execute() method.
-cursor.execute('''USE paperdata;
-LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata
-COLUMNS TERMINATED BY ','
-LINES TERMINATED BY '\n' '''%(dbnum))
+cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbnum))
 
 print 'Table data loaded.'
 
