@@ -180,17 +180,18 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 			continue
 
 		#indicates size of compressed file MB
+		#ASSUME DATABASE IS CORRECT
 		compr_file = os.path.join(compr_path, 'visdata')
 		if os.path.isfile(compr_file):
 			compr_sz = round(float(sizeof_fmt(get_size(compr_path))), 1)
 			compressed = 1
+			edge = 0
 		else:
 			compr_sz = 0.0
 			compressed = 0
-			err = [item, 'No compressed file']
+			edge = 1
+			err = [item, 'No compressed file -- possibly edge file']
 			ewr.writerow(err)
-			error_file.close()
-			continue
 		
 
 		#indicates size of raw file in MB
@@ -201,6 +202,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 			err = [item, 'No .uv file']
 			ewr.writerow(err)
 			error_file.close()
+			continue
 
 	        #allows uv access
 		try:
@@ -252,9 +254,6 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 
 		#shows location of raw data on tape
 		tape_location = 'NULL'
-
-		#Show if file is edge file
-		edge = 0
 
 		#variable indicating if all files have been successfully compressed in one day
 		ready_to_tape = 0
