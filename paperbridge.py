@@ -147,7 +147,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 	#results list of lists should contain path, obsnum, julian_date, polarization string, length of data, and julian_day
 	for item in results:
 		#Opens error logging file
-		error_file = open(dbe,'a')
+		error_file = open(dbe,'ab')
 		ewr = csv.writer(error_file, dialect='excel')
 		#check for duplicate
 		if item[1] in obsnums:
@@ -157,7 +157,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 			continue
 
 		#Open file to write to
-		data_file = open(dbnum,'a')
+		data_file = open(dbnum,'ab')
 		#create 'writer' object
 		wr = csv.writer(data_file, dialect='excel')
 
@@ -351,7 +351,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                 outfile = o_dict[infile]
 
                 #Opens file to append to
-                dbr = open(dbo, 'a')
+                dbr = open(dbo, 'ab')
                 wr = csv.writer(dbr, dialect='excel')
 
                 #"moves" file

@@ -98,7 +98,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                 outfile = o_dict[infile]
 
                 #Opens file to append to
-                dbr = open(dbo, 'a')
+                dbr = open(dbo, 'ab')
                 wr = csv.writer(dbr, dialect='excel')
 
                 #"moves" file

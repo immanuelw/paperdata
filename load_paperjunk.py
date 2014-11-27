@@ -42,7 +42,7 @@ def gen_paperjunk(dirs, dbo):
 	host = 'folio'
 
         #Erase former data file
-        data_file = open(dbo,'w')
+        data_file = open(dbo,'wb')
 	data_file.close()
 
 	full_info = []
@@ -50,7 +50,7 @@ def gen_paperjunk(dirs, dbo):
 	for dir in dirs[:]:
 
 		#create csv file to log data
-		data_file = open(dbo,'a')
+		data_file = open(dbo,'ab')
 		wr = csv.writer(data_file, dialect='excel')
 
 		junk_path = host + ':' + dir

@@ -42,7 +42,7 @@ def gen_paperfeed(dirs, dbo, dbe):
 	host = 'folio'
 
         #Erase former data file
-        data_file = open(dbo,'w')
+        data_file = open(dbo,'wb')
 	data_file.close()
 
 	full_info = []
@@ -50,11 +50,11 @@ def gen_paperfeed(dirs, dbo, dbe):
 	for dir in dirs[:]:
 
 		#create csv file to log data
-		data_file = open(dbo,'a')
+		data_file = open(dbo,'ab')
 		wr = csv.writer(data_file, dialect='excel')
 
 		#create csv file to log bad files
-		error_file = open(dbe, 'a')
+		error_file = open(dbe, 'ab')
 		ewr = csv.writer(error_file, dialect='excel')
 
 		#checks if file loaded in is raw or compressed - makes changes to compensate
