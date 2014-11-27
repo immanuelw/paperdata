@@ -78,6 +78,7 @@ def consolidate(dbo)
 				else:
 					front.append(ra)
 
+	#Takes only unique entries
 	total = tuple(back + front)
 	backup = set(total)
 	backup = sorted(backup, key=lambda x: (x[6], x[9], x[0]))
