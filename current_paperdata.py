@@ -72,8 +72,8 @@ class TableFormatter:
             else:
                 self.rowData.append(data_row)
             #self.column_size= self.MAX(len(max(data_row)), self.column_size)
-            self.column_size = len(max(data_row))
-            #self.column_size = self.column_size 
+            #self.column_size = len(max(data_row))
+            self.column_size = self.column_size 
 
     def __str__(self):
         return self.createTable()
