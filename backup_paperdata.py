@@ -8,7 +8,6 @@ import sys
 import getpass
 import time
 import csv
-import base64
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
@@ -16,47 +15,34 @@ import base64
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-datab = 'paperdata'
-#usrnm = raw_input('Username: ')
-#pswd = getpass.getpass('Password: ')
+def backup_paperdata(dbnum, time_date)
+	print dbnum
+	resultFile = open(dbnum,'wb')
+	resultFile.close()
 
-usrnm = 'immwa'
-pswd = base64.b64decode('aW1td2EzOTc4')
+	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = datab, local_infile=True)
+	cursor = connection.cursor()
 
-time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
+	cursor.execute('SELECT * FROM paperdata order by julian_date asc, raw_location asc, path asc')
+	results = cursor.fetchall()
 
-table = 'paperdata' 
-dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_backup_%s.csv'%(time_date)
+	resultFile = open(dbnum,'ab')
+	wr = csv.writer(resultFile, dialect='excel')
 
-print dbnum
-resultFile = open(dbnum,'wb+')
+	for item in results:
+		wr.writerow(item)
+	resultFile.close()
 
-#create 'writer' object
-wr = csv.writer(resultFile, dialect='excel')
+	print time_date
+	print 'Table data backup saved'
 
-#Load data into named database and table
+	# Close the cursor object
+	cursor.close()
+	connection.close()
 
-# open a database connection
-# be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = datab, local_infile=True)
+	return None
 
-# prepare a cursor object using cursor() method
-cursor = connection.cursor()
-
-# execute the SQL query using execute() method.
-cursor.execute('SELECT * FROM paperdata order by julian_date asc, raw_location asc, path asc')
-results = cursor.fetchall()
-
-for item in results:
-	#write to csv file by item in list
-	wr.writerow(item)
-
-print time_date
-print 'Table data backup saved'
-
-# Close the cursor object
-cursor.close()
-connection.close()
-
-# exit the program
-sys.exit()
+if __name__ == '__main__':
+	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
+	dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_backup_%s.csv'%(time_date)
+	backup_paperdata(dbnum, time_date)
