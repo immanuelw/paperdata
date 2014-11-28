@@ -14,53 +14,49 @@ import os
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-usrnm = raw_input('Root username: ')
-pswd = getpass.getpass('Root password: ')
+def tape_check(era, usrnm, pswd):
+	#checks if files of the same Julian Date have all completed compression
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
-era = raw_input('32, 64, or 128?: ')
-era = int(era)
+	# prepare a cursor object using cursor() method
+	cursor = connection.cursor()
 
-res = {}
+	#counting the amount of files in each day
+	cursor.execute('''SELECT julian_day, COUNT(*) FROM paperdata WHERE era = %d and edge = 0 GROUP BY julian_day'''%(era))
+	sec_results = cursor.fetchall()
 
-#checks if files of the same Julian Date have all completed compression
+	#counting the amount of compressed files in each day
+	cursor.execute('''SELECT julian_day, COUNT(*), tape_location, raw_location FROM paperdata WHERE era = %d and compressed = 1 and raw_location != 'NULL' GROUP BY julian_day'''%(era))
+	thr_results = cursor.fetchall()
 
-# open a database connection
-# be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	#create dictionary with julian_day as key, count as value
+	res = {}
+	for item in sec_results:
+		res.update({item[0]:item[1]})
 
-# prepare a cursor object using cursor() method
-cursor = connection.cursor()
+	#testing if same amount in each day, updating if so
+	for item in thr_results:
+		jday = int(item[0])
+		if item[2] == 'NULL' and item[3] != 'ON TAPE':
+			if res[item[0]] == item[1]:
+				ready_to_tape = 1
+				cursor.execute('''
+		                UPDATE paperdata
+		                SET ready_to_tape = 1
+		                WHERE julian_day = %d
+		                '''%(jday))
 
-#counting the amount of files in each day
-cursor.execute('''SELECT julian_day, COUNT(*) FROM paperdata WHERE era = %d and edge = 0 GROUP BY julian_day'''%(era))
-sec_results = cursor.fetchall()
+	print 'Table data updated.'
 
-#counting the amount of compressed files in each day
-cursor.execute('''SELECT julian_day, COUNT(*), tape_location, raw_location FROM paperdata WHERE era = %d and compressed = 1 and raw_location != 'NULL' GROUP BY julian_day'''%(era))
-thr_results = cursor.fetchall()
+	# close the cursor object
+	cursor.close()
+	connection.commit()
+	connection.close()
 
-#create dictionary with julian_day as key, count as value
-for item in sec_results:
-	res.update({item[0]:item[1]})
+	return None
 
-#testing if same amount in each day, updating if so
-for item in thr_results:
-	j_value = item[0]
-	if item[2] == 'NULL' and item[3] != 'ON TAPE':
-		if res[item[0]] == item[1]:
-			ready_to_tape = 1
-			cursor.execute('''
-	                UPDATE paperdata
-	                SET ready_to_tape = %d
-	                WHERE julian_day = %d;
-	                '''%(ready_to_tape, j_value))
-
-print 'Table data updated.'
-
-# close the cursor object
-cursor.close()
-connection.commit()
-connection.close()
-
-# exit the program
-sys.exit()
+if __name__ == '__main__':
+	usrnm = raw_input('Root username: ')
+	pswd = getpass.getpass('Root password: ')
+	era = int(raw_input('32, 64, or 128?: '))
+	tape_check(era, usrnm, pswd)
