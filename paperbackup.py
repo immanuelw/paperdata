@@ -91,11 +91,11 @@ def paperbackup(time_date, usrnm, pswd):
 	cursor.close()
 	connection.close()
 
-def paperbackup():
+	return None
 
 if __name__ == '__main__':
-	usrnm = 'immwa'
-	pswd = base64.b64decode('aW1td2EzOTc4')
+	usrnm = 'paperboy'
+	pswd = 'paperboy'
 
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 
