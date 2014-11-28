@@ -2,24 +2,16 @@
 # -*- coding: utf-8 -*-
 # Search data in MySQL table
 
+from Tkinter import *
+import paperdataDB as pdb
+import decimal
+import getpass
+
 ### Script to create GUI to easily search paperdata database
 ### Has fields to enter to search for any and all which match certain parameters
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
-
-from Tkinter import *
-#from paperdataDB import *
-import paperdataDB as pdb
-import decimal
-import getpass
-
-fields = pdb.fields()
-
-#options for printed output values
-sql_string = 1
-db_list = 2
-db_dict = 3
 
 #create form
 def makeform(root, fields):
@@ -52,8 +44,6 @@ def makeform(root, fields):
 			#creates entries list
 			entries.append((field, c.var, a.var, ent))
 	return entries
-
-decimal.getcontext().prec = 5
 
 def convert(entries, output):
 	info_list = []
@@ -128,6 +118,15 @@ def convert(entries, output):
 	return info_list
 
 if __name__ == '__main__':
+	fields = pdb.fields()
+	decimal.getcontext().prec = 5
+
+	#options for printed output values
+	sql_string = 1
+	db_list = 2
+	db_dict = 3
+
+	#Generate GUI
 	root = Tk()
 	root.title('Paperdata Query')
 	ents = makeform(root, fields)
