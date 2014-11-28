@@ -15,70 +15,65 @@ import csv
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-usrnm = raw_input('Root username: ')
-pswd = getpass.getpass('Root password: ')
+def delete_files(usrnm, pswd, confirm, failed_delete):
+	del_file = open(failed_delete,'wb')
+	del_file.close()
 
-raw_value = 'ON TAPE'
-deletion = []
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
 
-failed_delete = '/data2/home/immwa/scripts/paperdata/failed_deletion.csv'
-del_file = open(failed_delete,'wb')
+	cursor.execute('SELECT obsnum, raw_location, tape_location, delete_file from paperdata where delete_file = 1 order by julian_date asc')
+	results = cursor.fetchall()
 
-#create 'writer' object
-fd = csv.writer(del_file, dialect='excel')
+	#results is a list of lists
+	deletion = []
+	for items in results:
+		obsnum = int(items[0])
+		raw_path = items[1]
+		tape_path = items[2]
+		delete = int(items[3])
+		if delete == 1 and tape_path != 'NULL' and raw_path != 'NULL':
+			deletion.append([raw_path,obsnum])
 
-# open a database connection
-# be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	if confirm == 'y':
+		for item in deletion:
+			del_file = open(failed_delete,'ab')
+			fd = csv.writer(del_file, dialect='excel')
+			raw_path = item[0]
+			obsnum = item[1]
+			try:
+				shutil.rmtree(item[0])
+			except:
+				fd.writerow([item[0], 'Not removed'])
+				print 'ERROR: uv file %s not removed' %(item[0])
+				del_file.close()
+				continue
 
-# prepare a cursor object using cursor() method
-cursor = connection.cursor()
+			if not os.path.isdir(item[0]):
+				cursor.execute('''
+				UPDATE paperdata
+				SET delete_file = 0, raw_location = 'ON TAPE'
+				WHERE obsnum = %d and raw_location = '%s';
+				'''%(obsnum, raw_path))
+			else:
+				fd.writerow([item[0], 'Not updated'])
+				print 'ERROR: uv file %s not updated' %(item[0])
+				del_file.close()
+				continue
+		print 'Table data updated.'
+	else:
+		sys.exit()
 
-#execute MySQL query
-cursor.execute('SELECT julian_day, obsnum, raw_location, tape_location, delete_file from paperdata where delete_file = 1 order by julian_day asc')
+	# Close and save changes to database
+	cursor.close()
+	connection.commit()
+	connection.close()
 
-#collects information from query
-results = cursor.fetchall()
+	return None
 
-#results is a list of lists
-for items in results:
-	obsnum = items[1]
-	if items[4] == 1 and not items[3] == 'NULL' and not items[2] == 'NULL':
-		deletion.append([items[2],obsnum])
-
-#loops through list and deletes raw files scheduled for deletion
-confirm = raw_input('Are you sure you want to delete (y/n) ?: ')
-
-#value to set delete_file to
-del_value = 0
-if confirm == 'y':
-	for item in deletion:
-		obsnum = item[1]
-		try:
-			shutil.rmtree(item[0])
-		except:
-			fd.writerow([item[0]])
-			print 'ERROR: uv file %s not removed' %(item[0])
-			continue
-
-		if not os.path.isdir(item[0]):
-			cursor.execute('''
-			UPDATE paperdata
-			SET delete_file = %d, raw_location = '%s'
-			WHERE obsnum = %d;
-			'''%(del_value, raw_value, obsnum)
-		else:
-			fd.writerow([item[0]])
-			print 'ERROR: uv file %s not removed' %(item[0])
-else:
-	sys.exit()
-
-print 'Table data updated.'
-
-# Close and save changes to database
-cursor.close()
-connection.commit()
-connection.close()
-
-# exit the program
-sys.exit()
+if __name__ == '__main__':
+	usrnm = raw_input('Root username: ')
+	pswd = getpass.getpass('Root password: ')
+	confirm = raw_input('Are you sure you want to delete (y/n) ?: ')
+	failed_delete = '/data2/home/immwa/scripts/paperdata/failed_deletion.csv'
+	delete_files(usrnm, pswd, confirm, failed_delete)
