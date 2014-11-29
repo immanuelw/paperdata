@@ -16,53 +16,80 @@ Important scripts:
 		as output an SQL string.
 
 	move_data.py:
-		Used to automatically update database with new location when moving .uvcRRE or .uv files
-
-	load_database_from_paperdistiller.py:
-		Used to fill paperdata with information from paperdistiller database. Much faster than crawling though folio.
+		Automatically updates database with new location when moving .uvcRRE or .uv files
 
 	load_paperdata.py:
-		Used to load raw and compressed data information into paperdata
+		Loads raw and compressed data information into paperdata from files on folio.
 
-	compression_check.py:
-		Used to update database to check if a compressed file exists in indicated location.
+	load_paper*.py:
+		Loads relevant information into paper* table in paperdata database from files on folio.
 
 	tape_check.py:
-		Used to check if every file in a particular Julian Day has a compressed file and thusly can be written to tape.
-
-	auto_compress.py:
-		Used to run compression pipeline on raw files. INCOMPLETE
+		Checks if every file in a particular Julian Day has a compressed file and thusly can be written to tape.
 
 	delete_raw_files.py:
-		Used to delete files from folio which have been written to tape and update paperdata to reflect that.
+		Delete files from folio which have been written to tape and update paperdata to reflect that.
 
-	rename.py:
-		Used to rename files which have lost their names due to accidental deletion of pot0.
+	load_backup.py:
+		Refill paperdata table after backup due to error or changed fields.
 
-	backup_paperdata.py:
-		Used to backup the paperdata database, saving to a .csv file to be easily reloaded.
+	make_paper*_table.py:
+		Creates the base of the paper* table -- includes field names and types.
 
-	load_database_from_backup.py:
-		Used to refill paperdata after backup due to error or changed fields.
+	consolidate_paperdata.py:
+		Runs through paperdata, joining matching .uv and .uvcRRE files and creating a new paperdata table by writing to a .csv file.
+		--Still experimental, but functioning and eliminating all disjoint entries
 
-	backup_paperdistiller.py:
-		Used to backup the several tables of paperdistiller -- Used mostly for testing purposes.
 
-	log_errors_from_folio.py:
-		Used to check for unaccessible/incomplete .uvcRRE or .uv files within folio.
+	***DAEMONS***
+	***All daemons are perpetually running versions of their respective python script***
 
-	make_paperdata_table.py:
-		Used to create the base of the paperdata table -- includes field names and types.
+	paperbridge.py & bridge_daemon.py:
+		Fills paperdata with information from completed files in the paperdistiller database.
+
+	paperjunk.py & junk_daemon.py:
+		Pulls files from pot1 and updates paperjunk table with new location.
+
+	paperrename.py & rename_daemon.py:
+		Rebuilds .uv files moved from pot1 and existing in the paperjunk table. Loads to paperfeed table if entire julian day exists.
+		Possible hub location for all .uv files before entering paperfeed table.
+
+	paperfeed.py & feed_daemon.py:
+		Pulls data from paperrename table to generate table full of .uv files waiting to be compressed.
+		Moves .uv files to centralized location -- sends to paperdistiller to be compressed.
+
+	paperbackup.py & backup_daemon.py:
+		Backups the entire paperdata database, loading all into a created folder labeled with time and data
+		-- separated .csv files by table.
+
+
+	***DATABASE DESCRIPTION***
+
+	current_paperdata.py:
+		Creates table describing the current status of data in the database -- location, amount raw and compressed, julian_day. 
+		-- Table located in table_descr.txt
+
+	table_descr.txt:
+		Table describing the current status of data in the database -- location, amount raw and compressed, julian_day.
 
 	describe_paperdata.py:
-		Used to generate a list of field names and types of paperdata -- generates paperdata_schema base.
+		Generates a list of field names and types of paperdata -- generates paperdata_schema base.
 		Do not run unless paperdata table has been rebuilt recently.
 
-	paperdata_schema:
+	db_paperdata_schema:
 		Description of each field in paperdata.
 
-	clear_paperdistiller.py:
-		Used to clear information from the paperdistiller database -- Used primarily in testing.
+
+	***TESTING***
+
+	backup_paperdata.py:
+		Backups the paperdata table, saving to a .csv file to be easily reloaded. Used mostly for testing.
 
 	clear_paperdata.py:
-		Used to clear information from the paperdata database -- Used exclusively for rebuliding paperdata
+		Clears information from the paperdata database -- Used exclusively for rebuliding paperdata
+
+	paperdistiller_backup.py:
+		Backups the several tables of paperdistiller -- Used mostly for testing purposes.
+
+	clear_paperdistiller.py:
+		Clears information from the paperdistiller database -- Used primarily in testing.
