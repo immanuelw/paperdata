@@ -33,8 +33,8 @@ Important scripts:
 	load_backup.py:
 		Refill paperdata table after backup due to error or changed fields.
 
-	make_paper*_table.py:
-		Creates the base of the paper* table -- includes field names and types.
+	make_paper_db_table.py:
+		Creates the base of any table in the paperdata database -- includes field names and types.
 
 	consolidate_paperdata.py:
 		Runs through paperdata, joining matching .uv and .uvcRRE files and creating a new paperdata table by writing to a .csv file.
