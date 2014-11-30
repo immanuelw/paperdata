@@ -66,7 +66,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         infile_dir = infile_list[0].split('z')[0]
 
         #create file to log movement data       
-        dbo = os.path.join('/data4/paper/', move_data)
+        dbo = os.path.join('/data4/paper/feed', move_data)
         dbr = open(dbo,'wb')
         dbr.close()
 
@@ -185,7 +185,7 @@ def paperfeed(auto):
 		pswd = 'immwa3978'
 
 	#Checks all filesystems
-	dir = '/data4/paper/128_data/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
+	dir = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
 	free_space = calculate_free_space(dir)
 
 	#Minimum amount of space to move a day ~3.1TiB
@@ -197,7 +197,7 @@ def paperfeed(auto):
 		infile_list = find_data(usrnm, pswd)
 		#create directory to output to
 		output_subdir = infile_list[0].split('/')[-2]
-		outfile = os.path.join('/data4/paper/', output_subdir)
+		outfile = os.path.join('/data4/paper/feed/', output_subdir)
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
 		outfile_list = move_files(infile_list, outfile, move_data, usrnm, pswd)
 		#EMAIL PEOPLE THAT DATA IS BEING MOVED AND LOADED

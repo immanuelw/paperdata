@@ -168,28 +168,28 @@ def rename_uv(dirs, datashift, dbe):
                 elif data_size < 524288000:
                         continue
 
-                if not os.path.isdir('/data4/paper/file_renaming_test_output/%d.uv' %(count)):
+                if not os.path.isdir('/data4/paper/rename/%d.uv' %(count)):
                         try:
-                                os.makedirs('/data4/paper/file_renaming_test_output/%d.uv' %(count))
+                                os.makedirs('/data4/paper/rename/%d.uv' %(count))
                         except:
                                 print 'Error creating new directory for %s' %(dir)
                                 continue
                         try:
                                 for item in glob.glob(filler_dir):
-                                        shutil.copy(item, '/data4/paper/file_renaming_test_output/%d.uv' %(count))
+                                        shutil.copy(item, '/data4/paper/rename/%d.uv' %(count))
                         except:
                                 print 'Error copying filler data with %s' %(dir)
                                 continue
 
                 #if over 100MB, copy over to folio/copy to new folder and rename
                 try:
-                        shutil.move(data_file, '/data4/paper/file_renaming_test_output/%d.uv/visdata' %(count))
+                        shutil.move(data_file, '/data4/paper/rename/%d.uv/visdata' %(count))
                 except:
-                        print 'Directory /data4/paper/file_renaming_test_output/%d.uv/ doesnt exist' %(count)
+                        print 'Directory /data4/paper/rename/%d.uv/ doesnt exist' %(count)
                         continue
 
                 #set string to location of new .uv file
-                newUV = '/data4/paper/file_renaming_test_output/%d.uv' %(count)
+                newUV = '/data4/paper/rename/%d.uv' %(count)
 
                 #allows uv access
                 try:
@@ -258,17 +258,17 @@ def paperrename(auto):
 		pswd = 'immwa3978'
 
         #location of directory to move to
-        datashift = '/data4/paper/file_renaming_test_output/'
+        datashift = '/data4/paper/rename/'
 
         #Named file to input renaming error
-        dbrn = '/data4/paper/file_renaming_test_output/128error.csv'
+        dbrn = '/data4/paper/rename/128error.csv'
 
 	#Files to temporarily store information about renamed files
-	dbo = '/data2/home/immwa/scripts/paper_output/paperrename_out.csv'
-        dbe = '/data2/home/immwa/scripts/paper_output/false_paperrename.csv'
+	dbo = '/data4/paper/rename/paperrename_out.csv'
+        dbe = '/data4/paper/rename/false_paperrename.csv'
 
 	#Checks output dir
-	dir = '/data4/paper/file_renaming_test/'
+	dir = '/data4/paper/rename/'
 	free_space = calculate_free_space(dir)
 
 	#Amount of free space needed -- one file of 3.6 GB ~10GB for safety
@@ -277,7 +277,7 @@ def paperrename(auto):
 	#Move if there is enough free space
 	if free_space >= required_space:
 		#GET LIST OF FILES
-		junk_dir = '/data4/paper/file_renaming_test/'
+		junk_dir = '/data4/paper/junk/'
 		infile_list = glob.glob(junk_dir)
 		#RENAME FILES AND UPDATE PAPERJUNK
 		rename_uv(infile_list, datashift, dbrn)
@@ -300,8 +300,8 @@ def paperrename(auto):
 		for file in complete_info:
 			completed_days.append(file[0])
 
-		dbo2 = '/data2/home/immwa/scripts/paper_output/paperfeed_out.csv'
-		dbe2 = '/data2/home/immwa/scripts/paper_output/false_paperfeed.csv'
+		dbo2 = '/data4/paper/feed/paperfeed_out.csv'
+		dbe2 = '/data4/paper/feed/false_paperfeed.csv'
 
 		#removes duplicate entries from directory 
 		dirs2 = load_paperfeed.remove_duplicates(completed_days, usrnm, pswd)

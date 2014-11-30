@@ -60,7 +60,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         infile_dir = infile_list[0].split('z')[0]
 
         #create file to log movement data       
-        dbo = os.path.join('/data4/paper/file_renaming_test', move_data)
+        dbo = os.path.join('/data4/paper/junk', move_data)
         dbr = open(dbo,'wb')
         dbr.close()
 
@@ -167,12 +167,12 @@ def paperjunk(auto):
 		pswd = 'immwa3978'
 
         #Files to temporarily store information about renamed files
-        outfile = '/data4/paper/file_renaming_test'
+        outfile = '/data4/paper/junk'
 
         #Checks all filesystems
         dir = '/*'
 	folio_space = calculate_folio_space(dir)
-	dir = '/data4/paper/file_renaming_test/'
+	dir = '/data4/paper/junk/'
         free_space = calculate_free_space(dir)
 
         #Amount of free space needed -- ~4.1TB
