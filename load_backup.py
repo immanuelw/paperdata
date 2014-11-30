@@ -14,36 +14,39 @@ import os
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-#User input information
-usrnm = raw_input('Username: ')
-pswd = getpass.getpass('Password: ')
+def load_backup(dbnum, usrnm, pswd):
+	#Load data into named database and table
 
-#searches for only particular files
-backup = raw_input('Insert backup manually or automatically? (m/a): ')
-if backup == 'm':
-	dbnum = raw_input('Insert path of backup: ')
-elif backup == 'a':
-	dbnum = '/data2/home/immwa/scripts/paperdata/backups/version6_11-27-2014.csv'
+	# open a database connection
+	# be sure to change the host IP address, username, password and database name to match your own
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
-#Load data into named database and table
+	# prepare a cursor object using cursor() method
+	cursor = connection.cursor()
 
-# open a database connection
-# be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	print dbnum 
+	# execute the SQL query using execute() method.
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbnum))
 
-# prepare a cursor object using cursor() method
-cursor = connection.cursor()
+	print 'Table data loaded.'
 
-print dbnum 
-# execute the SQL query using execute() method.
-cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbnum))
+	# Close database and save changes
+	cursor.close()
+	connection.commit()
+	connection.close()
 
-print 'Table data loaded.'
+	return None
 
-# Close database and save changes
-cursor.close()
-connection.commit()
-connection.close()
+if __name__ == '__main__':
+	#User input information
+	usrnm = raw_input('Username: ')
+	pswd = getpass.getpass('Password: ')
 
-# exit the program
-sys.exit()
+	#searches for only particular files
+	backup = raw_input('Insert backup manually or automatically? (m/a): ')
+	if backup == 'm':
+	        dbnum = raw_input('Insert path of backup: ')
+	elif backup == 'a':
+	        dbnum = '/data2/home/immwa/scripts/paperdata/backups/version6_11-27-2014.csv'
+
+	load_backup(dbnum, usrnm, pswd)
