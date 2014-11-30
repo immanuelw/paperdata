@@ -73,7 +73,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         o_dict = {}
         for file in infile_list:
                 zen = file.split('/')[-1]
-		psa = infile.split('.')[-3]
+		psa = file.split('.')[-3]
 
                 subdir = os.path.join(psa,zen)
                 outdir = os.path.join(outfile,psa)
