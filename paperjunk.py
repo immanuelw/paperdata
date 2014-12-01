@@ -77,10 +77,6 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
         #Load into db
         for infile in infile_list:
-                if infile.split('.')[-1] != 'uv':
-                        print 'Invalid file type'
-                        sys.exit()
-
                 outfile = o_dict[infile]
 
                 #Opens file to append to
