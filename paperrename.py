@@ -158,14 +158,17 @@ def rename_uv(dirs, datashift, dbe):
                 #Find size of file
                 data_size = os.path.getsize(data_file)
 
-                #check if file size is over 500MB, if not: skip
+                #check if file size is over 700MB, if not: skip
                 if data_size > 3832908476:
                         filler_dir = '/data4/paper/test_rename/64R/*'
                         file_type = '.uv'
-                elif data_size > 524288000:
+                elif data_size > 3188051868:
                         filler_dir = '/data4/paper/test_rename/128R/*'
                         file_type = '.uv'
-                elif data_size < 524288000:
+		elif  data_size > 734003200:
+			filler_dir = '/data4/paper/test_rename/64U/*'
+                        file_type = '.uv'
+                elif data_size < 734003200:
                         continue
 
                 if not os.path.isdir('/data4/paper/rename/%d.uv' %(count)):
@@ -207,14 +210,15 @@ def rename_uv(dirs, datashift, dbe):
 
                 print 'jd...'
                 #find Julian Date
-                jdate = str(round(uv['time'], 5))
+                jdate_num = round(uv['time'], 5)
+		jdate = '%.5f'%(jdate_num)
 
-                print 'nchan...'
-                nchan = uv['nchan']
-                if nchan < 1000:
-                        file_type = '.uv'
-                else:
-                        file_type = '.uvcRRE'
+                #print 'nchan...'
+                #nchan = uv['nchan']
+                #if nchan > 1000:
+                #        file_type = '.uv'
+                #else:
+                #        file_type = '.uvcRRE'
 
                 print 'pol...'
                 #assign letters to each polarization
@@ -277,17 +281,20 @@ def paperrename(auto):
 	#Move if there is enough free space
 	if free_space >= required_space:
 		#GET LIST OF FILES
-		junk_dir = '/data4/paper/junk/'
+		junk_dir = '/data4/paper/junk/I000*'
 		infile_list = glob.glob(junk_dir)
+		print infile_list
 		#RENAME FILES AND UPDATE PAPERJUNK
 		rename_uv(infile_list, datashift, dbrn)
 		update_paperjunk(infile_list, usrnm, pswd)
+		'''
 		#LOAD INTO PAPERRENAME
-		new_dir = os.path,join(datashift, '*')
+		new_dir = os.path.join(datashift, '*')
 		dirs_all = glob.glob(new_dir)
 		dirs = load_paperrename.remove_duplicates(dirs_all, usrnm, pswd)
 		dirs.sort()
-		load_paperrename.load_db(dirs, dbo, dbe)
+		load_paperrename.gen_paperrename(dirs, dbo, dbe)
+		load_paperrename.load_db(dbo, usrnm, pswd)
 		#UPDATE PAPERRENAME
 		update_paperrename(usrnm, pswd)
 		#SCAN PAPERRENAME
@@ -316,6 +323,7 @@ def paperrename(auto):
 			pswd2 = 'immwa3978'
 
 		load_paperfeed.load_db(dbo2, usrnm2, pswd2)
+		'''
 	else:
 		table = 'paperrename'
 		email_space(table)
