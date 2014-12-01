@@ -113,7 +113,7 @@ def check_paperjunk(max):
         connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
         cursor = connection.cursor()
 
-	cursor.execute('''SELECT junk_path, junk_size_bytes from paperjunk where folio_path == 'NULL' and junk_size_bytes > 524288000''')
+	cursor.execute('''SELECT junk_path, junk_size_bytes from paperjunk where folio_path == 'NULL' and junk_size_bytes > 524288000 usb_number asc, junk_path asc''')
 	results = cursor.fetchall()
 
 	junk_size_total = 0
