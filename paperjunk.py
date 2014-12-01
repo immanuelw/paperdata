@@ -13,9 +13,6 @@ import socket
 import time
 import subprocess
 import smtplib
-import rename_uv
-import load_paperrename
-import load_paperfeed
 
 ### Script to load paperfeed with files from the paperrename table
 ### Checks /data4 for space, moves entire days of data, renames them the correct names, then loads into paperfeed
@@ -42,7 +39,9 @@ def calculate_free_space(dir):
         #Amount of available bytes should be free_space
 
         #Do not surpass this amount ~1TiB
-        max_space = 1099511627776
+        #max_space = 1099511627776
+	#1.1TB
+	max_space = 1209462790553
 
 	total_space = 0
         for output in folio.split('\n'):
@@ -67,7 +66,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         o_dict = {}
         for file in infile_list:
                 zen = file.split('/')[-1]
-		out = os.path.join(outfile,psa)
+		out = os.path.join(outfile,zen)
 
                 o_dict.update({file:out})
 
@@ -87,7 +86,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                 try:
 			#scp infile, outfile
 			inner = 'obs@' + infile
-			subprocess.call('scp -r %s %s' %(inner, outfile))
+			subprocess.call(['scp', inner, outfile])
                         wr.writerow([infile,outfile])
                         print infile, outfile
                         dbr.close()
@@ -108,12 +107,12 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
         return o_dict
 
-def check_paperjunk(max):
+def check_paperjunk(max, usrnm, pswd):
 	#Load data into named database and table
         connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
         cursor = connection.cursor()
 
-	cursor.execute('''SELECT junk_path, junk_size_bytes from paperjunk where folio_path == 'NULL' and junk_size_bytes > 524288000 usb_number asc, junk_path asc''')
+	cursor.execute('''SELECT junk_path, junk_size_bytes from paperjunk where folio_path = 'NULL' and junk_size_bytes > 524288000 order by usb_number asc, junk_path asc''')
 	results = cursor.fetchall()
 
 	junk_size_total = 0
@@ -172,7 +171,9 @@ def paperjunk(auto):
         free_space = calculate_free_space(dir)
 
         #Amount of free space needed -- ~4.1TB
-        required_folio_space = 4507997673881
+        #required_folio_space = 4507997673881
+	#2.1TB
+	required_folio_space = 2308974418329
 	#~4GB
 	required_space = 4294967296
 
@@ -180,7 +181,7 @@ def paperjunk(auto):
         if folio_space >= required_folio_space:
 		#move files that haven't been moved
 		maximum = free_space - required_space
-                infile_list = check_paperjunk(maximum)
+                infile_list = check_paperjunk(maximum, usrnm, pswd)
                 #COPY FILES FROM 1 USB INTO FOLIO
                 outfile_dict = move_files(infile_list, outfile, move_data, usrnm, pswd)
 	else:
