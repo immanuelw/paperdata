@@ -209,7 +209,7 @@ def paperfeed(auto):
 				outfile_dirs.append(outfile.split('z')[0])
 		for out_direc in outfile_dirs:
 			out_dir = os.path.join(out_direc,'zen.*.uv')
-			subprocess.call('add_observations.py %s'%(out_dir)) 
+			subprocess.call(['add_observations.py', out_dir]) 
 	else:
 		table = 'paperfeed'
 		email_space(table)
