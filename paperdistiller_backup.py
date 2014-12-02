@@ -20,7 +20,7 @@ def paperdistiller_backup(time_date, usrnm, pswd):
 
 	backup_dir = os.path.join('/data4/paper/paperdistiller_backup', time_date)
 	if not os.path.isdir(backup_dir):
-		os.mkdir(backup_dir)
+		os.makedirs(backup_dir)
 
 	#Create separate files for each directory
 
@@ -37,20 +37,20 @@ def paperdistiller_backup(time_date, usrnm, pswd):
         wr2 = csv.writer(data_file2, dialect='excel')
 
 	db3 = 'neighbors_backup_%s.csv'%(time_date)
-	dbo1 = os.path.join(backup_dir,db3)
+	dbo3 = os.path.join(backup_dir,db3)
         print dbo3
         data_file3 = open(dbo3,'wb')
         wr3 = csv.writer(data_file3, dialect='excel')
 
 	db4 = 'log_backup_%s.csv'%(time_date)
-	dbo1 = os.path.join(backup_dir,db4)
+	dbo4 = os.path.join(backup_dir,db4)
         print dbo4
         data_file4 = open(dbo4,'wb')
         wr4 = csv.writer(data_file4, dialect='excel')
 
 	#Load data into named database and table
 	# open a database connection
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdistiller', local_infile=True)
 
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor()
