@@ -37,7 +37,7 @@ Important scripts:
 		Creates the base of any table in the paperdata database -- includes field names and types.
 
 	consolidate_paperdata.py:
-		Runs through paperdata, joining matching .uv and .uvcRRE files and creating a new paperdata table by writing to a .csv file.
+		Runs through paperdata, joining matching .uv and .uvcRRE files and creating a new paperdata table by writing to a .psv file.
 		--Still experimental, but functioning and eliminating all disjoint entries
 
 
@@ -60,7 +60,7 @@ Important scripts:
 
 	paperbackup.py & backup_daemon.py:
 		Backups the entire paperdata database, loading all into a created folder labeled with time and data
-		-- separated .csv files by table.
+		-- separated .psv files by table.
 
 
 	***DATABASE DESCRIPTION***
@@ -83,7 +83,7 @@ Important scripts:
 	***TESTING***
 
 	backup_paperdata.py:
-		Backups the paperdata table, saving to a .csv file to be easily reloaded. Used mostly for testing.
+		Backups the paperdata table, saving to a .psv file to be easily reloaded. Used mostly for testing.
 
 	clear_paperdata.py:
 		Clears information from the paperdata database -- Used exclusively for rebuliding paperdata
