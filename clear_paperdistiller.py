@@ -34,13 +34,13 @@ result = str(cursor.fetchone())
 j_day = result[3:7]
 
 #Instantiate file names
-back1 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_file_backup_%s_%s.csv'%(j_day,time_date)
-back2 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_observation_backup_%s_%s.csv'%(j_day,time_date)
-back3 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_neighbors_backup_%s_%s.csv'%(j_day,time_date)
-back4 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_log_backup_%s_%s.csv'%(j_day,time_date)
+back1 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_file_backup_%s_%s.psv'%(j_day,time_date)
+back2 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_observation_backup_%s_%s.psv'%(j_day,time_date)
+back3 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_neighbors_backup_%s_%s.psv'%(j_day,time_date)
+back4 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_log_backup_%s_%s.psv'%(j_day,time_date)
 
 resultFile = open(back1,'wb+')
-wr = csv.writer(resultFile, dialect='excel')
+wr = csv.writer(resultFile, delimiter='|', dialect='excel')
 
 cursor.execute('SELECT * FROM file')
 results = cursor.fetchall()
@@ -51,7 +51,7 @@ for item in results:
 
 resultFile.close()
 resultFile = open(back2,'wb+')
-wr = csv.writer(resultFile, dialect='excel')
+wr = csv.writer(resultFile, delimiter='|', dialect='excel')
 
 cursor.execute('SELECT * FROM observation')
 results = cursor.fetchall()
@@ -62,7 +62,7 @@ for item in results:
 
 resultFile.close()
 resultFile = open(back3,'wb+')
-wr = csv.writer(resultFile, dialect='excel')
+wr = csv.writer(resultFile, delimiter='|', dialect='excel')
 
 cursor.execute('SELECT * FROM neighbors')
 results = cursor.fetchall()
@@ -73,7 +73,7 @@ for item in results:
 
 resultFile.close()
 resultFile = open(back4,'wb+')
-wr = csv.writer(resultFile, dialect='excel')
+wr = csv.writer(resultFile, delimiter='|', dialect='excel')
 
 cursor.execute('SELECT * FROM log')
 results = cursor.fetchall()
@@ -92,5 +92,3 @@ cursor.execute('set foreign_key_checks = 0; TRUNCATE neighbors; TRUNCATE observa
 cursor.close()
 connection.commit()
 connection.close()
-
-sys.exit()
