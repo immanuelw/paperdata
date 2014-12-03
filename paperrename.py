@@ -133,7 +133,7 @@ def update_paperjunk(infile_list, usrnm, pswd):
         cursor = connection.cursor()
 
 	for infile in infile_list:
-        	cursor.execute('''UPDATE paperjunk SET renamed = 1 where folio_path = '%s' ''' %(infile))
+        	cursor.execute('''UPDATE paperjunk SET renamed = 1 where junk_path = '%s' and folio_path != 'NULL' ''' %(infile))
 
         #Close and save database
         cursor.close()
