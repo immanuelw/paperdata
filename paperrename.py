@@ -53,9 +53,9 @@ def email_paperrename(files):
 	#Send the mail
 	for file in files:
 		# The /n separates the message from the headers
-		jday = file[1]
-		actual = file[2]
-		expected = file[3]
+		jday = str(file[1])
+		actual = str(file[2])
+		expected = str(file[3])
 		if actual == expected:
 			msg = '\n' + jday + ' has expected # of ' + expected + ' files while having ' + actual + ' files.\n'
 		else:
@@ -281,13 +281,14 @@ def paperrename(auto):
 	#Move if there is enough free space
 	if free_space >= required_space:
 		#GET LIST OF FILES
+		
 		junk_dir = '/data4/paper/junk/I000*'
 		infile_list = glob.glob(junk_dir)
 		print infile_list
 		#RENAME FILES AND UPDATE PAPERJUNK
 		rename_uv(infile_list, datashift, dbrn)
 		update_paperjunk(infile_list, usrnm, pswd)
-		'''
+		
 		#LOAD INTO PAPERRENAME
 		new_dir = os.path.join(datashift, '*')
 		dirs_all = glob.glob(new_dir)
@@ -297,6 +298,7 @@ def paperrename(auto):
 		load_paperrename.load_db(dbo, usrnm, pswd)
 		#UPDATE PAPERRENAME
 		update_paperrename(usrnm, pswd)
+		
 		#SCAN PAPERRENAME
 		files_info, complete_info = check_data(usrnm,pswd)
 		#SEND EMAIL OF WHICH DAYS ARE COMPLETE AND WHICH DAYS ARE NOT COMPLETE
@@ -323,7 +325,7 @@ def paperrename(auto):
 			pswd2 = 'immwa3978'
 
 		load_paperfeed.load_db(dbo2, usrnm2, pswd2)
-		'''
+		
 	else:
 		table = 'paperrename'
 		email_space(table)
