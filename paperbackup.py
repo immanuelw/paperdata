@@ -93,10 +93,26 @@ def paperbackup(time_date, usrnm, pswd):
 
 	return None
 
+def sql_backup(dbnum, time_date, usrnm, pswd):
+        print dbnum
+        file = open(dbnum, 'wb')
+        subprocess.call(['mysqldump', '-h', 'shredder', '-u', usrnm, '--password=%s'%(pswd), 'paperdata'], stdout=file)
+        file.close()
+
+        print time_date
+        print 'Paperdata database backup saved'
+        return None
+
 if __name__ == '__main__':
-	usrnm = 'paperboy'
-	pswd = 'paperboy'
+        time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 
-	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-
-	paperbackup(time_date, usrnm, pswd)
+        full = raw_input('Backup through .sql?(y/n): ')
+        if full == 'y':
+                dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_%s.sql'%(time_date)
+                usrnm = 'immwa'
+                pswd = getpass.getpass('Password: ')
+                sql_backup(dbnum, time_date, usrnm, pswd)
+        else:
+		usrnm = 'paperboy'
+		pswd = 'paperboy'
+		paperbackup(time_date, usrnm, pswd)
