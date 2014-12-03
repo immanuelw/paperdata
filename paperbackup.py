@@ -10,6 +10,7 @@ import time
 import csv
 import base64
 import os
+import subprocess
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
