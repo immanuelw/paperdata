@@ -7,6 +7,8 @@ import MySQLdb
 import sys
 import getpass
 import os
+import subprocess
+import time
 
 ### Script to load backup of paperdata
 ### Loads csv file into paperdata to restore deleted table
@@ -37,16 +39,29 @@ def load_backup(dbnum, usrnm, pswd):
 
 	return None
 
+def load_sql_backup(dbnum, usrnm, pswd):
+	subprocess.call(['mysql', '-h', 'shredder', '-u', usrnm, '--password=%s'%(pswd), 'paperdata', '<', dbnum])
+
+	return None
+
 if __name__ == '__main__':
 	#User input information
 	usrnm = raw_input('Username: ')
 	pswd = getpass.getpass('Password: ')
+	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 
 	#searches for only particular files
+	full = raw_input('Reload entire database?(y/n): ')
 	backup = raw_input('Insert backup manually or automatically? (m/a): ')
-	if backup == 'm':
-	        dbnum = raw_input('Insert path of backup: ')
-	elif backup == 'a':
-	        dbnum = '/data2/home/immwa/scripts/paperdata/backups/version6_11-27-2014.csv'
-
-	load_backup(dbnum, usrnm, pswd)
+	if full =='y':
+		if backup == 'm':
+		        dbnum = raw_input('Insert path of backup: ')
+		elif backup == 'a':
+			dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_%s.sql'%(time_date)
+		load_sql_backup(dbnum, usrnm, pswd)
+	else:
+		if backup == 'm':
+			dbnum = raw_input('Insert path of backup: ')
+		elif backup == 'a':
+			dbnum = '/data2/home/immwa/scripts/paperdata/backups/version6_11-27-2014.csv'
+		load_backup(dbnum, usrnm, pswd)
