@@ -10,6 +10,7 @@ import time
 import csv
 import base64
 import os
+import subprocess
 
 ### Script to Backup paperdistiller database
 ### Finds time and date and writes table into .csv file
@@ -93,7 +94,7 @@ def paperdistiller_backup(time_date, usrnm, pswd):
 
 	return None
 
-def sql_backup(dbnum, time_date, usrnm, pswd):
+def sql_backup(time_date, usrnm, pswd):
 	backup_dir = os.path.join('/data4/paper/paperdistiller_backup', time_date)
 	if not os.path.isdir(backup_dir):
 		os.makedirs(backup_dir)
@@ -103,7 +104,7 @@ def sql_backup(dbnum, time_date, usrnm, pswd):
 
         print dbnum
         file = open(dbnum, 'wb')
-        subprocess.call(['mysqldump', '-h', 'shredder', '-u', usrnm, '--password=%s'%(pswd), 'paperdata'], stdout=file)
+        subprocess.call(['mysqldump', '-h', 'shredder', '-u', usrnm, '--password=%s'%(pswd), 'paperdistiller'], stdout=file)
         file.close()
 
         print time_date
