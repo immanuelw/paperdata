@@ -91,10 +91,34 @@ def paperdistiller_backup(time_date, usrnm, pswd):
 	cursor.close()
 	connection.close()
 
+	return None
+
+def sql_backup(dbnum, time_date, usrnm, pswd):
+	backup_dir = os.path.join('/data4/paper/paperdistiller_backup', time_date)
+	if not os.path.isdir(backup_dir):
+		os.makedirs(backup_dir)
+
+	num = 'paperdistiller_%s.sql'%(time_date)
+	dbnum = os.path.join(backup_dir, num)
+
+        print dbnum
+        file = open(dbnum, 'wb')
+        subprocess.call(['mysqldump', '-h', 'shredder', '-u', usrnm, '--password=%s'%(pswd), 'paperdata'], stdout=file)
+        file.close()
+
+        print time_date
+        print 'Paperdata database backup saved'
+        return None
+
 if __name__ == '__main__':
 	usrnm = raw_input('Input username: ')
 	pswd = getpass.getpass('Password: ')
 
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 
-	paperdistiller_backup(time_date, usrnm, pswd)
+	full = raw_input('Backup entire database(y/n): ')
+
+	if full == 'y':
+		sql_backup(time_date, usrnm, pswd)
+	else:
+		paperdistiller_backup(time_date, usrnm, pswd)
