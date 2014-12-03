@@ -98,7 +98,7 @@ def gen_paperdata(dirs, dbo, dbe):
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
 
 	#List of files that have gone through
-	complete_dirs = []
+	completed_dirs = []
 
 	for dir in dirs[:]:
 
