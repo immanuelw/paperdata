@@ -96,5 +96,5 @@ def consolidate(dbo)
 	return None
 
 if __name__ == '__main__':
-	dbo = '/data2/home/immwa/scripts/paperdata/single_entry.csv'
+	dbo = '/data2/home/immwa/scripts/paperdata/single_entry.psv'
 	consolidate(dbo)
