@@ -7,10 +7,11 @@ import MySQLdb
 import sys
 import getpass
 
-pswd = getpass.getpass('Password:')
+usrnm = raw_input('Username: ')
+pswd = getpass.getpass('Password: ')
 # open a database connection
 # be sure to change the host IP address, username, password and database name to match your own
-connection = MySQLdb.connect (host = 'shredder', passwd = pswd, db = 'paperdata', local_infile=True)
+connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
 # prepare a cursor object using cursor() method
 cursor = connection.cursor()
@@ -19,15 +20,7 @@ cursor = connection.cursor()
 cursor.execute('''TRUNCATE table paperdata''')
 print 'Table data deleted.' 
 
-# close the cursor object
+# Close and Save database
 cursor.close()
-
-#save changes to database
 connection.commit()
-
-# close the connection
 connection.close()
-
-# exit the program
-sys.exit()
-
