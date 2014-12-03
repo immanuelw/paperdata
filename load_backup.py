@@ -28,7 +28,7 @@ def load_backup(dbnum, usrnm, pswd):
 
 	print dbnum 
 	# execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbnum))
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' '''%(dbnum))
 
 	print 'Table data loaded.'
 
@@ -64,5 +64,5 @@ if __name__ == '__main__':
 		if backup == 'm':
 			dbnum = raw_input('Insert path of backup: ')
 		elif backup == 'a':
-			dbnum = '/data2/home/immwa/scripts/paperdata/backups/version6_11-27-2014.csv'
+			dbnum = '/data2/home/immwa/scripts/paperdata/backups/version7_12-03-2014.psv'
 		load_backup(dbnum, usrnm, pswd)
