@@ -25,29 +25,29 @@ def paperdistiller_backup(time_date, usrnm, pswd):
 
 	#Create separate files for each directory
 
-	db1 = 'file_backup_%s.csv'%(time_date)
+	db1 = 'file_backup_%s.psv'%(time_date)
 	dbo1 = os.path.join(backup_dir,db1)
         print dbo1
         data_file1 = open(dbo1,'wb')
-        wr1 = csv.writer(data_file1, dialect='excel')
+        wr1 = csv.writer(data_file1, delimiter='|', dialect='excel')
 
-	db2 = 'observation_backup_%s.csv'%(time_date)
+	db2 = 'observation_backup_%s.psv'%(time_date)
 	dbo2 = os.path.join(backup_dir,db2)
         print dbo2
         data_file2 = open(dbo2,'wb')
-        wr2 = csv.writer(data_file2, dialect='excel')
+        wr2 = csv.writer(data_file2, delimiter='|', dialect='excel')
 
-	db3 = 'neighbors_backup_%s.csv'%(time_date)
+	db3 = 'neighbors_backup_%s.psv'%(time_date)
 	dbo3 = os.path.join(backup_dir,db3)
         print dbo3
         data_file3 = open(dbo3,'wb')
-        wr3 = csv.writer(data_file3, dialect='excel')
+        wr3 = csv.writer(data_file3, delimiter='|', dialect='excel')
 
-	db4 = 'log_backup_%s.csv'%(time_date)
+	db4 = 'log_backup_%s.psv'%(time_date)
 	dbo4 = os.path.join(backup_dir,db4)
         print dbo4
         data_file4 = open(dbo4,'wb')
-        wr4 = csv.writer(data_file4, dialect='excel')
+        wr4 = csv.writer(data_file4, delimiter='|', dialect='excel')
 
 	#Load data into named database and table
 	# open a database connection

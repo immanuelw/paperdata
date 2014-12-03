@@ -153,7 +153,7 @@ def rename_uv(dirs, datashift, dbe):
                 count += 1
                 #create csv file to log bad files
                 error_file = open(dbe, 'ab')
-                ewr = csv.writer(error_file, dialect='excel')
+                ewr = csv.writer(error_file, delimiter='|', dialect='excel')
 
                 #Find size of file
                 data_size = os.path.getsize(data_file)
@@ -250,7 +250,7 @@ def rename_uv(dirs, datashift, dbe):
 def paperrename(auto):
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-        move_data = 'moved_data_%s.csv'%(time_date)
+        move_data = 'moved_data_%s.psv'%(time_date)
 
 	#Credentials
 	if auto != 'y':
@@ -265,11 +265,11 @@ def paperrename(auto):
         datashift = '/data4/paper/rename/'
 
         #Named file to input renaming error
-        dbrn = '/data4/paper/rename/128error.csv'
+        dbrn = '/data4/paper/rename/128error.psv'
 
 	#Files to temporarily store information about renamed files
-	dbo = '/data4/paper/rename/paperrename_out.csv'
-        dbe = '/data4/paper/rename/false_paperrename.csv'
+	dbo = '/data4/paper/rename/paperrename_out.psv'
+        dbe = '/data4/paper/rename/false_paperrename.psv'
 
 	#Checks output dir
 	dir = '/data4/paper/rename/'
@@ -309,8 +309,8 @@ def paperrename(auto):
 		for file in complete_info:
 			completed_days.append(file[0])
 
-		dbo2 = '/data4/paper/feed/paperfeed_out.csv'
-		dbe2 = '/data4/paper/feed/false_paperfeed.csv'
+		dbo2 = '/data4/paper/feed/paperfeed_out.psv'
+		dbe2 = '/data4/paper/feed/false_paperfeed.psv'
 
 		#removes duplicate entries from directory 
 		dirs2 = load_paperfeed.remove_duplicates(completed_days, usrnm, pswd)

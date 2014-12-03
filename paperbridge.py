@@ -148,7 +148,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 	for item in results:
 		#Opens error logging file
 		error_file = open(dbe,'ab')
-		ewr = csv.writer(error_file, dialect='excel')
+		ewr = csv.writer(error_file, delimiter='|', dialect='excel')
 		#check for duplicate
 		if item[1] in obsnums:
 			err = [item, 'Obsnum already in paperdata']
@@ -159,7 +159,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		#Open file to write to
 		data_file = open(dbnum,'ab')
 		#create 'writer' object
-		wr = csv.writer(data_file, dialect='excel')
+		wr = csv.writer(data_file, delimiter='|', dialect='excel')
 
 		#indicates location of raw file (usually same directory as compressed)	
 		if item[0].split('.')[-1] == 'uv':
@@ -351,7 +351,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
                 #Opens file to append to
                 dbr = open(dbo, 'ab')
-                wr = csv.writer(dbr, dialect='excel')
+                wr = csv.writer(dbr, delimiter='|', dialect='excel')
 
                 #"moves" file
                 try:
@@ -396,8 +396,8 @@ def paperbridge(auto):
 		auto_load = 'y'
 
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-	dbnum = '/data4/paper/paperdistiller_output/paperdistiller_output_%s.csv'%(time_date)
-	dbe = '/data4/paper/paperdistiller_output/paperdistiller_error_%s.csv'%(time_date)
+	dbnum = '/data4/paper/paperdistiller_output/paperdistiller_output_%s.psv'%(time_date)
+	dbe = '/data4/paper/paperdistiller_output/paperdistiller_error_%s.psv'%(time_date)
 
 	#Calculate amount of space needed to move a day ~1.1TB
 	required_space = 1112661213184
@@ -418,7 +418,7 @@ def paperbridge(auto):
 			#Load information into paperdata
 			load_paperdata.load_db(dbnum, usrnm, pswd)
 			#Update paperdata and move data
-			move_data = 'moved_data_%s.csv'%(time_date)	
+			move_data = 'moved_data_%s.psv'%(time_date)	
 			outfile = '/data4/paper/raw_to_tape'
 			move_files(filenames, outfile, move_data, usrnm, pswd)
 		else:

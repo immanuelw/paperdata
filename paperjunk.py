@@ -80,7 +80,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
                 #Opens file to append to
                 dbr = open(dbo, 'ab')
-                wr = csv.writer(dbr, dialect='excel')
+                wr = csv.writer(dbr, delimiter='|', dialect='excel')
 
                 #"moves" file
                 try:
@@ -112,7 +112,7 @@ def check_paperjunk(max, usrnm, pswd):
         connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
         cursor = connection.cursor()
 
-	cursor.execute('''SELECT junk_path, junk_size_bytes from paperjunk where folio_path = 'NULL' and junk_size_bytes > 524288000 order by usb_number asc, junk_path asc''')
+	cursor.execute('''SELECT junk_path, junk_size_bytes from paperjunk where folio_path = 'NULL' and junk_size_bytes > 3650722201 and junk_size_bytes < 4187593113 order by usb_number asc, junk_path asc''')
 	results = cursor.fetchall()
 
 	junk_size_total = 0
@@ -150,7 +150,7 @@ def email_space(table):
 def paperjunk(auto):
 	#Create output file
         time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-        move_data = 'moved_data_%s.csv'%(time_date)
+        move_data = 'moved_data_%s.psv'%(time_date)
 
         #Credentials
 	if auto != 'y':

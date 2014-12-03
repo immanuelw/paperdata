@@ -99,7 +99,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
                 #Opens file to append to
                 dbr = open(dbo, 'ab')
-                wr = csv.writer(dbr, dialect='excel')
+                wr = csv.writer(dbr, delimiter='|', dialect='excel')
 
                 #"moves" file
                 try:
@@ -174,7 +174,7 @@ def email_space(table):
 def paperfeed(auto):
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-        move_data = 'moved_data_%s.csv'%(time_date)
+        move_data = 'moved_data_%s.psv'%(time_date)
 
 	#Credentials
 	if auto != 'y':
