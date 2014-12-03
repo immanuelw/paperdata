@@ -27,7 +27,7 @@ def load_db(dbo, usrnm, pswd):
 	cursor = connection.cursor()
 
 	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperfeed COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbo))
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperfeed COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' '''%(dbo))
 
 	print 'Table data loaded.'
 
@@ -51,11 +51,11 @@ def gen_paperfeed(dirs, dbo, dbe):
 
 		#create csv file to log data
 		data_file = open(dbo,'ab')
-		wr = csv.writer(data_file, dialect='excel')
+		wr = csv.writer(data_file, delimiter='|', dialect='excel')
 
 		#create csv file to log bad files
 		error_file = open(dbe, 'ab')
-		ewr = csv.writer(error_file, dialect='excel')
+		ewr = csv.writer(error_file, delimiter='|', dialect='excel')
 
 		#checks if file loaded in is raw or compressed - makes changes to compensate
 		if dir.split('.')[-1] == 'uv':
@@ -162,8 +162,8 @@ if __name__ == '__main__':
 
         datanum = raw_input('Input file path: ')
 
-        dbo = '/data2/home/immwa/scripts/paper_output/paperfeed_out.csv'
-	dbe = '/data2/home/immwa/scripts/paper_output/false_paperfeed.csv'
+        dbo = '/data2/home/immwa/scripts/paper_output/paperfeed_out.psv'
+	dbe = '/data2/home/immwa/scripts/paper_output/false_paperfeed.psv'
 
         #iterates through directories, listing information about each one
         dirs_all = glob.glob(datanum)

@@ -27,7 +27,7 @@ def load_db(dbo, usrnm, pswd):
 	cursor = connection.cursor()
 
 	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperrename COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbo))
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperrename COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' '''%(dbo))
 
 	print 'Table data loaded.'
 
@@ -51,11 +51,11 @@ def gen_paperrename(dirs, dbo, dbe):
 
 		#create csv file to log data
 		data_file = open(dbo,'ab')
-		wr = csv.writer(data_file, dialect='excel')
+		wr = csv.writer(data_file, delimiter='|', dialect='excel')
 
 		#create csv file to log bad files
 		error_file = open(dbe, 'ab')
-		ewr = csv.writer(error_file, dialect='excel')
+		ewr = csv.writer(error_file, delimiter='|', dialect='excel')
 
 		#checks if file loaded in is raw or compressed - makes changes to compensate
 		if dir.split('.')[-1] == 'uv':
@@ -116,7 +116,7 @@ def gen_paperrename(dirs, dbo, dbe):
 
 		#actual and expected numbers
 		actual_num = 0
-		expected num = 288 
+		expected_num = 288 
 
 		#moved defaults to 0
 		moved = 0
@@ -164,7 +164,7 @@ def update_paperrename(jday, expected, usrnm, pswd):
 
         cursor.execute('''UPDATE paperrename SET expected_amount = %d WHERE julian_day = %d''' %(expected, jday))
 
-	print str(jday) + ' now expects ' str(expected) + ' amount of files.'
+	print str(jday) + ' now expects ' + str(expected) + ' amount of files.'
         #Close and save database
         cursor.close()
         connection.commit()
@@ -179,8 +179,8 @@ def load_paperrename(auto):
 
         datanum = raw_input('Input file path: ')
 
-        dbo = '/data2/home/immwa/scripts/paper_output/paperrename_out.csv'
-	dbe = '/data2/home/immwa/scripts/paper_output/false_paperrename.csv'
+        dbo = '/data2/home/immwa/scripts/paper_output/paperrename_out.psv'
+	dbe = '/data2/home/immwa/scripts/paper_output/false_paperrename.psv'
 
         #iterates through directories, listing information about each one
         dirs_all = glob.glob(datanum)
