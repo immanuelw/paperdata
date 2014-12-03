@@ -331,7 +331,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                 outdir = os.path.join(outfile,psa)
 
                 if not os.path.isdir(outdir):
-                        os.mkdir(outdir)
+                        os.makedirs(outdir)
 
                 out = os.path.join(outfile,subdir)
 
