@@ -8,6 +8,7 @@ import sys
 import getpass
 import time
 import csv
+import subprocess
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
@@ -15,7 +16,7 @@ import csv
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-def backup_paperdata(dbnum, time_date)
+def backup_paperdata(dbnum, time_date):
 	print dbnum
 	resultFile = open(dbnum,'wb')
 	resultFile.close()
@@ -44,7 +45,9 @@ def backup_paperdata(dbnum, time_date)
 
 def sql_backup(dbnum, time_date, usrnm, pswd):
 	print dbnum
-	subprocess.call(['mysqldump', '-h', 'shredder', '-u', usrnm, '--password=%s'%(pswd), 'paperdata', '>', dbnum])
+	file = open(dbnum, 'wb')
+	subprocess.call(['mysqldump', '-h', 'shredder', '-u', usrnm, '--password=%s'%(pswd), 'paperdata'], stdout=file)
+	file.close()
 
 	print time_date
 	print 'Paperdata database backup saved'

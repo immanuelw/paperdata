@@ -40,7 +40,9 @@ def load_backup(dbnum, usrnm, pswd):
 	return None
 
 def load_sql_backup(dbnum, usrnm, pswd):
-	subprocess.call(['mysql', '-h', 'shredder', '-u', usrnm, '--password=%s'%(pswd), 'paperdata', '<', dbnum])
+	file = open(dbnum, 'rb')
+	subprocess.call(['mysql', '-h', 'shredder', '-u', usrnm, '--password=%s'%(pswd), 'paperdata'], stdin=file)
+	file.close()
 
 	return None
 
@@ -48,7 +50,6 @@ if __name__ == '__main__':
 	#User input information
 	usrnm = raw_input('Username: ')
 	pswd = getpass.getpass('Password: ')
-	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 
 	#searches for only particular files
 	full = raw_input('Reload entire database?(y/n): ')
@@ -57,7 +58,7 @@ if __name__ == '__main__':
 		if backup == 'm':
 		        dbnum = raw_input('Insert path of backup: ')
 		elif backup == 'a':
-			dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_%s.sql'%(time_date)
+			dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_02-12-2014_20:33:29.sql'
 		load_sql_backup(dbnum, usrnm, pswd)
 	else:
 		if backup == 'm':
