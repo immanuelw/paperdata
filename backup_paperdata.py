@@ -21,14 +21,14 @@ def backup_paperdata(dbnum, time_date):
 	resultFile = open(dbnum,'wb')
 	resultFile.close()
 
-	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = datab, local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
 	cursor = connection.cursor()
 
 	cursor.execute('SELECT * FROM paperdata order by julian_date asc, raw_location asc, path asc')
 	results = cursor.fetchall()
 
 	resultFile = open(dbnum,'ab')
-	wr = csv.writer(resultFile, dialect='excel')
+	wr = csv.writer(resultFile, delimiter='|', dialect='excel')
 
 	for item in results:
 		wr.writerow(item)
@@ -63,5 +63,5 @@ if __name__ == '__main__':
 		pswd = getpass.getpass('Password: ')
 		sql_backup(dbnum, time_date, usrnm, pswd)
 	else:
-		dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_backup_%s.csv'%(time_date)
+		dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_backup_%s.psv'%(time_date)
 		backup_paperdata(dbnum, time_date)

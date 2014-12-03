@@ -75,7 +75,7 @@ def load_db(dbo, usrnm, pswd):
 	cursor = connection.cursor()
 
 	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbo))
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' '''%(dbo))
 
 	print 'Table data loaded.'
 
@@ -101,11 +101,11 @@ def gen_paperdata(dirs, dbo, dbe):
 
 		#create csv file to log data
 		data_file = open(dbo,'ab')
-		wr = csv.writer(data_file, dialect='excel')
+		wr = csv.writer(data_file, delimiter='|', dialect='excel')
 
 		#create csv file to log bad files
 		error_file = open(dbe, 'ab')
-		ewr = csv.writer(error_file, dialect='excel')
+		ewr = csv.writer(error_file, delimiter='|', dialect='excel')
 
 		#checks if file loaded in is raw or compressed - makes changes to compensate
 		if dir.split('.')[-1] == 'uvcRRE':
@@ -351,8 +351,8 @@ def load_paperdata(auto):
 
         datanum = raw_input('Input file path: ')
 
-        dbo = '/data2/home/immwa/scripts/paper_output/db_out.csv'
-	dbe = '/data2/home/immwa/scripts/paper_output/false.csv'
+        dbo = '/data2/home/immwa/scripts/paper_output/db_out.psv'
+	dbe = '/data2/home/immwa/scripts/paper_output/false.psv'
 
 	if auto != 'y':
         	auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')

@@ -85,7 +85,7 @@ def consolidate(dbo)
 
 	for item in backup:
 		resultFile = open(dbo,'ab')
-		wr = csv.writer(resultFile, dialect='excel')
+		wr = csv.writer(resultFile, delimiter='|', dialect='excel')
 		wr.writerow(item)
 		resultFile.close()
 

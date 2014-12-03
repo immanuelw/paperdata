@@ -27,7 +27,7 @@ def load_db(dbo, usrnm, pswd):
 	cursor = connection.cursor()
 
 	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperjunk COLUMNS TERMINATED BY ',' LINES TERMINATED BY '\n' '''%(dbo))
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperjunk COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' '''%(dbo))
 
 	print 'Table data loaded.'
 
@@ -51,7 +51,7 @@ def gen_paperjunk(dirs, dbo):
 
 		#create csv file to log data
 		data_file = open(dbo,'ab')
-		wr = csv.writer(data_file, dialect='excel')
+		wr = csv.writer(data_file, delimiter='|', dialect='excel')
 
 		junk_path = host + ':' + dir
 		folio_path = 'NULL'
@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
         datanum = raw_input('Input file path: ')
 
-        dbo = '/data2/home/immwa/scripts/paper_output/paperjunk_out.csv'
+        dbo = '/data2/home/immwa/scripts/paper_output/paperjunk_out.psv'
 
         #iterates through directories, listing information about each one
         dirs_all = glob.glob(datanum)
