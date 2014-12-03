@@ -97,7 +97,13 @@ def gen_paperdata(dirs, dbo, dbe):
 	#Dictionary of polarizations
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
 
+	#List of files that have gone through
+	complete_dirs = []
+
 	for dir in dirs[:]:
+
+		if dir in completed_dirs:
+			continue
 
 		#create csv file to log data
 		data_file = open(dbo,'ab')
@@ -294,14 +300,16 @@ def gen_paperdata(dirs, dbo, dbe):
 		#Remove corresponding file from list
 		if dir.split('.')[-1] == 'uvcRRE':
 			try:
-				dirs.remove(dir[:4])
+				completed_dirs.append(dir[:4])
 			except:
+				data_file.close()
 				continue		
 
 		if dir.split('.')[-1] == 'uv':
 			try:
-				dirs.remove(dir + 'cRRE')
+				completed_dirs.append(dir + 'cRRE')
 			except:
+				data_file.close()
 				continue
 		#save into file and close it
 		data_file.close()
