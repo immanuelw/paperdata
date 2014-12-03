@@ -73,8 +73,8 @@ def load_new_data(infile, new_data):
 
 	#If any new files exist
 	if len(new_data) > 1:
-		dbn = os.path.join(infile_dir, 'new_data.csv')
-		dbf = os.path.join(infile_dir, 'false_data.csv')
+		dbn = os.path.join(infile_dir, 'new_data.psv')
+		dbf = os.path.join(infile_dir, 'false_data.psv')
 
 		#writes to files with new information
 		load_paperdata.gen_paperdata(new_data, dbn, dbf)
@@ -114,7 +114,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
 		#Opens file to append to
 		dbr = open(dbo, 'a')
-		wr = csv.writer(dbr, dialect='excel')
+		wr = csv.writer(dbr, delimiter='|', dialect='excel')
 
 		#moves file
 		try:
@@ -145,7 +145,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 if __name__ == '__main__':
 	#output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-	move_data = 'moved_data_%s.csv'%(time_date)
+	move_data = 'moved_data_%s.psv'%(time_date)
 
 	usrnm = raw_input('Username: ')
 	pswd = getpass.getpass('Password: ')

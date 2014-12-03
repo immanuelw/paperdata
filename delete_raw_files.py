@@ -38,7 +38,7 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 	if confirm == 'y':
 		for item in deletion:
 			del_file = open(failed_delete,'ab')
-			fd = csv.writer(del_file, dialect='excel')
+			fd = csv.writer(del_file, delimiter='|', dialect='excel')
 			raw_path = item[0]
 			obsnum = item[1]
 			try:
@@ -75,5 +75,5 @@ if __name__ == '__main__':
 	usrnm = raw_input('Root username: ')
 	pswd = getpass.getpass('Root password: ')
 	confirm = raw_input('Are you sure you want to delete (y/n) ?: ')
-	failed_delete = '/data2/home/immwa/scripts/paperdata/failed_deletion.csv'
+	failed_delete = '/data2/home/immwa/scripts/paperdata/failed_deletion.psv'
 	delete_files(usrnm, pswd, confirm, failed_delete)
