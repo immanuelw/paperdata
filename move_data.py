@@ -151,8 +151,8 @@ if __name__ == '__main__':
 	pswd = getpass.getpass('Password: ')
 
 	#File information
-	infile = raw_input('Full input path: ')
-	outfile = raw_input('Output directory: ')
+	infile = raw_input('Full input path (EX: /data4/paper/feed/2456640/zen.*.uv*): ')
+	outfile = raw_input('Output directory(EX: /data4/paper/raw_to_tape/2456640/): ')
 
 	#checks to see that output dir is valid
 	if not os.path.isdir(outfile):
