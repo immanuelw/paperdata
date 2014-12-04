@@ -314,24 +314,21 @@ def email_space(table):
 def move_files(infile_list, outfile, move_data, usrnm, pswd):
         host = 'folio'
 
-        #Directory of the infiles
-        infile_dir = infile_list[0].split('z')[0]
-
         #create file to log movement data       
-        dbo = os.path.join('/data4/paper/raw_to_tape', move_data)
+        dbo = os.path.join(outfile, move_data)
         dbr = open(dbo,'wb')
         dbr.close()
 
         o_dict = {}
         for file in infile_list:
                 zen = file.split('/')[-1]
-		psa = file.split('.')[-3]
+		psa = file.split('.')[-4]
 
                 subdir = os.path.join(psa,zen)
                 outdir = os.path.join(outfile,psa)
 
                 if not os.path.isdir(outdir):
-                        os.makedirs(outdir)
+                        os.mkidr(outdir)
 
                 out = os.path.join(outfile,subdir)
 
@@ -376,11 +373,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         connection.commit()
         connection.close()
 
-        outfile_list = []
-        for path in o_dict.values():
-                outfile_list.append(path.split(':')[1])
-
-        return outfile_list
+        return None
 
 def paperbridge(auto):
 	#User input information
