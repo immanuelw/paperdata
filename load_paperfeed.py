@@ -157,8 +157,8 @@ def remove_duplicates(dirs_all, usrnm, pswd):
 if __name__ == '__main__':
 
         #User input information
-        usrnm = 'paperboy'
-        pswd = 'paperboy'
+        usrnm = raw_input('Username: ')
+        pswd = getpass.getpass('Password: ')
 
         datanum = raw_input('Input file path: ')
 
@@ -178,6 +178,6 @@ if __name__ == '__main__':
 
 	if auto_update == 'y':
 		usrnm2 = raw_input('Input username with edit privileges: ')
-		pswd2 = raw_input('Input password: ')
+		pswd2 = getpass.getpass('Input password: ')
 		load_db(dbo, usrnm2, pswd2)
 		sys.exit()
