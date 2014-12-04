@@ -1,11 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import time
 import paperjunk
-import paperrename
-import paperfeed
-import paperbridge
 
 ### Script to automatically load files into paperdistiller database
 ### Runs each step of process through modules

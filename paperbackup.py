@@ -114,6 +114,6 @@ if __name__ == '__main__':
                 pswd = getpass.getpass('Password: ')
                 sql_backup(dbnum, time_date, usrnm, pswd)
         else:
-		usrnm = 'paperboy'
-		pswd = 'paperboy'
+		usrnm = raw_input('Username: ')
+		pswd = getpass.getpass('Password: ')
 		paperbackup(time_date, usrnm, pswd)
