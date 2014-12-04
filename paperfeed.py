@@ -13,6 +13,7 @@ import socket
 import time
 import subprocess
 import smtplib
+import shutil
 
 ### Script to load paperdistiller with files from the paperfeed table
 ### Checks /data4 for space, moves entire days of data, then loads into paperdistiller
@@ -62,9 +63,6 @@ def find_data(usrnm, pswd):
 def move_files(infile_list, outfile, move_data, usrnm, pswd):
 	host = 'folio'
 
-        #Directory of the infiles
-        infile_dir = infile_list[0].split('z')[0]
-
         #create file to log movement data       
         dbo = os.path.join('/data4/paper/feed', move_data)
         dbr = open(dbo,'wb')
@@ -73,7 +71,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         o_dict = {}
         for file in infile_list:
                 zen = file.split('/')[-1]
-		psa = file.split('.')[-3]
+		psa = file.split('.')[-4]
 
                 subdir = os.path.join(psa,zen)
                 outdir = os.path.join(outfile,psa)
@@ -84,6 +82,9 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                 out = os.path.join(outfile,subdir)
 
                 o_dict.update({file:out})
+
+	#List of files added
+	outfile_list = []
 
         #Load data into named database and table
         connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
@@ -116,6 +117,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                 outfile_path = host + ':' + o_dict[infile]
                 if infile.split('.')[-1] == 'uv':
                         cursor.execute('''UPDATE paperfeed set raw_path = '%s', moved = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
+		outfile_list.append(outfile_path.split(':')[1])
 
         print 'File(s) moved and updated'
 
@@ -124,9 +126,6 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
         connection.commit()
         connection.close()
 
-	outfile_list = []
-	for path in o_dict.values():
-		outfile_list.append(path.split(':')[1])
 
         return outfile_list
 
@@ -141,7 +140,7 @@ def email_paperfeed(files):
         msgs = ''
         #Send the mail
         for file in files:
-		msg = '\n' + file  ' is being moved.\n'
+		msg = '\n' + file + ' is being moved.\n'
                 msgs = msgs + msg
 
         server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
@@ -196,8 +195,9 @@ def paperfeed(auto):
 		#FIND DATA
 		infile_list = find_data(usrnm, pswd)
 		#create directory to output to
-		output_subdir = infile_list[0].split('/')[-2]
-		outfile = os.path.join('/data4/paper/feed/', output_subdir)
+		#output_subdir = infile_list[0].split('/')[-2]
+		#outfile = os.path.join('/data4/paper/feed/', output_subdir)
+		outfile = '/data4/paper/feed/'
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
 		outfile_list = move_files(infile_list, outfile, move_data, usrnm, pswd)
 		#EMAIL PEOPLE THAT DATA IS BEING MOVED AND LOADED
@@ -205,11 +205,12 @@ def paperfeed(auto):
 		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
 		outfile_dirs = []
 		for outfiles in outfile_list:
-			if outfile.split('z')[0] not in outfile_dirs:
-				outfile_dirs.append(outfile.split('z')[0])
+			if outfiles.split('z')[0] not in outfile_dirs:
+				outfile_dirs.append(outfiles.split('z')[0])
 		for out_direc in outfile_dirs:
 			out_dir = os.path.join(out_direc,'zen.*.uv')
-			subprocess.call(['add_observations.py', out_dir]) 
+			add_obs = 'add_observations.py %s'%(out_dir)
+			subprocess.call(add_obs, shell=True)
 	else:
 		table = 'paperfeed'
 		email_space(table)
