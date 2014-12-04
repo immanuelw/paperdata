@@ -1,5 +1,5 @@
-paperdata
-=========
+paperdata v1.0
+==============
 
 Files related to building, searching, and updating the PAPER database compression pipeline
 
@@ -17,6 +17,7 @@ Important scripts:
 
 	move_data.py:
 		Automatically updates database with new location when moving .uvcRRE or .uv files
+		MUST USE THIS WHEN MOVING ANY FILES IN THE DATABASE
 
 	load_paperdata.py:
 		Loads raw and compressed data information into paperdata from files on folio.
