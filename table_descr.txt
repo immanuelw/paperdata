@@ -624,6 +624,8 @@
 | 128 |    6622    |           folio:/nas1/data/psa6622/            |                     NULL                     |      R      |  197   |
 | 128 |    6623    |                      NULL                      |     node16:/mnt/JohnAdams/data/psa6623/      |      C      |   43   |
 | 128 |    6625    |                      NULL                      |     node16:/mnt/JohnAdams/data/psa6625/      |      C      |   46   |
+| 128 |    6632    |     folio:/data4/paper/nas1_data/psa6632/      |    folio:/data4/paper/nas1_data/psa6632/     |      B      |  280   |
+| 128 |    6632    |     folio:/data4/paper/nas1_data/psa6632/      |                     NULL                     |      R      |   8    |
 | 128 |    6632    |           folio:/nas1/data/psa6632/            |     folio:/data4/paper/2013EoR/psa6632/      |      B      |   58   |
 | 128 |    6632    |           folio:/nas1/data/psa6632/            |                     NULL                     |      R      |  230   |
 | 128 |    6632    |                      NULL                      |     folio:/data4/paper/2013EoR/psa6632/      |      C      |   58   |
