@@ -616,6 +616,8 @@
 | 128 |    6617    |                      NULL                      |    node16:/mnt/JamesMonroe/data/psa6617/     |      C      |   29   |
 | 128 |    6619    |                      NULL                      |    node16:/mnt/JamesMadison/data/psa6619/    |      C      |   57   |
 | 128 |    6619    |                      NULL                      |     node16:/mnt/JohnAdams/data/psa6619/      |      C      |   57   |
+| 128 |    6620    |      folio:/data4/paper/2013EoR/2456620/       |     folio:/data4/paper/2013EoR/2456620/      |      B      |  280   |
+| 128 |    6620    |      folio:/data4/paper/2013EoR/2456620/       |                     NULL                     |      R      |   8    |
 | 128 |    6620    |           folio:/nas1/data/psa6620/            |                     NULL                     |      R      |  288   |
 | 128 |    6620    |                      NULL                      |    folio:/data4/paper/nas1_data/psa6620/     |      C      |  280   |
 | 128 |    6622    |     folio:/data4/paper/nas1_data/psa6622/      |    folio:/data4/paper/nas1_data/psa6622/     |      B      |  281   |
