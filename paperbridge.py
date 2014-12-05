@@ -148,7 +148,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 	for item in results:
 		#Opens error logging file
 		error_file = open(dbe,'ab')
-		ewr = csv.writer(error_file, delimiter='|', dialect='excel')
+		ewr = csv.writer(error_file, delimiter='|', lineterminator='\n', dialect='excel')
 		#check for duplicate
 		if item[1] in obsnums:
 			err = [item, 'Obsnum already in paperdata']
@@ -159,7 +159,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		#Open file to write to
 		data_file = open(dbnum,'ab')
 		#create 'writer' object
-		wr = csv.writer(data_file, delimiter='|', dialect='excel')
+		wr = csv.writer(data_file, delimiter='|', lineterminator='\n', dialect='excel')
 
 		#indicates location of raw file (usually same directory as compressed)	
 		if item[0].split('.')[-1] == 'uv':
@@ -348,7 +348,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
                 #Opens file to append to
                 dbr = open(dbo, 'ab')
-                wr = csv.writer(dbr, delimiter='|', dialect='excel')
+                wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 
                 #"moves" file
                 try:

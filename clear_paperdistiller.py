@@ -40,7 +40,7 @@ back3 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_neighbors_ba
 back4 = '/data2/home/immwa/scripts/paperdata/backups/paperdistiller_log_backup_%s_%s.psv'%(j_day,time_date)
 
 resultFile = open(back1,'wb+')
-wr = csv.writer(resultFile, delimiter='|', dialect='excel')
+wr = csv.writer(resultFile, delimiter='|', lineterminator='\n', dialect='excel')
 
 cursor.execute('SELECT * FROM file')
 results = cursor.fetchall()
@@ -51,7 +51,7 @@ for item in results:
 
 resultFile.close()
 resultFile = open(back2,'wb+')
-wr = csv.writer(resultFile, delimiter='|', dialect='excel')
+wr = csv.writer(resultFile, delimiter='|', lineterminator='\n', dialect='excel')
 
 cursor.execute('SELECT * FROM observation')
 results = cursor.fetchall()
@@ -62,7 +62,7 @@ for item in results:
 
 resultFile.close()
 resultFile = open(back3,'wb+')
-wr = csv.writer(resultFile, delimiter='|', dialect='excel')
+wr = csv.writer(resultFile, delimiter='|', lineterminator='\n', dialect='excel')
 
 cursor.execute('SELECT * FROM neighbors')
 results = cursor.fetchall()
@@ -73,7 +73,7 @@ for item in results:
 
 resultFile.close()
 resultFile = open(back4,'wb+')
-wr = csv.writer(resultFile, delimiter='|', dialect='excel')
+wr = csv.writer(resultFile, delimiter='|', lineterminator='\n', dialect='excel')
 
 cursor.execute('SELECT * FROM log')
 results = cursor.fetchall()

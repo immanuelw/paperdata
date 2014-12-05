@@ -51,7 +51,7 @@ def gen_paperjunk(dirs, dbo):
 
 		#create csv file to log data
 		data_file = open(dbo,'ab')
-		wr = csv.writer(data_file, delimiter='|', dialect='excel')
+		wr = csv.writer(data_file, delimiter='|', lineterminator='\n', dialect='excel')
 
 		junk_path = host + ':' + dir
 		folio_path = 'NULL'

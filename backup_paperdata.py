@@ -28,7 +28,7 @@ def backup_paperdata(dbnum, time_date):
 	results = cursor.fetchall()
 
 	resultFile = open(dbnum,'ab')
-	wr = csv.writer(resultFile, delimiter='|', dialect='excel')
+	wr = csv.writer(resultFile, delimiter='|', lineterminator='\n', dialect='excel')
 
 	for item in results:
 		wr.writerow(item)

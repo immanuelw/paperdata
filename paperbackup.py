@@ -29,25 +29,25 @@ def paperbackup(time_date, usrnm, pswd):
 	dbo1 = os.path.join(backup_dir,db1)
         print dbo1
         data_file1 = open(dbo1,'wb')
-        wr1 = csv.writer(data_file1, delimiter='|', dialect='excel')
+        wr1 = csv.writer(data_file1, delimiter='|', lineterminator='\n', dialect='excel')
 
 	db2 = 'paperjunk_backup_%s.psv'%(time_date)
 	dbo2 = os.path.join(backup_dir,db2)
         print dbo2
         data_file2 = open(dbo2,'wb')
-        wr2 = csv.writer(data_file2, delimiter='|', dialect='excel')
+        wr2 = csv.writer(data_file2, delimiter='|', lineterminator='\n', dialect='excel')
 
 	db3 = 'paperrename_backup_%s.psv'%(time_date)
 	dbo1 = os.path.join(backup_dir,db3)
         print dbo3
         data_file3 = open(dbo3,'wb')
-        wr3 = csv.writer(data_file3, delimiter='|', dialect='excel')
+        wr3 = csv.writer(data_file3, delimiter='|', lineterminator='\n', dialect='excel')
 
 	db4 = 'paperfeed_backup_%s.psv'%(time_date)
 	dbo1 = os.path.join(backup_dir,db4)
         print dbo4
         data_file4 = open(dbo4,'wb')
-        wr4 = csv.writer(data_file4, delimiter='|', dialect='excel')
+        wr4 = csv.writer(data_file4, delimiter='|', lineterminator='\n', dialect='excel')
 
 	#Load data into named database and table
 	# open a database connection

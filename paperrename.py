@@ -153,7 +153,7 @@ def rename_uv(dirs, datashift, dbe):
                 count += 1
                 #create csv file to log bad files
                 error_file = open(dbe, 'ab')
-                ewr = csv.writer(error_file, delimiter='|', dialect='excel')
+                ewr = csv.writer(error_file, delimiter='|', lineterminator='\n', dialect='excel')
 
                 #Find size of file
                 data_size = os.path.getsize(data_file)

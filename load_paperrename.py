@@ -51,11 +51,11 @@ def gen_paperrename(dirs, dbo, dbe):
 
 		#create csv file to log data
 		data_file = open(dbo,'ab')
-		wr = csv.writer(data_file, delimiter='|', dialect='excel')
+		wr = csv.writer(data_file, delimiter='|', lineterminator='\n', dialect='excel')
 
 		#create csv file to log bad files
 		error_file = open(dbe, 'ab')
-		ewr = csv.writer(error_file, delimiter='|', dialect='excel')
+		ewr = csv.writer(error_file, delimiter='|', lineterminator='\n', dialect='excel')
 
 		#checks if file loaded in is raw or compressed - makes changes to compensate
 		if dir.split('.')[-1] == 'uv':

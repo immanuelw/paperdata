@@ -8,7 +8,7 @@ import getpass
 import os
 import csv
 
-def consolidate(dbo)
+def consolidate(dbo):
 	resultFile = open(dbo,'wb')
 	resultFile.close()
 
@@ -31,7 +31,30 @@ def consolidate(dbo)
 
 	for item in resa:
 		if item[9] != 'NULL':
-			back.append(item)
+			if item[0] in ['NULL', 'ON TAPE']:
+				path = item[0]
+			else:
+				compr_host = item[0].split(':')[0]
+				compr = item[0].split(':')[1]
+				if compr_host == 'folio' and not os.path.isdir(compr):
+					path = 'NULL'
+				else:
+					path = item[0]
+			if item[9] in  ['NULL', 'ON TAPE']:
+				raw_path = item[9]
+			else:
+				raw_host = item[9].split(':')[0]
+				raw = item[9].split(':')[1]
+				if raw_host == 'folio' and not os.path.isdir(raw):
+					raw_path = 'NULL'
+				else:
+					raw_path = item[9]
+
+			if raw_path == 'NULL' and path == 'NULL':
+				continue
+
+			it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],item[12],item[13],item[14],item[15],item[16],item[17],item[18])
+			back.append(it)
 		else:
 			#do stuff
 			cursor.execute('''SELECT * from paperdata where julian_date = '%.5f' and polarization = '%s' order by julian_date asc''' %(item[6], item[7]))
@@ -49,7 +72,30 @@ def consolidate(dbo)
 						cal = ra[10]
 					else:
 						cal = item[10]
-					it = (item[0],item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,ra[9],cal,ra[11],item[12],ra[13],item[14],item[15],item[16],item[17],item[18])
+
+					if item[0] == 'NULL':
+                                                path = 'NULL'
+                                        else:
+                                                compr_host = item[0].split(':')[0]
+                                                compr = item[0].split(':')[1]
+                                                if compr_host == 'folio' and not os.path.isdir(compr):
+                                                        path = 'NULL'
+                                                else:
+                                                        path = item[0]
+                                        if ra[9] == 'NULL':
+                                                raw_path = 'NULL'
+                                        else:
+                                                raw_host = ra[9].split(':')[0]
+                                                raw = ra[9].split(':')[1]
+                                                if raw_host == 'folio' and not os.path.isdir(raw):
+                                                        raw_path = 'NULL'
+                                                else:
+                                                        raw_path = ra[9]
+
+					if raw_path == 'NULL' and path == 'NULL':
+						continue
+
+					it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,ra[11],item[12],ra[13],item[14],item[15],item[16],item[17],item[18])
 					back.append(it)
 				else:
 					back.append(item)
@@ -73,7 +119,30 @@ def consolidate(dbo)
 						cal = item[10]
 					else:
 						cal = ra[10]
-	                        	it = (item[0],item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,ra[9],cal,ra[11],item[12],ra[13],item[14],item[15],item[16],item[17],item[18])
+
+					if item[0] == 'NULL':
+						path = 'NULL'
+					else:
+						compr_host = item[0].split(':')[0]
+						compr = item[0].split(':')[1]
+						if compr_host == 'folio' and not os.path.isdir(compr):
+							path = 'NULL'
+						else:
+							path = item[0]
+					if ra[9] == 'NULL': 
+						raw_path = 'NULL'
+					else:
+						raw_host = ra[9].split(':')[0]
+						raw = ra[9].split(':')[1]
+						if raw_host == 'folio' and not os.path.isdir(raw):
+							raw_path = 'NULL'
+						else:
+							raw_path = ra[9]
+
+					if raw_path == 'NULL' and path == 'NULL':
+						continue
+
+	                        	it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,ra[11],item[12],ra[13],item[14],item[15],item[16],item[17],item[18])
 	                        	front.append(it)
 				else:
 					front.append(ra)

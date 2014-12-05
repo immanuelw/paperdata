@@ -80,7 +80,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
                 #Opens file to append to
                 dbr = open(dbo, 'ab')
-                wr = csv.writer(dbr, delimiter='|', dialect='excel')
+                wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 
                 #"moves" file
                 try:
