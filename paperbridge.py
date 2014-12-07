@@ -250,13 +250,24 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 			md5 = item[2]
 
 		#location of calibrate files
-		cal_location = 'NULL'
+		cal_path = 'NULL'
 
 		#shows location of raw data on tape
-		tape_location = 'NULL'
+		tape_index = 'NULL'
+
+		#shows path of npz file
+                npz_path = compr_full_path.split('uvcRRE')[0] + 'uvcRE.npz'
+                if not os.path.isfile(npz_path.split(':')[1]):
+                        npz_path = 'NULL'
+
+                #shows path of final product
+                if era = 32:
+                        final_product_path = compr_full_path.split('uvcRRE')[0] + '?'
+                        if not os.path.isdir(final_product_path.split(':')[1]):
+                                final_product_path = 'NULL'
 
 		#variable indicating if all files have been successfully compressed in one day
-		ready_to_tape = 0
+		write_to_tape = 0
 
 		#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
 		delete_file = 0 
@@ -265,7 +276,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		restore_history = 'NULL'
 
 		#create list of important data and open csv file
-		databs = [compr_full_path,era,era_type,obsnum,md5,jday,jdate,polarization,length,raw_full_path,cal_location,tape_location,compr_sz,raw_sz,compressed,edge,ready_to_tape,delete_file,restore_history]
+		databs = [compr_full_path,era,era_type,obsnum,md5,jday,jdate,polarization,length,raw_full_path,cal_path,npz_path,final_product_path,tape_index,compr_sz,raw_sz,compressed,edge,write_to_tape,delete_file,restore_history]
 		print databs 
 
 		#write to csv file by item in list
@@ -364,7 +375,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
                 infile_path = infile
                 outfile_path = host + ':' + o_dict[infile]
                 if infile.split('.')[-1] == 'uv':
-                        cursor.execute('''UPDATE paperdata set raw_path = '%s', ready_to_tape = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
+                        cursor.execute('''UPDATE paperdata set raw_path = '%s', write_to_tape = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
 
         print 'File(s) moved and updated'
 

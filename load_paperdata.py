@@ -268,20 +268,31 @@ def gen_paperdata(dirs, dbo, dbe):
 
 		#location of calibrate files
 		if era == 32:
-			cal_location = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
+			cal_path = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
 		elif era == 64:
-			cal_location = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
+			cal_path = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
 		elif era == 128:
-			cal_location = 'NULL'
+			cal_path = 'NULL'
 
-		#shows location of raw data on tape
-		tape_location = 'NULL'
+		#shows path of npz file
+		npz_path = compr_full_path.split('uvcRRE')[0] + 'uvcRE.npz'
+		if not os.path.isfile(npz_path.split(':')[1]):
+			npz_path = 'NULL'
+
+		#shows path of final product
+		if era = 32:
+			final_product_path = compr_full_path.split('uvcRRE')[0] + '?'
+			if not os.path.isdir(final_product_path.split(':')[1]):
+				final_product_path = 'NULL'
+
+		#shows index of raw data on tape
+		tape_index = 'NULL'
 
 		#Shows if file is edge file
 		edge = 0
 
 		#variable indicating if all files have been successfully compressed in one day
-		ready_to_tape = 0
+		write_to_tape = 0
 
 		#indicates if all raw data is compressed, moved to tape, and the raw data can be deleted from folio
 		delete_file = 0 
@@ -290,7 +301,7 @@ def gen_paperdata(dirs, dbo, dbe):
 		restore_history = 'NULL'
 
 		#create list of important data and open csv file
-		databs = [compr_full_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_full_path,cal_location,tape_location,compr_file_size,raw_file_size,compressed,edge,ready_to_tape,delete_file,restore_history]
+		databs = [compr_full_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_full_path,cal_path,npz_path,final_product_path,tape_index,compr_file_size,raw_file_size,compressed,edge,write_to_tape,delete_file,restore_history]
 		print databs
 
 		#write to csv file
@@ -322,7 +333,7 @@ def remove_duplicates(dirs_all, usrnm, pswd):
 
         cursor = connection.cursor()
 
-        cursor.execute('''SELECT path, raw_location from paperdata''')
+        cursor.execute('''SELECT path, raw_path from paperdata''')
         results = cursor.fetchall()
         cursor.close()
         connection.close()
