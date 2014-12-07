@@ -28,7 +28,7 @@ def dupe_check(infile_list):
 	#Check if input file is in paperdata database
 	cursor.execute('''SELECT path from paperdata''')
 	resA = cursor.fetchall()
-	cursor.execute('''SELECT raw_location from paperdata''')
+	cursor.execute('''SELECT raw_path from paperdata''')
 	resB = cursor.fetchall()
 
 	#convert tuples into list
@@ -131,7 +131,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 		if infile.split('.')[-1] == 'uvcRRE':
 			cursor.execute('''UPDATE paperdata set path = '%s' where path = '%s' '''%(outfile_path, infile_path))
 		elif infile.split('.')[-1] == 'uv':
-			cursor.execute('''UPDATE paperdata set raw_location = '%s', ready_to_tape = 1 where raw_location = '%s' '''%(outfile_path, infile_path))
+			cursor.execute('''UPDATE paperdata set raw_path = '%s', write_to_tape = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
 
 	print 'File(s) moved and updated'
 
