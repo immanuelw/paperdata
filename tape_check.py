@@ -26,7 +26,7 @@ def tape_check(era, usrnm, pswd):
 	sec_results = cursor.fetchall()
 
 	#counting the amount of compressed files in each day
-	cursor.execute('''SELECT julian_day, COUNT(*), tape_location, raw_location FROM paperdata WHERE era = %d and compressed = 1 and raw_location != 'NULL' GROUP BY julian_day'''%(era))
+	cursor.execute('''SELECT julian_day, COUNT(*), tape_index, raw_path FROM paperdata WHERE era = %d and compressed = 1 and raw_path != 'NULL' GROUP BY julian_day'''%(era))
 	thr_results = cursor.fetchall()
 
 	#create dictionary with julian_day as key, count as value
@@ -42,7 +42,7 @@ def tape_check(era, usrnm, pswd):
 				ready_to_tape = 1
 				cursor.execute('''
 		                UPDATE paperdata
-		                SET ready_to_tape = 1
+		                SET write_to_tape = 1
 		                WHERE julian_day = %d
 		                '''%(jday))
 
