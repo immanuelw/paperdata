@@ -57,7 +57,7 @@ def paperbackup(time_date, usrnm, pswd):
 	cursor = connection.cursor()
 
 	# execute the SQL query using execute() method.
-	cursor.execute('SELECT * FROM paperdata order by julian_date asc, raw_location asc, path asc')
+	cursor.execute('SELECT * FROM paperdata order by julian_date asc, raw_path asc, path asc')
 	results = cursor.fetchall()
 
 	for item in results:

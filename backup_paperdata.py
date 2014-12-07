@@ -24,7 +24,7 @@ def backup_paperdata(dbnum, time_date):
 	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
 	cursor = connection.cursor()
 
-	cursor.execute('SELECT * FROM paperdata order by julian_date asc, raw_location asc, path asc')
+	cursor.execute('SELECT * FROM paperdata order by julian_date asc, raw_path asc, path asc')
 	results = cursor.fetchall()
 
 	resultFile = open(dbnum,'ab')
