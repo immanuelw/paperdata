@@ -90,7 +90,7 @@ def generate_entry_2(item, ra):
 	else:
 		compr_sz = item[14]
 
-	it = (path,item[1],item[2],obsnum,ra[4],item[5],item[6],ra[7],length,raw_path,cal,item[11],item[12],ra[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
+	it = (path,item[1],item[2],obsnum,ra[4],item[5],item[6],ra[7],length,raw_path,cal,item[11],item[12],ra[13],compr_sz,raw_sz,item[16],ra[17],ra[18],ra[19],ra[20])
 	return it
 
 def consolidate(dbo):
@@ -135,12 +135,6 @@ def consolidate(dbo):
 						continue
 					else:
 						back.append(it)
-				else:
-					it = generate_entry_1(item)
-					if it is None:
-						continue
-					else:
-						back.append(it)
 	for ra in resb:
 		if ra[0] != 'NULL':
 			continue
@@ -153,13 +147,7 @@ def consolidate(dbo):
 					if item == ra:
 						continue
 	                	if len(item) > 0:
-					it = generate_entry_2(ra,item)
-					if it is None:
-						continue
-					else:
-						front.append(it)
-				else:
-					it = generate_entry_1(ra)
+					it = generate_entry_2(item,ra)
 					if it is None:
 						continue
 					else:
