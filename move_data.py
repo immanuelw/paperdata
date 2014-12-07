@@ -101,8 +101,8 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 		o_dict.update({file:out})
 
 	#Load data into named database and table
-        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-        cursor = connection.cursor()
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
 
 	#Load into db
 	for infile in infile_list:
@@ -131,7 +131,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 		if infile.split('.')[-1] == 'uvcRRE':
 			cursor.execute('''UPDATE paperdata set path = '%s' where path = '%s' '''%(outfile_path, infile_path))
 		elif infile.split('.')[-1] == 'uv':
-			cursor.execute('''UPDATE paperdata set raw_path = '%s', write_to_tape = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
+			cursor.execute('''UPDATE paperdata set raw_path = '%s' where raw_path = '%s' '''%(outfile_path, infile_path))
 
 	print 'File(s) moved and updated'
 
@@ -156,15 +156,15 @@ if __name__ == '__main__':
 
 	#checks to see that output dir is valid
 	if not os.path.isdir(outfile):
-	        print 'Output directory does not exist'
-	        sys.exit()
+		print 'Output directory does not exist'
+		sys.exit()
 
 	#checks for input file type
 	file_type = raw_input('uv, uvcRRE, or both?: ')
 
 	if not file_type in ['uv','uvcRRE','both']:
-	        print 'Invalid file type'
-	        sys.exit()
+		print 'Invalid file type'
+		sys.exit()
 
 	#List of files in directory -- allowing mass movement of .uvcRRE and .uv files
 	infile_list = glob.glob(infile)
