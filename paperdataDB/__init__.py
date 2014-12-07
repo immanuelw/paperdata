@@ -34,37 +34,40 @@ POL = 7
 LENGTH = 8
 RAW_PATH = 9
 CAL_PATH = 10
-TAPE_PATH = 11
-COMPR_SIZE = 12
-RAW_SIZE = 13
-COMPRESSED = 14
-READY_TO_TAPE = 15
-DELETE_FILE = 16
-RESTORE_HISTORY = 17
+NPZ_PATH = 11
+FINAL_PRODUCT_PATH = 12
+TAPE_INDEX = 13
+COMPR_SIZE = 14
+RAW_SIZE = 15
+COMPRESSED = 16
+EDGE = 17
+WRITE_TO_TAPE = 18
+DELETE_FILE = 19
+RESTORE_HISTORY = 20
 
-MIN = 20
-MAX = 21
-EXACT = 22 
-RANGE = 23
-LIST = 24
-NONE = 25
+MIN = 25
+MAX = 26
+EXACT = 27 
+RANGE = 28
+LIST = 29
+NONE = 30
 
-SEARCH = 30
-NOSEARCH = 31
+SEARCH = 40
+NOSEARCH = 41
 
 def constants():
-	const = {PATH:'PATH', ERA:'ERA', ERA_TYPE:'ERA_TYPE', OBSNUM:'OBSNUM', MD5SUM:'MS5SUM', JDAY:'JDAY', JDATE:'JDATE', POL:'POL', LENGTH:'LENGTH', RAW_PATH:'RAW_PATH', CAL_PATH:'CAL_PATH', TAPE_PATH:'TAPE_PATH', COMPR_SIZE:'COMPR_SIZE', RAW_SIZE:'RAW_SIZE', COMPRESSED:'COMPRESSED', READY_TO_TAPE:'READY_TO_TAPE', DELETE_FILE:'DELETE_FILE', RESTORE_HISTORY:'RESTORE_HISTORY', MIN:'MIN', MAX:'MAX', EXACT:'EXACT', RANGE:'RANGE', NONE:'NONE', SEARCH:'SEARCH', NOSEARCH:'NOSEARCH'}
+	const = {PATH:'PATH', ERA:'ERA', ERA_TYPE:'ERA_TYPE', OBSNUM:'OBSNUM', MD5SUM:'MS5SUM', JDAY:'JDAY', JDATE:'JDATE', POL:'POL', LENGTH:'LENGTH', RAW_PATH:'RAW_PATH', CAL_PATH:'CAL_PATH', NPZ_PATH:'NPZ_PATH', FINAL_PRODUCT_PATH: 'FINAL PRODUCT_PATH', TAPE_INDEX:'TAPE_INDEX', COMPR_SIZE:'COMPR_SIZE', RAW_SIZE:'RAW_SIZE', COMPRESSED:'COMPRESSED', WRITE_TO_TAPE:'WRITE_TO_TAPE', DELETE_FILE:'DELETE_FILE', RESTORE_HISTORY:'RESTORE_HISTORY', MIN:'MIN', MAX:'MAX', EXACT:'EXACT', RANGE:'RANGE', NONE:'NONE', SEARCH:'SEARCH', NOSEARCH:'NOSEARCH'}
 	return const
 
-pd_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_location', CAL_PATH:'cal_location', TAPE_PATH:'tape_location', COMPR_SIZE:'compr_file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', READY_TO_TAPE:'ready_to_tape', DELETE_FILE:'delete_file', RESTORE_HISTORY:'restore_history'}
+pd_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_path', CAL_PATH:'cal_path', NPZ_PATH:'npz_path', FINAL_PRODUCT_PATH:'final_product_path', TAPE_INDEX:'tape_index', COMPR_SIZE:'compr_file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', WRITE_TO_TAPE:'write_to_tape', DELETE_FILE:'delete_file', RESTORE_HISTORY:'restore_history'}
 
 def fields():
-	field_list = ['path', 'era', 'era_type', 'obsnum', 'md5sum', 'julian_day', 'julian_date', 'polarization', 'data_length', 'raw_location', 'cal_location', 'tape_location', 'compr_file_size_MB', 'raw_file_size_MB', 'compressed', 'ready_to_tape', 'delete_file', 'restore_history']
+	field_list = ['path', 'era', 'era_type', 'obsnum', 'md5sum', 'julian_day', 'julian_date', 'polarization', 'data_length', 'raw_path', 'cal_path', 'npz_path', 'final_product_path', 'tape_index', 'compr_file_size_MB', 'raw_file_size_MB', 'compressed', 'write_to_tape', 'delete_file', 'restore_history']
 
 	return field_list
 
 def dict():
-	paperdata_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_location', CAL_PATH:'cal_location', TAPE_PATH:'tape_location', COMPR_SIZE:'compr_file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', READY_TO_TAPE:'ready_to_tape', DELETE_FILE:'delete_file', RESTORE_HISTORY:'restore_history'}
+	paperdata_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_path', CAL_PATH:'cal_path', NPZ_PATH:'npz_path', FINAL_PRODUCT_PATH:'final_product_path', TAPE_INDEX:'tape_index', COMPR_SIZE:'compr_file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', WRITE_TO_TAPE:'write_to_tape', DELETE_FILE:'delete_file', RESTORE_HISTORY:'restore_history'}
 	return paperdata_dict
 
 def options():
