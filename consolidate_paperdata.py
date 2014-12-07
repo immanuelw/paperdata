@@ -53,7 +53,17 @@ def consolidate(dbo):
 			if raw_path == 'NULL' and path == 'NULL':
 				continue
 
-			it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],item[12],item[13],item[14],item[15],item[16],item[17],item[18])
+			if raw_path == 'NULL': 
+				raw_sz = 0.0
+			else:
+				raw_sz = item[13]
+
+			if path == 'NULL':
+				compr_sz = 0.0
+			else:
+				compr_sz = item[12]
+
+			it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],compr_sz,raw_sz,item[14],item[15],item[16],item[17],item[18])
 			back.append(it)
 		else:
 			#do stuff
@@ -95,7 +105,17 @@ def consolidate(dbo):
 					if raw_path == 'NULL' and path == 'NULL':
 						continue
 
-					it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,ra[11],item[12],ra[13],item[14],item[15],item[16],item[17],item[18])
+					if raw_path == 'NULL': 
+						raw_sz = 0.0
+					else:
+						raw_sz = ra[13]
+
+					if path == 'NULL':
+						compr_sz = 0.0
+					else:
+						compr_sz = item[12]
+
+					it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,ra[11],compr_sz,raw_sz,item[14],item[15],item[16],item[17],item[18])
 					back.append(it)
 				else:
 					back.append(item)
@@ -142,7 +162,17 @@ def consolidate(dbo):
 					if raw_path == 'NULL' and path == 'NULL':
 						continue
 
-	                        	it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,ra[11],item[12],ra[13],item[14],item[15],item[16],item[17],item[18])
+					if raw_path == 'NULL':
+						raw_sz = 0.0
+					else:
+						raw_sz = ra[13]
+
+					if path == 'NULL':
+						compr_sz = 0.0
+					else:
+						compr_size = item[12]
+
+	                        	it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,ra[11],compr_sz,raw_sz,item[14],item[15],item[16],item[17],item[18])
 	                        	front.append(it)
 				else:
 					front.append(ra)
