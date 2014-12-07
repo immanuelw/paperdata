@@ -8,6 +8,43 @@ import getpass
 import os
 import csv
 
+def generate_entry_1(item):
+	if item[0] in ['NULL', 'ON TAPE']:
+		path = item[0]
+	else:
+		compr_host = item[0].split(':')[0]
+		compr = item[0].split(':')[1]
+		if compr_host == 'folio' and not os.path.isdir(compr):
+			path = 'NULL'
+		else:
+			path = item[0]
+	if item[9] in  ['NULL', 'ON TAPE']:
+		raw_path = item[9]
+	else:
+		raw_host = item[9].split(':')[0]
+		raw = item[9].split(':')[1]
+		if raw_host == 'folio' and not os.path.isdir(raw):
+			raw_path = 'NULL'
+		else:
+			raw_path = item[9]
+
+	if raw_path == 'NULL' and path == 'NULL':
+	continue
+
+	if raw_path == 'NULL':
+		raw_sz = 0.0
+	else:
+		raw_sz = item[15]
+
+	if path == 'NULL':
+		compr_sz = 0.0
+	else:
+		compr_sz = item[14]
+
+	it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],item[12],item[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
+
+	return it
+
 def consolidate(dbo):
 	resultFile = open(dbo,'wb')
 	resultFile.close()
@@ -56,14 +93,14 @@ def consolidate(dbo):
 			if raw_path == 'NULL': 
 				raw_sz = 0.0
 			else:
-				raw_sz = item[13]
+				raw_sz = item[15]
 
 			if path == 'NULL':
 				compr_sz = 0.0
 			else:
-				compr_sz = item[12]
+				compr_sz = item[14]
 
-			it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],compr_sz,raw_sz,item[14],item[15],item[16],item[17],item[18])
+			it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],item[12],item[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
 			back.append(it)
 		else:
 			#do stuff
@@ -108,17 +145,50 @@ def consolidate(dbo):
 					if raw_path == 'NULL': 
 						raw_sz = 0.0
 					else:
-						raw_sz = ra[13]
+						raw_sz = ra[15]
 
 					if path == 'NULL':
 						compr_sz = 0.0
 					else:
-						compr_sz = item[12]
+						compr_sz = item[14]
 
-					it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,ra[11],compr_sz,raw_sz,item[14],item[15],item[16],item[17],item[18])
+					it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,item[11],item[12],ra[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
 					back.append(it)
 				else:
-					back.append(item)
+					if item[0] in ['NULL', 'ON TAPE']:
+                                		path = item[0]
+                        		else:
+                                		compr_host = item[0].split(':')[0]
+                                		compr = item[0].split(':')[1]
+                                		if compr_host == 'folio' and not os.path.isdir(compr):
+                                		        path = 'NULL'
+                                		else:
+                                        		path = item[0]
+                        		if item[9] in  ['NULL', 'ON TAPE']:
+                                		raw_path = item[9]
+                        		else:
+                                		raw_host = item[9].split(':')[0]
+                                		raw = item[9].split(':')[1]
+                                		if raw_host == 'folio' and not os.path.isdir(raw):
+                                        		raw_path = 'NULL'
+                                		else:
+                                        		raw_path = item[9]
+
+                        		if raw_path == 'NULL' and path == 'NULL':
+                         		       continue
+
+                        		if raw_path == 'NULL':
+                        		        raw_sz = 0.0
+                        		else:
+                                		raw_sz = item[15]
+
+                        		if path == 'NULL':
+                        		        compr_sz = 0.0
+                        		else:
+                        		        compr_sz = item[14]
+
+                        		it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],item[12],item[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
+					back.append(it)
 	for ra in resb:
 		if ra[0] != 'NULL':
 			continue
@@ -165,17 +235,50 @@ def consolidate(dbo):
 					if raw_path == 'NULL':
 						raw_sz = 0.0
 					else:
-						raw_sz = ra[13]
+						raw_sz = ra[15]
 
 					if path == 'NULL':
 						compr_sz = 0.0
 					else:
-						compr_size = item[12]
+						compr_size = item[14]
 
-	                        	it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,ra[11],compr_sz,raw_sz,item[14],item[15],item[16],item[17],item[18])
+	                        	it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,item[11],item[12],ra[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
 	                        	front.append(it)
 				else:
-					front.append(ra)
+					if ra[0] in ['NULL', 'ON TAPE']:
+                                                path = ra[0]
+                                        else:
+                                                compr_host = ra[0].split(':')[0]
+                                                compr = ra[0].split(':')[1]
+                                                if compr_host == 'folio' and not os.path.isdir(compr):
+                                                        path = 'NULL'
+                                                else:
+                                                        path = ra[0]
+                                        if ra[9] in  ['NULL', 'ON TAPE']:
+                                                raw_path = ra[9]
+                                        else:
+                                                raw_host = ra[9].split(':')[0]
+                                                raw = ra[9].split(':')[1]
+                                                if raw_host == 'folio' and not os.path.isdir(raw):
+                                                        raw_path = 'NULL'
+                                                else:
+                                                        raw_path = ra[9]
+
+                                        if raw_path == 'NULL' and path == 'NULL':
+                                               continue
+
+                                        if raw_path == 'NULL':
+                                                raw_sz = 0.0
+                                        else:
+                                                raw_sz = ra[15]
+
+                                        if path == 'NULL':
+                                                compr_sz = 0.0
+                                        else:
+                                                compr_sz = ra[14]
+
+                                        it = (path,ra[1],ra[2],ra[3],ra[4],ra[5],ra[6],ra[7],ra[8],raw_path,ra[10],ra[11],ra[12],ra[13],compr_sz,raw_sz,ra[16],ra[17],ra[18],ra[19],ra[20])
+					front.append(it)
 
 	#Takes only unique entries
 	total = tuple(back + front)
@@ -184,7 +287,7 @@ def consolidate(dbo):
 
 	for item in backup:
 		resultFile = open(dbo,'ab')
-		wr = csv.writer(resultFile, delimiter='|', dialect='excel')
+		wr = csv.writer(resultFile, delimiter='|', lineterminator='\n', dialect='excel')
 		wr.writerow(item)
 		resultFile.close()
 
