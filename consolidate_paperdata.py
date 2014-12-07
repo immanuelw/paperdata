@@ -29,7 +29,7 @@ def generate_entry_1(item):
 			raw_path = item[9]
 
 	if raw_path == 'NULL' and path == 'NULL':
-	continue
+		return None
 
 	if raw_path == 'NULL':
 		raw_sz = 0.0
@@ -43,6 +43,54 @@ def generate_entry_1(item):
 
 	it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],item[12],item[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
 
+	return it
+
+def generate_entry_2(item, ra):
+	if ra[8] == 0.00000:
+		length = item[8]
+	else:
+		length = ra[8]
+	if item[10] == 'NULL':
+		cal = ra[10]
+	else:
+		cal = item[10]
+
+	if item[0] == 'NULL':
+		path = 'NULL'
+		obsnum = ra[3]
+	else:
+		compr_host = item[0].split(':')[0]
+		compr = item[0].split(':')[1]
+		if compr_host == 'folio' and not os.path.isdir(compr):
+			path = 'NULL'
+			obsnum = ra[3]
+		else:
+			path = item[0]
+			obsnum = item[3]
+	if ra[9] == 'NULL':
+		raw_path = 'NULL'
+	else:
+		raw_host = ra[9].split(':')[0]
+		raw = ra[9].split(':')[1]
+		if raw_host == 'folio' and not os.path.isdir(raw):
+			raw_path = 'NULL'
+		else:
+			raw_path = ra[9]
+
+	if raw_path == 'NULL' and path == 'NULL':
+		return None
+
+	if raw_path == 'NULL':
+		raw_sz = 0.0
+	else:
+		raw_sz = ra[15]
+
+	if path == 'NULL':
+		compr_sz = 0.0
+	else:
+		compr_sz = item[14]
+
+	it = (path,item[1],item[2],obsnum,ra[4],item[5],item[6],ra[7],length,raw_path,cal,item[11],item[12],ra[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
 	return it
 
 def consolidate(dbo):
@@ -68,217 +116,54 @@ def consolidate(dbo):
 
 	for item in resa:
 		if item[9] != 'NULL':
-			if item[0] in ['NULL', 'ON TAPE']:
-				path = item[0]
-			else:
-				compr_host = item[0].split(':')[0]
-				compr = item[0].split(':')[1]
-				if compr_host == 'folio' and not os.path.isdir(compr):
-					path = 'NULL'
-				else:
-					path = item[0]
-			if item[9] in  ['NULL', 'ON TAPE']:
-				raw_path = item[9]
-			else:
-				raw_host = item[9].split(':')[0]
-				raw = item[9].split(':')[1]
-				if raw_host == 'folio' and not os.path.isdir(raw):
-					raw_path = 'NULL'
-				else:
-					raw_path = item[9]
-
-			if raw_path == 'NULL' and path == 'NULL':
+			it = generate_entry_1(item)
+			if it is None:
 				continue
-
-			if raw_path == 'NULL': 
-				raw_sz = 0.0
 			else:
-				raw_sz = item[15]
-
-			if path == 'NULL':
-				compr_sz = 0.0
-			else:
-				compr_sz = item[14]
-
-			it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],item[12],item[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
-			back.append(it)
+				back.append(it)
 		else:
 			#do stuff
-			cursor.execute('''SELECT * from paperdata where julian_date = '%.5f' and polarization = '%s' order by julian_date asc''' %(item[6], item[7]))
+			cursor.execute('''SELECT * from paperdata where julian_date = '%.5f' and polarization = '%s' order by julian_date asc''' %(float(item[6]), item[7]))
 			ras = cursor.fetchall()
 			for ra in ras:
 				if len(ras) > 1:
 					if item == ra:
 						continue
 				if len(ra) > 0:
-					if ra[8] == 0.00000:
-						length = item[8]
-					else:
-						length = ra[8]
-					if item[10] == 'NULL':
-						cal = ra[10]
-					else:
-						cal = item[10]
-
-					if item[0] == 'NULL':
-                                                path = 'NULL'
-                                        else:
-                                                compr_host = item[0].split(':')[0]
-                                                compr = item[0].split(':')[1]
-                                                if compr_host == 'folio' and not os.path.isdir(compr):
-                                                        path = 'NULL'
-                                                else:
-                                                        path = item[0]
-                                        if ra[9] == 'NULL':
-                                                raw_path = 'NULL'
-                                        else:
-                                                raw_host = ra[9].split(':')[0]
-                                                raw = ra[9].split(':')[1]
-                                                if raw_host == 'folio' and not os.path.isdir(raw):
-                                                        raw_path = 'NULL'
-                                                else:
-                                                        raw_path = ra[9]
-
-					if raw_path == 'NULL' and path == 'NULL':
+					it = generate_entry_2(item,ra)
+					if it is None:
 						continue
-
-					if raw_path == 'NULL': 
-						raw_sz = 0.0
 					else:
-						raw_sz = ra[15]
-
-					if path == 'NULL':
-						compr_sz = 0.0
-					else:
-						compr_sz = item[14]
-
-					it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,item[11],item[12],ra[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
-					back.append(it)
+						back.append(it)
 				else:
-					if item[0] in ['NULL', 'ON TAPE']:
-                                		path = item[0]
-                        		else:
-                                		compr_host = item[0].split(':')[0]
-                                		compr = item[0].split(':')[1]
-                                		if compr_host == 'folio' and not os.path.isdir(compr):
-                                		        path = 'NULL'
-                                		else:
-                                        		path = item[0]
-                        		if item[9] in  ['NULL', 'ON TAPE']:
-                                		raw_path = item[9]
-                        		else:
-                                		raw_host = item[9].split(':')[0]
-                                		raw = item[9].split(':')[1]
-                                		if raw_host == 'folio' and not os.path.isdir(raw):
-                                        		raw_path = 'NULL'
-                                		else:
-                                        		raw_path = item[9]
-
-                        		if raw_path == 'NULL' and path == 'NULL':
-                         		       continue
-
-                        		if raw_path == 'NULL':
-                        		        raw_sz = 0.0
-                        		else:
-                                		raw_sz = item[15]
-
-                        		if path == 'NULL':
-                        		        compr_sz = 0.0
-                        		else:
-                        		        compr_sz = item[14]
-
-                        		it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],item[12],item[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
-					back.append(it)
+					it = generate_entry_1(item)
+					if it is None:
+						continue
+					else:
+						back.append(it)
 	for ra in resb:
 		if ra[0] != 'NULL':
 			continue
 		else:
 			#do stuff
-			cursor.execute('''SELECT * from paperdata where julian_date = '%.5f' and polarization = '%s' order by julian_date asc''' %(ra[6], ra[7]))
+			cursor.execute('''SELECT * from paperdata where julian_date = '%.5f' and polarization = '%s' order by julian_date asc''' %(float(ra[6]), ra[7]))
         	        items = cursor.fetchall()
 			for item in items:
 				if len(items) > 1:
 					if item == ra:
 						continue
 	                	if len(item) > 0:
-					if item[8] == 0.00000:
-						length = ra[8]
-					else:
-						length = item[8]
-					if ra[10] == 'NULL':
-						cal = item[10]
-					else:
-						cal = ra[10]
-
-					if item[0] == 'NULL':
-						path = 'NULL'
-					else:
-						compr_host = item[0].split(':')[0]
-						compr = item[0].split(':')[1]
-						if compr_host == 'folio' and not os.path.isdir(compr):
-							path = 'NULL'
-						else:
-							path = item[0]
-					if ra[9] == 'NULL': 
-						raw_path = 'NULL'
-					else:
-						raw_host = ra[9].split(':')[0]
-						raw = ra[9].split(':')[1]
-						if raw_host == 'folio' and not os.path.isdir(raw):
-							raw_path = 'NULL'
-						else:
-							raw_path = ra[9]
-
-					if raw_path == 'NULL' and path == 'NULL':
+					it = generate_entry_2(ra,item)
+					if it is None:
 						continue
-
-					if raw_path == 'NULL':
-						raw_sz = 0.0
 					else:
-						raw_sz = ra[15]
-
-					if path == 'NULL':
-						compr_sz = 0.0
-					else:
-						compr_size = item[14]
-
-	                        	it = (path,item[1],item[2],item[3],ra[4],item[5],item[6],ra[7],length,raw_path,cal,item[11],item[12],ra[13],compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20])
-	                        	front.append(it)
+						front.append(it)
 				else:
-					if ra[0] in ['NULL', 'ON TAPE']:
-                                                path = ra[0]
-                                        else:
-                                                compr_host = ra[0].split(':')[0]
-                                                compr = ra[0].split(':')[1]
-                                                if compr_host == 'folio' and not os.path.isdir(compr):
-                                                        path = 'NULL'
-                                                else:
-                                                        path = ra[0]
-                                        if ra[9] in  ['NULL', 'ON TAPE']:
-                                                raw_path = ra[9]
-                                        else:
-                                                raw_host = ra[9].split(':')[0]
-                                                raw = ra[9].split(':')[1]
-                                                if raw_host == 'folio' and not os.path.isdir(raw):
-                                                        raw_path = 'NULL'
-                                                else:
-                                                        raw_path = ra[9]
-
-                                        if raw_path == 'NULL' and path == 'NULL':
-                                               continue
-
-                                        if raw_path == 'NULL':
-                                                raw_sz = 0.0
-                                        else:
-                                                raw_sz = ra[15]
-
-                                        if path == 'NULL':
-                                                compr_sz = 0.0
-                                        else:
-                                                compr_sz = ra[14]
-
-                                        it = (path,ra[1],ra[2],ra[3],ra[4],ra[5],ra[6],ra[7],ra[8],raw_path,ra[10],ra[11],ra[12],ra[13],compr_sz,raw_sz,ra[16],ra[17],ra[18],ra[19],ra[20])
-					front.append(it)
+					it = generate_entry_1(ra)
+					if it is None:
+						continue
+					else:
+						front.append(it)
 
 	#Takes only unique entries
 	total = tuple(back + front)
