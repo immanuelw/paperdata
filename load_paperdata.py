@@ -89,8 +89,8 @@ def load_db(dbo, usrnm, pswd):
 def gen_paperdata(dirs, dbo, dbe):
 	host = socket.gethostname()
 
-        #Erase former data file
-        data_file = open(dbo,'wb')
+	#Erase former data file
+	data_file = open(dbo,'wb')
 	data_file.close()
 
 	full_info = []
@@ -184,26 +184,26 @@ def gen_paperdata(dirs, dbo, dbe):
 			continue	
 
 		#indicates size of compressed file, removing units
-	        if compr_full_path != 'NULL':
-	                lil_byte = sizeof_fmt(get_size(compr_path))
-	                compr_file_size = round(float(lil_byte), 1)
+		if compr_full_path != 'NULL':
+			lil_byte = sizeof_fmt(get_size(compr_path))
+			compr_file_size = round(float(lil_byte), 1)
 
-	                compressed = 1
+			compressed = 1
 
-	        else:
-	                compr_file_size = 0.0
-	                compressed = 0
+		else:
+			compr_file_size = 0.0
+			compressed = 0
 
-	        #indicates size of raw file, removing units
-	        if raw_full_path != 'NULL':
-	                lil_byte = sizeof_fmt(get_size(raw_path))
-	                raw_file_size = round(float(lil_byte), 1)
+		#indicates size of raw file, removing units
+		if raw_full_path != 'NULL':
+			lil_byte = sizeof_fmt(get_size(raw_path))
+			raw_file_size = round(float(lil_byte), 1)
 
-	                #calculate md5sum
-	                mdsum = md5sum(raw_path)
-	        else:
-	                raw_file_size = 0.0
-	                mdsum = 'NULL'
+			#calculate md5sum
+			mdsum = md5sum(raw_path)
+		else:
+			raw_file_size = 0.0
+			mdsum = 'NULL'
 
 		#indicates julian date
 		jdate = round(uv['time'], 5)
@@ -334,62 +334,62 @@ def gen_paperdata(dirs, dbo, dbe):
 
 def remove_duplicates(dirs_all, usrnm, pswd):
 	#Removes all files from list that already exist in the database
-        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
-        cursor = connection.cursor()
+	cursor = connection.cursor()
 
-        cursor.execute('''SELECT path, raw_path from paperdata''')
-        results = cursor.fetchall()
-        cursor.close()
-        connection.close()
+	cursor.execute('''SELECT path, raw_path from paperdata''')
+	results = cursor.fetchall()
+	cursor.close()
+	connection.close()
 
-        for res in results:
-                if res[0] != 'NULL':
-                        folderC = res[0].split(':')[1]
-                else:
-                        folderC = 'NULL'
-                if res[1] != 'NULL':
-                        folderR = res[1].split(':')[1]
-                else:
-                        folderR = 'NULL'
+	for res in results:
+		if res[0] != 'NULL':
+			folderC = res[0].split(':')[1]
+		else:
+			folderC = 'NULL'
+		if res[1] != 'NULL':
+			folderR = res[1].split(':')[1]
+		else:
+			folderR = 'NULL'
 
-                try:
-                        dirs_all.remove(folderR)
-                except:
-                        try:
-                                dirs_all.remove(folderC)
-                        except:
-                                continue
+		try:
+			dirs_all.remove(folderR)
+		except:
+			try:
+				dirs_all.remove(folderC)
+			except:
+				continue
 
-                try:
-                        dirs_all.remove(folderC)
-                except:
-                        continue
+		try:
+			dirs_all.remove(folderC)
+		except:
+			continue
 
 	return dirs_all
 
 def load_paperdata(auto):
-        #User input information
-        usrnm = 'paperboy'
-        pswd = 'paperboy'
+	#User input information
+	usrnm = 'paperboy'
+	pswd = 'paperboy'
 
-        datanum = raw_input('Input file path: ')
+	datanum = raw_input('Input file path: ')
 
-        dbo = '/data2/home/immwa/scripts/paper_output/db_out.psv'
+	dbo = '/data2/home/immwa/scripts/paper_output/db_out.psv'
 	dbe = '/data2/home/immwa/scripts/paper_output/false.psv'
 
 	if auto != 'y':
-        	auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
+		auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
 	else:
 		auto_update == 'y'
-        #iterates through directories, listing information about each one
-        dirs_all = glob.glob(datanum)
+	#iterates through directories, listing information about each one
+	dirs_all = glob.glob(datanum)
 
 	#removes duplicate entries from directory
 	dirs = remove_duplicates(dirs_all, usrnm, pswd)
 
-        dirs.sort()
-        gen_paperdata(dirs, dbo, dbe)
+	dirs.sort()
+	gen_paperdata(dirs, dbo, dbe)
 
 	if auto_update == 'y':
 		usrnm2 = raw_input('Input username with edit privileges: ')

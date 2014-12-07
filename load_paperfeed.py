@@ -41,8 +41,8 @@ def load_db(dbo, usrnm, pswd):
 def gen_paperfeed(dirs, dbo, dbe):
 	host = 'folio'
 
-        #Erase former data file
-        data_file = open(dbo,'wb')
+	#Erase former data file
+	data_file = open(dbo,'wb')
 	data_file.close()
 
 	full_info = []
@@ -132,49 +132,49 @@ def gen_paperfeed(dirs, dbo, dbe):
 
 def remove_duplicates(dirs_all, usrnm, pswd):
 	#Removes all files from list that already exist in the database
-        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
-        cursor = connection.cursor()
+	cursor = connection.cursor()
 
-        cursor.execute('''SELECT raw_path from paperfeed''')
-        results = cursor.fetchall()
-        cursor.close()
-        connection.close()
+	cursor.execute('''SELECT raw_path from paperfeed''')
+	results = cursor.fetchall()
+	cursor.close()
+	connection.close()
 
-        for res in results:
-                if res[0] != 'NULL':
-                        folderC = res[0].split(':')[1]
-                else:
-                        folderC = 'NULL'
+	for res in results:
+		if res[0] != 'NULL':
+			folderC = res[0].split(':')[1]
+		else:
+			folderC = 'NULL'
 
-                try:
-                        dirs_all.remove(folderC)
-                except:
-                        continue
+		try:
+			dirs_all.remove(folderC)
+		except:
+			continue
 
 	return dirs_all
 
 if __name__ == '__main__':
 
-        #User input information
-        usrnm = raw_input('Username: ')
-        pswd = getpass.getpass('Password: ')
+	#User input information
+	usrnm = raw_input('Username: ')
+	pswd = getpass.getpass('Password: ')
 
-        datanum = raw_input('Input file path: ')
+	datanum = raw_input('Input file path: ')
 
-        dbo = '/data2/home/immwa/scripts/paper_output/paperfeed_out.psv'
+	dbo = '/data2/home/immwa/scripts/paper_output/paperfeed_out.psv'
 	dbe = '/data2/home/immwa/scripts/paper_output/false_paperfeed.psv'
 
-        #iterates through directories, listing information about each one
-        dirs_all = glob.glob(datanum)
+	#iterates through directories, listing information about each one
+	dirs_all = glob.glob(datanum)
 
 	#removes duplicate entries from directory
 	dirs = remove_duplicates(dirs_all, usrnm, pswd)
 
-        auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
+	auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
 
-        dirs.sort()
-        gen_paperfeed(dirs, dbo, dbe)
+	dirs.sort()
+	gen_paperfeed(dirs, dbo, dbe)
 
 	if auto_update == 'y':
 		usrnm2 = raw_input('Input username with edit privileges: ')

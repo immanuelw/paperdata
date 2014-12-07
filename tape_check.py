@@ -41,10 +41,10 @@ def tape_check(era, usrnm, pswd):
 			if res[item[0]] == item[1]:
 				ready_to_tape = 1
 				cursor.execute('''
-		                UPDATE paperdata
-		                SET write_to_tape = 1
-		                WHERE julian_day = %d
-		                '''%(jday))
+				UPDATE paperdata
+				SET write_to_tape = 1
+				WHERE julian_day = %d
+				'''%(jday))
 
 	print 'Table data updated.'
 

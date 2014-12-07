@@ -141,12 +141,12 @@ def consolidate(dbo):
 		else:
 			#do stuff
 			cursor.execute('''SELECT * from paperdata where julian_date = '%.5f' and polarization = '%s' order by julian_date asc''' %(float(ra[6]), ra[7]))
-        	        items = cursor.fetchall()
+			items = cursor.fetchall()
 			for item in items:
 				if len(items) > 1:
 					if item == ra:
 						continue
-	                	if len(item) > 0:
+				if len(item) > 0:
 					it = generate_entry_2(item,ra)
 					if it is None:
 						continue

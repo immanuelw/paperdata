@@ -34,8 +34,8 @@ def calculate_free_space(dir):
 
 	total_space = 0
 	for output in folio.split('\n'):
-	        subdir = output.split('\t')[-1]
-	        if subdir == dir:
+		subdir = output.split('\t')[-1]
+		if subdir == dir:
 			total_space = int(output.split('\t')[0])
 	free_space = max_space - total_space
 
@@ -44,7 +44,7 @@ def calculate_free_space(dir):
 def email_paperrename(files):
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
-        server.starttls()
+	server.starttls()
 
 	#Next, log in to the server
 	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
@@ -72,23 +72,23 @@ def email_paperrename(files):
 	return None
 
 def email_space(table):
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
-        server.starttls()
+	server.starttls()
 
-        #Next, log in to the server
-        server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+	#Next, log in to the server
+	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
 
-        #Send the mail
-        msgs = '\nNot enough space for ' + table + ' on folio'
+	#Send the mail
+	msgs = '\nNot enough space for ' + table + ' on folio'
 
-        server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
-        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
 
 	server.quit()
 
-        return None
+	return None
 
 def check_data(usrnm, pswd):
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
@@ -98,7 +98,7 @@ def check_data(usrnm, pswd):
 	results = cursor.fetchall()
 
 	cursor.execute('''SELECT raw_path, julian_day, actual_amount, expected_amount from paperrename where moved = 0 and actual_amount = expected_amount order by julian_day''')
-        complete_results = cursor.fetchall()
+	complete_results = cursor.fetchall()
 
 	#Close database
 	cursor.close()
@@ -111,7 +111,7 @@ def check_data(usrnm, pswd):
 
 def update_paperrename(usrnm, pswd):
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-        cursor = connection.cursor()
+	cursor = connection.cursor()
 
 	cursor.execute('''SELECT julian_day, count(*) from paperrename group by julian_day''')
 	results = cursor.fetchall()
@@ -121,155 +121,155 @@ def update_paperrename(usrnm, pswd):
 		actual = int(item[1])
 		cursor.execute('''UPDATE paperrename SET actual_amount = %d WHERE julian_day = %d''' %(actual, jday))
 
-        #Close and save database
-        cursor.close()
+	#Close and save database
+	cursor.close()
 	connection.commit()
-        connection.close()
+	connection.close()
 
-        return None
+	return None
 
 def update_paperjunk(infile_list, usrnm, pswd):
-        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-        cursor = connection.cursor()
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
 
 	for infile in infile_list:
-        	cursor.execute('''UPDATE paperjunk SET renamed = 1 where junk_path = '%s' and folio_path != 'NULL' ''' %(infile))
+		cursor.execute('''UPDATE paperjunk SET renamed = 1 where junk_path = '%s' and folio_path != 'NULL' ''' %(infile))
 
-        #Close and save database
-        cursor.close()
-        connection.commit()
-        connection.close()
+	#Close and save database
+	cursor.close()
+	connection.commit()
+	connection.close()
 
-        return None
+	return None
 
 def rename_uv(dirs, datashift, dbe):
-        #Dummy variable
-        count = 0
+	#Dummy variable
+	count = 0
 
-        #polarization dictionary
-        pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
+	#polarization dictionary
+	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
 
-        for data_file in dirs:
-                count += 1
-                #create csv file to log bad files
-                error_file = open(dbe, 'ab')
-                ewr = csv.writer(error_file, delimiter='|', lineterminator='\n', dialect='excel')
+	for data_file in dirs:
+		count += 1
+		#create csv file to log bad files
+		error_file = open(dbe, 'ab')
+		ewr = csv.writer(error_file, delimiter='|', lineterminator='\n', dialect='excel')
 
-                #Find size of file
-                data_size = os.path.getsize(data_file)
+		#Find size of file
+		data_size = os.path.getsize(data_file)
 
-                #check if file size is over 700MB, if not: skip
-                if data_size > 3832908476:
-                        filler_dir = '/data4/paper/test_rename/64R/*'
-                        file_type = '.uv'
-                elif data_size > 3188051868:
-                        filler_dir = '/data4/paper/test_rename/128R/*'
-                        file_type = '.uv'
+		#check if file size is over 700MB, if not: skip
+		if data_size > 3832908476:
+			filler_dir = '/data4/paper/test_rename/64R/*'
+			file_type = '.uv'
+		elif data_size > 3188051868:
+			filler_dir = '/data4/paper/test_rename/128R/*'
+			file_type = '.uv'
 		elif  data_size > 734003200:
 			filler_dir = '/data4/paper/test_rename/64U/*'
-                        file_type = '.uv'
-                elif data_size < 734003200:
-                        continue
-
-                if not os.path.isdir('/data4/paper/rename/%d.uv' %(count)):
-                        try:
-                                os.makedirs('/data4/paper/rename/%d.uv' %(count))
-                        except:
-                                print 'Error creating new directory for %s' %(dir)
-                                continue
-                        try:
-                                for item in glob.glob(filler_dir):
-                                        shutil.copy(item, '/data4/paper/rename/%d.uv' %(count))
-                        except:
-                                print 'Error copying filler data with %s' %(dir)
-                                continue
-
-                #if over 100MB, copy over to folio/copy to new folder and rename
-                try:
-                        shutil.move(data_file, '/data4/paper/rename/%d.uv/visdata' %(count))
-                except:
-                        print 'Directory /data4/paper/rename/%d.uv/ doesnt exist' %(count)
-                        continue
-
-                #set string to location of new .uv file
-                newUV = '/data4/paper/rename/%d.uv' %(count)
-
-                #allows uv access
-                try:
-                        print 'Accessing uv...'
-                        #Fixes random fatal error
-                        uv = 0
-                        uv = A.miriad.UV(newUV)
-                        print 'uv Success'
-                except:
-                        item = [newUV, dir,'Cannot access .uv file']
-                        ewr.writerow(item)
-                        error_file.close()
-                        print 'UV Error'
-                        continue
-
-                print 'jd...'
-                #find Julian Date
-                jdate_num = round(uv['time'], 5)
-		jdate = '%.5f'%(jdate_num)
-
-                #print 'nchan...'
-                #nchan = uv['nchan']
-                #if nchan > 1000:
-                #        file_type = '.uv'
-                #else:
-                #        file_type = '.uvcRRE'
-
-                print 'pol...'
-                #assign letters to each polarization
-                if uv['npol'] == 1:
-                        pol = pol_dict[uv['pol']]
-
-                        #create variable to indicate new directory
-                        newdir = 'zen.' + jdate + '.' + pol + file_type
-                        newfile = os.path.join(datashift, newdir)
-
-                #if polarizations aren't separated
-                if uv['npol'] == 4:
-                        newdir = 'zen.' + jdate + file_type
-                        newfile = os.path.join(datashift, newdir)
-
-                print newfile
-
-                #copy data from one file to the other directory
-                try:
-                        shutil.move(newUV,newfile)
-                except:
-                        item = [newfile, dir, '''Couldn't move file''']
-                        ewr.writerow(item)
-                        error_file.close()
+			file_type = '.uv'
+		elif data_size < 734003200:
 			continue
 
-        return None
+		if not os.path.isdir('/data4/paper/rename/%d.uv' %(count)):
+			try:
+				os.makedirs('/data4/paper/rename/%d.uv' %(count))
+			except:
+				print 'Error creating new directory for %s' %(dir)
+				continue
+			try:
+				for item in glob.glob(filler_dir):
+					shutil.copy(item, '/data4/paper/rename/%d.uv' %(count))
+			except:
+				print 'Error copying filler data with %s' %(dir)
+				continue
+
+		#if over 100MB, copy over to folio/copy to new folder and rename
+		try:
+			shutil.move(data_file, '/data4/paper/rename/%d.uv/visdata' %(count))
+		except:
+			print 'Directory /data4/paper/rename/%d.uv/ doesnt exist' %(count)
+			continue
+
+		#set string to location of new .uv file
+		newUV = '/data4/paper/rename/%d.uv' %(count)
+
+		#allows uv access
+		try:
+			print 'Accessing uv...'
+			#Fixes random fatal error
+			uv = 0
+			uv = A.miriad.UV(newUV)
+			print 'uv Success'
+		except:
+			item = [newUV, dir,'Cannot access .uv file']
+			ewr.writerow(item)
+			error_file.close()
+			print 'UV Error'
+			continue
+
+		print 'jd...'
+		#find Julian Date
+		jdate_num = round(uv['time'], 5)
+		jdate = '%.5f'%(jdate_num)
+
+		#print 'nchan...'
+		#nchan = uv['nchan']
+		#if nchan > 1000:
+		#	file_type = '.uv'
+		#else:
+		#	file_type = '.uvcRRE'
+
+		print 'pol...'
+		#assign letters to each polarization
+		if uv['npol'] == 1:
+			pol = pol_dict[uv['pol']]
+
+			#create variable to indicate new directory
+			newdir = 'zen.' + jdate + '.' + pol + file_type
+			newfile = os.path.join(datashift, newdir)
+
+		#if polarizations aren't separated
+		if uv['npol'] == 4:
+			newdir = 'zen.' + jdate + file_type
+			newfile = os.path.join(datashift, newdir)
+
+		print newfile
+
+		#copy data from one file to the other directory
+		try:
+			shutil.move(newUV,newfile)
+		except:
+			item = [newfile, dir, '''Couldn't move file''']
+			ewr.writerow(item)
+			error_file.close()
+			continue
+
+	return None
 
 def paperrename(auto):
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-        move_data = 'moved_data_%s.psv'%(time_date)
+	move_data = 'moved_data_%s.psv'%(time_date)
 
 	#Credentials
 	if auto != 'y':
 		usrnm = raw_input('Username: ')
-	        pswd = getpass.getpass('Password: ')
+		pswd = getpass.getpass('Password: ')
 
 	else:
 		usrnm = 'immwa'
 		pswd = 'immwa3978'
 
-        #location of directory to move to
-        datashift = '/data4/paper/rename/'
+	#location of directory to move to
+	datashift = '/data4/paper/rename/'
 
-        #Named file to input renaming error
-        dbrn = '/data4/paper/rename/128error.psv'
+	#Named file to input renaming error
+	dbrn = '/data4/paper/rename/128error.psv'
 
 	#Files to temporarily store information about renamed files
 	dbo = '/data4/paper/rename/paperrename_out.psv'
-        dbe = '/data4/paper/rename/false_paperrename.psv'
+	dbe = '/data4/paper/rename/false_paperrename.psv'
 
 	#Checks output dir
 	dir = '/data4/paper/rename/'

@@ -22,21 +22,21 @@ import shutil
 ### Date: 11-23-14
 
 def calculate_free_space(dir):
-        #Calculates the free space left on input dir
-        folio = subprocess.check_output(['du', '-bs', dir])
-        #Amount of available bytes should be free_space
+	#Calculates the free space left on input dir
+	folio = subprocess.check_output(['du', '-bs', dir])
+	#Amount of available bytes should be free_space
 
-        #Do not surpass this amount ~3.1TiB
-        max_space = 3408486046105
+	#Do not surpass this amount ~3.1TiB
+	max_space = 3408486046105
 
 	total_space = 0
-        for output in folio.split('\n'):
-                subdir = output.split('\t')[-1]
-                if subdir == dir:
-                        total_space = int(output.split('\t')[0])
-        free_space = max_space - total_space
+	for output in folio.split('\n'):
+		subdir = output.split('\t')[-1]
+		if subdir == dir:
+			total_space = int(output.split('\t')[0])
+	free_space = max_space - total_space
 
-        return free_space
+	return free_space
 
 def find_data(usrnm, pswd):
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
@@ -63,89 +63,89 @@ def find_data(usrnm, pswd):
 def move_files(infile_list, outfile, move_data, usrnm, pswd):
 	host = 'folio'
 
-        #create file to log movement data       
-        dbo = os.path.join('/data4/paper/feed', move_data)
-        dbr = open(dbo,'wb')
-        dbr.close()
+	#create file to log movement data       
+	dbo = os.path.join('/data4/paper/feed', move_data)
+	dbr = open(dbo,'wb')
+	dbr.close()
 
-        o_dict = {}
-        for file in infile_list:
-                zen = file.split('/')[-1]
+	o_dict = {}
+	for file in infile_list:
+		zen = file.split('/')[-1]
 		psa = file.split('.')[-4]
 
-                subdir = os.path.join(psa,zen)
-                outdir = os.path.join(outfile,psa)
+		subdir = os.path.join(psa,zen)
+		outdir = os.path.join(outfile,psa)
 
-                if not os.path.isdir(outdir):
-                        os.mkdir(outdir)
+		if not os.path.isdir(outdir):
+			os.mkdir(outdir)
 
-                out = os.path.join(outfile,subdir)
+		out = os.path.join(outfile,subdir)
 
-                o_dict.update({file:out})
+		o_dict.update({file:out})
 
 	#List of files added
 	outfile_list = []
 
-        #Load data into named database and table
-        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-        cursor = connection.cursor()
+	#Load data into named database and table
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
 
-        #Load into db
-        for infile in infile_list:
-                if infile.split('.')[-1] != 'uv':
-                        print 'Invalid file type'
-                        sys.exit()
+	#Load into db
+	for infile in infile_list:
+		if infile.split('.')[-1] != 'uv':
+			print 'Invalid file type'
+			sys.exit()
 
-                outfile = o_dict[infile]
+		outfile = o_dict[infile]
 
-                #Opens file to append to
-                dbr = open(dbo, 'ab')
-                wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
+		#Opens file to append to
+		dbr = open(dbo, 'ab')
+		wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 
-                #"moves" file
-                try:
+		#"moves" file
+		try:
 			inner = infile.split(':')[1]
 			shutil.move(inner, outfile)
-                        wr.writerow([infile,outfile])
-                        print infile, outfile
-                        dbr.close()
-                except:
-                        dbr.close()
-                        continue
-                # execute the SQL query using execute() method, updates new location
-                infile_path = infile
-                outfile_path = host + ':' + o_dict[infile]
-                if infile.split('.')[-1] == 'uv':
-                        cursor.execute('''UPDATE paperfeed set raw_path = '%s', moved = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
+			wr.writerow([infile,outfile])
+			print infile, outfile
+			dbr.close()
+		except:
+			dbr.close()
+			continue
+		# execute the SQL query using execute() method, updates new location
+		infile_path = infile
+		outfile_path = host + ':' + o_dict[infile]
+		if infile.split('.')[-1] == 'uv':
+			cursor.execute('''UPDATE paperfeed set raw_path = '%s', moved = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
 		outfile_list.append(outfile_path.split(':')[1])
 
-        print 'File(s) moved and updated'
+	print 'File(s) moved and updated'
 
-        #Close database and save changes
-        cursor.close()
-        connection.commit()
-        connection.close()
+	#Close database and save changes
+	cursor.close()
+	connection.commit()
+	connection.close()
 
 
-        return outfile_list
+	return outfile_list
 
 def email_paperfeed(files):
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
-        server.starttls()
+	server.starttls()
 
-        #Next, log in to the server
-        server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+	#Next, log in to the server
+	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
 
-        msgs = ''
-        #Send the mail
-        for file in files:
+	msgs = ''
+	#Send the mail
+	for file in files:
 		msg = '\n' + file + ' is being moved.\n'
-                msgs = msgs + msg
+		msgs = msgs + msg
 
-        server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
-        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
 	server.sendmail('paperfeed.paperdata@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
 
 	server.quit()
@@ -153,34 +153,34 @@ def email_paperfeed(files):
 	return None
 
 def email_space(table):
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
-        server.starttls()
+	server.starttls()
 
-        #Next, log in to the server
-        server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+	#Next, log in to the server
+	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
 
-        #Send the mail
-        msgs = '\nNot enough space for ' + table + ' on folio'
+	#Send the mail
+	msgs = '\nNot enough space for ' + table + ' on folio'
 
-        server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
-        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
 	server.sendmail('paperfeed.paperdata@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
 
 	server.quit()
 
-        return None
+	return None
 
 def paperfeed(auto):
 	#Create output file
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-        move_data = 'moved_data_%s.psv'%(time_date)
+	move_data = 'moved_data_%s.psv'%(time_date)
 
 	#Credentials
 	if auto != 'y':
 		usrnm = raw_input('Username: ')
-        	pswd = getpass.getpass('Password: ')
+		pswd = getpass.getpass('Password: ')
 	else:
 		usrnm = 'immwa'
 		pswd = 'immwa3978'

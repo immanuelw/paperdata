@@ -42,21 +42,21 @@ def sizeof_fmt(num):
 	return "%3.1f" % (num)
 
 def md5sum(fname):
-        """
-        calculate the md5 checksum of a file whose filename entry is fname.
-        """
-        fname = fname.split(':')[-1]
-        BLOCKSIZE = 65536
-        hasher = hashlib.md5()
-        try:
-                afile = open(fname, 'rb')
-        except(IOError):
-                afile = open("%s/visdata"%fname, 'rb')
-        buf = afile.read(BLOCKSIZE)
-        while len(buf) >0:
-                hasher.update(buf)
-                buf = afile.read(BLOCKSIZE)
-        return hasher.hexdigest()
+	"""
+	calculate the md5 checksum of a file whose filename entry is fname.
+	"""
+	fname = fname.split(':')[-1]
+	BLOCKSIZE = 65536
+	hasher = hashlib.md5()
+	try:
+		afile = open(fname, 'rb')
+	except(IOError):
+		afile = open("%s/visdata"%fname, 'rb')
+	buf = afile.read(BLOCKSIZE)
+	while len(buf) >0:
+		hasher.update(buf)
+		buf = afile.read(BLOCKSIZE)
+	return hasher.hexdigest()
 
 def gen_data_list(usrnm, pswd):
 	#pulls all relevant information from full paperdistiller database
@@ -113,16 +113,16 @@ def gen_data_list(usrnm, pswd):
 
 	print len(results)
 	#Close database and save changes
-        cursor.close()
-        connection.close()
+	cursor.close()
+	connection.close()
 
 	#Results should be list of days that have been completed for all files
 
 	#pulls all relevant information from full paperdistiller database
-        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
 	# prepare a cursor object using cursor() method
-        cursor = connection.cursor()
+	cursor = connection.cursor()
 
 	#Create list of obsnums to check for duplicates-- only adds files that have not been compressed
 	cursor.execute('''SELECT obsnum from paperdata where compressed = 1''')
@@ -204,9 +204,9 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 			error_file.close()
 			continue
 
-	        #allows uv access
+		#allows uv access
 		try:
-		        uv = A.miriad.UV(raw_path)
+			uv = A.miriad.UV(raw_path)
 		except:
 			err = [item, 'Cannot access .uv file']
 			ewr.writerow(err)
@@ -256,15 +256,15 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		tape_index = 'NULL'
 
 		#shows path of npz file
-                npz_path = compr_full_path.split('uvcRRE')[0] + 'uvcRE.npz'
-                if not os.path.isfile(npz_path.split(':')[1]):
-                        npz_path = 'NULL'
+		npz_path = compr_full_path.split('uvcRRE')[0] + 'uvcRE.npz'
+		if not os.path.isfile(npz_path.split(':')[1]):
+			npz_path = 'NULL'
 
-                #shows path of final product
-                if era = 32:
-                        final_product_path = compr_full_path.split('uvcRRE')[0] + '?'
-                        if not os.path.isdir(final_product_path.split(':')[1]):
-                                final_product_path = 'NULL'
+		#shows path of final product
+		if era = 32:
+			final_product_path = compr_full_path.split('uvcRRE')[0] + '?'
+			if not os.path.isdir(final_product_path.split(':')[1]):
+				final_product_path = 'NULL'
 
 		#variable indicating if all files have been successfully compressed in one day
 		write_to_tape = 0
@@ -287,105 +287,105 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 	return None
 
 def calculate_free_space(dir):
-        #Calculates the free space left on input dir
-        folio = subprocess.check_output(['du', '-bs', dir])
-        #Amount of available bytes should be free_space
+	#Calculates the free space left on input dir
+	folio = subprocess.check_output(['du', '-bs', dir])
+	#Amount of available bytes should be free_space
 
-        #Do not surpass this amount ~1.2TiB
-        max_space = 1319413953331
+	#Do not surpass this amount ~1.2TiB
+	max_space = 1319413953331
 
 	total_space = 0
-        for output in folio.split('\n'):
-                subdir = output.split('\t')[-1]
-                if subdir == dir:
-                        total_space = int(output.split('\t')[0])
-        free_space = max_space - total_space
+	for output in folio.split('\n'):
+		subdir = output.split('\t')[-1]
+		if subdir == dir:
+			total_space = int(output.split('\t')[0])
+	free_space = max_space - total_space
 
-        return free_space
+	return free_space
 
 def email_space(table):
-        server = smtplib.SMTP('smtp.gmail.com', 587)
+	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
 	server.starttls()
 
-        #Next, log in to the server
-        server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+	#Next, log in to the server
+	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
 
-        #Send the mail
-        msgs = '\nNot enough space for ' + table + ' on folio'
+	#Send the mail
+	msgs = '\nNot enough space for ' + table + ' on folio'
 
-        server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
-        server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-        server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
 	server.sendmail('paperfeed.paperdata@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
 
 	server.quit()
 
-        return None
+	return None
 
 def move_files(infile_list, outfile, move_data, usrnm, pswd):
-        host = 'folio'
+	host = 'folio'
 
-        #create file to log movement data       
-        dbo = os.path.join(outfile, move_data)
-        dbr = open(dbo,'wb')
-        dbr.close()
+	#create file to log movement data       
+	dbo = os.path.join(outfile, move_data)
+	dbr = open(dbo,'wb')
+	dbr.close()
 
-        o_dict = {}
-        for file in infile_list:
-                zen = file.split('/')[-1]
+	o_dict = {}
+	for file in infile_list:
+		zen = file.split('/')[-1]
 		psa = file.split('.')[-4]
 
-                subdir = os.path.join(psa,zen)
-                outdir = os.path.join(outfile,psa)
+		subdir = os.path.join(psa,zen)
+		outdir = os.path.join(outfile,psa)
 
-                if not os.path.isdir(outdir):
-                        os.mkidr(outdir)
+		if not os.path.isdir(outdir):
+			os.mkidr(outdir)
 
-                out = os.path.join(outfile,subdir)
+		out = os.path.join(outfile,subdir)
 
-                o_dict.update({file:out})
+		o_dict.update({file:out})
 
-        #Load data into named database and table
-        connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-        cursor = connection.cursor()
+	#Load data into named database and table
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
 
-        #Load into db
-        for infile in infile_list:
-                if infile.split('.')[-1] != 'uv':
-                        print 'Invalid file type'
-                        sys.exit()
+	#Load into db
+	for infile in infile_list:
+		if infile.split('.')[-1] != 'uv':
+			print 'Invalid file type'
+			sys.exit()
 
-                outfile = o_dict[infile]
+		outfile = o_dict[infile]
 
-                #Opens file to append to
-                dbr = open(dbo, 'ab')
-                wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
+		#Opens file to append to
+		dbr = open(dbo, 'ab')
+		wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 
-                #"moves" file
-                try:
+		#"moves" file
+		try:
 			inner = infile.split(':')[1]
-                        shutil.move(inner, outfile)
-                        wr.writerow([infile,outfile])
-                        print infile, outfile
-                        dbr.close()
-                except:
-                        dbr.close()
-                        continue
-                # execute the SQL query using execute() method, updates new location
-                infile_path = infile
-                outfile_path = host + ':' + o_dict[infile]
-                if infile.split('.')[-1] == 'uv':
-                        cursor.execute('''UPDATE paperdata set raw_path = '%s', write_to_tape = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
+			shutil.move(inner, outfile)
+			wr.writerow([infile,outfile])
+			print infile, outfile
+			dbr.close()
+		except:
+			dbr.close()
+			continue
+		# execute the SQL query using execute() method, updates new location
+		infile_path = infile
+		outfile_path = host + ':' + o_dict[infile]
+		if infile.split('.')[-1] == 'uv':
+			cursor.execute('''UPDATE paperdata set raw_path = '%s', write_to_tape = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
 
-        print 'File(s) moved and updated'
+	print 'File(s) moved and updated'
 
-        #Close database and save changes
-        cursor.close()
-        connection.commit()
-        connection.close()
+	#Close database and save changes
+	cursor.close()
+	connection.commit()
+	connection.close()
 
-        return None
+	return None
 
 def paperbridge(auto):
 	#User input information

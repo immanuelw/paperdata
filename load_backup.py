@@ -56,7 +56,7 @@ if __name__ == '__main__':
 	backup = raw_input('Insert backup path manually or automatically? (m/a): ')
 	if full =='y':
 		if backup == 'm':
-		        dbnum = raw_input('Insert path of backup: ')
+			dbnum = raw_input('Insert path of backup: ')
 		elif backup == 'a':
 			dbnum = '/data2/home/immwa/scripts/paperdata/backups/paperdata_02-12-2014_20:33:29.sql'
 		load_sql_backup(dbnum, usrnm, pswd)

@@ -107,27 +107,27 @@ def dbsearch_dict(query):
 	return result
 
 def dbsearch(query):
-        # open a database connection
-        # be sure to change the host IP address, username, password and database name to match your own
-        connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
+	# open a database connection
+	# be sure to change the host IP address, username, password and database name to match your own
+	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
 
-        # prepare a cursor object using cursor() method
-        cursor = connection.cursor()
+	# prepare a cursor object using cursor() method
+	cursor = connection.cursor()
 
-        # execute the SQL query using execute() method.
-        cursor.execute(query)
+	# execute the SQL query using execute() method.
+	cursor.execute(query)
 
-        #finds all rows outputted by query, prints them
-        results = cursor.fetchall()
+	#finds all rows outputted by query, prints them
+	results = cursor.fetchall()
 
-        #complete
-        print 'Query Complete'
+	#complete
+	print 'Query Complete'
 
-        # Close connection to database
-        cursor.close()
-        connection.close()
+	# Close connection to database
+	cursor.close()
+	connection.close()
 
-        return results
+	return results
 
 
 #Generate strings to load into query 
