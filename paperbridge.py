@@ -456,7 +456,7 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 				else:
 					infile_npz_path = 'NULL'
 					outfile_npz_path = 'NULL'
-				if os.path.isfile(infile_final_product):
+				if os.path.isdir(infile_final_product):
 					inner_final = infile_final_product.split(':')[1]
 					shutil.move(inner_final, final_product_path)
 					wr.writerow([inner_final,final_product_path])
