@@ -460,7 +460,7 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 		infile_npz_path = infile_npz
 		outfile_path = host + ':' + o_dict[infile]
 		outfile_npz_path = host + ':' + npz_path
-		if infile.split('.')[-1] == 'uv':
+		if infile.split('.')[-1] == 'uvcRRE':
 			cursor.execute('''UPDATE paperdata set path = '%s', npz_path = '%s' where path = '%s' and npz_path = '%s' '''%(outfile_path, outfile_npz_path, infile_path, infile_npz_path))
 
 	print 'File(s) moved and updated'
