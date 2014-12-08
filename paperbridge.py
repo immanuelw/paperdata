@@ -427,6 +427,10 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 			sys.exit()
 
 		infile_npz = infile.split('uvcRRE')[0] + 'uvcRE.npz'
+		infile_final_product = infile.split('uvcRRE')[0] + 'uvcRREzCPSBx'
+
+		infile_npz_path = ''
+		infile_final_path = ''
 
 		outfile = o_dict[infile]
 
@@ -435,6 +439,7 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 		wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 
 		npz_path = outfile_path.split('uvcRRE')[0] + 'uvcRE.npz'
+		final_product_path = outfile_path.split('uvcRRE')[0] + 'uvcRREzCPSBx'
 
 		#"moves" file
 		try:
@@ -448,7 +453,17 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 					shutil.move(inner_npz, npz_path)
 					wr.writerow([inner_npz,npz_path])
 					print inner_npz, npz_path
-					dbr.close()
+				else:
+					infile_npz_path = 'NULL'
+					outfile_npz_path = 'NULL'
+				if os.path.isfile(infile_final_product):
+					inner_final = infile_final_product.split(':')[1]
+					shutil.move(inner_final, final_product_path)
+					wr.writerow([inner_final,final_product_path])
+					print inner_final, final_product_path
+					infile_final_path = 'NULL'
+					outfile_final_path = 'NULL'
+				dbr.close()
 			except:
 				dbr.close()
 				continue
@@ -457,11 +472,15 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 			continue
 		# execute the SQL query using execute() method, updates new location
 		infile_path = infile
-		infile_npz_path = infile_npz
 		outfile_path = host + ':' + o_dict[infile]
-		outfile_npz_path = host + ':' + npz_path
+		if infile_npz_path != 'NULL':
+			infile_npz_path = infile_npz
+			outfile_npz_path = host + ':' + npz_path
+		if infile_final_path != 'NULL':
+			infile_final_path = infile_final_product
+			outfile_final_path = host + ':' + final_product_path
 		if infile.split('.')[-1] == 'uvcRRE':
-			cursor.execute('''UPDATE paperdata set path = '%s', npz_path = '%s' where path = '%s' and npz_path = '%s' '''%(outfile_path, outfile_npz_path, infile_path, infile_npz_path))
+			cursor.execute('''UPDATE paperdata set path = '%s', npz_path = '%s', final_product_path = '%s' where path = '%s' and npz_path = '%s' and final_product_path = '%s' '''%(outfile_path, outfile_npz_path, outfile_final_path, infile_path, infile_npz_path, infile_final_path))
 
 	print 'File(s) moved and updated'
 
