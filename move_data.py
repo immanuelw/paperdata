@@ -106,7 +106,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
 	#Load into db
 	for infile in infile_list:
-		if infile.split('.')[-1] != 'uv'and infile.split('.')[-1] != 'uvcRRE':
+		if infile.split('.')[-1] not in  ['uv', 'uvcRRE', 'npz']:
 			print 'Invalid file type'
 			sys.exit()
 
@@ -130,6 +130,8 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 		outfile_path = host + ':' + outfile
 		if infile.split('.')[-1] == 'uvcRRE':
 			cursor.execute('''UPDATE paperdata set path = '%s' where path = '%s' '''%(outfile_path, infile_path))
+		elif infile.split('.')[-1] == 'npz':
+			cursor.execute('''UPDATE paperdata set npz_path = '%s' where npz_path = '%s' '''%(outfile_path, infile_path))
 		elif infile.split('.')[-1] == 'uv':
 			cursor.execute('''UPDATE paperdata set raw_path = '%s' where raw_path = '%s' '''%(outfile_path, infile_path))
 
