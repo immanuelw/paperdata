@@ -140,7 +140,13 @@ def gen_data_list(usrnm, pswd):
 	for file in results:
 		filenames.append(file[0])
 
-	return [results, obsnums, filenames]
+	filenames_c = []
+	for file in filenames:
+		c_dir = file + 'cRRE'
+		if os.path.isdir(c_dir):
+			filenames_c.append(c_dir)
+
+	return [results, obsnums, filenames, filenames_c]
 
 def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 	host = 'folio'
@@ -387,6 +393,85 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
 	return None
 
+def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
+	host = 'folio'
+
+	#create file to log movement data       
+	dbo = os.path.join(outfile, move_data)
+	dbr = open(dbo,'wb')
+	dbr.close()
+
+	o_dict = {}
+	for file in infile_list:
+		zen = file.split('/')[-1]
+		psa = file.split('.')[-4]
+
+		subdir = os.path.join(psa,zen)
+		outdir = os.path.join(outfile,psa)
+
+		if not os.path.isdir(outdir):
+			os.mkidr(outdir)
+
+		out = os.path.join(outfile,subdir)
+
+		o_dict.update({file:out})
+
+	#Load data into named database and table
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
+
+	#Load into db
+	for infile in infile_list:
+		if infile.split('.')[-1] != 'uvcRRE':
+			print 'Invalid file type'
+			sys.exit()
+
+		infile_npz = infile.split('uvcRRE')[0] + 'uvcRE.npz'
+
+		outfile = o_dict[infile]
+
+		#Opens file to append to
+		dbr = open(dbo, 'ab')
+		wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
+
+		npz_path = outfile_path.split('uvcRRE')[0] + 'uvcRE.npz'
+
+		#"moves" file
+		try:
+			inner = infile.split(':')[1]
+			shutil.move(inner, outfile)
+			wr.writerow([infile,outfile])
+			print infile, outfile
+			try:
+				if os.path.isfile(infile_npz):
+					inner_npz = infile_npz.split(':')[1]
+					shutil.move(inner_npz, npz_path)
+					wr.writerow([inner_npz,npz_path])
+					print inner_npz, npz_path
+					dbr.close()
+			except:
+				dbr.close()
+				continue
+		except:
+			dbr.close()
+			continue
+		# execute the SQL query using execute() method, updates new location
+		infile_path = infile
+		infile_npz_path = infile_npz
+		outfile_path = host + ':' + o_dict[infile]
+		outfile_npz_path = host + ':' + npz_path
+		if infile.split('.')[-1] == 'uv':
+			cursor.execute('''UPDATE paperdata set path = '%s', npz_path = '%s' where path = '%s' and npz_path = '%s' '''%(outfile_path, outfile_npz_path, infile_path, infile_npz_path))
+
+	print 'File(s) moved and updated'
+
+	#Close database and save changes
+	cursor.close()
+	connection.commit()
+	connection.close()
+
+	return None
+
 def paperbridge(auto):
 	#User input information
 	if auto != 'y':
@@ -413,7 +498,7 @@ def paperbridge(auto):
 
 	if free_space >= required_space:
 		#Pull information from paperdistiler
-		results, obsnums, filenames = gen_data_list(usrnm,pswd)
+		results, obsnums, filenames, filenames_c = gen_data_list(usrnm,pswd)
 
 		#Generate data from info pulled
 		gen_data_from_paperdistiller(results, obsnums, dbnum, dbe)
@@ -426,6 +511,8 @@ def paperbridge(auto):
 			move_data = 'moved_data_%s.psv'%(time_date)	
 			outfile = '/data4/paper/raw_to_tape'
 			move_files(filenames, outfile, move_data, usrnm, pswd)
+			outfile_c = '/data4/paper/2013EoR'
+			move_compressed_files(filenames_c, outfile_c, move_data, usrnm, pswd)
 		else:
 			print '''Information logged into '%s' ''' %(dbnum)
 
