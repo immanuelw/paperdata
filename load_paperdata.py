@@ -282,13 +282,13 @@ def gen_paperdata(dirs, dbo, dbe):
 
 			#shows path of final product
 			if era = 32:
-				final_product_path = compr_full_path.split('uvcRRE')[0] + '?'
+				final_product_path = compr_full_path.split('uvcRRE')[0] + 'zCPSBx'
 				if not os.path.isdir(final_product_path.split(':')[1]):
 					final_product_path = 'NULL'
 
 		else:
 			npz_path = 'NULL'
-			final_product_paht = 'NULL'
+			final_product_path = 'NULL'
 
 		#shows index of raw data on tape
 		tape_index = 'NULL'
