@@ -197,8 +197,6 @@ def paperfeed(auto):
 		#FIND DATA
 		infile_list = find_data(usrnm, pswd)
 		#create directory to output to
-		#output_subdir = infile_list[0].split('/')[-2]
-		#outfile = os.path.join('/data4/paper/feed/', output_subdir)
 		outfile = '/data4/paper/feed/'
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
 		outfile_list = move_files(infile_list, outfile, move_data, usrnm, pswd)
