@@ -271,6 +271,8 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 			final_product_path = compr_full_path.split('uvcRRE')[0] + '?'
 			if not os.path.isdir(final_product_path.split(':')[1]):
 				final_product_path = 'NULL'
+		else:
+			 final_product_path = 'NULL'
 
 		#variable indicating if all files have been successfully compressed in one day
 		write_to_tape = 0

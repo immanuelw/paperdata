@@ -285,6 +285,8 @@ def gen_paperdata(dirs, dbo, dbe):
 				final_product_path = compr_full_path.split('uvcRRE')[0] + 'uvcRREzCPSBx'
 				if not os.path.isdir(final_product_path.split(':')[1]):
 					final_product_path = 'NULL'
+			else:
+				 final_product_path = 'NULL'
 
 		else:
 			npz_path = 'NULL'
