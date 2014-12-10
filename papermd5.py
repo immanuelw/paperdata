@@ -37,12 +37,7 @@ def md5sum(fname):
 
 def create_md5(dbo, dbe, usrnm, pswd):
 
-	data_file = open(dbo,'ab')
-	wr = csv.writer(data_file, delimiter='|', lineterminator='\n', dialect='excel')
 
-	#create csv file to log bad files
-	error_file = open(dbe, 'ab')
-	ewr = csv.writer(error_file, delimiter='|', lineterminator='\n', dialect='excel')
 
 	#Removes all files from list that already exist in the database
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdistiller', local_infile=True)
@@ -53,23 +48,35 @@ def create_md5(dbo, dbe, usrnm, pswd):
 
 	#Update database with new md5sums
 	for item in results:
-		filename = item[0]
-		try:
-			md5 = md5sum(filename)
-			wr.writerow([filename,md5])
-		except:
-			ewr.writerow([filename, 'Failed generating md5sum'])
-			continue
+		data_file = open(dbo,'ab')
+		wr = csv.writer(data_file, delimiter='|', lineterminator='\n', dialect='excel')
+		#create csv file to log bad files
+		error_file = open(dbe, 'ab')
+		ewr = csv.writer(error_file, delimiter='|', lineterminator='\n', dialect='excel')
 
-		cursor.execute('''UPDATE file SET md5sum = '%s' WHERE filename = '%s' ''' %(md5, filename))
-		
+		filename = item[0]
+		if os.path.isdir(filename):
+			try:
+				md5 = md5sum(filename)
+				wr.writerow([filename,md5])
+				data_file.close()
+			except:
+				ewr.writerow([filename, 'Failed generating md5sum'])
+				error_file.close()
+				continue
+			cursor.execute('''UPDATE file SET md5sum = '%s' WHERE filename = '%s' ''' %(md5, filename))
+		else:
+			ewr.writerow([filename, 'Path no longer exists'])
+			error_file.close()
+			continue
+	
 	cursor.close()
 	connection.commit()
 	connection.close()
 
 	return None
 
-def update_md5(auto):
+def papermd5(auto):
 	#User input information
 	if auto != 'y':
 		usrnm = raw_input('Username: ')
@@ -87,4 +94,4 @@ def update_md5(auto):
 
 if __name__ == '__main__':
 	auto = 'n'
-	update_md5(auto)
+	papermd5(auto)
