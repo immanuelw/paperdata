@@ -268,7 +268,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 
 		#shows path of final product
 		if era = 32:
-			final_product_path = compr_full_path.split('uvcRRE')[0] + '?'
+			final_product_path = compr_full_path.split('uvcRRE')[0] + 'uvcRREzCPSBx'
 			if not os.path.isdir(final_product_path.split(':')[1]):
 				final_product_path = 'NULL'
 		else:
