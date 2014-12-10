@@ -16,4 +16,4 @@ if __name__ == '__main__':
 			auto = 'y'
 			paperbridge.paperbridge(auto)
 	except KeyboardInterrupt:
-                pass
+		pass

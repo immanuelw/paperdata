@@ -15,4 +15,4 @@ if __name__ == '__main__':
 			auto = 'y'
 			paperrename.paperename(auto)
 	except KeyboardInterrupt:
-                pass
+		pass

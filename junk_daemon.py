@@ -15,4 +15,4 @@ if __name__ == '__main__':
 			auto = 'y'
 			paperjunk.paperjunk(auto)
 	except KeyboardInterrupt:
-                pass
+		pass
