@@ -124,8 +124,8 @@ def gen_data_list(usrnm, pswd):
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor()
 
-	#Create list of obsnums to check for duplicates-- only adds files that have not been compressed
-	cursor.execute('''SELECT obsnum from paperdata where compressed = 1''')
+	#Create list of obsnums to check for duplicates
+	cursor.execute('''SELECT obsnum from paperdata''')
 	obs = cursor.fetchall()
 
 	obsnums = []
@@ -198,6 +198,8 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 			edge = 1
 			err = [item, 'No compressed file -- possibly edge file']
 			ewr.writerow(err)
+			compr_path = 'NULL'
+			compr_full_path = 'NULL'
 		
 
 		#indicates size of raw file in MB
@@ -262,12 +264,15 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		tape_index = 'NULL'
 
 		#shows path of npz file
-		npz_path = compr_full_path.split('uvcRRE')[0] + 'uvcRE.npz'
-		if not os.path.isfile(npz_path.split(':')[1]):
+		if compr_full_path != 'NULL':
+			npz_path = compr_full_path.split('uvcRRE')[0] + 'uvcRE.npz'
+			if not os.path.isfile(npz_path.split(':')[1]):
+				npz_path = 'NULL'
+		else:
 			npz_path = 'NULL'
 
 		#shows path of final product
-		if era = 32:
+		if era == 32 and compr_full_path != 'NULL':
 			final_product_path = compr_full_path.split('uvcRRE')[0] + 'uvcRREzCPSBx'
 			if not os.path.isdir(final_product_path.split(':')[1]):
 				final_product_path = 'NULL'
@@ -517,7 +522,7 @@ def paperbridge(auto):
 	dir = '/data4/paper/raw_to_tape/'
 	free_space = calculate_free_space(dir)
 
-	if free_space >= required_space:
+	if free_space <= required_space:
 		#Pull information from paperdistiler
 		results, obsnums, filenames, filenames_c = gen_data_list(usrnm,pswd)
 
