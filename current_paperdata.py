@@ -1460,7 +1460,7 @@ def main():
     connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
     cursor = connection.cursor()
 
-    cursor.execute('''SELECT era, julian_day, SUBSTRING_INDEX(raw_location, 'z', 1), SUBSTRING_INDEX(path, 'z', 1), count(*) from paperdata group by julian_day, SUBSTRING_INDEX(raw_location, 'z', 1), SUBSTRING_INDEX(path, 'z', 1) order by julian_day ASC''')
+    cursor.execute('''SELECT era, julian_day, SUBSTRING_INDEX(raw_path, 'z', 1), SUBSTRING_INDEX(path, 'z', 1), count(*) from paperdata group by julian_day, SUBSTRING_INDEX(raw_path, 'z', 1), SUBSTRING_INDEX(path, 'z', 1) order by julian_day ASC''')
     results = cursor.fetchall()
 
     cursor.close()
