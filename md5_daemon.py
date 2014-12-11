@@ -14,5 +14,6 @@ if __name__ == '__main__':
 		while True:
 			auto = 'y'
 			update_md5.update_md5(auto)
+			time.sleep(28800)
 	except KeyboardInterrupt:
 		pass
