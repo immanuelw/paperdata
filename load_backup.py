@@ -64,5 +64,5 @@ if __name__ == '__main__':
 		if backup == 'm':
 			dbnum = raw_input('Insert path of backup: ')
 		elif backup == 'a':
-			dbnum = '/data2/home/immwa/scripts/paperdata/backups/version8-4_12-07-2014.psv'
+			dbnum = '/data2/home/immwa/scripts/paperdata/backups/version9-1_12-11-2014.psv'
 		load_backup(dbnum, usrnm, pswd)
