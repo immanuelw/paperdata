@@ -86,6 +86,67 @@ def load_db(dbo, usrnm, pswd):
 
 	return None
 
+def obsnum_fixer(usrnm, pswd):
+	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
+	cursor.execute('''SELECT julian_day, count(*) from paperdata group by julian_day order by julian_day asc''')
+	results = cursor.fetchall()
+
+	jday = [int(item[0]) for item in results if int(item[1]) > 60]
+
+	for day in jday:
+		cursor.execute('''SELECT julian_date, polarization from paperdata where julian_day = %s and raw_path like '%s' group by julian_date, polarization order by julian_date asc'''%(day,'folio%'))
+
+		jd_pols = cursor.fetchall()
+		#collects information from query
+		jd_one = [round(float(jd),5) for jd,pol in jd_pols if pol == jd_pols[0][1]]
+
+		length = n.mean(n.diff(jd_one))
+		print length
+		cursor.execute('''SELECT raw_path, obsnum from paperdata where julian_day = %s and raw_path like '%s' group by julian_date, polarization order by julian_date asc'''%(day,'folio%'))
+		results = cursor.fetchall()
+
+		#results is a list of lists
+		for item in results:
+			full_path = item[0]
+			path = item[0].split(':')[1]
+
+			#Random error
+			if path in ['/mnt/WilliamHenryHarrison/psa6250/zen.2456250.16694.uv', '/nas1/data/psa6644/zen.2456644.18779.xy.uv', '/nas1/data/psa6644/zen.2456644.19475.xx.uv', '/nas1/data/psa6644/zen.2456644.19475.xx.uv', '/nas2/data/psa6650/zen.2456650.16694.xx.uv', '/nas2/data/psa6650/zen.2456650.16694.xy.uv']:
+			continue
+
+			#allows uv access
+			try:
+				uv = A.miriad.UV(path)
+			except:
+				continue
+			try:
+				jdate = uv['time']
+			except:
+				continue
+
+			#assign letters to each polarization
+			if uv['npol'] == 1:
+				polarization = pol_dict[uv['pol']]
+			elif uv['npol'] == 4:
+				#       polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
+				polarization = 'yy'
+			#variable to input into jdpol2obsnum
+			divided_jdate = length
+
+			#gives each file unique id
+			if length > 0:
+				obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
+			else:
+				obsnum = 0
+			cursor.execute('''UPDATE paperdata set obsnum = %d, data_length = %.5f where raw_path = '%s' ''' %(obsnum, length, full_path))
+	cursor.close()
+	connection.commit()
+	connection.close()
+
+	return None
+
 def gen_paperdata(dirs, dbo, dbe):
 	host = socket.gethostname()
 
@@ -398,6 +459,12 @@ def load_paperdata(auto):
 		pswd2 = raw_input('Input password: ')
 		load_db(dbo, usrnm2, pswd2)
 		sys.exit()
+
+	fix_obs = raw_input('Update obsnums (y/n)?: ')
+	if fix_obs == 'y':
+		usrnm3 = raw_input('Input username with edit privileges: ')
+		pswd3 = raw_input('Input password: ')
+		obsnum_fixer(usrnm3, pswd3)
 
 	return None
 
