@@ -8,6 +8,34 @@ import getpass
 import os
 import csv
 
+def clean_paperdata(usrnm, pswd):
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
+
+	cursor.execute('''SELECT path, raw_path, npz_path, final_product_path from paperdata where (path like 'folio%' or raw_path like 'folio%')''')
+	results = cursor.fetchall()
+	for item in results:
+		path = item[0]
+		raw_path = item[1]
+		npz_path = item[2]
+		final_product_path = item[3]
+		if not os.path.isdir(path.split(':')[1]):
+			cursor.execute('''UPDATE paperdata SET path = 'NULL' where path = '%s' ''' %(path))
+		if not os.path.isdir(raw_path.split(':')[1]):
+			cursor.execute('''UPDATE paperdata SET raw_path = 'NULL' where raw_path = '%s' ''' %(raw_path))
+		if not os.path.isfile(npz_path.split(':')[1]):
+			cursor.execute('''UPDATE paperdata SET npz_path = 'NULL' where npz_path = '%s' ''' %(npz_path))
+		if not os.path.isdir(final_product_path.split(':')[1]):
+			cursor.execute('''UPDATE paperdata SET final_product_path = 'NULL' where final_product_path = '%s' ''' %(final_product_path))
+
+	cursor.execute('''DELETE FROM paperdata where raw_path = 'NULL' and path = 'NULL' ''')
+	# Close and save database
+	cursor.close()
+	connection.commit()
+	connection.close()
+
+	return None
+
 def generate_entry_1(item):
 	if item[0] in ['NULL', 'ON TAPE']:
 		path = item[0]
@@ -172,4 +200,9 @@ def consolidate(dbo):
 
 if __name__ == '__main__':
 	dbo = '/data2/home/immwa/scripts/paperdata/single_entry.psv'
+	clean = raw_input('Clean?(y/n): ')
+	if clean == 'y':
+		usrnm = raw_input('Username: ')
+		pswd = getpass.getpass('Password: ')
+		clean_paperdata(usrnm, pswd)
 	consolidate(dbo)
