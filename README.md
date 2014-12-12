@@ -75,10 +75,6 @@ Important scripts:
 	table_descr.txt:
 		Table describing the current status of data in the database -- location, amount raw and compressed, julian_day.
 
-	describe_paperdata.py:
-		Generates a list of field names and types of paperdata -- generates paperdata_schema base.
-		Do not run unless paperdata table has been rebuilt recently.
-
 	db_paperdata_schema:
 		Description of each field in paperdata.
 
