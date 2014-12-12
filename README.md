@@ -63,6 +63,8 @@ Important scripts:
 		Backups the entire paperdata database, loading all into a created folder labeled with time and data
 		-- separated .psv files by table.
 
+	papermd5.py & md5_daemon.py:
+		Creates md5sums for all files without in paperdistiller for quicker loading into paperdata.
 
 	***DATABASE DESCRIPTION***
 
