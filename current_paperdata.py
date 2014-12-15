@@ -1484,7 +1484,7 @@ def main():
 	full_item = item[:4] + (file_type, item[4])
 	x.add_row(full_item)
     stuff = x.get_string()
-    with open('/data2/home/immwa/scripts/paper/table_descr.txt', 'w') as df:
+    with open('/data2/home/immwa/scripts/paper/table_descr.txt', 'wb') as df:
 	df.write(stuff)
     #print stuff   
 
