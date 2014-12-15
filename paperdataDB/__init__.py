@@ -19,7 +19,7 @@ import decimal
 # import paperdataDB as pdb
 # files = pdb.dbsearch(pdb.fetch(list_of_info), pswd)
 #OR combine dbsearch to include both
-# files = pdf.dbsearch(db_query, pswd)
+# files = pdb.dbsearch(db_query, pswd)
 
 # config variables
 
@@ -52,8 +52,8 @@ RANGE = 28
 LIST = 29
 NONE = 30
 
-SEARCH = 40
-NOSEARCH = 41
+SEARCH = 1
+NOSEARCH = 0
 
 def constants():
 	const = {PATH:'PATH', ERA:'ERA', ERA_TYPE:'ERA_TYPE', OBSNUM:'OBSNUM', MD5SUM:'MS5SUM', JDAY:'JDAY', JDATE:'JDATE', POL:'POL', LENGTH:'LENGTH', RAW_PATH:'RAW_PATH', CAL_PATH:'CAL_PATH', NPZ_PATH:'NPZ_PATH', FINAL_PRODUCT_PATH: 'FINAL PRODUCT_PATH', TAPE_INDEX:'TAPE_INDEX', COMPR_SIZE:'COMPR_SIZE', RAW_SIZE:'RAW_SIZE', COMPRESSED:'COMPRESSED', WRITE_TO_TAPE:'WRITE_TO_TAPE', DELETE_FILE:'DELETE_FILE', RESTORE_HISTORY:'RESTORE_HISTORY', MIN:'MIN', MAX:'MAX', EXACT:'EXACT', RANGE:'RANGE', NONE:'NONE', SEARCH:'SEARCH', NOSEARCH:'NOSEARCH'}
@@ -141,7 +141,7 @@ def fetch(info_list):
 	for item in info_list:
 		if len(item) != 4:
 			print 'ERROR -- LIST %s does not have enough entries' %(item)
-			sys.exit() #HOW SHOULD I THROW ERRORS?
+			return None #HOW SHOULD I THROW ERRORS?
 
 		#instantiates field variable
 		if isinstance(item[0], str):
@@ -152,7 +152,7 @@ def fetch(info_list):
 		if item[2] == EXACT:
 			if len(item[3]) != 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-				sys.exit() #HOW SHOULD I THROW ERRORS?
+				return None #HOW SHOULD I THROW ERRORS?
 
 			exact = item[3][0]
 
@@ -169,7 +169,7 @@ def fetch(info_list):
 		elif item[2] == MIN:
 			if len(item[3]) != 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-				sys.exit() #HOW SHOULD I THROW ERRORS?
+				return None #HOW SHOULD I THROW ERRORS?
 
 			min = item[3][0]
 
@@ -184,7 +184,7 @@ def fetch(info_list):
 		elif item[2] == MAX:
 			if len(item[3]) != 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
-				sys.exit() #HOW SHOULD I THROW ERRORS?
+				return None #HOW SHOULD I THROW ERRORS?
 
 			max = item[3][0]
 
@@ -199,7 +199,7 @@ def fetch(info_list):
 		elif item[2] == RANGE:
 			if len(item[3]) != 2:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
-				sys.exit() #HOW SHOULD I THROW ERRORS?
+				return None #HOW SHOULD I THROW ERRORS?
 
 			min = item[3][0]
 			max = item[3][1]
@@ -216,7 +216,7 @@ def fetch(info_list):
 		elif item[2] == LIST:
 			if len(item[3]) <= 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-				sys.exit() #HOW SHOULD I THROW ERRORS?
+				return None #HOW SHOULD I THROW ERRORS?
 
 			if item[1] == SEARCH:
 				query.append(field)
@@ -249,14 +249,14 @@ def fetch(info_list):
 		elif item[2] == NONE:
 			if len(item[3]) != 0:
 				print 'ERROR -- LIST %s has too many entries' %(item) 
-				sys.exit() #HOW SHOULD I THROW ERRORS?
+				return None #HOW SHOULD I THROW ERRORS?
 
 			#adding info to lists to generate strings later
 			if item[1] == SEARCH:
 				query.append(field)
 
 		else:
-			sys.exit() #HOW SHOULD I THROW ERRORS?
+			return None #HOW SHOULD I THROW ERRORS?
 
 	for item in searchstr:
 		if item == searchstr[0]:
@@ -280,8 +280,18 @@ def fetch(info_list):
 
 	return dbstr
 
+class searchobj:
+	def __init__(self):
+		self.info_list = []
+		return None
+	def return(self, field, search_bool, limit, *range):
+		self.info_list.append([field, search_bool, limit, range])
+		return None
+	def output(self):
+		return dbsearch(fetch(self.info_list))
+	def output_dict(self):
+		return dbsearch_dict(fetch(self.info_list))
+
 #Only do things if running this script, not importing
 if __name__ == '__main__':
-	#allows user to input database and table queried
-	usrnm = raw_input('Username: ')
-	pswd = getpass.getpass('Password: ')
+	print 'Not a script file'
