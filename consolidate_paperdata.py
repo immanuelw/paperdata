@@ -128,7 +128,7 @@ def generate_entry_2(item, ra):
 	except:
 		tape = ra[13]
 
-	it = (path,item[1],item[2],obsnum,ra[4],item[5],item[6],ra[7],length,raw_path,cal,item[11],item[12],tape,compr_sz,raw_sz,item[16],ra[17],ra[18],ra[19],ra[20])
+	it = (path,item[1],item[2],obsnum,ra[4],ra[5],ra[6],ra[7],length,raw_path,cal,item[11],item[12],tape,compr_sz,raw_sz,item[16],ra[17],ra[18],ra[19],ra[20])
 	return it
 
 def consolidate(dbo):
@@ -161,7 +161,8 @@ def consolidate(dbo):
 				back.append(it)
 		else:
 			#do stuff
-			cursor.execute('''SELECT * from paperdata where julian_date = '%.5f' and polarization = '%s' order by julian_date asc''' %(float(item[6]), item[7]))
+			zen = '%' + item[0].split('/')[-1][:-4] + '%'
+			cursor.execute('''SELECT * from paperdata where raw_path like '%s' or path like '%s' order by julian_date asc''' %(zen, zen))
 			ras = cursor.fetchall()
 			for ra in ras:
 				if len(ras) > 1:
@@ -178,7 +179,8 @@ def consolidate(dbo):
 			continue
 		else:
 			#do stuff
-			cursor.execute('''SELECT * from paperdata where julian_date = '%.5f' and polarization = '%s' order by julian_date asc''' %(float(ra[6]), ra[7]))
+			zen = '%' + ra[9].split('/')[-1] + '%'
+			cursor.execute('''SELECT * from paperdata where raw_path like '%s' or path like '%s' order by julian_date asc''' %(zen, zen))
 			items = cursor.fetchall()
 			for item in items:
 				if len(items) > 1:
@@ -190,7 +192,6 @@ def consolidate(dbo):
 						continue
 					else:
 						front.append(it)
-
 	#Takes only unique entries
 	total = tuple(back + front)
 	backup = set(total)
