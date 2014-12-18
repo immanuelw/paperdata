@@ -162,7 +162,7 @@ def consolidate(dbo):
 		else:
 			#do stuff
 			zen = '%' + item[0].split('/')[-1][:-4] + '%'
-			cursor.execute('''SELECT * from paperdata where raw_path like '%s' or path like '%s' order by julian_date asc''' %(zen, zen))
+			cursor.execute('''SELECT * from paperdata where raw_path like '%s' order by julian_date asc''' %(zen))
 			ras = cursor.fetchall()
 			for ra in ras:
 				if len(ras) > 1:
@@ -174,13 +174,19 @@ def consolidate(dbo):
 						continue
 					else:
 						back.append(it)
+			if len(ras) == 0:
+				it = generate_entry_1(item)
+				if it is None:
+					continue
+				else:
+					front.append(it)
 	for ra in resb:
 		if ra[0] != 'NULL':
 			continue
 		else:
 			#do stuff
 			zen = '%' + ra[9].split('/')[-1] + '%'
-			cursor.execute('''SELECT * from paperdata where raw_path like '%s' or path like '%s' order by julian_date asc''' %(zen, zen))
+			cursor.execute('''SELECT * from paperdata where path like '%s' order by julian_date asc''' %(zen))
 			items = cursor.fetchall()
 			for item in items:
 				if len(items) > 1:
@@ -192,6 +198,12 @@ def consolidate(dbo):
 						continue
 					else:
 						front.append(it)
+			if len(items) == 0:
+				it = generate_entry_1(ra)
+				if it is None:
+					continue
+				else:
+					front.append(it)
 	#Takes only unique entries
 	total = tuple(back + front)
 	backup = set(total)
