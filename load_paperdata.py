@@ -114,7 +114,7 @@ def obsnum_fixer(usrnm, pswd):
 
 			#Random error
 			if path in ['/mnt/WilliamHenryHarrison/psa6250/zen.2456250.16694.uv', '/nas1/data/psa6644/zen.2456644.18779.xy.uv', '/nas1/data/psa6644/zen.2456644.19475.xx.uv', '/nas1/data/psa6644/zen.2456644.19475.xx.uv', '/nas2/data/psa6650/zen.2456650.16694.xx.uv', '/nas2/data/psa6650/zen.2456650.16694.xy.uv']:
-			continue
+				continue
 
 			#allows uv access
 			try:
