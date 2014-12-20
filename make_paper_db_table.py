@@ -37,7 +37,8 @@ def make_paperdata(cursor):
 	edge BOOLEAN DEFAULT FALSE,
 	write_to_tape BOOLEAN DEFAULT FALSE,
 	delete_file BOOLEAN DEFAULT FALSE,
-	restore_history VARCHAR(255) DEFAULT NULL);''')
+	restore_history VARCHAR(255) DEFAULT NULL,
+	comments TEXT);''')
 
 	print 'Table paperdata created'
 

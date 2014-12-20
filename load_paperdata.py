@@ -368,8 +368,11 @@ def gen_paperdata(dirs, dbo, dbe):
 		#indicates times the file has been restored
 		restore_history = 'NULL'
 
+		#comment about file
+		comment = ''
+
 		#create list of important data and open csv file
-		databs = [compr_full_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_full_path,cal_path,npz_path,final_product_path,tape_index,compr_file_size,raw_file_size,compressed,edge,write_to_tape,delete_file,restore_history]
+		databs = [compr_full_path,era,era_type,obsnum,mdsum,jday,jdate,polarization,length,raw_full_path,cal_path,npz_path,final_product_path,tape_index,compr_file_size,raw_file_size,compressed,edge,write_to_tape,delete_file,restore_history,comment]
 		print databs
 
 		#write to csv file
