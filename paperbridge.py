@@ -125,26 +125,17 @@ def gen_data_list(usrnm, pswd):
 	cursor = connection.cursor()
 
 	#Create list of obsnums to check for duplicates
-	cursor.execute('''SELECT obsnum from paperdata''')
+	cursor.execute('''SELECT obsnum, compressed, edge from paperdata''')
 	obs = cursor.fetchall()
 
-	obsnums = []
-	for obsnum in obs:
-		obsnums.append(obsnum[0])
+	obsnums = [obsnum for obsnum in obs]
 
 	#Close db connection
 	cursor.close()
 	connection.close()
 
-	filenames = []
-	for file in results:
-		filenames.append(file[0])
-
-	filenames_c = []
-	for file in filenames:
-		c_dir = file + 'cRRE'
-		if os.path.isdir(c_dir):
-			filenames_c.append(c_dir)
+	filenames = [file[0] for file in results]
+	filenames_c = [file + 'cRRE' for file in filenames if os.path.isdir(file + 'cRRE')]
 
 	return [results, obsnums, filenames, filenames_c]
 
@@ -156,8 +147,8 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		error_file = open(dbe,'ab')
 		ewr = csv.writer(error_file, delimiter='|', lineterminator='\n', dialect='excel')
 		#check for duplicate
-		if item[1] in obsnums:
-			err = [item, 'Obsnum already in paperdata']
+		if (item[1], 1, 0) in obsnums:
+			err = [item, 'File already in paperdata']
 			ewr.writerow(err)
 			error_file.close()
 			continue
@@ -210,6 +201,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 			err = [item, 'No .uv file']
 			ewr.writerow(err)
 			error_file.close()
+			data_file.close()
 			continue
 
 		#allows uv access
@@ -353,7 +345,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 		outdir = os.path.join(outfile,psa)
 
 		if not os.path.isdir(outdir):
-			os.mkidr(outdir)
+			os.mkdir(outdir)
 
 		out = os.path.join(outfile,subdir)
 
@@ -417,7 +409,7 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 		outdir = os.path.join(outfile,psa)
 
 		if not os.path.isdir(outdir):
-			os.mkidr(outdir)
+			os.mkdir(outdir)
 
 		out = os.path.join(outfile,subdir)
 
@@ -535,8 +527,8 @@ def paperbridge(auto):
 			load_paperdata.load_db(dbnum, usrnm, pswd)
 			#Update paperdata and move data
 			move_data = 'moved_data_%s.psv'%(time_date)	
-			outfile = '/data4/paper/raw_to_tape'
-			move_files(filenames, outfile, move_data, usrnm, pswd)
+			#outfile = '/data4/paper/raw_to_tape'
+			#move_files(filenames, outfile, move_data, usrnm, pswd)
 			outfile_c = '/data4/paper/2013EoR'
 			move_compressed_files(filenames_c, outfile_c, move_data, usrnm, pswd)
 		else:
