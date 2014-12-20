@@ -86,6 +86,62 @@ def load_new_data(infile, new_data):
 
 def move_files(infile_list, outfile, move_data, usrnm, pswd):
 	host = socket.gethostname()
+
+	#create file to log movement data       
+	dbo = os.path.join(outfile, move_data)
+	dbr = open(dbo,'wb')
+	dbr.close()
+
+	o_dict = {}
+	for file in infile_list:
+		zen = file.split('/')[-1]
+		out = os.path.join(outfile,zen)
+		o_dict.update({file:out})
+
+	#Load data into named database and table
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
+
+	#Load into db
+	for infile in infile_list:
+		if infile.split('.')[-1] != 'uv':
+			print 'Invalid file type'
+			sys.exit()
+
+		outfile = o_dict[infile]
+
+		#Opens file to append to
+		dbr = open(dbo, 'ab')
+		wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
+
+		#"moves" file
+		try:
+			inner = infile.split(':')[1]
+			shutil.move(inner, outfile)
+			wr.writerow([infile,outfile])
+			print infile, outfile
+			dbr.close()
+		except:
+			dbr.close()
+			continue
+		# execute the SQL query using execute() method, updates new location
+		infile_path = infile
+		outfile_path = host + ':' + o_dict[infile]
+		if infile.split('.')[-1] == 'uv':
+			cursor.execute('''UPDATE paperdata set raw_path = '%s' where raw_path = '%s' '''%(outfile_path, infile_path))
+
+	print 'File(s) moved and updated'
+
+	#Close database and save changes
+	cursor.close()
+	connection.commit()
+	connection.close()
+
+	return None
+
+
+def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
+	host = socket.gethostname()
 	#Directory of the infiles
 	infile_dir = infile_list[0].split('z')[0]
 
@@ -106,34 +162,65 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 
 	#Load into db
 	for infile in infile_list:
-		if infile.split('.')[-1] not in  ['uv', 'uvcRRE', 'npz']:
+		if infile.split('.')[-1] not in  ['uvcRRE']:
 			print 'Invalid file type'
 			sys.exit()
+
+		infile_npz = infile.split('uvcRRE')[0] + 'uvcRE.npz'
+		infile_final_product = infile.split('uvcRRE')[0] + 'uvcRREzCPSBx'
+
+		infile_npz_path = ''
+		infile_final_path = ''
 
 		outfile = o_dict[infile]
 
 		#Opens file to append to
-		dbr = open(dbo, 'a')
+		dbr = open(dbo, 'ab')
 		wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 
-		#moves file
+		npz_path = outfile.split('uvcRRE')[0] + 'uvcRE.npz'
+		final_product_path = outfile.split('uvcRRE')[0] + 'uvcRREzCPSBx'
+
+		#"moves" file
 		try:
-			shutil.move(infile,outfile)
+			inner = infile.split(':')[1]
+			shutil.move(inner, outfile)
 			wr.writerow([infile,outfile])
 			print infile, outfile
-			dbr.close()
+			try:
+				if os.path.isfile(infile_npz):
+					inner_npz = infile_npz.split(':')[1]
+					shutil.move(inner_npz, npz_path)
+					wr.writerow([inner_npz,npz_path])
+					print inner_npz, npz_path
+				else:
+					infile_npz_path = 'NULL'
+					outfile_npz_path = 'NULL'
+				if os.path.isdir(infile_final_product):
+					inner_final = infile_final_product.split(':')[1]
+					shutil.move(inner_final, final_product_path)
+					wr.writerow([inner_final,final_product_path])
+					print inner_final, final_product_path
+					infile_final_path = 'NULL'
+					outfile_final_path = 'NULL'
+				dbr.close()
+			except:
+				dbr.close()
+				continue
 		except:
 			dbr.close()
 			continue
 		# execute the SQL query using execute() method, updates new location
-		infile_path = host + ':' + infile
-		outfile_path = host + ':' + outfile
+		infile_path = infile
+		outfile_path = host + ':' + o_dict[infile]
+		if infile_npz_path != 'NULL':
+			infile_npz_path = infile_npz
+			outfile_npz_path = host + ':' + npz_path
+		if infile_final_path != 'NULL':
+			infile_final_path = infile_final_product
+			outfile_final_path = host + ':' + final_product_path
 		if infile.split('.')[-1] == 'uvcRRE':
-			cursor.execute('''UPDATE paperdata set path = '%s' where path = '%s' '''%(outfile_path, infile_path))
-		elif infile.split('.')[-1] == 'npz':
-			cursor.execute('''UPDATE paperdata set npz_path = '%s' where npz_path = '%s' '''%(outfile_path, infile_path))
-		elif infile.split('.')[-1] == 'uv':
-			cursor.execute('''UPDATE paperdata set raw_path = '%s' where raw_path = '%s' '''%(outfile_path, infile_path))
+			cursor.execute('''UPDATE paperdata set path = '%s', npz_path = '%s', final_product_path = '%s' where path = '%s' and npz_path = '%s' and final_product_path = '%s' '''%(outfile_path, outfile_npz_path, outfile_final_path, infile_path, infile_npz_path, infile_final_path))
 
 	print 'File(s) moved and updated'
 
@@ -153,7 +240,7 @@ if __name__ == '__main__':
 	pswd = getpass.getpass('Password: ')
 
 	#File information
-	infile = raw_input('Full input path (EX: /data4/paper/feed/2456640/zen.*.uv*): ')
+	infile = raw_input('Full input path (EX: /data4/paper/feed/2456640/zen.*.uv): ')
 	outfile = raw_input('Output directory(EX: /data4/paper/raw_to_tape/2456640/): ')
 
 	#checks to see that output dir is valid
@@ -162,7 +249,7 @@ if __name__ == '__main__':
 		sys.exit()
 
 	#checks for input file type
-	file_type = raw_input('uv, uvcRRE, or both?: ')
+	file_type = raw_input('uv or uvcRRE: ')
 
 	if not file_type in ['uv','uvcRRE','both']:
 		print 'Invalid file type'
@@ -178,4 +265,7 @@ if __name__ == '__main__':
 	load_new_data(infile, new_data)
 
 	#Moves files and updates their location
-	move_files(infile_list, outfile, move_data, usrnm, pswd)
+	if file_type in ['uv']:
+		move_files(infile_list, outfile, move_data, usrnm, pswd)
+	elif file_type in ['uvcRRE']:
+		move_compressed_files(infile_list, outfile, move_data, usrnm, pswd)

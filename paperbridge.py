@@ -440,8 +440,8 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 		dbr = open(dbo, 'ab')
 		wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 
-		npz_path = outfile_path.split('uvcRRE')[0] + 'uvcRE.npz'
-		final_product_path = outfile_path.split('uvcRRE')[0] + 'uvcRREzCPSBx'
+		npz_path = outfile.split('uvcRRE')[0] + 'uvcRE.npz'
+		final_product_path = outfile.split('uvcRRE')[0] + 'uvcRREzCPSBx'
 
 		#"moves" file
 		try:
