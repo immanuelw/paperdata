@@ -20,3 +20,4 @@ edge			tinyint(1)		0		Value telling if file is on edge of day and thus cannot be
 write_to_tape 		tinyint(1) 		0 		Value telling if raw file can be written to tape
 delete_file 		tinyint(1) 		0 		Value telling if file can be deleted
 restore_history 	varchar(255) 		NULL 		List indicating the dates the raw files  have been restored
+comments		text			None		Comment about file entry
