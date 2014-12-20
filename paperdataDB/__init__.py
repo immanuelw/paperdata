@@ -44,6 +44,7 @@ EDGE = 17
 WRITE_TO_TAPE = 18
 DELETE_FILE = 19
 RESTORE_HISTORY = 20
+COMMENTS = 21
 
 MIN = 25
 MAX = 26
@@ -56,18 +57,18 @@ SEARCH = 1
 NOSEARCH = 0
 
 def constants():
-	const = {PATH:'PATH', ERA:'ERA', ERA_TYPE:'ERA_TYPE', OBSNUM:'OBSNUM', MD5SUM:'MS5SUM', JDAY:'JDAY', JDATE:'JDATE', POL:'POL', LENGTH:'LENGTH', RAW_PATH:'RAW_PATH', CAL_PATH:'CAL_PATH', NPZ_PATH:'NPZ_PATH', FINAL_PRODUCT_PATH: 'FINAL PRODUCT_PATH', TAPE_INDEX:'TAPE_INDEX', COMPR_SIZE:'COMPR_SIZE', RAW_SIZE:'RAW_SIZE', COMPRESSED:'COMPRESSED', WRITE_TO_TAPE:'WRITE_TO_TAPE', DELETE_FILE:'DELETE_FILE', RESTORE_HISTORY:'RESTORE_HISTORY', MIN:'MIN', MAX:'MAX', EXACT:'EXACT', RANGE:'RANGE', NONE:'NONE', SEARCH:'SEARCH', NOSEARCH:'NOSEARCH'}
+	const = {PATH:'PATH', ERA:'ERA', ERA_TYPE:'ERA_TYPE', OBSNUM:'OBSNUM', MD5SUM:'MS5SUM', JDAY:'JDAY', JDATE:'JDATE', POL:'POL', LENGTH:'LENGTH', RAW_PATH:'RAW_PATH', CAL_PATH:'CAL_PATH', NPZ_PATH:'NPZ_PATH', FINAL_PRODUCT_PATH: 'FINAL PRODUCT_PATH', TAPE_INDEX:'TAPE_INDEX', COMPR_SIZE:'COMPR_SIZE', RAW_SIZE:'RAW_SIZE', COMPRESSED:'COMPRESSED', WRITE_TO_TAPE:'WRITE_TO_TAPE', DELETE_FILE:'DELETE_FILE', RESTORE_HISTORY:'RESTORE_HISTORY', COMMENTS:'COMMENTS', MIN:'MIN', MAX:'MAX', EXACT:'EXACT', RANGE:'RANGE', NONE:'NONE', SEARCH:'SEARCH', NOSEARCH:'NOSEARCH'}
 	return const
 
-pd_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_path', CAL_PATH:'cal_path', NPZ_PATH:'npz_path', FINAL_PRODUCT_PATH:'final_product_path', TAPE_INDEX:'tape_index', COMPR_SIZE:'compr_file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', WRITE_TO_TAPE:'write_to_tape', DELETE_FILE:'delete_file', RESTORE_HISTORY:'restore_history'}
+pd_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_path', CAL_PATH:'cal_path', NPZ_PATH:'npz_path', FINAL_PRODUCT_PATH:'final_product_path', TAPE_INDEX:'tape_index', COMPR_SIZE:'compr_file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', WRITE_TO_TAPE:'write_to_tape', DELETE_FILE:'delete_file', RESTORE_HISTORY:'restore_history', COMMENTS:'comments'}
 
 def fields():
-	field_list = ['path', 'era', 'era_type', 'obsnum', 'md5sum', 'julian_day', 'julian_date', 'polarization', 'data_length', 'raw_path', 'cal_path', 'npz_path', 'final_product_path', 'tape_index', 'compr_file_size_MB', 'raw_file_size_MB', 'compressed', 'write_to_tape', 'delete_file', 'restore_history']
+	field_list = ['path', 'era', 'era_type', 'obsnum', 'md5sum', 'julian_day', 'julian_date', 'polarization', 'data_length', 'raw_path', 'cal_path', 'npz_path', 'final_product_path', 'tape_index', 'compr_file_size_MB', 'raw_file_size_MB', 'compressed', 'write_to_tape', 'delete_file', 'restore_history', 'comments']
 
 	return field_list
 
 def dict():
-	paperdata_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_path', CAL_PATH:'cal_path', NPZ_PATH:'npz_path', FINAL_PRODUCT_PATH:'final_product_path', TAPE_INDEX:'tape_index', COMPR_SIZE:'compr_file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', WRITE_TO_TAPE:'write_to_tape', DELETE_FILE:'delete_file', RESTORE_HISTORY:'restore_history'}
+	paperdata_dict = {PATH:'path', ERA:'era', ERA_TYPE:'era_type', OBSNUM:'obsnum', MD5SUM:'md5sum', JDAY:'julian_day', JDATE:'julian_date', POL:'polarization', LENGTH:'data_length', RAW_PATH:'raw_path', CAL_PATH:'cal_path', NPZ_PATH:'npz_path', FINAL_PRODUCT_PATH:'final_product_path', TAPE_INDEX:'tape_index', COMPR_SIZE:'compr_file_size_MB', RAW_SIZE:'raw_file_size_MB', COMPRESSED:'compressed', WRITE_TO_TAPE:'write_to_tape', DELETE_FILE:'delete_file', RESTORE_HISTORY:'restore_history', COMMENTS:'comments'}
 	return paperdata_dict
 
 def options():

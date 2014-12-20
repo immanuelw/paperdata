@@ -17,7 +17,7 @@ import getpass
 def makeform(root, fields):
 	entries = []
 	for field in fields:
-		if field not in ['md5sum', 'restore_history', 'data_length', 'cal_path', 'npz_path', 'final_product_path', 'tape_index', 'write_to_tape','delete_file']:
+		if field not in ['md5sum', 'restore_history', 'data_length', 'cal_path', 'npz_path', 'final_product_path', 'tape_index', 'write_to_tape','delete_file','comments']:
 			var = IntVar()
 			row = Frame(root)
 			lab = Label(row, width=15, text=field, anchor='w')

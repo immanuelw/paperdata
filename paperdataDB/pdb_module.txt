@@ -96,6 +96,7 @@ List of named constants and purpose:
 *READY_TO_TAPE* - ready_to_tape
 *DELETE_FILE* - delete_file
 *RESTORE_HISTORY* - restore_history
+*COMMENTS* - comments
 
 **Field range specifier**
 
