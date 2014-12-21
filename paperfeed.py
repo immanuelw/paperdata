@@ -137,7 +137,8 @@ def email_paperfeed(files):
 	#Next, log in to the server
 	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
 
-	msgs = ''
+	header = 'From: PAPERFeed <paperfeed.paperdata@gmail.com>\nSubject: FILES ARE BEING MOVED\n'
+        msgs = header
 	#Send the mail
 	for file in files:
 		msg = '\n' + file + ' is being moved.\n'
@@ -161,7 +162,8 @@ def email_space(table):
 	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
 
 	#Send the mail
-	msgs = '\nNot enough space for ' + table + ' on folio'
+	header = 'From: PAPERFeed <paperfeed.paperdata@gmail.com>\nSubject: NOT ENOUGH SPACE ON FOLIO\n'
+        msgs = header + '\nNot enough space for ' + table + ' on folio'
 
 	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
 	server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
