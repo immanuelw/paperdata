@@ -13,15 +13,7 @@ import getpass
 import collections
 import decimal
 
-#Input list which indicates certain aspects fo the query
-
-#for files do
-# import paperdataDB as pdb
-# files = pdb.dbsearch(pdb.fetch(list_of_info), pswd)
-#OR combine dbsearch to include both
-# files = pdb.dbsearch(db_query, pswd)
-
-# config variables
+# Config variables
 
 PATH = 0
 ERA = 1
@@ -56,6 +48,9 @@ NONE = 30
 SEARCH = 1
 NOSEARCH = 0
 
+# Functions which describe a variety of attributes in the module, such as field names, named constant and string matching, and dicts
+# Mostly unused
+
 def constants():
 	const = {PATH:'PATH', ERA:'ERA', ERA_TYPE:'ERA_TYPE', OBSNUM:'OBSNUM', MD5SUM:'MS5SUM', JDAY:'JDAY', JDATE:'JDATE', POL:'POL', LENGTH:'LENGTH', RAW_PATH:'RAW_PATH', CAL_PATH:'CAL_PATH', NPZ_PATH:'NPZ_PATH', FINAL_PRODUCT_PATH: 'FINAL PRODUCT_PATH', TAPE_INDEX:'TAPE_INDEX', COMPR_SIZE:'COMPR_SIZE', RAW_SIZE:'RAW_SIZE', COMPRESSED:'COMPRESSED', WRITE_TO_TAPE:'WRITE_TO_TAPE', DELETE_FILE:'DELETE_FILE', RESTORE_HISTORY:'RESTORE_HISTORY', COMMENTS:'COMMENTS', MIN:'MIN', MAX:'MAX', EXACT:'EXACT', RANGE:'RANGE', NONE:'NONE', SEARCH:'SEARCH', NOSEARCH:'NOSEARCH'}
 	return const
@@ -75,6 +70,7 @@ def options():
 	opt = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
 	return opt
 
+# Function to create and output dictionary of results from query
 def dbsearch_dict(query):
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
@@ -107,6 +103,7 @@ def dbsearch_dict(query):
 
 	return result
 
+# Function to create and output list of results from query
 def dbsearch(query):
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
@@ -131,20 +128,20 @@ def dbsearch(query):
 	return results
 
 
-#Generate strings to load into query 
+# Generate strings to load into query 
 def fetch(info_list):
-	#instantiate variables to use to generate query string
+	# Instantiate variables to use to generate query string
 	query = []
 	searchstr = []
 
-	#info list should be [[field_name, search_field, option, [more_info]], 
-	#ex: [['era', NOSEARCH, EXACT, [32]], ['path', SEARCH, NONE, []], ['julian_day', SEARCH, RANGE, [922, 935]]]
+	# Info list should be [[field_name, search_field, option, [more_info]], 
+	# Ex: [['era', NOSEARCH, EXACT, [32]], ['path', SEARCH, NONE, []], ['julian_day', SEARCH, RANGE, [922, 935]]]
 	for item in info_list:
 		if len(item) != 4:
 			print 'ERROR -- LIST %s does not have enough entries' %(item)
 			return None #HOW SHOULD I THROW ERRORS?
 
-		#instantiates field variable
+		# Instantiates field variable
 		if isinstance(item[0], str):
 			field = item[0]
 		elif isinstance(item[0], int):
@@ -157,7 +154,7 @@ def fetch(info_list):
 
 			exact = item[3][0]
 
-			#adding info to lists to generate strings later
+			# Adding info to lists to generate strings later
 			if item[1] == SEARCH:
 				query.append(field)
 			if field == 'julian_date':
@@ -174,7 +171,7 @@ def fetch(info_list):
 
 			min = item[3][0]
 
-			#adding info to lists to generate strings later
+			# Adding info to lists to generate strings later
 			if item[1] == SEARCH:
 				query.append(field)
 			if field == 'julian_date':			
@@ -189,7 +186,7 @@ def fetch(info_list):
 
 			max = item[3][0]
 
-			#adding info to lists to generate strings later
+			# Adding info to lists to generate strings later
 			if item[1] == SEARCH:
 				query.append(field)
 			if field == 'julian_date':
@@ -205,7 +202,7 @@ def fetch(info_list):
 			min = item[3][0]
 			max = item[3][1]
 
-			#adding info to lists to generate strings later
+			# Adding info to lists to generate strings later
 			if item[1] == SEARCH:
 				query.append(field)
 			if field == 'julian_date':
@@ -252,7 +249,7 @@ def fetch(info_list):
 				print 'ERROR -- LIST %s has too many entries' %(item) 
 				return None #HOW SHOULD I THROW ERRORS?
 
-			#adding info to lists to generate strings later
+			# Adding info to lists to generate strings later
 			if item[1] == SEARCH:
 				query.append(field)
 
@@ -281,6 +278,10 @@ def fetch(info_list):
 
 	return dbstr
 
+# Near redundant class instantiation in order to facilitate easy repeatable access to paperdata through scripts
+# It's a way to code in queries without using the GUI whenever a change is wanted
+# REQUIRES knowledge of fields and paperdataDB constants
+
 class searchobj:
 	def __init__(self):
 		self.info_list = []
@@ -295,4 +296,4 @@ class searchobj:
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':
-	print 'Not a script file'
+	print 'Not a script file, just a module'
