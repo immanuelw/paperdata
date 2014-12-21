@@ -103,12 +103,13 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 	cursor = connection.cursor()
 
 	#Load into db
-	for infile in infile_list:
+	for file in infile_list:
+		infile = host + ':' + file
 		if infile.split('.')[-1] != 'uv':
 			print 'Invalid file type'
 			sys.exit()
 
-		outfile = o_dict[infile]
+		outfile = o_dict[file]
 
 		#Opens file to append to
 		dbr = open(dbo, 'ab')
@@ -126,7 +127,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 			continue
 		# execute the SQL query using execute() method, updates new location
 		infile_path = infile
-		outfile_path = host + ':' + o_dict[infile]
+		outfile_path = host + ':' + o_dict[file]
 		if infile.split('.')[-1] == 'uv':
 			cursor.execute('''UPDATE paperdata set raw_path = '%s' where raw_path = '%s' '''%(outfile_path, infile_path))
 
@@ -161,7 +162,8 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 	cursor = connection.cursor()
 
 	#Load into db
-	for infile in infile_list:
+	for file in infile_list:
+		infile = host + ':' + file
 		if infile.split('.')[-1] not in  ['uvcRRE']:
 			print 'Invalid file type'
 			sys.exit()
@@ -172,7 +174,7 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 		infile_npz_path = ''
 		infile_final_path = ''
 
-		outfile = o_dict[infile]
+		outfile = o_dict[file]
 
 		#Opens file to append to
 		dbr = open(dbo, 'ab')
@@ -188,7 +190,7 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 			wr.writerow([infile,outfile])
 			print infile, outfile
 			try:
-				if os.path.isfile(infile_npz):
+				if os.path.isfile(infile_npz.split(':')[1]):
 					inner_npz = infile_npz.split(':')[1]
 					shutil.move(inner_npz, npz_path)
 					wr.writerow([inner_npz,npz_path])
@@ -196,11 +198,12 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 				else:
 					infile_npz_path = 'NULL'
 					outfile_npz_path = 'NULL'
-				if os.path.isdir(infile_final_product):
+				if os.path.isdir(infile_final_product.split(':')[1]):
 					inner_final = infile_final_product.split(':')[1]
 					shutil.move(inner_final, final_product_path)
 					wr.writerow([inner_final,final_product_path])
 					print inner_final, final_product_path
+				else:
 					infile_final_path = 'NULL'
 					outfile_final_path = 'NULL'
 				dbr.close()
@@ -212,7 +215,7 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 			continue
 		# execute the SQL query using execute() method, updates new location
 		infile_path = infile
-		outfile_path = host + ':' + o_dict[infile]
+		outfile_path = host + ':' + o_dict[file]
 		if infile_npz_path != 'NULL':
 			infile_npz_path = infile_npz
 			outfile_npz_path = host + ':' + npz_path
@@ -249,14 +252,15 @@ if __name__ == '__main__':
 		sys.exit()
 
 	#checks for input file type
-	file_type = raw_input('uv or uvcRRE: ')
+	file_type = raw_input('uv or uvcRRE?: ')
 
-	if not file_type in ['uv','uvcRRE','both']:
+	if not file_type in ['uv','uvcRRE']:
 		print 'Invalid file type'
 		sys.exit()
 
 	#List of files in directory -- allowing mass movement of .uvcRRE and .uv files
 	infile_list = glob.glob(infile)
+	infile_list.sort()
 
 	#Check for copies of files in database
 	new_data = dupe_check(infile_list)

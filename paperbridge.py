@@ -463,6 +463,7 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 					shutil.move(inner_final, final_product_path)
 					wr.writerow([inner_final,final_product_path])
 					print inner_final, final_product_path
+				else:
 					infile_final_path = 'NULL'
 					outfile_final_path = 'NULL'
 				dbr.close()
