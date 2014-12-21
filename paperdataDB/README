@@ -47,12 +47,15 @@ searchobj
 * return(field, output_bool, limit, range):
 	Main function of class -- appends the variable to info_list
 				instantiated in __init__ function.
+	-- input is simply the items that would be in a single element of info_list
+		Ex: searchobj.return('julian_day', paperdb.SEARCH, paperdb.RANGE, 5930, 6036)
+			will add that search entry to info_list.
 
-* output(info_list):
+* output():
 	Run after list is complete --
 	Outputs data requested in list of entries in paperdata
 
-* output_dict(info_list):
+* output_dict():
 	Run after list is complete --
 	Outputs data requested through dictionary with
 	field as key and list of outputs of field as value.
