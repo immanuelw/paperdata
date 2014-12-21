@@ -49,7 +49,7 @@ searchobj
 				instantiated in __init__ function.
 	-- input is simply the items that would be in a single element of info_list
 		Ex: searchobj.return('julian_day', paperdb.SEARCH, paperdb.RANGE, 5930, 6036)
-			will add that search entry to info_list.
+			will add this search entry, [julian_day, paperdb.SEARCH, paperdb.RANGE, (5930,6036)], to info_list.
 
 * output():
 	Run after list is complete --
