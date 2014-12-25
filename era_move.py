@@ -44,7 +44,7 @@ if __name__ == '__main__':
 	if file_type == 'uvcRRE':
 		cursor.execute('''SELECT SUBSTRING_INDEX(path, 'z', 1), julian_day from paperdata where path like '%/raw_data/psa%' group by SUBSTRING_INDEX(path, 'z', 1) order by julian_day asc''')
 	elif file_type == 'uv':
-		cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, 'z', 1), julian_day from paperdata where raw_path like '%/raw_data/psa%' group by SUBSTRING_INDEX(raw_path, 'z', 1) order by julian_day asc''')
+		cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, 'z', 1), julian_day from paperdata where raw_path like '%/paper/nas1_data/psa%' group by SUBSTRING_INDEX(raw_path, 'z', 1) order by julian_day asc''')
 	jdays = cursor.fetchall()
 	cursor.close()
 	connection.close()
