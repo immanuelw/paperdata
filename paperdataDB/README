@@ -44,11 +44,11 @@ searchobj
 * __init__:
 	creates empty list
 
-* return(field, output_bool, limit, range):
+* add_to_output(field, output_bool, limit, range):
 	Main function of class -- appends the variable to info_list
 				instantiated in __init__ function.
 	-- input is simply the items that would be in a single element of info_list
-		Ex: searchobj.return('julian_day', paperdb.SEARCH, paperdb.RANGE, 5930, 6036)
+		Ex: searchobj.add_to_output('julian_day', paperdb.SEARCH, paperdb.RANGE, 5930, 6036)
 			will add this search entry, [julian_day, paperdb.SEARCH, paperdb.RANGE, (5930,6036)], to info_list.
 
 * output():

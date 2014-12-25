@@ -286,7 +286,7 @@ class searchobj:
 	def __init__(self):
 		self.info_list = []
 		return None
-	def return(self, field, search_bool, limit, *range):
+	def add_to_output(self, field, search_bool, limit, *range):
 		self.info_list.append([field, search_bool, limit, range])
 		return None
 	def output(self):
