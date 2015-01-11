@@ -17,7 +17,9 @@ if __name__ == '__main__':
 	try:
 		while True:
 			time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
+			backup_file = '/data4/paper/paperdata_backup/%s/paperdata_backup_%s.psv' %(time_date, time_date)
 			paperbackup.paperbackup(time_date, usrnm, pswd)
+			paperbackup.email_backup(backup_file)
 			time.sleep(86400)
 	except KeyboardInterrupt:
 		pass

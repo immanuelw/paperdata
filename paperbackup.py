@@ -11,6 +11,10 @@ import csv
 import base64
 import os
 import subprocess
+import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email import Encoders
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
@@ -38,13 +42,13 @@ def paperbackup(time_date, usrnm, pswd):
 	wr2 = csv.writer(data_file2, delimiter='|', lineterminator='\n', dialect='excel')
 
 	db3 = 'paperrename_backup_%s.psv'%(time_date)
-	dbo1 = os.path.join(backup_dir,db3)
+	dbo3 = os.path.join(backup_dir,db3)
 	print dbo3
 	data_file3 = open(dbo3,'wb')
 	wr3 = csv.writer(data_file3, delimiter='|', lineterminator='\n', dialect='excel')
 
 	db4 = 'paperfeed_backup_%s.psv'%(time_date)
-	dbo1 = os.path.join(backup_dir,db4)
+	dbo4 = os.path.join(backup_dir,db4)
 	print dbo4
 	data_file4 = open(dbo4,'wb')
 	wr4 = csv.writer(data_file4, delimiter='|', lineterminator='\n', dialect='excel')
@@ -104,6 +108,32 @@ def sql_backup(dbnum, time_date, usrnm, pswd):
 	print 'Paperdata database backup saved'
 	return None
 
+def email_backup(backup_file):
+	server = smtplib.SMTP('smtp.gmail.com', 587)
+	server.ehlo()
+	server.starttls()
+
+	#Next, log in to the server
+	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+
+	msg = MIMEMultipart()
+	msg['Subject'] = 'PAPERDATA TABLE BACKUP'
+	msg['From'] = 'paperfeed.paperdata@gmail.com'
+	msg['To'] = 'paperfeed.paperdata@gmail.com'
+
+	part = MIMEBase('application', 'octet-stream')
+	part.set_payload(open(backup_file, 'rb').read())
+	Encoders.encode_base64(part)
+	part.add_header('Content-Disposition', 'attachment', filename=backup_file)
+	msg.attach(part)
+
+	#Send the mail
+	server.sendmail('paperfeed.paperdata@gmail.com', 'paperfeed.paperdata@gmail.com', msg.as_string())
+
+	server.quit()
+
+	return None
+
 if __name__ == '__main__':
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 
@@ -117,3 +147,5 @@ if __name__ == '__main__':
 		usrnm = raw_input('Username: ')
 		pswd = getpass.getpass('Password: ')
 		paperbackup(time_date, usrnm, pswd)
+		backup_file = '/data4/paper/paperdata_backup/%s/paperdata_backup_%s.psv' %(time_date, time_date)
+		email_backup(backup_file)
