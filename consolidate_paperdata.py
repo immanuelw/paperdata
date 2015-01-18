@@ -20,13 +20,13 @@ def clean_paperdata(usrnm, pswd):
 		npz_path = item[2]
 		final_product_path = item[3]
 		if not os.path.isdir(path.split(':')[1]):
-			cursor.execute('''UPDATE paperdata SET path = 'NULL' where path = '%s' ''', (path))
+			cursor.execute('''UPDATE paperdata SET path = 'NULL' where path = %s ''', (path,))
 		if not os.path.isdir(raw_path.split(':')[1]):
-			cursor.execute('''UPDATE paperdata SET raw_path = 'NULL' where raw_path = '%s' ''', (raw_path))
+			cursor.execute('''UPDATE paperdata SET raw_path = 'NULL' where raw_path = %s ''', (raw_path,))
 		if not os.path.isfile(npz_path.split(':')[1]):
-			cursor.execute('''UPDATE paperdata SET npz_path = 'NULL' where npz_path = '%s' ''', (npz_path))
+			cursor.execute('''UPDATE paperdata SET npz_path = 'NULL' where npz_path = %s ''', (npz_path,))
 		if not os.path.isdir(final_product_path.split(':')[1]):
-			cursor.execute('''UPDATE paperdata SET final_product_path = 'NULL' where final_product_path = '%s' ''', (final_product_path))
+			cursor.execute('''UPDATE paperdata SET final_product_path = 'NULL' where final_product_path = %s ''', (final_product_path,))
 
 	cursor.execute('''DELETE FROM paperdata where raw_path = 'NULL' and path = 'NULL' ''')
 	# Close and save database
@@ -162,7 +162,7 @@ def consolidate(dbo):
 		else:
 			#do stuff
 			zen = '%' + item[0].split('/')[-1][:-4] + '%'
-			cursor.execute('''SELECT * from paperdata where raw_path like '%s' order by julian_date asc''', (zen))
+			cursor.execute('''SELECT * from paperdata where raw_path like %s order by julian_date asc''', (zen,))
 			ras = cursor.fetchall()
 			for ra in ras:
 				if len(ras) > 1:
@@ -176,6 +176,7 @@ def consolidate(dbo):
 						back.append(it)
 			if len(ras) == 0:
 				it = generate_entry_1(item)
+				print it
 				if it is None:
 					continue
 				else:
@@ -186,7 +187,7 @@ def consolidate(dbo):
 		else:
 			#do stuff
 			zen = '%' + ra[9].split('/')[-1] + '%'
-			cursor.execute('''SELECT * from paperdata where path like '%s' order by julian_date asc''', (zen))
+			cursor.execute('''SELECT * from paperdata where path like %s order by julian_date asc''', (zen,))
 			items = cursor.fetchall()
 			for item in items:
 				if len(items) > 1:
