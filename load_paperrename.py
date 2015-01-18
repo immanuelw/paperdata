@@ -27,7 +27,7 @@ def load_db(dbo, usrnm, pswd):
 	cursor = connection.cursor()
 
 	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperrename COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' ''', (dbo))
+	cursor.execute('''LOAD DATA LOCAL INFILE %s INTO TABLE paperrename COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' ''', (dbo,))
 
 	print 'Table data loaded.'
 

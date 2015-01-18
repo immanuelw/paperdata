@@ -62,7 +62,7 @@ def create_md5(dbo, dbe, usrnm, pswd):
 				ewr.writerow([filename, 'Failed generating md5sum'])
 				error_file.close()
 				continue
-			cursor.execute('''UPDATE file SET md5sum = '%s' WHERE filename = '%s' ''' %(md5, filename))
+			cursor.execute('''UPDATE file SET md5sum = %s WHERE filename = %s ''', (md5, filename))
 		else:
 			ewr.writerow([filename, 'Path no longer exists'])
 			error_file.close()

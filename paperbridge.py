@@ -75,7 +75,7 @@ def gen_data_list(usrnm, pswd):
 	#gather all data to input into paperdata
 	results = []
 	for item in result:
-		cursor.execute('''SELECT julian_date, pol, length, status, substring(julian_date, 4, 4) from observation where obsnum = %d '''%(int(item[1])))
+		cursor.execute('''SELECT julian_date, pol, length, status, substring(julian_date, 4, 4) from observation where obsnum = %d ''', (int(item[1]),))
 		sec_results = cursor.fetchall()
 		results.append(item + sec_results[0])	
 
@@ -388,7 +388,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 		infile_path = infile
 		outfile_path = host + ':' + o_dict[infile]
 		if infile.split('.')[-1] == 'uv':
-			cursor.execute('''UPDATE paperdata set raw_path = '%s', write_to_tape = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
+			cursor.execute('''UPDATE paperdata set raw_path = %s, write_to_tape = 1 where raw_path = %s ''', (outfile_path, infile_path))
 
 	print 'File(s) moved and updated'
 
@@ -487,7 +487,7 @@ def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 			infile_final_path = infile_final_product
 			outfile_final_path = host + ':' + final_product_path
 		if infile.split('.')[-1] == 'uvcRRE':
-			cursor.execute('''UPDATE paperdata set path = '%s', npz_path = '%s', final_product_path = '%s' where path = '%s' and npz_path = '%s' and final_product_path = '%s' '''%(outfile_path, outfile_npz_path, outfile_final_path, infile_path, infile_npz_path, infile_final_path))
+			cursor.execute('''UPDATE paperdata set path = %s, npz_path = %s, final_product_path = %s where path = %s and npz_path = %s and final_product_path = %s ''', (outfile_path, outfile_npz_path, outfile_final_path, infile_path, infile_npz_path, infile_final_path))
 
 	print 'File(s) moved and updated'
 

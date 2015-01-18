@@ -119,7 +119,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 		infile_path = infile
 		outfile_path = host + ':' + o_dict[infile]
 		if infile.split('.')[-1] == 'uv':
-			cursor.execute('''UPDATE paperfeed set raw_path = '%s', moved = 1 where raw_path = '%s' ''', (outfile_path, infile_path))
+			cursor.execute('''UPDATE paperfeed set raw_path = %s, moved = 1 where raw_path = %s ''', (outfile_path, infile_path))
 		outfile_list.append(outfile_path.split(':')[1])
 
 	print 'File(s) moved and updated'

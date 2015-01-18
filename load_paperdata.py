@@ -75,7 +75,7 @@ def load_db(dbo, usrnm, pswd):
 	cursor = connection.cursor()
 
 	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' ''', (dbo))
+	cursor.execute('''LOAD DATA LOCAL INFILE %s INTO TABLE paperdata COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' ''', (dbo,))
 
 	print 'Table data loaded.'
 
@@ -140,7 +140,7 @@ def obsnum_fixer(usrnm, pswd):
 				obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
 			else:
 				obsnum = 0
-			cursor.execute('''UPDATE paperdata set obsnum = %d, data_length = %.5f where raw_path = '%s' ''', (obsnum, length, full_path))
+			cursor.execute('''UPDATE paperdata set obsnum = %d, data_length = %.5f where raw_path = %s ''', (obsnum, length, full_path))
 	cursor.close()
 	connection.commit()
 	connection.close()

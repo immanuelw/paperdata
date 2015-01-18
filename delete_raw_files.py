@@ -53,8 +53,8 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 				cursor.execute('''
 				UPDATE paperdata
 				SET delete_file = 0, raw_location = 'ON TAPE'
-				WHERE obsnum = %d and raw_location = '%s';
-				'''%(obsnum, raw_path))
+				WHERE obsnum = %d and raw_location = %s;
+				''', (obsnum, raw_path))
 			else:
 				fd.writerow([item[0], 'Not updated'])
 				print 'ERROR: uv file %s not updated' %(item[0])
