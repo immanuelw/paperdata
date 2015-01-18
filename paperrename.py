@@ -17,6 +17,9 @@ import subprocess
 import smtplib
 import load_paperrename
 import load_paperfeed
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email import Encoders
 
 ### Script to load paperfeed with files from the paperrename table
 ### Checks /data4 for space, moves entire days of data, renames them the correct names, then loads into paperfeed

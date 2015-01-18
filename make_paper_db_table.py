@@ -25,7 +25,7 @@ def make_paperdata(cursor):
 	julian_day INT DEFAULT 0,
 	julian_date DECIMAL(12,5) DEFAULT 0.00000,
 	polarization VARCHAR(4) DEFAULT NULL,
-	data_length DECIMAL(6,5) DEFAULT 0.00000,
+	data_length DECIMAL(20,19) DEFAULT 0.0000000000000000000,
 	raw_path VARCHAR(100) DEFAULT NULL,
 	cal_path VARCHAR(100) DEFAULT NULL,
 	npz_path VARCHAR(100) DEFAULT NULL,

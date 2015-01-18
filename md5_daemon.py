@@ -1,7 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import update_md5
+import papermd5
 
 ### Script to automatically load files into paperdistiller database
 ### Runs each step of process through modules
@@ -13,7 +13,7 @@ if __name__ == '__main__':
 	try:
 		while True:
 			auto = 'y'
-			update_md5.update_md5(auto)
+			papermd5.papermd5(auto)
 			time.sleep(28800)
 	except KeyboardInterrupt:
 		pass

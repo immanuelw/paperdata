@@ -14,6 +14,9 @@ import time
 import subprocess
 import smtplib
 import shutil
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEBase import MIMEBase
+from email import Encoders
 
 ### Script to load paperdistiller with files from the paperfeed table
 ### Checks /data4 for space, moves entire days of data, then loads into paperdistiller

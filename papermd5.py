@@ -37,8 +37,6 @@ def md5sum(fname):
 
 def create_md5(dbo, dbe, usrnm, pswd):
 
-
-
 	#Removes all files from list that already exist in the database
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdistiller', local_infile=True)
 
