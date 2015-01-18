@@ -84,8 +84,8 @@ def papermd5(auto):
 		usrnm = 'jaguirre'
 		pswd = base64.b64decode('amFndWlycmU2OTE5')
 
-	dbo = '/data2/home/immwa/scripts/paper_output/md5.psv'
-	dbe = '/data2/home/immwa/scripts/paper_output/err_md5.psv'
+	dbo = '/data4/paper/paperoutput/md5.psv'
+	dbe = '/data4/paper/paperoutput/err_md5.psv'
 
 	#Creates md5sum and updates database
 	create_md5(dbo, dbe, usrnm, pswd)
