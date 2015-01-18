@@ -84,11 +84,11 @@ Important scripts:
 	backup_paperdata.py:
 		Backups the paperdata table, saving to a .psv file to be easily reloaded. Used mostly for testing.
 
-	clear_paperdata.py:
+	paperclear.py:
 		Clears information from the paperdata database -- Used exclusively for rebuliding paperdata
 
-	paperdistiller_backup.py:
+	distillerbackup.py:
 		Backups the several tables of paperdistiller -- Used mostly for testing purposes.
 
-	clear_paperdistiller.py:
+	distillerclear.py:
 		Clears information from the paperdistiller database -- Used primarily in testing.
