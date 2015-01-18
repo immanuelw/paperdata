@@ -50,7 +50,7 @@ def find_data(usrnm, pswd):
 	#NEED HIGHER LEVEL CHECK TO MAKE SURE EACH DAY IS COMPLETE
 	jday = int(jdays_to_be_moved[0][0])
 
-	cursor.execute('''SELECT raw_path, julian_day from paperfeed where moved = 0 and julian_day = %d'''%(jday))
+	cursor.execute('''SELECT raw_path, julian_day from paperfeed where moved = 0 and julian_day = %d''', (jday))
 	results = cursor.fetchall()
 
 	#Close database
@@ -119,7 +119,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 		infile_path = infile
 		outfile_path = host + ':' + o_dict[infile]
 		if infile.split('.')[-1] == 'uv':
-			cursor.execute('''UPDATE paperfeed set raw_path = '%s', moved = 1 where raw_path = '%s' '''%(outfile_path, infile_path))
+			cursor.execute('''UPDATE paperfeed set raw_path = '%s', moved = 1 where raw_path = '%s' ''', (outfile_path, infile_path))
 		outfile_list.append(outfile_path.split(':')[1])
 
 	print 'File(s) moved and updated'
@@ -141,7 +141,7 @@ def email_paperfeed(files):
 	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
 
 	header = 'From: PAPERFeed <paperfeed.paperdata@gmail.com>\nSubject: FILES ARE BEING MOVED\n'
-        msgs = header
+    msgs = header
 	#Send the mail
 	for file in files:
 		msg = '\n' + file + ' is being moved.\n'
@@ -166,7 +166,7 @@ def email_space(table):
 
 	#Send the mail
 	header = 'From: PAPERFeed <paperfeed.paperdata@gmail.com>\nSubject: NOT ENOUGH SPACE ON FOLIO\n'
-        msgs = header + '\nNot enough space for ' + table + ' on folio'
+    msgs = header + '\nNot enough space for ' + table + ' on folio'
 
 	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
 	server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)

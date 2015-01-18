@@ -27,7 +27,7 @@ def load_db(dbo, usrnm, pswd):
 	cursor = connection.cursor()
 
 	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperrename COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' '''%(dbo))
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperrename COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' ''', (dbo))
 
 	print 'Table data loaded.'
 
@@ -162,7 +162,7 @@ def update_paperrename(jday, expected, usrnm, pswd):
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 	cursor = connection.cursor()
 
-	cursor.execute('''UPDATE paperrename SET expected_amount = %d WHERE julian_day = %d''' %(expected, jday))
+	cursor.execute('''UPDATE paperrename SET expected_amount = %d WHERE julian_day = %d''', (expected, jday))
 
 	print str(jday) + ' now expects ' + str(expected) + ' amount of files.'
 	#Close and save database

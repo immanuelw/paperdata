@@ -99,7 +99,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 		# execute the SQL query using execute() method, updates new location
 		infile_path = infile
 		outfile_path = host + ':' + o_dict[infile]
-		cursor.execute('''UPDATE paperjunk set folio_path = '%s' where junk_path = '%s' '''%(outfile_path, infile_path))
+		cursor.execute('''UPDATE paperjunk set folio_path = '%s' where junk_path = '%s' ''', (outfile_path, infile_path))
 
 	print 'File(s) moved and updated'
 

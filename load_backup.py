@@ -28,7 +28,7 @@ def load_backup(dbnum, usrnm, pswd):
 
 	print dbnum 
 	# execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' '''%(dbnum))
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' ''', (dbnum))
 
 	print 'Table data loaded.'
 

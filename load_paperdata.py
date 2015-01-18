@@ -75,7 +75,7 @@ def load_db(dbo, usrnm, pswd):
 	cursor = connection.cursor()
 
 	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' '''%(dbo))
+	cursor.execute('''LOAD DATA LOCAL INFILE '%s' INTO TABLE paperdata COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' ''', (dbo))
 
 	print 'Table data loaded.'
 
@@ -96,7 +96,7 @@ def obsnum_fixer(usrnm, pswd):
 	jday = [int(item[0]) for item in results if int(item[1]) > 60]
 
 	for day in jday:
-		cursor.execute('''SELECT julian_date, polarization from paperdata where julian_day = %s and raw_path like '%s' group by julian_date, polarization order by julian_date asc'''%(day,'folio%'))
+		cursor.execute('''SELECT julian_date, polarization from paperdata where julian_day = %s and raw_path like '%s' group by julian_date, polarization order by julian_date asc''', (day,'folio%'))
 
 		jd_pols = cursor.fetchall()
 		#collects information from query
@@ -104,7 +104,7 @@ def obsnum_fixer(usrnm, pswd):
 
 		length = n.mean(n.diff(jd_one))
 		print length
-		cursor.execute('''SELECT raw_path, obsnum from paperdata where julian_day = %s and raw_path like '%s' group by julian_date, polarization order by julian_date asc'''%(day,'folio%'))
+		cursor.execute('''SELECT raw_path, obsnum from paperdata where julian_day = %s and raw_path like '%s' group by julian_date, polarization order by julian_date asc''', (day,'folio%'))
 		results = cursor.fetchall()
 
 		#results is a list of lists
@@ -140,7 +140,7 @@ def obsnum_fixer(usrnm, pswd):
 				obsnum = jdpol2obsnum(jdate,polarization,divided_jdate)
 			else:
 				obsnum = 0
-			cursor.execute('''UPDATE paperdata set obsnum = %d, data_length = %.5f where raw_path = '%s' ''' %(obsnum, length, full_path))
+			cursor.execute('''UPDATE paperdata set obsnum = %d, data_length = %.5f where raw_path = '%s' ''', (obsnum, length, full_path))
 	cursor.close()
 	connection.commit()
 	connection.close()
