@@ -103,7 +103,7 @@ if __name__ == '__main__':
 
 	datanum = raw_input('Input file path: ')
 
-	dbo = '/data2/home/immwa/scripts/paper_output/paperjunk_out.psv'
+	dbo = '/data4/paper/paperoutput/paperjunk_out.psv'
 
 	#iterates through directories, listing information about each one
 	dirs_all = glob.glob(datanum)

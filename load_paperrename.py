@@ -179,8 +179,8 @@ def load_paperrename(auto):
 
 	datanum = raw_input('Input file path: ')
 
-	dbo = '/data2/home/immwa/scripts/paper_output/paperrename_out.psv'
-	dbe = '/data2/home/immwa/scripts/paper_output/false_paperrename.psv'
+	dbo = '/data4/paper/paperoutput/paperrename_out.psv'
+	dbe = '/data4/paper/paperoutput/false_paperrename.psv'
 
 	#iterates through directories, listing information about each one
 	dirs_all = glob.glob(datanum)

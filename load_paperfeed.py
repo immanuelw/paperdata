@@ -162,8 +162,8 @@ if __name__ == '__main__':
 
 	datanum = raw_input('Input file path: ')
 
-	dbo = '/data2/home/immwa/scripts/paper_output/paperfeed_out.psv'
-	dbe = '/data2/home/immwa/scripts/paper_output/false_paperfeed.psv'
+	dbo = '/data4/paper/paperoutput/paperfeed_out.psv'
+	dbe = '/data4/paper/paperoutput/false_paperfeed.psv'
 
 	#iterates through directories, listing information about each one
 	dirs_all = glob.glob(datanum)

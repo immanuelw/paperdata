@@ -441,8 +441,8 @@ def load_paperdata(auto):
 
 	datanum = raw_input('Input file path: ')
 
-	dbo = '/data2/home/immwa/scripts/paper_output/db_out.psv'
-	dbe = '/data2/home/immwa/scripts/paper_output/false.psv'
+	dbo = '/data4/paper/paperoutput/db_out.psv'
+	dbe = '/data4/paper/paperoutput/false.psv'
 
 	if auto != 'y':
 		auto_update = raw_input('Auto-load immediately after finishing (y/n)?: ')
