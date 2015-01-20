@@ -122,7 +122,7 @@ def update_paperrename(usrnm, pswd):
 	for item in results:
 		jday = int(item[0])
 		actual = int(item[1])
-		cursor.execute('''UPDATE paperrename SET actual_amount = %d WHERE julian_day = %d''' %(actual, jday))
+		cursor.execute('''UPDATE paperrename SET actual_amount = %d WHERE julian_day = %d''', (actual, jday))
 
 	#Close and save database
 	cursor.close()
@@ -136,7 +136,7 @@ def update_paperjunk(infile_list, usrnm, pswd):
 	cursor = connection.cursor()
 
 	for infile in infile_list:
-		cursor.execute('''UPDATE paperjunk SET renamed = 1 where junk_path = '%s' and folio_path != 'NULL' ''' %(infile))
+		cursor.execute('''UPDATE paperjunk SET renamed = 1 where junk_path = '%s' and folio_path != 'NULL' ''', (infile))
 
 	#Close and save database
 	cursor.close()
