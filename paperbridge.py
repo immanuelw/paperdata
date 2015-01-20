@@ -238,7 +238,7 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		polarization = item[4]
 
 		#indicates length of information in file
-		length = round(float(item[5]),5)
+		length = round(float(item[5]),19)
 
 		#indicates obsnum
 		obsnum = int(item[1])

@@ -316,7 +316,7 @@ def gen_paperdata(dirs, dbo, dbe):
 
 		length = n_times * dt
 		#round so fits obsnum
-		length = round(length, 5)
+		length = round(length, 19)
 
 		#variable to input into jdpol2obsnum
 		divided_jdate = length
