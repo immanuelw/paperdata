@@ -131,12 +131,12 @@ def update_paperrename(usrnm, pswd):
 
 	return None
 
-def update_paperjunk(infile_list, usrnm, pswd):
+def update_paperjunk(infile_list, outfile_dict, usrnm, pswd):
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 	cursor = connection.cursor()
 
 	for infile in infile_list:
-		cursor.execute('''UPDATE paperjunk SET renamed = 1 where junk_path = '%s' and folio_path != 'NULL' ''', (infile))
+		cursor.execute('''UPDATE paperjunk SET renamed = 1, uv_path = %s where junk_path = %s and folio_path != 'NULL' ''', (outfile_dict[infile], infile))
 
 	#Close and save database
 	cursor.close()
@@ -151,6 +151,9 @@ def rename_uv(dirs, datashift, dbe):
 
 	#polarization dictionary
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
+
+	#outfile dictionary
+	outfile_dict = {}
 
 	for data_file in dirs:
 		count += 1
@@ -248,7 +251,9 @@ def rename_uv(dirs, datashift, dbe):
 			error_file.close()
 			continue
 
-	return None
+		outfile_dict.update({data_file:newfile})
+
+	return outfile_dic
 
 def paperrename(auto):
 	#Create output file
@@ -289,8 +294,8 @@ def paperrename(auto):
 		infile_list = glob.glob(junk_dir)
 		print infile_list
 		#RENAME FILES AND UPDATE PAPERJUNK
-		rename_uv(infile_list, datashift, dbrn)
-		update_paperjunk(infile_list, usrnm, pswd)
+		outfile_dict = rename_uv(infile_list, datashift, dbrn)
+		update_paperjunk(infile_list, outfile_dict, usrnm, pswd)
 		
 		#LOAD INTO PAPERRENAME
 		new_dir = os.path.join(datashift, '*')
