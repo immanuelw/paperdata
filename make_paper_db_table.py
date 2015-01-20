@@ -48,6 +48,7 @@ def make_paperjunk(cursor):
 	cursor.execute('''CREATE TABLE paperjunk (
 	junk_path VARCHAR(100) DEFAULT NULL,
 	folio_path VARCHAR(100) DEFAULT NULL,
+	uv_path VARCHAR(100) DEFAULT NULL,
 	junk_size_bytes BIGINT DEFAULT 0,
 	usb_number INT DEFAULT 99,
 	renamed tinyint(1) DEFAULT 0);''')
