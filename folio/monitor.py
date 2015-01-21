@@ -66,7 +66,18 @@ def iostat():
 
 	return [folio_name, folio_use]
 
-def write_file(folio_data, time_date, folio_space, free_space, host_name, usage):
+def ram_free():
+	#Calculates ram usage on folio
+	folio = subprocess.check_output(['free', '-b'])
+	ram = []
+	for output in folio.split('\n'):
+		line = output[:].split(' ')
+		new_line = filter(lambda a: a not in [''], line)
+		ram.append(new_line)	
+
+	return ram
+
+def write_file(folio_data, time_date, folio_space, free_space, host_name, usage, ram):
 	dbr = open(folio_data, 'ab')
 	wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 	wr.writerow([time_date])
@@ -75,6 +86,9 @@ def write_file(folio_data, time_date, folio_space, free_space, host_name, usage)
 	wr.writerow(['Host', host_name])
 	wr.writerow(['CPU statistics:'])
 	for row in usage:
+		wr.writerow(row)
+	wr.writerow(['RAM:'])
+	for row in ram:
 		wr.writerow(row)
 
 	dbr.close()
@@ -95,8 +109,9 @@ def monitor(auto):
 	free_space = calculate_free_space(dir)
 
 	host_name, usage = iostat()
+	ram = ram_free()
 
-	write_file(folio_data, time_date, folio_space, free_space, host_name, usage)
+	write_file(folio_data, time_date, folio_space, free_space, host_name, usage, ram)
 
 	if auto in ['y']:
 		time.sleep(60)
