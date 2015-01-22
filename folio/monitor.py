@@ -32,25 +32,6 @@ def calculate_folio_space(dir):
 			folio_space = int(output.split(' ')[-4])
 	return folio_space
 
-def calculate_free_space(dir):
-	#Calculates the free space left on input dir
-	folio = subprocess.check_output(['du', '-bs', dir])
-	#Amount of available bytes should be free_space
-
-	#Do not surpass this amount ~1TiB
-	#max_space = 1099511627776
-	#1.1TB
-	max_space = 1209462790553
-
-	total_space = 0
-	for output in folio.split('\n'):
-		subdir = output.split('\t')[-1]
-		if subdir == dir:
-			total_space = int(output.split('\t')[0])
-	free_space = max_space - total_space
-
-	return free_space
-
 def iostat():
 	#Calculates cpu usage on folio nodes
 	folio = subprocess.check_output(['iostat'])
@@ -77,18 +58,51 @@ def ram_free():
 
 	return ram
 
-def write_file(folio_data, time_date, folio_space, free_space, host_name, usage, ram):
+def cpu_perc():
+	#Calculates cpu usage on folio
+	folio = subprocess.check_output(['mpstat', '-P', 'ALL'])
+	cpu = []
+	for output in folio.split('\n'):
+		if output in [folio.split('\n')[0],folio.split('\n')[1]]:
+			continue
+		line = output[:].split(' ')
+		new_line = filter(lambda a: a not in [''], line)
+		cpu.append(new_line)
+
+	return cpu
+
+def processes():
+	#Calculates cpu usage on folio
+	folio = subprocess.check_output(['top', '-n1'])
+	pro = []
+	#for output in folio.split('\n'):
+	for output in folio.split('\n'):
+		if output in folio.split('\n')[:6]:
+			continue
+		line = output[:].split(' ')
+		new_line = filter(lambda a: a not in [''], line)
+		pro.append(new_line[1:-1])
+
+	return pro
+
+
+def write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro):
 	dbr = open(folio_data, 'ab')
 	wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 	wr.writerow([time_date])
 	wr.writerow(['Space on folio', folio_space])
-	wr.writerow(['Free space on folio', free_space])
 	wr.writerow(['Host', host_name])
-	wr.writerow(['CPU statistics:'])
+	wr.writerow(['Average CPU statistics:'])
 	for row in usage:
 		wr.writerow(row)
 	wr.writerow(['RAM:'])
 	for row in ram:
+		wr.writerow(row)
+	wr.writerow(['CPU Usage:'])
+	for row in cpu:
+		wr.writerow(row)
+	wr.writerow(['Processes:'])
+	for row in pro:
 		wr.writerow(row)
 
 	dbr.close()
@@ -105,13 +119,13 @@ def monitor(auto):
 	#Checks all filesystems
 	dir = '/*'
 	folio_space = calculate_folio_space(dir)
-	dir = '/data4/paper/junk/'
-	free_space = calculate_free_space(dir)
 
 	host_name, usage = iostat()
 	ram = ram_free()
+	cpu = cpu_perc()
+	pro = processes()
 
-	write_file(folio_data, time_date, folio_space, free_space, host_name, usage, ram)
+	write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro)
 
 	if auto in ['y']:
 		time.sleep(60)
