@@ -109,12 +109,21 @@ def write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, p
 
 	return None
 
-def monitor(auto):
+def data_out(time_date):
 	#Create output file
-	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-	folio_data = '/data4/paper/paperoutput/folio_data.psv'
+	time_day = time.strftime('%d-%m-%Y')
+	host = socket.gethostname()
+	folio_data = '/data4/paper/paperoutput/folio_data_%s_%s.psv' %(host, time_day)
 	dbr = open(folio_data, 'wb')
 	dbr.close()
+
+	return folio_data
+
+def monitor(auto):
+	time_date = time.strftime('%d-%m-%Y_%H:%M:%S')
+
+	#Create output file
+	folio_data = data_out(time_date)
 
 	#Checks all filesystems
 	dir = '/*'
