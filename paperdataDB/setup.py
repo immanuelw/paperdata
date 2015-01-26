@@ -7,7 +7,7 @@ setup_args = {
 	'author': 'Immanuel Washington',
 	'author_email': 'immwa at sas.upenn.edu',
 	'license': 'GPL',
-	'package_dir' : {'paperdataDB':'src'},
+	'package_dir' : {'paperdataDB': ''},
 	'packages' : ['paperdataDB'],
 	'scripts': glob.glob('scripts/*'),
 	'version': __version__,
