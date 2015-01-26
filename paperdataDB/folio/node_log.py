@@ -71,6 +71,7 @@ def cpu_perc():
 
 	return cpu
 
+"""
 def processes():
 	#Calculates cpu usage on folio
 	folio = subprocess.check_output(['top', '-n1'])
@@ -84,9 +85,10 @@ def processes():
 		pro.append(new_line[1:-1])
 
 	return pro
+"""
 
-
-def write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro):
+#def write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro):
+def write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu):
 	dbr = open(folio_data, 'ab')
 	wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 	wr.writerow([time_date])
@@ -101,9 +103,9 @@ def write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, p
 	wr.writerow(['CPU Usage:'])
 	for row in cpu:
 		wr.writerow(row)
-	wr.writerow(['Processes:'])
-	for row in pro:
-		wr.writerow(row)
+	#wr.writerow(['Processes:'])
+	#for row in pro:
+	#	wr.writerow(row)
 
 	dbr.close()
 
@@ -126,16 +128,21 @@ def monitor(auto):
 	#Create output file
 	folio_data = data_out(time_date)
 
-	#Checks all filesystems
-	dir = '/*'
-	folio_space = calculate_folio_space(dir)
+	for i in range(3):
+		time_date = time.strftime('%d-%m-%Y_%H:%M:%S')
 
-	host_name, usage = iostat()
-	ram = ram_free()
-	cpu = cpu_perc()
-	pro = processes()
+		#Checks all filesystems
+		dir = '/*'
+		folio_space = calculate_folio_space(dir)
 
-	write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro)
+		host_name, usage = iostat()
+		ram = ram_free()
+		cpu = cpu_perc()
+		#pro = processes()
+
+		#write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro)
+		write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu)
+		time.sleep(1)
 
 	if auto in ['y']:
 		time.sleep(60)
