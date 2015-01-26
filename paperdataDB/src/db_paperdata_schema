@@ -1,0 +1,23 @@
+Field				Type 			Default 	Extra
+path				varchar(100) 	NULL 		Path of compressed file (includes host)
+era					int(11) 		0			Era of data taken (32,64,128)
+era_type			varchar(100) 	NULL 		Type of data taken (ex: dual pol)
+obsnum				bigint(20) 		0			Unique id related to julian date
+md5sum				varchar(32) 	NULL 		Unique id related to raw file
+julian_day			int(11) 		0 		
+julian_date 		decimal(12,5) 	0.00000 	
+polarization 		varchar(4) 		NULL		Polarization of an observation
+data_length 		decimal(20,19) 	0.00000 	Value indicating the average length of a file in a day
+raw_path			varchar(100) 	NULL 		Path of raw file (includes host)
+cal_path			varchar(100) 	NULL 		Path of calibration file
+npz_path			VARCHAR(100)	NULL		Path of npz file
+final_product_path	VARCHAR(100)	NULL		Path of final compressed product
+tape_index			varchar(100) 	NULL 		Location of raw file on tape
+compr_file_size_MB 	decimal(6,1) 	0.0 		Size of compressed file in MB
+raw_file_size_MB 	decimal(10,1) 	0.0 		Size of raw file in MB
+compressed			tinyint(1) 		0			Checks if compressed file exists on folio
+edge				tinyint(1)		0			Value telling if file is on edge of day and thus cannot be compressed
+write_to_tape 		tinyint(1) 		0			Value telling if raw file can be written to tape
+delete_file 		tinyint(1) 		0			Value telling if file can be deleted
+restore_history 	varchar(255) 	NULL 		List indicating the dates the raw files  have been restored
+comments			text			None		Comment about file entry
