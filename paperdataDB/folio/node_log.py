@@ -128,6 +128,9 @@ def monitor(auto):
 	#Create output file
 	folio_data = data_out(time_date)
 
+	start_time = time.time()
+	interval = 1
+
 	for i in range(3):
 		time_date = time.strftime('%d-%m-%Y_%H:%M:%S')
 
@@ -142,7 +145,7 @@ def monitor(auto):
 
 		#write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro)
 		write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu)
-		time.sleep(1)
+		time.sleep(start_time + (i + 1) * interval - time.time())
 
 	if auto in ['y']:
 		time.sleep(60)
