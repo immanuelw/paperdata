@@ -19,6 +19,7 @@ time_d = time.strftime('%d-%m-%Y')
 file_data = '/data4/paper/paperoutput/monitor_folio_log_%s.psv' %(time_d)
 file_log = []
 file_status = {}
+file_time = {}
 
 #setup my curses stuff following
 # https://docs.python.org/2/howto/curses.html
@@ -81,9 +82,11 @@ try:
 			if filename not in file_status.keys():
 				file_status.update({filename:status})
 				file_log.append((filename,status,time_date,still_host))
+				file_time.update({filename:time.time()})
 			#write output log
 			if file_status[filename] not in [status]:
-				file_log.append((filename,status,time_date,still_host))
+				del_time = time.time() - file_time[filename]
+				file_log.append((filename,status,del_time,still_host,time_date))
 				file_status.update({filename:status})
 		write_file(file_log, file_data, '\n')
 		s.close()
