@@ -4,17 +4,21 @@ from sqlalchemy import func
 import curses,time,os
 import csv
 
-def write_file(log_info, node_data, time_date):
+def write_file(log_info, node_data, title):
 	dbr = open(node_data, 'ab')
 	wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
-	wr.writerow([time_date])
+	wr.writerow([title])
 	for row in log_info:
 		wr.writerow(row)
 	dbr.close()
 	return None
 
 #setup my output file
-node_data = '/data4/paper/paperoutput/monitor_folio_log.psv'
+#node_data = '/data4/paper/paperoutput/monitor_folio_log.psv'
+time_d = time.strftime('%d-%m-%Y')
+file_data = '/data4/paper/paperoutput/monitor_folio_log_%s.psv' %(time_d)
+file_log = []
+file_status = {}
 
 #setup my curses stuff following
 # https://docs.python.org/2/howto/curses.html
@@ -73,9 +77,15 @@ try:
 			else:
 				row = j%statheight
 			statusscr.addstr(row,col*colwidth,"{filename} {status} {still_host}".format(col=col,filename=os.path.basename(filename),status=status,still_host=still_host))
+			#check for new filenames
+			if filename not in file_status.keys():
+				file_status.update({filename:status})
+				file_log.append((filename,status,time_date,still_host))
 			#write output log
-			log_info.append([filename, status, still_host])
-		write_file(log_info, node_data, time_date)
+			if file_status[filename] not in [status]:
+				file_log.append((filename,status,time_date,still_host))
+				file_status.update({filename:status})
+		write_file(file_log, file_data, '\n')
 		s.close()
 		statusscr.refresh()
 		c = stdscr.getch()
