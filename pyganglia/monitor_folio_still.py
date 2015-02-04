@@ -81,7 +81,8 @@ try:
 			#check for new filenames
 			if filename not in file_status.keys():
 				file_status.update({filename:status})
-				file_log.append((filename,status,time_date,still_host))
+				del_time = 0
+				file_log.append((filename,status,del_time,still_host,time_date))
 				file_time.update({filename:time.time()})
 			#write output log
 			if file_status[filename] not in [status]:
