@@ -93,9 +93,9 @@ class monitor_files:
 		self.TIME_DATE = 15
 		self.db_list = ['filename', 'status', 'del_time', 'still_host', 'time_date']
 		self.db_dict = {self.FILENAME:'filename', self.STATUS:'status', self.DEL_TIME:'del_time', self.STILL_HOST:'still_host', self.TIME_DATE:'time_date'}
-		self.var_flo = []
+		self.var_flo = ['time_date']
 		self.var_str = ['filename', 'status', 'still_host']
-		self.var_int = ['del_time', 'time_date']
+		self.var_int = ['del_time']
 		self.table = 'monitor_files'
 
 class ram:
@@ -115,9 +115,9 @@ class ram:
 		self.TIME_DATE = 23
 		self.db_list = ['host', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free', 'time_date']
 		self.db_dict = {self.HOST:'host', self.TOTAL:'total', self.USED:'used', self.FREE:'free', self.SHARED:'shared', self.BUFFERS:'buffers', self.CACHED:'cached', self.BC_USED:'bc_used', self.BC_FREE:'bc_free', self.SWAP_TOTAL:'swap_total', self.SWAP_TOTAL:'swap_used', self.SWAP_FREE:'swap_free', self.TIME_DATE:'time_date'}
-		self.var_flo = []
+		self.var_flo = ['time_date']
 		self.var_str = ['host']
-		self.var_int = ['total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free', 'time_date']
+		self.var_int = ['total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']
 		self.table = 'ram'
 
 class iostat:
@@ -132,9 +132,9 @@ class iostat:
 		self.TIME_DATE = 18
 		self.db_list = ['host', 'device', 'tps', 'read_s', 'write_s', 'reads', 'writes', 'time_date']
 		self.db_dict = {self.HOST:'host', self.DEVICE:'device', self.TPS:'tps', self.READ_S:'read_s', self.WRITE_S:'write_s', self.READS:'reads', self.WRITES:'writes', self.TIME_DATE:'time_date'}
-		self.var_flo = ['tps', 'read_s', 'write_s']
+		self.var_flo = ['tps', 'read_s', 'write_s', 'time_date']
 		self.var_str = ['host', 'device']
-		self.var_int = ['reads', 'writes', 'time_date']
+		self.var_int = ['reads', 'writes']
 		self.table = 'iostat'
 
 class cpu:
@@ -149,9 +149,9 @@ class cpu:
 		self.TIME_DATE = 18
 		self.db_list = ['host','cpu', 'user_perc', 'sys_perc', 'iowait_perc', 'idle_perc', 'intr_s', 'time_date']
 		self.db_dict = {self.HOST:'host', self.CPU:'cpu', self.USER_PERC:'user_perc', self.SYS_PERC:'sys_perc', self.IOWAIT_PERC:'iowait_perc', self.IDLE_PERC:'idle_perc', self.INTR_S:'intr_s', self.TIME_DATE:'time_date'}
-		self.var_flo = ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']
+		self.var_flo = ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc', 'time_date']
 		self.var_str = ['host']
-		self.var_int = ['cpu', 'intr_s', 'time_date']
+		self.var_int = ['cpu', 'intr_s']
 		self.table = 'cpu'
 
 # Generate strings to load into query 
@@ -184,7 +184,7 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			if item[1] == SEARCH:
 				query.append(field)
 			if field in var_flo:
-				searchstr.append('%s = %.2f'%(field, exact))
+				searchstr.append('%s = %.6f'%(field, exact))
 			elif field in var_str:
 				searchstr.append("%s = '%s'"%(field, exact))
 			elif field in var_int:
@@ -201,7 +201,7 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			if item[1] == SEARCH:
 				query.append(field)
 			if field in var_flo:
-				searchstr.append('%s >= %.2f'%(field, min))
+				searchstr.append('%s >= %.6f'%(field, min))
 			elif field in var_str:
 				searchstr.append("%s >= '%s'"%(field, min))
 			elif field in var_int:
@@ -218,7 +218,7 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			if item[1] == SEARCH:
 				query.append(field)
 			if field in var_flo:
-				searchstr.append('%s <= %.2f'%(field, max))
+				searchstr.append('%s <= %.6f'%(field, max))
 			elif field in var_str:
 				searchstr.append("%s <= '%s'"%(field, max))
 			elif field in var_int:
@@ -236,7 +236,7 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			if item[1] == SEARCH:
 				query.append(field)
 			if field in var_flo:
-				searchstr.append('%s >= %.2f and %s <= %.2f'%(field, min, field, max))
+				searchstr.append('%s >= %.6f and %s <= %.6f'%(field, min, field, max))
 			elif field in var_str:
 				searchstr.append("%s >= '%s' and %s <= '%s'"%(field, min, field, max))
 			elif field in var_int:
@@ -252,11 +252,11 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			if field in var_flo:
 				for it in item[3]:
 					if it == item[3][0]:
-						list_str = '(%s = %.2f' %(field, it)
+						list_str = '(%s = %.6f' %(field, it)
 					elif it == item[3][-1]:
-						list_str = list_str + ' or %s = %.2f)' %(field, it)
+						list_str = list_str + ' or %s = %.6f)' %(field, it)
 					else:
-						list_str = list_str + ' or %s = %.2f' %(field, it)
+						list_str = list_str + ' or %s = %.6f' %(field, it)
 			elif field in var_str:
 				for it in item[3]:
 					if it == item[3][0]:

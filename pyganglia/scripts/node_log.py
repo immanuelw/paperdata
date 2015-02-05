@@ -183,7 +183,9 @@ def monitor(auto):
 		pswd = getpass.getpass('Password: ')
 
 	for i in range(3):
-		time_date = int(time.strftime('%Y%m%d%H%M%S'))
+		time_date = time.strftime('%Y:%m:%d:%H:%M:%S')
+		temp_time = time_date.split(':')
+		time_date = jdcal.gcal2jd(temp_time[0],temp_time[1],temp_time[2],temp_time[3],temp_time[4],temp_time[5])
 
 		#Checks all filesystems
 		dir = '/*'

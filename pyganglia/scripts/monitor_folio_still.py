@@ -3,6 +3,7 @@ from ddr_compress.dbi import DataBaseInterface,Observation,File
 from sqlalchemy import func
 import curses,time,os
 import csv
+import jdcal
 
 def write_file(log_info, node_data, title):
 	dbr = open(node_data, 'ab')
@@ -24,7 +25,7 @@ def write_db(usrnm, pswd, log_info):
 	for row in log_info:
 		val = tuple(row)
 		values = ('monitor_files',) + val
-		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%d,%s,%s)''', values)
+		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%d,%s,%.6f)''', values)
 
 	#Close and save changes to database
 	cursor.close()
@@ -69,7 +70,9 @@ i=0
 stat = ['\\','|','/','-','.']
 try:
 	while(1):
-		time_date = int(time.strftime('%Y%m%d%H%M%S'))
+		time_date = time.strftime('%Y:%m:%d:%H:%M:%S')
+		temp_time = time_date.split(':')
+		time_date = jdcal.gcal2jd(temp_time[0],temp_time[1],temp_time[2],temp_time[3],temp_time[4],temp_time[5])
 		log_info = []
 		#get the screen dimensions
 
