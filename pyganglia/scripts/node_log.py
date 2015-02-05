@@ -45,7 +45,9 @@ def iostat():
 			new_line = filter(lambda a: a not in [''], line)
 			folio_use.append(new_line)
 
-	folio_use = folio_use[1:]
+	device = ['Device:', 'sda', 'sda1', 'sda2','dm-0', 'dm-1']
+	#Convert all numbers to floats, keep words as strings
+	folio_use = [float(i) if i not in device else i for i in folio_use[1:]]
 
 	return [folio_name, folio_use]
 
@@ -61,9 +63,9 @@ def ram_free():
 	reram = []
 	for key, row in enumerate(ram[1:-1]):
 		if key in [0,2]:
-				reram.extend(row[1:])
+				reram.extend([int(i) for i in row[1:]])
 		if key in [1]:
-				reram.extend(row[2:])
+				reram.extend([int(i) for i in row[2:]])
 
 	return [reram]
 
@@ -84,7 +86,7 @@ def cpu_perc():
 		dummy_cpu = []
 		for key, item in enumerate(row):
 			if key in [2,3,5,6,10,11]:
-				dummy_cpu.append(item)
+				dummy_cpu.append(float(item))
 		recpu.append(dummy_cpu)
 
 	return recpu
