@@ -81,7 +81,8 @@ try:
 		totalobs = s.query(Observation).count()
 		stdscr.addstr(curline,0,"Number of observations currently in the database: {totalobs}".format(totalobs=totalobs))
 		curline += 1
-		OBSs = s.query(Observation).filter(Observation.status!='NEW').filter(Observation.status!='COMPLETE').all()
+		#OBSs = s.query(Observation).filter(Observation.status!='NEW').filter(Observation.status!='COMPLETE').all()
+		OBSs = s.query(Observation).all()
 		obsnums = [OBS.obsnum for OBS in OBSs]
 		stdscr.addstr(curline,0,"Number of observations currently being processed {num}".format(num=len(obsnums)))
 		curline += 1
