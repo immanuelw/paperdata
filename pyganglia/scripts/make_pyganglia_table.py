@@ -21,7 +21,7 @@ def make_monitor_files(cursor):
 	status VARCHAR(255) DEFAULT NULL,
 	del_time INT DEFAULT 0,
 	still_host VARCHAR(255) DEFAULT NULL,
-	time_date VARCHAR(255) DEFAULT NULL);''')
+	time_date BIGINT DEFAULT 0);''')
 
 	print 'Table monitor_files created'
 
@@ -41,7 +41,7 @@ def make_ram(cursor):
 	swap_total INT DEFAULT 0,
 	swap_used INT DEFAULT 0,
 	swap_free INT DEFAULT 0,
-	time_date VARCHAR(255) DEFAULT NULL);''')
+	time_date BIGINT DEFAULT 0);''')
 
 	print 'Table ram created'
 
@@ -56,7 +56,7 @@ def make_iostat(cursor):
 	write_s DECIMAL(7,2) DEFAULT 0.00,
 	reads INT DEFAULT 0,
 	writes INT DEFAULT 0,
-	time_date VARCHAR(255) DEFAULT NULL);''')
+	time_date BIGINT DEFAULT 0);''')
 
 	print 'Table iostat created'
 
@@ -71,7 +71,7 @@ def make_cpu(cursor):
 	iowait_perc DECIMAL(5,2) DEFAULT 0.00,
 	idle_perc DECIMAL(5,2) DEFAULT 0.00,
 	intr_s INT DEFAULT 0,
-	time_date VARCHAR(255) DEFAULT NULL);''')
+	time_date BIGINT DEFAULT 0);''')
 
 	print 'Table cpu created'
 

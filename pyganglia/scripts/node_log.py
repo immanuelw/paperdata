@@ -138,15 +138,15 @@ def write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage
 	for row in usage:
 		val = tuple(row)
 		values = ('iostat', host_name) + val + (time_date,)
-		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%.2f,%.2f,%.2f,%d,%d,%s)''', values)
+		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%.2f,%.2f,%.2f,%d,%d,%d)''', values)
 	for row in ram:
 		val = tuple(row)
 		values = ('ram', host_name) + val + (time_date,)
-		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s)''', values)
+		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)''', values)
 	for row in cpu:
 		val = tuple(row)
 		values = ('cpu', host_name) + val + (time_date,)
-		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%.2f,%.2f,%.2f,%.2f,%d,%s)''', values)
+		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%.2f,%.2f,%.2f,%.2f,%d,%d)''', values)
 
 	#Close and save changes to database
 	cursor.close()
@@ -167,7 +167,7 @@ def data_out(time_date):
 	return folio_data
 
 def monitor(auto):
-	time_date = time.strftime('%d-%m-%Y_%H:%M:%S')
+	time_date = int(time.strftime('%Y%m%d%H%M%S'))
 
 	#Create output file
 	folio_data = data_out(time_date)
@@ -183,7 +183,7 @@ def monitor(auto):
 		pswd = getpass.getpass('Password: ')
 
 	for i in range(3):
-		time_date = time.strftime('%d-%m-%Y_%H:%M:%S')
+		time_date = int(time.strftime('%Y%m%d%H%M%S'))
 
 		#Checks all filesystems
 		dir = '/*'

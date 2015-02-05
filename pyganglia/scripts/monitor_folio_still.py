@@ -69,7 +69,7 @@ i=0
 stat = ['\\','|','/','-','.']
 try:
 	while(1):
-		time_date = time.strftime('%d-%m-%Y_%H:%M:%S')
+		time_date = int(time.strftime('%Y%m%d%H%M%S'))
 		log_info = []
 		#get the screen dimensions
 
