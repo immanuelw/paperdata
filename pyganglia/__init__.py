@@ -92,176 +92,10 @@ class monitor_files(self):
 	self.TIME_DATE = 15
 	self.db_list = ['filename', 'status', 'del_time', 'still_host', 'time_date']
 	self.db_dict = {self.FILENAME:'filename', self.STATUS:'status', self.DEL_TIME'del_time', self.STILL_HOST'still_host', self.TIME_DATE:'time_date'}
-	# Generate strings to load into query 
-	def fetch(info_list):
-		# Instantiate variables to use to generate query string
-		query = []
-		searchstr = []
-
-		# Info list should be [[field_name, search_field, option, [more_info]], 
-		# Ex: [['cpu', NOSEARCH, EXACT, [2]], ['user_perc', SEARCH, NONE, []], ['intr_s', SEARCH, RANGE, [922, 935]]]
-		for item in info_list:
-			if len(item) != 4:
-				print 'ERROR -- LIST %s does not have enough entries' %(item)
-				return None #HOW SHOULD I THROW ERRORS?
-
-			# Instantiates field variable
-			if isinstance(item[0], str):
-				field = item[0]
-			elif isinstance(item[0], int):
-				field = self.db_dict[item[0]]
-
-			if item[2] == EXACT:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-	
-				exact = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in []:
-					searchstr.append('%s = %.2f'%(field, exact))
-				elif field in ['filename', 'status', 'still_host', 'time_date']:
-					searchstr.append("%s = '%s'"%(field, exact))
-				elif field in ['del_time']:
-					searchstr.append('%s = %d'%(field, exact))
-
-			elif item[2] == MIN:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-
-				min = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in []:
-					searchstr.append('%s >= %.2f'%(field, min))
-				elif field in ['filename', 'status', 'still_host', 'time_date']:
-					searchstr.append("%s >= '%s'"%(field, min))
-				elif field in ['del_time']:
-					searchstr.append('%s >= %d'%(field, min))
-
-			elif item[2] == MAX:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				max = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in []:
-					searchstr.append('%s >= %.2f'%(field, max))
-				elif field in ['filename', 'status', 'still_host', 'time_date']:
-					searchstr.append("%s >= '%s'"%(field, max))
-				elif field in ['del_time']:
-					searchstr.append('%s >= %d'%(field, max))
-
-			elif item[2] == RANGE:
-				if len(item[3]) != 2:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				min = item[3][0]
-				max = item[3][1]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-
-				if field in []:
-					searchstr.append('%s >= %.2f and %s <= %.2f'%(field, min, field, max))
-				elif field in ['filename', 'status', 'still_host', 'time_date']:
-					searchstr.append("%s >= '%s' and %s <= '%s'"%(field, min, field, max))
-				elif field in ['del_time']:
-					searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
-
-			elif item[2] == LIST:
-				if len(item[3]) <= 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in []:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = '(%s = %.2f' %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + ' or %s = %.2f)' %(field, it)
-						else:
-							list_str = list_str + ' or %s = %.2f' %(field, it)
-				elif field in ['filename', 'status', 'still_host', 'time_date']:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = "(%s = '%s'" %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + " or %s = '%s')" %(field, it)
-						else:
-							list_str = list_str + " or %s = '%s'" %(field, it)
-				elif field in ['del_time']:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = '(%s = %d' %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + ' or %s = %d)' %(field, it)
-						else:
-							list_str = list_str + ' or %s = %d' %(field, it)
-				searchstr.append(list_str)
-
-			elif item[2] == NONE:
-				if len(item[3]) != 0:
-					print 'ERROR -- LIST %s has too many entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-
-			else:
-				return None #HOW SHOULD I THROW ERRORS?
-
-		for item in searchstr:
-			if item == searchstr[0]:
-				qsearch = item
-			else:
-				qsearch = qsearch + ' and ' + item
-
-		for item in query:
-			if len(query) == 1:
-				if qsearch == '':
-					dbstr = 'SELECT ' + item + ' FROM monitor_files'
-				else:
-					dbstr = 'SELECT ' + item + ' FROM monitor_files WHERE ' + qsearch
-			else:
-				if item == query[0]:
-					dbstr = 'SELECT ' + item + ', '
-				elif item == query[-1]:
-					dbstr = dbstr + item + ' FROM monitor_files WHERE ' + qsearch
-				else:
-					dbstr = dbstr + item + ', '
-
-		return dbstr
-
-	# Near redundant class instantiation in order to facilitate easy repeatable access to paperdata through scripts
-	# It's a way to code in queries without using the GUI whenever a change is wanted
-	# REQUIRES knowledge of fields and paperdataDB constants
-
-	class searchobj:
-		def __init__(self):
-			self.info_list = []
-			return None
-		def add_to_output(self, field, search_bool, limit, *range):
-			self.info_list.append([field, search_bool, limit, range])
-			return None
-		def output(self):
-			return dbsearch(fetch(self.info_list))
-		def output_dict(self):
-			return dbsearch_dict(fetch(self.info_list))
+	self.var_flo = []
+	self.var_str = ['filename', 'status', 'still_host', 'time_date']
+	self.var_int = ['del_time']
+	self.table = 'monitor_files'
 
 class ram(self):
 	self.CPU = 11
@@ -279,176 +113,10 @@ class ram(self):
 	self.TIME_DATE = 23
 	self.db_list = ['cpu', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free', 'time_date']
 	self.db_dict = {self.CPU:'cpu', self.TOTAL:'total', self.USED:'used', self.FREE:'free', self.SHARED:'shared', self.BUFFERS:'buffers', self.CACHED:'cached', self.BC_USED:'bc_used', self.BC_FREE:'bc_free', self.SWAP_TOTAL:'swap_total', self.SWAP_TOTAL:'swap_used', self.SWAP_FREE:'swap_free', self.TIME_DATE:'time_date'}
-	# Generate strings to load into query 
-	def fetch(info_list):
-		# Instantiate variables to use to generate query string
-		query = []
-		searchstr = []
-
-		# Info list should be [[field_name, search_field, option, [more_info]], 
-		# Ex: [['cpu', NOSEARCH, EXACT, [2]], ['user_perc', SEARCH, NONE, []], ['intr_s', SEARCH, RANGE, [922, 935]]]
-		for item in info_list:
-			if len(item) != 4:
-				print 'ERROR -- LIST %s does not have enough entries' %(item)
-				return None #HOW SHOULD I THROW ERRORS?
-
-			# Instantiates field variable
-			if isinstance(item[0], str):
-				field = item[0]
-			elif isinstance(item[0], int):
-				field = self.db_dict[item[0]]
-
-			if item[2] == EXACT:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-	
-				exact = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in []:
-					searchstr.append('%s = %.2f'%(field, exact))
-				elif field in ['time_date']:
-					searchstr.append("%s = '%s'"%(field, exact))
-				elif field in ['cpu', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']:
-					searchstr.append('%s = %d'%(field, exact))
-
-			elif item[2] == MIN:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-
-				min = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in []:
-					searchstr.append('%s >= %.2f'%(field, min))
-				elif field in ['time_date']:
-					searchstr.append("%s >= '%s'"%(field, min))
-				elif field in ['cpu', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']:
-					searchstr.append('%s >= %d'%(field, min))
-
-			elif item[2] == MAX:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				max = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in []:
-					searchstr.append('%s <= %.2f'%(field, max))
-				elif field in ['time_date']:
-					searchstr.append("%s <= '%s'"%(field, max))
-				elif field in ['cpu', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']:
-					searchstr.append('%s <= %d'%(field, max))
-
-			elif item[2] == RANGE:
-				if len(item[3]) != 2:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				min = item[3][0]
-				max = item[3][1]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in []:
-					searchstr.append('%s >= %.2f and %s <= %.2f'%(field, min, field, max))
-				elif field in ['time_date']:
-					searchstr.append("%s >= '%s' and %s <= '%s'"%(field, min, field, max))
-				elif field in ['cpu', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']:
-					searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
-
-			elif item[2] == LIST:
-				if len(item[3]) <= 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in []:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = '(%s = %.2f' %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + ' or %s = %.2f)' %(field, it)
-						else:
-							list_str = list_str + ' or %s = %.2f' %(field, it)
-				elif field in ['time_date']:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = "(%s = '%s'" %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + " or %s = '%s')" %(field, it)
-						else:
-							list_str = list_str + " or %s = '%s'" %(field, it)
-				elif field in ['cpu', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = '(%s = %d' %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + ' or %s = %d)' %(field, it)
-						else:
-							list_str = list_str + ' or %s = %d' %(field, it)
-				searchstr.append(list_str)
-
-			elif item[2] == NONE:
-				if len(item[3]) != 0:
-					print 'ERROR -- LIST %s has too many entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-
-			else:
-				return None #HOW SHOULD I THROW ERRORS?
-
-		for item in searchstr:
-			if item == searchstr[0]:
-				qsearch = item
-			else:
-				qsearch = qsearch + ' and ' + item
-
-		for item in query:
-			if len(query) == 1:
-				if qsearch == '':
-					dbstr = 'SELECT ' + item + ' FROM ram'
-				else:
-					dbstr = 'SELECT ' + item + ' FROM ram WHERE ' + qsearch
-			else:
-				if item == query[0]:
-					dbstr = 'SELECT ' + item + ', '
-				elif item == query[-1]:
-					dbstr = dbstr + item + ' FROM ram WHERE ' + qsearch
-				else:
-					dbstr = dbstr + item + ', '
-
-		return dbstr
-
-	# Near redundant class instantiation in order to facilitate easy repeatable access to paperdata through scripts
-	# It's a way to code in queries without using the GUI whenever a change is wanted
-	# REQUIRES knowledge of fields and paperdataDB constants
-
-	class searchobj:
-		def __init__(self):
-			self.info_list = []
-			return None
-		def add_to_output(self, field, search_bool, limit, *range):
-			self.info_list.append([field, search_bool, limit, range])
-			return None
-		def output(self):
-			return dbsearch(fetch(self.info_list))
-		def output_dict(self):
-			return dbsearch_dict(fetch(self.info_list))
+	self.var_flo = []
+	self.var_str = ['time_date']
+	self.var_int = ['cpu', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']
+	self.table = 'ram'
 
 class iostat(self):
 	self.CPU = 11
@@ -459,177 +127,11 @@ class iostat(self):
 	self.WRITES = 16
 	self.TIME_DATE = 17
 	self.db_list = ['cpu', 'device', 'read_s', 'write_s', 'reads', 'writes', 'time_date']
-	self.db_dict = {self.CPU:'cpu', self.DEVICE:'device', self.READ_S:'read_s', self.WRITE_S:'write_s', self.READS:'reads', self.WRTIES:'writes', self.TIME_DATE:'time_date'}
-	# Generate strings to load into query 
-	def fetch(info_list):
-		# Instantiate variables to use to generate query string
-		query = []
-		searchstr = []
-
-		# Info list should be [[field_name, search_field, option, [more_info]], 
-		# Ex: [['cpu', NOSEARCH, EXACT, [2]], ['user_perc', SEARCH, NONE, []], ['intr_s', SEARCH, RANGE, [922, 935]]]
-		for item in info_list:
-			if len(item) != 4:
-				print 'ERROR -- LIST %s does not have enough entries' %(item)
-				return None #HOW SHOULD I THROW ERRORS?
-
-			# Instantiates field variable
-			if isinstance(item[0], str):
-				field = item[0]
-			elif isinstance(item[0], int):
-				field = self.db_dict[item[0]]
-
-			if item[2] == EXACT:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-	
-				exact = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']:
-					searchstr.append('%s = %.2f'%(field, exact))
-				elif field in ['time_date']:
-					searchstr.append("%s = '%s'"%(field, exact))
-				elif field in ['cpu', 'intr_s']:
-					searchstr.append('%s = %d'%(field, exact))
-
-			elif item[2] == MIN:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-
-				min = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']:
-					searchstr.append('%s >= %.2f'%(field, min))
-				elif field in ['time_date']:
-					searchstr.append("%s >= '%s'"%(field, min))
-				elif field in ['cpu', 'intr_s']:
-					searchstr.append('%s >= %d'%(field, min))
-
-			elif item[2] == MAX:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				max = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']:
-					searchstr.append('%s <= %.2f'%(field, max))
-				elif field in ['time_date']:
-					searchstr.append("%s <= '%s'"%(field, max))
-				elif field in ['cpu', 'intr_s']:
-					searchstr.append('%s <= %d'%(field, max))
-
-			elif item[2] == RANGE:
-				if len(item[3]) != 2:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				min = item[3][0]
-				max = item[3][1]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']:
-					searchstr.append('%s >= %.2f and %s <= %.2f'%(field, min, field, max))
-				elif field in ['time_date']:
-					searchstr.append("%s >= '%s' and %s <= '%s'"%(field, min, field, max))
-				elif field in ['cpu', 'intr_s']:
-					searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
-
-			elif item[2] == LIST:
-				if len(item[3]) <= 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = '(%s = %.2f' %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + ' or %s = %.2f)' %(field, it)
-						else:
-							list_str = list_str + ' or %s = %.2f' %(field, it)
-				elif field in ['time_date']:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = "(%s = '%s'" %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + " or %s = '%s')" %(field, it)
-						else:
-							list_str = list_str + " or %s = '%s'" %(field, it)
-				elif field in ['cpu', 'intr_s']:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = '(%s = %d' %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + ' or %s = %d)' %(field, it)
-						else:
-							list_str = list_str + ' or %s = %d' %(field, it)
-				searchstr.append(list_str)
-
-			elif item[2] == NONE:
-				if len(item[3]) != 0:
-					print 'ERROR -- LIST %s has too many entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-
-			else:
-				return None #HOW SHOULD I THROW ERRORS?
-
-		for item in searchstr:
-			if item == searchstr[0]:
-				qsearch = item
-			else:
-				qsearch = qsearch + ' and ' + item
-
-		for item in query:
-			if len(query) == 1:
-				if qsearch == '':
-					dbstr = 'SELECT ' + item + ' FROM iostat'
-				else:
-					dbstr = 'SELECT ' + item + ' FROM iostat WHERE ' + qsearch
-			else:
-				if item == query[0]:
-					dbstr = 'SELECT ' + item + ', '
-				elif item == query[-1]:
-					dbstr = dbstr + item + ' FROM iostat WHERE ' + qsearch
-				else:
-					dbstr = dbstr + item + ', '
-
-		return dbstr
-
-	# Near redundant class instantiation in order to facilitate easy repeatable access to paperdata through scripts
-	# It's a way to code in queries without using the GUI whenever a change is wanted
-	# REQUIRES knowledge of fields and paperdataDB constants
-
-	class searchobj:
-		def __init__(self):
-			self.info_list = []
-			return None
-		def add_to_output(self, field, search_bool, limit, *range):
-			self.info_list.append([field, search_bool, limit, range])
-			return None
-		def output(self):
-			return dbsearch(fetch(self.info_list))
-		def output_dict(self):
-			return dbsearch_dict(fetch(self.info_list))
+	self.db_dict = {self.CPU:'cpu', self.DEVICE:'device', self.READ_S:'read_s', self.WRITE_S:'write_s', self.READS:'reads', self.WRITES:'writes', self.TIME_DATE:'time_date'}
+	self.var_flo = []
+	self.var_str = ['device', 'time_date']
+	self.var_int = ['cpu', 'read_s', 'write_s', 'reads', 'writes']
+	self.table = 'iostat'
 
 class cpu(self):
 	self.CPU = 11
@@ -641,176 +143,186 @@ class cpu(self):
 	self.TIME_DATE = 17
 	self.db_list = ['cpu', 'user_perc', 'sys_perc', 'iowait_perc', 'idle_perc', 'intr_s', 'time_date']
 	self.db_dict = {self.CPU:'cpu', self.USER_PERC:'user_perc', self.SYS_PERC:'sys_perc', self.IOWAIT_PERC:'iowait_perc', self.IDLE_PERC:'idle_perc', self.INTR_S:'intr_s', self.TIME_DATE:'time_date'}
-	# Generate strings to load into query 
-	def fetch(info_list):
-		# Instantiate variables to use to generate query string
-		query = []
-		searchstr = []
+	self.var_flo = ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']
+	self.var_str = ['time_date']
+	self.var_int = ['cpu', 'intr_s']
+	self.table = 'cpu'
 
-		# Info list should be [[field_name, search_field, option, [more_info]], 
-		# Ex: [['cpu', NOSEARCH, EXACT, [2]], ['user_perc', SEARCH, NONE, []], ['intr_s', SEARCH, RANGE, [922, 935]]]
-		for item in info_list:
-			if len(item) != 4:
-				print 'ERROR -- LIST %s does not have enough entries' %(item)
+# Generate strings to load into query 
+def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
+	# Instantiate variables to use to generate query string
+	query = []
+	searchstr = []
+
+	# Info list should be [[field_name, search_field, option, [more_info]], 
+	# Ex: [['cpu', NOSEARCH, EXACT, [2]], ['user_perc', SEARCH, NONE, []], ['intr_s', SEARCH, RANGE, [922, 935]]]
+	for item in info_list:
+		if len(item) != 4:
+			print 'ERROR -- LIST %s does not have enough entries' %(item)
+			return None #HOW SHOULD I THROW ERRORS?
+
+		# Instantiates field variable
+		if isinstance(item[0], str):
+		field = item[0]
+		elif isinstance(item[0], int):
+			field = db_dict[item[0]]
+
+		if item[2] == EXACT:
+			if len(item[3]) != 1:
+				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
 				return None #HOW SHOULD I THROW ERRORS?
-
-			# Instantiates field variable
-			if isinstance(item[0], str):
-				field = item[0]
-			elif isinstance(item[0], int):
-				field = self.db_dict[item[0]]
-
-			if item[2] == EXACT:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
 	
-				exact = item[3][0]
+			exact = item[3][0]
 
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']:
-					searchstr.append('%s = %.2f'%(field, exact))
-				elif field in ['time_date']:
-					searchstr.append("%s = '%s'"%(field, exact))
-				elif field in ['cpu', 'intr_s']:
-					searchstr.append('%s = %d'%(field, exact))
+			# Adding info to lists to generate strings later
+			if item[1] == SEARCH:
+				query.append(field)
+			if field in var_flo:
+				searchstr.append('%s = %.2f'%(field, exact))
+			elif field in var_str:
+				searchstr.append("%s = '%s'"%(field, exact))
+			elif field in var_int:
+				searchstr.append('%s = %d'%(field, exact))
 
-			elif item[2] == MIN:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-
-				min = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']:
-					searchstr.append('%s >= %.2f'%(field, min))
-				elif field in ['time_date']:
-					searchstr.append("%s >= '%s'"%(field, min))
-				elif field in ['cpu', 'intr_s']:
-					searchstr.append('%s >= %d'%(field, min))
-
-			elif item[2] == MAX:
-				if len(item[3]) != 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				max = item[3][0]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']:
-					searchstr.append('%s <= %.2f'%(field, max))
-				elif field in ['time_date']:
-					searchstr.append("%s <= '%s'"%(field, max))
-				elif field in ['cpu', 'intr_s']:
-					searchstr.append('%s <= %d'%(field, max))
-
-			elif item[2] == RANGE:
-				if len(item[3]) != 2:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				min = item[3][0]
-				max = item[3][1]
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']:
-					searchstr.append('%s >= %.2f and %s <= %.2f'%(field, min, field, max))
-				elif field in ['time_date']:
-					searchstr.append("%s >= '%s' and %s <= '%s'"%(field, min, field, max))
-				elif field in ['cpu', 'intr_s']:
-					searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
-
-			elif item[2] == LIST:
-				if len(item[3]) <= 1:
-					print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
-					return None #HOW SHOULD I THROW ERRORS?
-
-				if item[1] == SEARCH:
-					query.append(field)
-				if field in ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = '(%s = %.2f' %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + ' or %s = %.2f)' %(field, it)
-						else:
-							list_str = list_str + ' or %s = %.2f' %(field, it)
-				elif field in ['time_date']:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = "(%s = '%s'" %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + " or %s = '%s')" %(field, it)
-						else:
-							list_str = list_str + " or %s = '%s'" %(field, it)
-				elif field in ['cpu', 'intr_s']:
-					for it in item[3]:
-						if it == item[3][0]:
-							list_str = '(%s = %d' %(field, it)
-						elif it == item[3][-1]:
-							list_str = list_str + ' or %s = %d)' %(field, it)
-						else:
-							list_str = list_str + ' or %s = %d' %(field, it)
-				searchstr.append(list_str)
-
-			elif item[2] == NONE:
-				if len(item[3]) != 0:
-					print 'ERROR -- LIST %s has too many entries' %(item) 
-					return None #HOW SHOULD I THROW ERRORS?
-
-				# Adding info to lists to generate strings later
-				if item[1] == SEARCH:
-					query.append(field)
-
-			else:
+		elif item[2] == MIN:
+			if len(item[3]) != 1:
+				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
 				return None #HOW SHOULD I THROW ERRORS?
 
-		for item in searchstr:
-			if item == searchstr[0]:
-				qsearch = item
+			min = item[3][0]
+
+			# Adding info to lists to generate strings later
+			if item[1] == SEARCH:
+				query.append(field)
+			if field in var_flo:
+				searchstr.append('%s >= %.2f'%(field, min))
+			elif field in var_str:
+				searchstr.append("%s >= '%s'"%(field, min))
+			elif field in var_int:
+				searchstr.append('%s >= %d'%(field, min))
+
+		elif item[2] == MAX:
+			if len(item[3]) != 1:
+				print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
+				return None #HOW SHOULD I THROW ERRORS?
+
+			max = item[3][0]
+
+			# Adding info to lists to generate strings later
+			if item[1] == SEARCH:
+				query.append(field)
+			if field in var_flo:
+				searchstr.append('%s <= %.2f'%(field, max))
+			elif field in var_str:
+				searchstr.append("%s <= '%s'"%(field, max))
+			elif field in var_int:
+				searchstr.append('%s <= %d'%(field, max))
+
+		elif item[2] == RANGE:
+			if len(item[3]) != 2:
+				print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
+				return None #HOW SHOULD I THROW ERRORS?
+
+			min = item[3][0]
+			max = item[3][1]
+
+			# Adding info to lists to generate strings later
+			if item[1] == SEARCH:
+				query.append(field)
+			if field in var_flo:
+				searchstr.append('%s >= %.2f and %s <= %.2f'%(field, min, field, max))
+			elif field in var_str:
+				searchstr.append("%s >= '%s' and %s <= '%s'"%(field, min, field, max))
+			elif field in var_int:
+				searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
+
+		elif item[2] == LIST:
+			if len(item[3]) <= 1:
+				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
+				return None #HOW SHOULD I THROW ERRORS?
+
+			if item[1] == SEARCH:
+				query.append(field)
+			if field in var_flo:
+				for it in item[3]:
+					if it == item[3][0]:
+						list_str = '(%s = %.2f' %(field, it)
+					elif it == item[3][-1]:
+						list_str = list_str + ' or %s = %.2f)' %(field, it)
+					else:
+						list_str = list_str + ' or %s = %.2f' %(field, it)
+			elif field in var_str:
+				for it in item[3]:
+					if it == item[3][0]:
+						list_str = "(%s = '%s'" %(field, it)
+					elif it == item[3][-1]:
+						list_str = list_str + " or %s = '%s')" %(field, it)
+					else:
+						list_str = list_str + " or %s = '%s'" %(field, it)
+			elif field in var_int:
+				for it in item[3]:
+					if it == item[3][0]:
+						list_str = '(%s = %d' %(field, it)
+					elif it == item[3][-1]:
+						list_str = list_str + ' or %s = %d)' %(field, it)
+					else:
+						list_str = list_str + ' or %s = %d' %(field, it)
+			searchstr.append(list_str)
+
+		elif item[2] == NONE:
+			if len(item[3]) != 0:
+				print 'ERROR -- LIST %s has too many entries' %(item) 
+				return None #HOW SHOULD I THROW ERRORS?
+
+			# Adding info to lists to generate strings later
+			if item[1] == SEARCH:
+				query.append(field)
+
+		else:
+			return None #HOW SHOULD I THROW ERRORS?
+
+	for item in searchstr:
+		if item == searchstr[0]:
+			qsearch = item
+		else:
+			qsearch = qsearch + ' and ' + item
+
+	for item in query:
+		if len(query) == 1:
+			if qsearch == '':
+				dbstr = 'SELECT ' + item + ' FROM ' + table
 			else:
-				qsearch = qsearch + ' and ' + item
-
-		for item in query:
-			if len(query) == 1:
-				if qsearch == '':
-					dbstr = 'SELECT ' + item + ' FROM cpu'
-				else:
-					dbstr = 'SELECT ' + item + ' FROM cpu WHERE ' + qsearch
+				dbstr = 'SELECT ' + item + ' FROM ' + table + ' WHERE ' + qsearch
+		else:
+			if item == query[0]:
+				dbstr = 'SELECT ' + item + ', '
+			elif item == query[-1]:
+				dbstr = dbstr + item + ' FROM ' + table + ' WHERE ' + qsearch
 			else:
-				if item == query[0]:
-					dbstr = 'SELECT ' + item + ', '
-				elif item == query[-1]:
-					dbstr = dbstr + item + ' FROM cpu WHERE ' + qsearch
-				else:
-					dbstr = dbstr + item + ', '
+				dbstr = dbstr + item + ', '
 
-		return dbstr
+	return dbstr
 
-	# Near redundant class instantiation in order to facilitate easy repeatable access to paperdata through scripts
-	# It's a way to code in queries without using the GUI whenever a change is wanted
-	# REQUIRES knowledge of fields and paperdataDB constants
+# Near redundant class instantiation in order to facilitate easy repeatable access to paperdata through scripts
+# It's a way to code in queries without using the GUI whenever a change is wanted
+# REQUIRES knowledge of fields and paperdataDB constants
 
-	class searchobj:
-		def __init__(self):
-			self.info_list = []
-			return None
-		def add_to_output(self, field, search_bool, limit, *range):
-			self.info_list.append([field, search_bool, limit, range])
-			return None
-		def output(self):
-			return dbsearch(fetch(self.info_list))
-		def output_dict(self):
-			return dbsearch_dict(fetch(self.info_list))
+class searchobj:
+	def __init__(self, db_dict, var_flo, var_str, var_int, table):
+		self.info_list = []
+		self.db_dict = db_dict
+		self.var_flo = var_flo
+		self.var_str = var_str
+		self.var_int = var_int
+		self.table = table
+		return None
+	def add_to_output(self, field, search_bool, limit, *range):
+		self.info_list.append([field, search_bool, limit, range])
+		return None
+	def output(self):
+		return dbsearch(fetch(self.info_list, self.db_dict, self.var_flo, self.var_str, self.var_int, self.db))
+	def output_dict(self):
+		return dbsearch_dict(fetch(self.info_list, self.db_dict, self.var_flo, self.var_str, self.var_int, self.db))
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':
