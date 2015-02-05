@@ -13,6 +13,30 @@ def write_file(log_info, node_data, title):
 	dbr.close()
 	return None
 
+def write_db(usrnm, pswd, log_info):
+	# open a database connection
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'ganglia', local_infile=True)
+
+	# prepare a cursor object using cursor() method
+	cursor = connection.cursor()
+
+	#execute the SQL query using execute() method.
+	for row in log_info:
+		val = tuple(row)
+		values = ('monitor_files',) + val
+		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%d,%s,%s)''', values)
+
+	#Close and save changes to database
+	cursor.close()
+	connection.commit()
+	connection.close()
+
+	return None
+
+#user info
+usrnm = 'immwa'
+pswd = 'immwa3978'
+
 #setup my output file
 #node_data = '/data4/paper/paperoutput/monitor_folio_log.psv'
 time_d = time.strftime('%d-%m-%Y')
@@ -90,6 +114,7 @@ try:
 				file_log.append((filename,status,del_time,still_host,time_date))
 				file_status.update({filename:status})
 		write_file(file_log, file_data, '\n')
+		write_db(usrnm, pswd, file_log)
 		s.close()
 		statusscr.refresh()
 		c = stdscr.getch()
