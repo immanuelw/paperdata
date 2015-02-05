@@ -60,15 +60,10 @@ def ram_free():
 
 	reram = []
 	for key, row in enumerate(ram[1:-1]):
-		if key in [0]:
-			for item in row[1:]:
-				reram.append(item)
+		if key in [0,2]:
+				reram.extend(row[1:])
 		if key in [1]:
-			for item in row[2:]:
-				reram.append(item)
-		if key in [2]:
-			for item in row[1:]:
-				reram.append(item)
+				reram.extend(row[2:])
 
 	return [reram]
 
