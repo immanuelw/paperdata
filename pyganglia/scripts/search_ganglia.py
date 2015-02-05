@@ -131,25 +131,25 @@ if __name__ == '__main__':
 		table = pyg.monitor_files.table
 	elif tab in ['iostat']:
 		fields.extend(pyg.iostat.db_list)
-        db_dict = pyg.iostat.db_dict
-        var_flo = pyg.iostat.var_flo
-        var_str = pyg.iostat.var_str
-        var_int = pyg.iostat.var_int
-        table = pyg.iostat.table
+		db_dict = pyg.iostat.db_dict
+		var_flo = pyg.iostat.var_flo
+		var_str = pyg.iostat.var_str
+		var_int = pyg.iostat.var_int
+		table = pyg.iostat.table
 	elif tab in ['ram']:
 		fields.extend(pyg.ram.db_list)
-        db_dict = pyg.ram.db_dict
-        var_flo = pyg.ram.var_flo
-        var_str = pyg.ram.var_str
-        var_int = pyg.ram.var_int
-        table = pyg.ram.table
+		db_dict = pyg.ram.db_dict
+		var_flo = pyg.ram.var_flo
+		var_str = pyg.ram.var_str
+		var_int = pyg.ram.var_int
+		table = pyg.ram.table
 	elif tab in ['cpu']:
 		fields.extend(pyg.cpu.db_list)
-        db_dict = pyg.cpu.db_dict
-        var_flo = pyg.cpu.var_flo
-        var_str = pyg.cpu.var_str
-        var_int = pyg.cpu.var_int
-        table = pyg.cpu.table
+		db_dict = pyg.cpu.db_dict
+		var_flo = pyg.cpu.var_flo
+		var_str = pyg.cpu.var_str
+		var_int = pyg.cpu.var_int
+		table = pyg.cpu.table
 
 	decimal.getcontext().prec = 2
 
@@ -165,7 +165,7 @@ if __name__ == '__main__':
 	root.bind('<Return>', (lambda event, e=ents: convert(e, sql_string)))
 	b1 = Button(root, text='Output String', command=(lambda e=ents: convert(e, sql_string, db_dict, var_flo, var_str, var_int, table)))
 	b2 = Button(root, text='Output List', command=(lambda e=ents: convert(e, dbs_list, db_dict, var_flo, var_str, var_int, table)))
-	b3 = Button(root, text='Output Dict', command=(lambda e=ents: convert(e, dbs_dict, db_dict, var_flo, var_str, var_int, table))
+	b3 = Button(root, text='Output Dict', command=(lambda e=ents: convert(e, dbs_dict, db_dict, var_flo, var_str, var_int, table)))
 	b1.pack(side=LEFT, padx=5, pady=5)
 	b2.pack(side=LEFT, padx=5, pady=5)
 	b3.pack(side=LEFT, padx=5, pady=5)
