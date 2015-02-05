@@ -47,7 +47,7 @@ def iostat():
 
 	device = ['Device:', 'sda', 'sda1', 'sda2','dm-0', 'dm-1']
 	#Convert all numbers to floats, keep words as strings
-	folio_use = [float(i) if i not in device else i for i in folio_use[1:]]
+	folio_use = [[float(i) if i not in device else i for i in j] for j in folio_use[1:]]
 
 	return [folio_name, folio_use]
 
