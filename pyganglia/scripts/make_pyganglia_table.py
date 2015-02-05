@@ -51,8 +51,9 @@ def make_iostat(cursor):
 	cursor.execute('''CREATE TABLE iostat (
 	host VARCHAR(255) DEFAULT NULL,
 	device VARCHAR(100) DEFAULT NULL,
-	read_s INT DEFAULT 0,
-	write_s INT DEFAULT 0,
+	tps DECIMAL(7,2) DEFAULT 0.00,
+	read_s DECIMAL(7,2) DEFAULT 0.00,
+	write_s DECIMAL(7,2) DEFAULT 0.00,
 	reads INT DEFAULT 0,
 	writes INT DEFAULT 0,
 	time_date VARCHAR(255) DEFAULT NULL);''')

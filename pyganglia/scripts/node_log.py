@@ -45,6 +45,8 @@ def iostat():
 			new_line = filter(lambda a: a not in [''], line)
 			folio_use.append(new_line)
 
+	folio_use = folio_use[1:]
+
 	return [folio_name, folio_use]
 
 def ram_free():
@@ -56,7 +58,19 @@ def ram_free():
 		new_line = filter(lambda a: a not in [''], line)
 		ram.append(new_line)	
 
-	return ram
+	reram = []
+	for key, row in enumerate(ram[1:-1]):
+		if key in [0]:
+			for item in row[1:]:
+				reram.append(item)
+		if key in [1]:
+			for item in row[2:]:
+				reram.append(item)
+		if key in [2]:
+			for item in row[1:]:
+				reram.append(item)
+
+	return [reram]
 
 def cpu_perc():
 	#Calculates cpu usage on folio
@@ -69,7 +83,16 @@ def cpu_perc():
 		new_line = filter(lambda a: a not in [''], line)
 		cpu.append(new_line)
 
-	return cpu
+	recpu = []
+
+	for row in cpu[3:]:
+		dummy_cpu = []
+		for key, item in enumerate(row):
+			if key in [2,3,5,6,10,11]:
+				dummy_cpu.append(item)
+		recpu.append(dummy_cpu)
+
+	return recpu
 
 """
 def processes():
@@ -117,18 +140,16 @@ def write_file((usrnm, pswd, folio_data, time_date, folio_space, host_name, usag
 	#execute the SQL query using execute() method.
 	for row in usage:
 		val = tuple(row)
-		values = ('iostat', host_name) + val
-		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%d,%d,%d,%d,%s)''', values)
+		values = ('iostat', host_name) + val + (time_date,)
+		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%.2f,%.2f,%.2f,%d,%d,%s)''', values)
 	for row in ram:
 		val = tuple(row)
-		values = ('ram', host_name) + val
+		values = ('ram', host_name) + val + (time_date,)
 		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s)''', values)
 	for row in cpu:
 		val = tuple(row)
-		values = ('cpu', host_name) + val
+		values = ('cpu', host_name) + val + (time_date,)
 		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%.2f,%.2f,%.2f,%.2f,%d,%s)''', values)
-
-	print 'Table data loaded.'
 
 	#Close and save changes to database
 	cursor.close()

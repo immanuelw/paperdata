@@ -121,16 +121,17 @@ class ram(self):
 class iostat(self):
 	self.HOST = 11
 	self.DEVICE = 12
-	self.READ_S = 13
-	self.WRITE_S = 14
-	self.READS = 15
-	self.WRITES = 16
-	self.TIME_DATE = 17
-	self.db_list = ['host', 'device', 'read_s', 'write_s', 'reads', 'writes', 'time_date']
-	self.db_dict = {self.HOST:'host', self.DEVICE:'device', self.READ_S:'read_s', self.WRITE_S:'write_s', self.READS:'reads', self.WRITES:'writes', self.TIME_DATE:'time_date'}
-	self.var_flo = []
+	self.TPS = 13
+	self.READ_S = 14
+	self.WRITE_S = 15
+	self.READS = 16
+	self.WRITES = 17
+	self.TIME_DATE = 18
+	self.db_list = ['host', 'device', 'tps', 'read_s', 'write_s', 'reads', 'writes', 'time_date']
+	self.db_dict = {self.HOST:'host', self.DEVICE:'device', self.TPS:'tps', self.READ_S:'read_s', self.WRITE_S:'write_s', self.READS:'reads', self.WRITES:'writes', self.TIME_DATE:'time_date'}
+	self.var_flo = ['tps', 'read_s', 'write_s']
 	self.var_str = ['host', 'device', 'time_date']
-	self.var_int = ['read_s', 'write_s', 'reads', 'writes']
+	self.var_int = ['reads', 'writes']
 	self.table = 'iostat'
 
 class cpu(self):
