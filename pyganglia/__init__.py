@@ -98,7 +98,7 @@ class monitor_files(self):
 	self.table = 'monitor_files'
 
 class ram(self):
-	self.CPU = 11
+	self.HOST = 11
 	self.TOTAL = 12
 	self.USED = 13
 	self.FREE = 14
@@ -111,40 +111,41 @@ class ram(self):
 	self.SWAP_USED = 21
 	self.SWAP_FREE = 22
 	self.TIME_DATE = 23
-	self.db_list = ['cpu', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free', 'time_date']
-	self.db_dict = {self.CPU:'cpu', self.TOTAL:'total', self.USED:'used', self.FREE:'free', self.SHARED:'shared', self.BUFFERS:'buffers', self.CACHED:'cached', self.BC_USED:'bc_used', self.BC_FREE:'bc_free', self.SWAP_TOTAL:'swap_total', self.SWAP_TOTAL:'swap_used', self.SWAP_FREE:'swap_free', self.TIME_DATE:'time_date'}
+	self.db_list = ['host', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free', 'time_date']
+	self.db_dict = {self.HOST:'host', self.TOTAL:'total', self.USED:'used', self.FREE:'free', self.SHARED:'shared', self.BUFFERS:'buffers', self.CACHED:'cached', self.BC_USED:'bc_used', self.BC_FREE:'bc_free', self.SWAP_TOTAL:'swap_total', self.SWAP_TOTAL:'swap_used', self.SWAP_FREE:'swap_free', self.TIME_DATE:'time_date'}
 	self.var_flo = []
-	self.var_str = ['time_date']
-	self.var_int = ['cpu', 'total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']
+	self.var_str = ['host', 'time_date']
+	self.var_int = ['total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']
 	self.table = 'ram'
 
 class iostat(self):
-	self.CPU = 11
+	self.HOST = 11
 	self.DEVICE = 12
 	self.READ_S = 13
 	self.WRITE_S = 14
 	self.READS = 15
 	self.WRITES = 16
 	self.TIME_DATE = 17
-	self.db_list = ['cpu', 'device', 'read_s', 'write_s', 'reads', 'writes', 'time_date']
-	self.db_dict = {self.CPU:'cpu', self.DEVICE:'device', self.READ_S:'read_s', self.WRITE_S:'write_s', self.READS:'reads', self.WRITES:'writes', self.TIME_DATE:'time_date'}
+	self.db_list = ['host', 'device', 'read_s', 'write_s', 'reads', 'writes', 'time_date']
+	self.db_dict = {self.HOST:'host', self.DEVICE:'device', self.READ_S:'read_s', self.WRITE_S:'write_s', self.READS:'reads', self.WRITES:'writes', self.TIME_DATE:'time_date'}
 	self.var_flo = []
-	self.var_str = ['device', 'time_date']
-	self.var_int = ['cpu', 'read_s', 'write_s', 'reads', 'writes']
+	self.var_str = ['host', 'device', 'time_date']
+	self.var_int = ['read_s', 'write_s', 'reads', 'writes']
 	self.table = 'iostat'
 
 class cpu(self):
-	self.CPU = 11
-	self.USER_PERC = 12
-	self.SYS_PERC = 13
-	self.IOWAIT_PERC = 14
-	self.IDLE_PERC = 15
-	self.INTR_S = 16
-	self.TIME_DATE = 17
-	self.db_list = ['cpu', 'user_perc', 'sys_perc', 'iowait_perc', 'idle_perc', 'intr_s', 'time_date']
-	self.db_dict = {self.CPU:'cpu', self.USER_PERC:'user_perc', self.SYS_PERC:'sys_perc', self.IOWAIT_PERC:'iowait_perc', self.IDLE_PERC:'idle_perc', self.INTR_S:'intr_s', self.TIME_DATE:'time_date'}
+	self.HOST = 11
+	self.CPU = 12
+	self.USER_PERC = 13
+	self.SYS_PERC = 14
+	self.IOWAIT_PERC = 15
+	self.IDLE_PERC = 16
+	self.INTR_S = 17
+	self.TIME_DATE = 18
+	self.db_list = ['host','cpu', 'user_perc', 'sys_perc', 'iowait_perc', 'idle_perc', 'intr_s', 'time_date']
+	self.db_dict = {self.HOST:'host', self.CPU:'cpu', self.USER_PERC:'user_perc', self.SYS_PERC:'sys_perc', self.IOWAIT_PERC:'iowait_perc', self.IDLE_PERC:'idle_perc', self.INTR_S:'intr_s', self.TIME_DATE:'time_date'}
 	self.var_flo = ['user_perc', 'sys_perc', 'iowait_perc', 'idle_perc']
-	self.var_str = ['time_date']
+	self.var_str = ['host', 'time_date']
 	self.var_int = ['cpu', 'intr_s']
 	self.table = 'cpu'
 

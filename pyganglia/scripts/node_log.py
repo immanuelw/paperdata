@@ -87,8 +87,8 @@ def processes():
 	return pro
 """
 
-#def write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro):
-def write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu):
+#def write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro):
+def write_file((usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu):
 	dbr = open(folio_data, 'ab')
 	wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 	wr.writerow([time_date])
@@ -108,7 +108,33 @@ def write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu):
 	#	wr.writerow(row)
 
 	dbr.close()
+	# open a database connection
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'ganglia', local_infile=True)
 
+	# prepare a cursor object using cursor() method
+	cursor = connection.cursor()
+
+	#execute the SQL query using execute() method.
+	for row in usage:
+		val = tuple(row)
+		values = ('iostat', host_name) + val
+		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%d,%d,%d,%d,%s)''', values)
+	for row in ram:
+		val = tuple(row)
+		values = ('ram', host_name) + val
+		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%s)''', values)
+	for row in cpu:
+		val = tuple(row)
+		values = ('cpu', host_name) + val
+		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%.2f,%.2f,%.2f,%.2f,%d,%s)''', values)
+
+	print 'Table data loaded.'
+
+	#Close and save changes to database
+	cursor.close()
+	connection.commit()
+	connection.close()
+	
 	return None
 
 def data_out(time_date):
@@ -131,6 +157,13 @@ def monitor(auto):
 	start_time = time.time()
 	interval = 1
 
+	if auto in ['y']:
+		usrnm = 'immwa'
+		pswd = 'immwa3978'
+	else:
+		usrnm = raw_input('Username: ')
+		pswd = getpass.getpass('Password: ')
+
 	for i in range(3):
 		time_date = time.strftime('%d-%m-%Y_%H:%M:%S')
 
@@ -143,8 +176,8 @@ def monitor(auto):
 		cpu = cpu_perc()
 		#pro = processes()
 
-		#write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro)
-		write_file(folio_data, time_date, folio_space, host_name, usage, ram, cpu)
+		#write_file((usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro)
+		write_file((usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu)
 		time.sleep(start_time + (i + 1) * interval - time.time())
 
 	if auto in ['y']:

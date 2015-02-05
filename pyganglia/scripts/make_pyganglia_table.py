@@ -29,7 +29,7 @@ def make_monitor_files(cursor):
 
 def make_ram(cursor):
 	cursor.execute('''CREATE TABLE ram (
-	cpu INT DEFAULT 0,
+	host VARCHAR(255) DEFAULT NULL,
 	total INT DEFAULT 0,
 	used INT DEFAULT 0,
 	free INT DEFAULT 0,
@@ -49,7 +49,7 @@ def make_ram(cursor):
 
 def make_iostat(cursor):
 	cursor.execute('''CREATE TABLE iostat (
-	cpu INT DEFAULT 0,
+	host VARCHAR(255) DEFAULT NULL,
 	device VARCHAR(100) DEFAULT NULL,
 	read_s INT DEFAULT 0,
 	write_s INT DEFAULT 0,
@@ -63,6 +63,7 @@ def make_iostat(cursor):
 
 def make_cpu(cursor):
 	cursor.execute('''CREATE TABLE cpu (
+	host VARCHAR(255) DEFAULT NULL,
 	cpu INT DEFAULT 0,
 	user_perc DECIMAL(5,2) DEFAULT 0.00,
 	sys_perc DECIMAL(5,2) DEFAULT 0.00,
