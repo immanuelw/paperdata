@@ -71,18 +71,18 @@ def ram_free():
 
 def cpu_perc():
 	#Calculates cpu usage on folio
-	folio = subprocess.check_output(['mpstat', '-P', 'ALL'])
+	folio = subprocess.check_output(['mpstat', '-P', 'ALL', '1', '1'])
 	cpu = []
 	for output in folio.split('\n'):
 		if output in [folio.split('\n')[0],folio.split('\n')[1]]:
 			continue
 		line = output[:].split(' ')
 		new_line = filter(lambda a: a not in [''], line)
-		cpu.append(new_line)
+		if new_line[0] not in ['Average:']:
+			cpu.append(new_line)
 
 	recpu = []
-
-	for row in cpu[3:]:
+	for row in cpu[2:]:
 		dummy_cpu = []
 		for key, item in enumerate(row):
 			if key in [2,3,5,6,10,11]:
@@ -108,7 +108,7 @@ def processes():
 """
 
 #def write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro):
-def write_file((usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu):
+def write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu):
 	dbr = open(folio_data, 'ab')
 	wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
 	wr.writerow([time_date])
@@ -194,8 +194,8 @@ def monitor(auto):
 		cpu = cpu_perc()
 		#pro = processes()
 
-		#write_file((usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro)
-		write_file((usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu)
+		#write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro)
+		write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu)
 		time.sleep(start_time + (i + 1) * interval - time.time())
 
 	if auto in ['y']:
