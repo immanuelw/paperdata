@@ -26,6 +26,7 @@ LIST = 6
 NONE = 7
 
 options = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
+classes = ['monitor_files', 'ram', 'iostat', 'cpu']
 
 # Function to create and output dictionary of results from query
 def dbsearch_dict(query):
@@ -157,6 +158,9 @@ class cpu:
 		self.var_int = ['cpu', 'intr_s']
 		self.table = 'cpu'
 		self.values = '%s,%d,%.2f,%.2f,%.2f,%.2f,%d,%.6f'
+
+#dictionary of instantiated classes
+instant_class = {'monitor_files':monitor_files(), 'ram':ram(), 'iostat':iostat(), 'cpu':cpu()}
 
 # Generate strings to load into query 
 def fetch(info_list, db_dict, var_flo, var_str, var_int, table):

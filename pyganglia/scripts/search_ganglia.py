@@ -6,6 +6,7 @@ from Tkinter import *
 import pyganglia as pyg
 import decimal
 import getpass
+import sys
 
 ### Script to create GUI to easily search paperdata database
 ### Has fields to enter to search for any and all which match certain parameters
@@ -120,36 +121,18 @@ def convert(entries, output, db_dict, var_flo, var_str, var_int, table):
 if __name__ == '__main__':
 	#Decide which table to search
 	tab = raw_input('Search which table? -- [monitor_files, iostat, ram, cpu]: ')
+	if tab not in pyg.classes:
+		sys.exit()
 
 	fields = []
-	if tab in ['monitor_files']:
-		fields.extend(pyg.monitor_files().db_list)
-		db_dict = pyg.monitor_files().db_dict
-		var_flo = pyg.monitor_files().var_flo
-		var_str = pyg.monitor_files().var_str
-		var_int = pyg.monitor_files().var_int
-		table = pyg.monitor_files().table
-	elif tab in ['iostat']:
-		fields.extend(pyg.iostat().db_list)
-		db_dict = pyg.iostat().db_dict
-		var_flo = pyg.iostat().var_flo
-		var_str = pyg.iostat().var_str
-		var_int = pyg.iostat().var_int
-		table = pyg.iostat().table
-	elif tab in ['ram']:
-		fields.extend(pyg.ram().db_list)
-		db_dict = pyg.ram().db_dict
-		var_flo = pyg.ram().var_flo
-		var_str = pyg.ram().var_str
-		var_int = pyg.ram().var_int
-		table = pyg.ram().table
-	elif tab in ['cpu']:
-		fields.extend(pyg.cpu().db_list)
-		db_dict = pyg.cpu().db_dict
-		var_flo = pyg.cpu().var_flo
-		var_str = pyg.cpu().var_str
-		var_int = pyg.cpu().var_int
-		table = pyg.cpu().table
+	var_class = pyg.instant_class[tab]
+
+	fields.extend(var_class.db_list)
+	db_dict = var_class.db_dict
+	var_flo = var_class.var_flo
+	var_str = var_class.var_str
+	var_int = var_class.var_int
+	table = var_class.table
 
 	decimal.getcontext().prec = 2
 
