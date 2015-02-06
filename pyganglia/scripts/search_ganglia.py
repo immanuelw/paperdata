@@ -123,33 +123,33 @@ if __name__ == '__main__':
 
 	fields = []
 	if tab in ['monitor_files']:
-		fields.extend(pyg.monitor_files.db_list)
-		db_dict = pyg.monitor_files.db_dict
-		var_flo = pyg.monitor_files.var_flo
-		var_str = pyg.monitor_files.var_str
-		var_int = pyg.monitor_files.var_int
-		table = pyg.monitor_files.table
+		fields.extend(pyg.monitor_files().db_list)
+		db_dict = pyg.monitor_files().db_dict
+		var_flo = pyg.monitor_files().var_flo
+		var_str = pyg.monitor_files().var_str
+		var_int = pyg.monitor_files().var_int
+		table = pyg.monitor_files().table
 	elif tab in ['iostat']:
-		fields.extend(pyg.iostat.db_list)
-		db_dict = pyg.iostat.db_dict
-		var_flo = pyg.iostat.var_flo
-		var_str = pyg.iostat.var_str
-		var_int = pyg.iostat.var_int
-		table = pyg.iostat.table
+		fields.extend(pyg.iostat().db_list)
+		db_dict = pyg.iostat().db_dict
+		var_flo = pyg.iostat().var_flo
+		var_str = pyg.iostat().var_str
+		var_int = pyg.iostat().var_int
+		table = pyg.iostat().table
 	elif tab in ['ram']:
-		fields.extend(pyg.ram.db_list)
-		db_dict = pyg.ram.db_dict
-		var_flo = pyg.ram.var_flo
-		var_str = pyg.ram.var_str
-		var_int = pyg.ram.var_int
-		table = pyg.ram.table
+		fields.extend(pyg.ram().db_list)
+		db_dict = pyg.ram().db_dict
+		var_flo = pyg.ram().var_flo
+		var_str = pyg.ram().var_str
+		var_int = pyg.ram().var_int
+		table = pyg.ram().table
 	elif tab in ['cpu']:
-		fields.extend(pyg.cpu.db_list)
-		db_dict = pyg.cpu.db_dict
-		var_flo = pyg.cpu.var_flo
-		var_str = pyg.cpu.var_str
-		var_int = pyg.cpu.var_int
-		table = pyg.cpu.table
+		fields.extend(pyg.cpu().db_list)
+		db_dict = pyg.cpu().db_dict
+		var_flo = pyg.cpu().var_flo
+		var_str = pyg.cpu().var_str
+		var_int = pyg.cpu().var_int
+		table = pyg.cpu().table
 
 	decimal.getcontext().prec = 2
 

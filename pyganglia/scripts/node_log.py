@@ -139,17 +139,17 @@ def write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage
 	insert_base = '''INSERT INTO %s VALUES(%s)'''
 	for row in usage:
 		val = tuple(row)
-		insert = insert_base % (pyg.iostat.table, pyg.iostat.values)
+		insert = insert_base % (pyg.iostat().table, pyg.iostat().values)
 		values = (host_name,) + val + (time_date,)
 		cursor.execute(insert, values)
 	for row in ram:
 		val = tuple(row)
-		insert = insert_base % (pyg.ram.table, pyg.ram.values)
+		insert = insert_base % (pyg.ram().table, pyg.ram().values)
 		values = (host_name,) + val + (time_date,)
 		cursor.execute(insert, values)
 	for row in cpu:
 		val = tuple(row)
-		insert = insert_base % (pyg.cpu.table, pyg.cpu.values)
+		insert = insert_base % (pyg.cpu().table, pyg.cpu().values)
 		values = (host_name,) + val + (time_date,)
 		cursor.execute(insert, values)
 
