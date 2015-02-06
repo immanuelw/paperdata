@@ -97,6 +97,7 @@ class monitor_files:
 		self.var_str = ['filename', 'status', 'still_host']
 		self.var_int = ['del_time']
 		self.table = 'monitor_files'
+		self.values = '%s,%s,%d,%s,%.6f'
 
 class ram:
 	def __init__(self):
@@ -119,6 +120,7 @@ class ram:
 		self.var_str = ['host']
 		self.var_int = ['total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']
 		self.table = 'ram'
+		self.values = '%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%.6f'
 
 class iostat:
 	def __init__(self):
@@ -136,6 +138,7 @@ class iostat:
 		self.var_str = ['host', 'device']
 		self.var_int = ['reads', 'writes']
 		self.table = 'iostat'
+		self.values = '%s,%s,%.2f,%.2f,%.2f,%d,%d,%.6f'
 
 class cpu:
 	def __init__(self):
@@ -153,6 +156,7 @@ class cpu:
 		self.var_str = ['host']
 		self.var_int = ['cpu', 'intr_s']
 		self.table = 'cpu'
+		self.values = '%s,%d,%.2f,%.2f,%.2f,%.2f,%d,%.6f'
 
 # Generate strings to load into query 
 def fetch(info_list, db_dict, var_flo, var_str, var_int, table):

@@ -136,18 +136,22 @@ def write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage
 	cursor = connection.cursor()
 
 	#execute the SQL query using execute() method.
+	insert_base = '''INSERT INTO %s VALUES(%s)'''
 	for row in usage:
 		val = tuple(row)
-		values = (pyg.iostat.table, host_name) + val + (time_date,)
-		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%.2f,%.2f,%.2f,%d,%d,%d)''', values)
+		insert = insert_base % (pyg.iostat.table, pyg.iostat.values)
+		values = (host_name,) + val + (time_date,)
+		cursor.execute(insert, values)
 	for row in ram:
 		val = tuple(row)
-		values = (pyg.ram.table, host_name) + val + (time_date,)
-		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)''', values)
+		insert = insert_base % (pyg.ram.table, pyg.ram.values)
+		values = (host_name,) + val + (time_date,)
+		cursor.execute(insert, values)
 	for row in cpu:
 		val = tuple(row)
-		values = (pyg.cpu.table, host_name) + val + (time_date,)
-		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%.2f,%.2f,%.2f,%.2f,%d,%d)''', values)
+		insert = insert_base % (pyg.cpu.table, pyg.cpu.values)
+		values = (host_name,) + val + (time_date,)
+		cursor.execute(insert, values)
 
 	#Close and save changes to database
 	cursor.close()
