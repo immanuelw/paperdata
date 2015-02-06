@@ -12,6 +12,7 @@ import glob
 import socket
 import time
 import subprocess
+import pyganglia as pyg
 
 ### Script to check the status of folio at any point
 ### Checks /data4 for space, uses iostat to check for cpu usage and I/O statistics
@@ -137,15 +138,15 @@ def write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage
 	#execute the SQL query using execute() method.
 	for row in usage:
 		val = tuple(row)
-		values = ('iostat', host_name) + val + (time_date,)
+		values = (pyg.iostat.table, host_name) + val + (time_date,)
 		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%.2f,%.2f,%.2f,%d,%d,%d)''', values)
 	for row in ram:
 		val = tuple(row)
-		values = ('ram', host_name) + val + (time_date,)
+		values = (pyg.ram.table, host_name) + val + (time_date,)
 		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d)''', values)
 	for row in cpu:
 		val = tuple(row)
-		values = ('cpu', host_name) + val + (time_date,)
+		values = (pyg.cpu.table, host_name) + val + (time_date,)
 		cursor.execute('''INSERT INTO %s VALUES(%s,%d,%.2f,%.2f,%.2f,%.2f,%d,%d)''', values)
 
 	#Close and save changes to database
