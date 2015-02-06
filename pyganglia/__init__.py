@@ -37,7 +37,7 @@ def dbsearch_dict(query):
 	cursor = connection.cursor(cursorclass = MySQLdb.cursors.DictCursor)
 
 	# execute the SQL query using execute() method.
-	cursor.execute('%s', query)
+	cursor.execute('%s', (query,))
 	
 	#finds all rows outputted by query, prints them
 	results = cursor.fetchall()
@@ -70,7 +70,7 @@ def dbsearch(query):
 	cursor = connection.cursor()
 
 	# execute the SQL query using execute() method.
-	cursor.execute('%s', query)
+	cursor.execute('%s', (query,))
 
 	#finds all rows outputted by query, prints them
 	results = cursor.fetchall()
