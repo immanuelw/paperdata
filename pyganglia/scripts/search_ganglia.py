@@ -34,7 +34,7 @@ def makeform(root, fields):
 
 			ivar = IntVar()
 			ivar.set(pyg.NONE)
-			for key, value in pyg.options().items():
+			for key, value in pyg.options.items():
 				a = Radiobutton(row2, text=value, variable=ivar, value = key)
 				a.var = ivar
 				a.pack(side=LEFT)
