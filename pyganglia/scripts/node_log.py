@@ -178,7 +178,7 @@ def monitor(auto):
 	folio_data = data_out(time_date)
 
 	start_time = time.time()
-	interval = 1
+	interval = 60
 
 	if auto in ['y']:
 		usrnm = 'immwa'
