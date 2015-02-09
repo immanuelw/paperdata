@@ -120,7 +120,11 @@ def convert(entries, output, db_dict, var_flo, var_str, var_int, table):
 
 if __name__ == '__main__':
 	#Decide which table to search
-	tab = raw_input('Search which table? -- [monitor_files, iostat, ram, cpu]: ')
+	if len(sys.argv) > 1:
+		tab = sys.argv[1]
+	else:
+		tab = raw_input('Search which table? -- [monitor_files, iostat, ram, cpu]: ')
+	
 	if tab not in pyg.classes:
 		sys.exit()
 
