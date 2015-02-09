@@ -13,6 +13,8 @@ import socket
 import time
 import subprocess
 import pyganglia as pyg
+import sys
+import jdcal
 
 ### Script to check the status of folio at any point
 ### Checks /data4 for space, uses iostat to check for cpu usage and I/O statistics
@@ -129,6 +131,11 @@ def write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage
 	#	wr.writerow(row)
 
 	dbr.close()
+
+	return None
+
+def add_to_db(usrnm, pswd, usage, ram, cpu):
+
 	# open a database connection
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'ganglia', local_infile=True)
 
@@ -175,10 +182,13 @@ def monitor(auto):
 	time_date = int(time.strftime('%Y%m%d%H%M%S'))
 
 	#Create output file
-	folio_data = data_out(time_date)
 
 	start_time = time.time()
 	interval = 60
+
+	if auto not in ['y']:
+		if len(sys.argv) > 1:
+			auto = sys.argv[1]
 
 	if auto in ['y']:
 		usrnm = 'immwa'
@@ -187,7 +197,9 @@ def monitor(auto):
 		usrnm = raw_input('Username: ')
 		pswd = getpass.getpass('Password: ')
 
-	for i in range(3):
+	folio_data = data_out(time_date)
+
+	for i in range(48):
 		time_date = time.strftime('%Y:%m:%d:%H:%M:%S')
 		temp_time = time_date.split(':')
 		time_date = jdcal.gcal2jd(temp_time[0],temp_time[1],temp_time[2],temp_time[3],temp_time[4],temp_time[5])
@@ -203,6 +215,7 @@ def monitor(auto):
 
 		#write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro)
 		write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu)
+		#add_to_db(usrnm, pswd, usage, ram, cpu)
 		time.sleep(start_time + (i + 1) * interval - time.time())
 
 	if auto in ['y']:
