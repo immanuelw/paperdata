@@ -4,6 +4,7 @@ from sqlalchemy import func
 import curses,time,os
 import csv
 import jdcal
+#import pyganglia as pyg
 
 def write_file(log_info, node_data, title):
 	dbr = open(node_data, 'ab')
@@ -13,7 +14,7 @@ def write_file(log_info, node_data, title):
 		wr.writerow(row)
 	dbr.close()
 	return None
-
+"""
 def write_db(usrnm, pswd, log_info):
 	# open a database connection
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'ganglia', local_infile=True)
@@ -21,11 +22,12 @@ def write_db(usrnm, pswd, log_info):
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor()
 
-	#execute the SQL query using execute() method.
+	insert_base = '''INSERT INTO %s VALUES(%s)'''
 	for row in log_info:
 		val = tuple(row)
-		values = ('monitor_files',) + val
-		cursor.execute('''INSERT INTO %s VALUES(%s,%s,%d,%s,%.6f)''', values)
+		insert = insert_base % (pyg.monitor_files().table, pyg.monitor_files().values)
+		values = val
+		cursor.execute(insert, values)
 
 	#Close and save changes to database
 	cursor.close()
@@ -33,7 +35,7 @@ def write_db(usrnm, pswd, log_info):
 	connection.close()
 
 	return None
-
+"""
 #user info
 usrnm = 'immwa'
 pswd = 'immwa3978'
@@ -118,7 +120,7 @@ try:
 				file_log.append((filename,status,del_time,still_host,time_date))
 				file_status.update({filename:status})
 		write_file(file_log, file_data, '\n')
-		write_db(usrnm, pswd, file_log)
+		#write_db(usrnm, pswd, file_log)
 		s.close()
 		statusscr.refresh()
 		c = stdscr.getch()
