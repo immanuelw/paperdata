@@ -12,7 +12,7 @@ import glob
 import socket
 import time
 import subprocess
-import pyganglia as pyg
+#import pyganglia as pyg
 import sys
 import jdcal
 
@@ -133,7 +133,7 @@ def write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage
 	dbr.close()
 
 	return None
-
+"""
 def add_to_db(usrnm, pswd, usage, ram, cpu):
 
 	# open a database connection
@@ -166,7 +166,7 @@ def add_to_db(usrnm, pswd, usage, ram, cpu):
 	connection.close()
 	
 	return None
-
+"""
 def data_out(time_date):
 	#Create output file
 	time_day = time.strftime('%d-%m-%Y')
