@@ -81,7 +81,7 @@ if __name__ == '__main__':
 	#inputs for user to access database
 	usrnm = raw_input('Username: ')
 	pswd = getpass.getpass('Password: ')
-	table = raw_input('Create which table (monitor_files, ram, iostat, cpu)? :')
+	table = raw_input('Create which table (monitor_files, ram, iostat, cpu, all)? :')
 
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
@@ -97,6 +97,11 @@ if __name__ == '__main__':
 	elif table == 'iostat':
 		make_iostat(cursor)
 	elif table == 'cpu':
+		make_cpu(cursor)
+	elif table == 'all':
+		make_monitor_files(cursor)
+		make_ram(cursor)
+		make_iostat(cursor)
 		make_cpu(cursor)
 
 	# Close and Save database connection

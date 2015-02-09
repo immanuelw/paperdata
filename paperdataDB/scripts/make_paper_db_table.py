@@ -83,7 +83,10 @@ if __name__ == '__main__':
 	#inputs for user to access database
 	usrnm = raw_input('Username: ')
 	pswd = getpass.getpass('Password: ')
-	table = raw_input('Create which table (junk, rename, feed, data)? :')
+	if len(sys.argv) > 1:
+		table = sys.argv[1]
+	else:
+		table = raw_input('Create which table (junk, rename, feed, data, all)? :')
 
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
@@ -99,6 +102,11 @@ if __name__ == '__main__':
 	elif table == 'feed':
 		make_paperfeed(cursor)
 	elif table == 'data':
+		make_paperdata(cursor)
+	elif table == 'all':
+		make_paperjunk(cursor)
+		make_paperrename(cursor)
+		make_paperfeed(cursor)
 		make_paperdata(cursor)
 
 	# Close and Save database connection
