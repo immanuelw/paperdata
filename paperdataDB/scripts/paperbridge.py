@@ -537,8 +537,8 @@ def paperbridge(auto):
 			move_data = 'moved_data_%s.psv'%(time_date)	
 			#outfile = '/data4/paper/raw_to_tape'
 			#move_files(filenames, outfile, move_data, usrnm, pswd)
-			outfile_c = '/data4/paper/2013EoR'
-			move_compressed_files(filenames_c, outfile_c, move_data, usrnm, pswd)
+			#outfile_c = '/data4/paper/2013EoR'
+			#move_compressed_files(filenames_c, outfile_c, move_data, usrnm, pswd)
 		else:
 			print '''Information logged into '%s' ''' %(dbnum)
 
