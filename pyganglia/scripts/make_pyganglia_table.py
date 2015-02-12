@@ -81,7 +81,10 @@ if __name__ == '__main__':
 	#inputs for user to access database
 	usrnm = raw_input('Username: ')
 	pswd = getpass.getpass('Password: ')
-	table = raw_input('Create which table (monitor_files, ram, iostat, cpu, all)? :')
+	if len(sys.argv) > 1:
+		table = sys.argv[1]
+	else:
+		table = raw_input('Create which table (monitor_files, ram, iostat, cpu, all)? :')
 
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
