@@ -87,27 +87,27 @@ def dbsearch(query):
 
 class paperdata:
 	def __init__(self):
-		[self.PATH
-		self.ERA
-		self.ERA_TYPE
-		self.OBSNUM
-		self.MD5SUM
-		self.JDAY
-		self.JDATE
-		self.POL
-		self.LENGTH
-		self.RAW_PATH
-		self.CAL_PATH
-		self.NPZ_PATH
-		self.FINAL_PRODUCT_PATH
-		self.TAPE_INDEX
-		self.COMPR_SIZE
-		self.RAW_SIZE
-		self.COMPRESSED
-		self.EDGE
-		self.WRITE_TO_TAPE
-		self.DELETE_FILE
-		self.RESTORE_HISTORY
+		[self.PATH,
+		self.ERA,
+		self.ERA_TYPE,
+		self.OBSNUM,
+		self.MD5SUM,
+		self.JDAY,
+		self.JDATE,
+		self.POL,
+		self.LENGTH,
+		self.RAW_PATH,
+		self.CAL_PATH,
+		self.NPZ_PATH,
+		self.FINAL_PRODUCT_PATH,
+		self.TAPE_INDEX,
+		self.COMPR_SIZE,
+		self.RAW_SIZE,
+		self.COMPRESSED,
+		self.EDGE,
+		self.WRITE_TO_TAPE,
+		self.DELETE_FILE,
+		self.RESTORE_HISTORY,
 		self.COMMENTS] = range(10,32)
 		self.db_list = ['path', 'era', 'era_type', 'obsnum', 'md5sum', 'julian_day', 'julian_date', 'polarization', 'data_length', 'raw_path', 
 						'cal_path', 'npz_path', 'final_product_path', 'tape_index', 'compr_file_size_MB', 'raw_file_size_MB', 'compressed', 
@@ -127,11 +127,11 @@ class paperdata:
 
 class paperjunk:
 	def __init__(self):
-		[self.JUNK_PATH
-		self.FOLIO_PATH
-		self.UV_PATH
-		self.JUNK_SIZE_BYTES
-		self.USB_NUMBER
+		[self.JUNK_PATH,
+		self.FOLIO_PATH,
+		self.UV_PATH,
+		self.JUNK_SIZE_BYTES,
+		self.USB_NUMBER,
 		self.RENAMED] = range(10,16)
 		self.db_list = ['junk_path', 'folio_path', 'uv_path', 'junk_size_bytes', 'usb_number', 'renamed']
 		self.db_dict = {self.JUNK_PATH:'junk_path', self.FOLIO_PATH:'folio_path', self.UV_PATH:'uv_path', 
@@ -144,10 +144,10 @@ class paperjunk:
 
 class paperrename:
 	def __init__(self):
-		[self.RAW_PATH
-		self.JULIAN_DAY
-		self.ACTUAL_AMOUNT
-		self.EXPECTED_AMOUNT
+		[self.RAW_PATH,
+		self.JULIAN_DAY,
+		self.ACTUAL_AMOUNT,
+		self.EXPECTED_AMOUNT,
 		self.MOVED] = range(10,15)
 		self.db_list = ['raw_path', 'julian_day', 'actual_amount', 'expected_amount', 'moved']
 		self.db_dict = {self.RAW_PATH:'raw_path', self.JULIAN_DAY:'julian_day', self.ACTUAL_AMOUNT:'actual_amount', 
@@ -160,8 +160,8 @@ class paperrename:
 
 class paperfeed:
 	def __init__(self):
-		[self.RAW_PATH
-		self.JULIAN_DAY
+		[self.RAW_PATH,
+		self.JULIAN_DAY,
 		self.MOVED] = range(10,13)
 		self.db_list = ['raw_path', 'julian_day', 'moved']
 		self.db_dict = {self.RAW_PATH:'raw_path', self.JULIAN_DAY:'julian_day', self.MOVED:'moved'}
