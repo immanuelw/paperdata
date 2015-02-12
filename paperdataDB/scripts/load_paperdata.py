@@ -13,6 +13,7 @@ import hashlib
 import glob
 import socket
 import decimal
+import paperdataDB as pdb
 
 ### Script to load data from folio into paperdata database
 ### Crawls folio and reads through .uvcRRE or .uv files to generate all field information
@@ -66,16 +67,33 @@ def md5sum(fname):
 		buf = afile.read(BLOCKSIZE)
 	return hasher.hexdigest()
 
-def load_db(dbo, usrnm, pswd):
+def load_db_from_file(dbo, table, usrnm, pswd):
 	#Load data into named database and table
 	# open a database connection
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, password = pswd, database = 'paperdata')
 
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor()
 
+	outfile = dbo %(table)
+
 	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE %s INTO TABLE paperdata COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' ''', (dbo,))
+	insert_base = '''INSERT INTO %s VALUES(%s)'''
+
+	if table not in pdb.classes:
+		print 'Incorrect table name'
+		return None
+	var_class = pdb.instant_class[table]
+	table_vars = (var_class.table, var_class.values)
+
+	#load information from file into eatwell database
+	with open(outfile, 'rb') as read_file:
+		read = csv.reader(read_file, delimiter='|', lineterminator='\n', dialect='excel')
+		for row in read:
+			val = tuple(row)
+			insert = insert_base % table_vars
+			values = val
+			cursor.execute(insert, values)
 
 	print 'Table data loaded.'
 
@@ -130,7 +148,7 @@ def obsnum_fixer(usrnm, pswd):
 			if uv['npol'] == 1:
 				polarization = pol_dict[uv['pol']]
 			elif uv['npol'] == 4:
-				#       polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
+				#	   polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
 				polarization = 'yy'
 			#variable to input into jdpol2obsnum
 			divided_jdate = length
@@ -396,6 +414,7 @@ def gen_paperdata(dirs, dbo, dbe):
 		#save into file and close it
 		data_file.close()
 
+
 	return full_info
 
 def remove_duplicates(dirs_all, usrnm, pswd):
@@ -460,7 +479,8 @@ def load_paperdata(auto):
 	if auto_update == 'y':
 		usrnm2 = raw_input('Input username with edit privileges: ')
 		pswd2 = raw_input('Input password: ')
-		load_db(dbo, usrnm2, pswd2)
+		table = 'paperdata'
+		load_db_from_file(dbo, table, usrnm2, pswd2)
 		sys.exit()
 
 	fix_obs = raw_input('Update obsnums (y/n)?: ')

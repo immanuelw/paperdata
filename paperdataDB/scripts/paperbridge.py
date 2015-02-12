@@ -20,6 +20,7 @@ import base64
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
+import paperdataDB as pdb
 
 ### Script to load infromation quickly from paperdistiller database into paperdata
 ### Queries paperdistiller for relevant information, loads paperdata with complete info
@@ -338,7 +339,7 @@ def email_space(table):
 def move_files(infile_list, outfile, move_data, usrnm, pswd):
 	host = 'folio'
 
-	#create file to log movement data       
+	#create file to log movement data	   
 	dbo = os.path.join(outfile, move_data)
 	dbr = open(dbo,'wb')
 	dbr.close()
@@ -402,7 +403,7 @@ def move_files(infile_list, outfile, move_data, usrnm, pswd):
 def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
 	host = 'folio'
 
-	#create file to log movement data       
+	#create file to log movement data	   
 	dbo = os.path.join(outfile, move_data)
 	dbr = open(dbo,'wb')
 	dbr.close()
