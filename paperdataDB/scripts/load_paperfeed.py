@@ -11,6 +11,7 @@ import csv
 import glob
 import socket
 import aipy as A
+import paperdataDB as pdb
 
 ### Script to load data from anywhere into paperfeed database
 ### Crawls folio or elsewhere and reads through .uv files to generate all field information
@@ -18,16 +19,33 @@ import aipy as A
 ### Author: Immanuel Washington
 ### Date: 11-23-14
 
-def load_db(dbo, usrnm, pswd):
+def load_db_from_file(dbo, table, usrnm, pswd):
 	#Load data into named database and table
 	# open a database connection
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, password = pswd, database = 'paperdata')
 
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor()
 
+	outfile = dbo %(table)
+
 	#execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE %s INTO TABLE paperfeed COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' ''', (dbo,))
+	insert_base = '''INSERT INTO %s VALUES(%s)'''
+
+	if table not in pdb.classes:
+		print 'Incorrect table name'
+		return None
+	var_class = pdb.instant_class[table]
+	table_vars = (var_class.table, var_class.values)
+
+	#load information from file into eatwell database
+	with open(outfile, 'rb') as read_file:
+		read = csv.reader(read_file, delimiter='|', lineterminator='\n', dialect='excel')
+		for row in read:
+			val = tuple(row)
+			insert = insert_base % table_vars
+			values = val
+			cursor.execute(insert, values)
 
 	print 'Table data loaded.'
 
@@ -179,5 +197,6 @@ if __name__ == '__main__':
 	if auto_update == 'y':
 		usrnm2 = raw_input('Input username with edit privileges: ')
 		pswd2 = getpass.getpass('Input password: ')
-		load_db(dbo, usrnm2, pswd2)
+		table = 'paperfeed'
+		load_db_from_file(dbo, table, usrnm2, pswd2)
 		sys.exit()

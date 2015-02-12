@@ -6,6 +6,7 @@ from Tkinter import *
 import paperdataDB as pdb
 import decimal
 import getpass
+import sys
 
 ### Script to create GUI to easily search paperdata database
 ### Has fields to enter to search for any and all which match certain parameters
@@ -17,7 +18,7 @@ import getpass
 def makeform(root, fields):
 	entries = []
 	for field in fields:
-		if field not in ['md5sum', 'restore_history', 'data_length', 'cal_path', 'npz_path', 'final_product_path', 'tape_index', 'write_to_tape','delete_file','comments']:
+		if field not in []:
 			var = IntVar()
 			row = Frame(root)
 			lab = Label(row, width=15, text=field, anchor='w')
@@ -33,7 +34,7 @@ def makeform(root, fields):
 
 			ivar = IntVar()
 			ivar.set(pdb.NONE)
-			for key, value in pdb.options().items():
+			for key, value in pdb.options.items():
 				a = Radiobutton(row2, text=value, variable=ivar, value = key)
 				a.var = ivar
 				a.pack(side=LEFT)
@@ -45,7 +46,7 @@ def makeform(root, fields):
 			entries.append((field, c.var, a.var, ent))
 	return entries
 
-def convert(entries, output):
+def convert(entries, output, db_dict, var_flo, var_str, var_int, table):
 	info_list = []
 
 	#Populate info_list with info that fits pdb module
@@ -55,8 +56,8 @@ def convert(entries, output):
 		range_spec = entry[2].get()
 		range = entry[3].get()
 		#Need to parse range
-		if field == 'polarization' and range_spec != pdb.NONE:
-			if range_spec == pdb.LIST:
+		if field in [] and range_spec not in [pdb.NONE]:
+			if range_spec in [pdb.LIST]:
 				ran = range
 				range = []
 				if len(ran.split(',')) >= 2:
@@ -65,10 +66,10 @@ def convert(entries, output):
 			else:
 				range = [range]
 		
-		elif range_spec == pdb.NONE:
+		elif range_spec in [pdb.NONE]:
 			range = []
 
-		elif range_spec == pdb.RANGE:
+		elif range_spec in [pdb.RANGE]:
 			ran = range
 			range = []
 			if len(ran.split('-')) == 2:
@@ -84,7 +85,7 @@ def convert(entries, output):
 				except ValueError:
 					range = [decimal.Decimal(range)]
 
-		elif range_spec == pdb.LIST:
+		elif range_spec in [pdb.LIST]:
 			ran = range
 			range = []
 			if len(ran.split(',')) >= 2:
@@ -105,35 +106,53 @@ def convert(entries, output):
 		info_list.append(field_info)
 
 	#Decides which output to show user
-	limit_query = pdb.fetch(info_list) + ' limit 20'
-	if output == sql_string:
-		print pdb.fetch(info_list)
-	elif output == db_list:
+	limit_query = pdb.fetch(info_list, db_dict, var_flo, var_str, var_int, table) + ' limit 20'
+	if output in [sql_string]:
+		print pdb.fetch(info_list, db_dict, var_flo, var_str, var_int, table)
+	elif output in [dbs_list]:
 		print pdb.dbsearch(limit_query)
 		print 'Output was limited to 20 entries'
-	elif output == db_dict:
+	elif output in [dbs_dict]:
 		print pdb.dbsearch_dict(limit_query)
 		print 'Output was limited to 20 entries'
 
 	return info_list
 
 if __name__ == '__main__':
-	fields = pdb.fields()
-	decimal.getcontext().prec = 5
+	#Decide which table to search
+	if len(sys.argv) > 1:
+		tab = sys.argv[1]
+	else:
+		tab = raw_input('Search which table? -- [paperdata, paperjunk, paperrename, paperfeed]: ')
+	
+	if tab not in pdb.classes:
+		sys.exit()
+
+	fields = []
+	var_class = pdb.instant_class[tab]
+
+	fields.extend(var_class.db_list)
+	db_dict = var_class.db_dict
+	var_flo = var_class.var_flo
+	var_str = var_class.var_str
+	var_int = var_class.var_int
+	table = var_class.table
+
+	decimal.getcontext().prec = 2
 
 	#options for printed output values
 	sql_string = 1
-	db_list = 2
-	db_dict = 3
+	dbs_list = 2
+	dbs_dict = 3
 
 	#Generate GUI
 	root = Tk()
 	root.title('Paperdata Query')
 	ents = makeform(root, fields)
 	root.bind('<Return>', (lambda event, e=ents: convert(e, sql_string)))
-	b1 = Button(root, text='Output String', command=(lambda e=ents: convert(e, sql_string)))
-	b2 = Button(root, text='Output List', command=(lambda e=ents: convert(e, db_list)))
-	b3 = Button(root, text='Output Dict', command=(lambda e=ents: convert(e, db_dict)))
+	b1 = Button(root, text='Output String', command=(lambda e=ents: convert(e, sql_string, db_dict, var_flo, var_str, var_int, table)))
+	b2 = Button(root, text='Output List', command=(lambda e=ents: convert(e, dbs_list, db_dict, var_flo, var_str, var_int, table)))
+	b3 = Button(root, text='Output Dict', command=(lambda e=ents: convert(e, dbs_dict, db_dict, var_flo, var_str, var_int, table)))
 	b1.pack(side=LEFT, padx=5, pady=5)
 	b2.pack(side=LEFT, padx=5, pady=5)
 	b3.pack(side=LEFT, padx=5, pady=5)

@@ -9,6 +9,7 @@ import getpass
 import os
 import subprocess
 import time
+import paperdataDB as pdb
 
 ### Script to load backup of paperdata
 ### Loads csv file into paperdata to restore deleted table
@@ -16,23 +17,37 @@ import time
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-def load_backup(dbnum, usrnm, pswd):
+def load_backup_from_file(dbo, table, usrnm, pswd):
 	#Load data into named database and table
-
 	# open a database connection
-	# be sure to change the host IP address, username, password and database name to match your own
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = usrnm, password = pswd, database = 'paperdata')
 
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor()
 
-	print dbnum 
-	# execute the SQL query using execute() method.
-	cursor.execute('''LOAD DATA LOCAL INFILE %s INTO TABLE paperdata COLUMNS TERMINATED BY '|' LINES TERMINATED BY '\n' ''', (dbnum,))
+	outfile = dbo %(table)
+
+	#execute the SQL query using execute() method.
+	insert_base = '''INSERT INTO %s VALUES(%s)'''
+
+	if table not in pdb.classes:
+		print 'Incorrect table name'
+		return None
+	var_class = pdb.instant_class[table]
+	table_vars = (var_class.table, var_class.values)
+
+	#load information from file into eatwell database
+	with open(outfile, 'rb') as read_file:
+		read = csv.reader(read_file, delimiter='|', lineterminator='\n', dialect='excel')
+		for row in read:
+			val = tuple(row)
+			insert = insert_base % table_vars
+			values = val
+			cursor.execute(insert, values)
 
 	print 'Table data loaded.'
 
-	# Close database and save changes
+	#Close and save changes to database
 	cursor.close()
 	connection.commit()
 	connection.close()
@@ -50,6 +65,7 @@ if __name__ == '__main__':
 	#User input information
 	usrnm = raw_input('Username: ')
 	pswd = getpass.getpass('Password: ')
+	table = 'paperdata'
 
 	#searches for only particular files
 	full = raw_input('Reload entire database?(y/n): ')
@@ -65,4 +81,4 @@ if __name__ == '__main__':
 			dbnum = raw_input('Insert path of backup: ')
 		elif backup == 'a':
 			dbnum = '/data2/home/immwa/scripts/paperdata/backups/version11_12-20-2014.psv'
-		load_backup(dbnum, usrnm, pswd)
+		load_backup_from_file(dbnum, table, usrnm, pswd)
