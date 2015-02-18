@@ -125,6 +125,7 @@ try:
 				file_status.update({filename:status})
 		write_file(file_log, file_data, '\n')
 		write_db(usrnm, pswd, file_log)
+		file_log = []
 		s.close()
 		statusscr.refresh()
 		c = stdscr.getch()
