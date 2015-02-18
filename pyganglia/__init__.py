@@ -98,7 +98,8 @@ class monitor_files:
 		self.var_str = ['filename', 'status', 'still_host']
 		self.var_int = ['del_time']
 		self.table = 'monitor_files'
-		self.values = '%s,%s,%d,%s,%.6f'
+		#self.values = '%s,%s,%d,%s,%.6f'
+		self.values = '%s' + ',%s' * (len(self.db_list) - 1)
 
 class ram:
 	def __init__(self):
@@ -121,7 +122,8 @@ class ram:
 		self.var_str = ['host']
 		self.var_int = ['total', 'used', 'free', 'shared', 'buffers', 'cached', 'bc_used', 'bc_free', 'swap_total', 'swap_used', 'swap_free']
 		self.table = 'ram'
-		self.values = '%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%.6f'
+		#self.values = '%s,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%d,%.6f'
+		self.values = '%s' + ',%s' * (len(self.db_list) - 1)
 
 class iostat:
 	def __init__(self):
@@ -139,7 +141,8 @@ class iostat:
 		self.var_str = ['host', 'device']
 		self.var_int = ['bl_reads', 'bl_writes']
 		self.table = 'iostat'
-		self.values = '%s,%s,%.2f,%.2f,%.2f,%d,%d,%.6f'
+		#self.values = '%s,%s,%.2f,%.2f,%.2f,%d,%d,%.6f'
+		self.values = '%s' + ',%s' * (len(self.db_list) - 1)
 
 class cpu:
 	def __init__(self):
@@ -157,7 +160,8 @@ class cpu:
 		self.var_str = ['host']
 		self.var_int = ['cpu', 'intr_s']
 		self.table = 'cpu'
-		self.values = '%s,%d,%.2f,%.2f,%.2f,%.2f,%d,%.6f'
+		#self.values = '%s,%d,%.2f,%.2f,%.2f,%.2f,%d,%.6f'
+		self.values = '%s' + ',%s' * (len(self.db_list) - 1)
 
 #dictionary of instantiated classes
 instant_class = {'monitor_files':monitor_files(), 'ram':ram(), 'iostat':iostat(), 'cpu':cpu()}

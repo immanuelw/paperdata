@@ -4,7 +4,8 @@ from sqlalchemy import func
 import curses,time,os
 import csv
 import jdcal
-#import pyganglia as pyg
+import pyganglia as pyg
+import MySQLdb
 
 def write_file(log_info, node_data, title):
 	dbr = open(node_data, 'ab')
@@ -86,8 +87,8 @@ try:
 		totalobs = s.query(Observation).count()
 		stdscr.addstr(curline,0,"Number of observations currently in the database: {totalobs}".format(totalobs=totalobs))
 		curline += 1
-		#OBSs = s.query(Observation).filter(Observation.status!='NEW').filter(Observation.status!='COMPLETE').all()
-		OBSs = s.query(Observation).all()
+		OBSs = s.query(Observation).filter(Observation.status!='NEW').filter(Observation.status!='COMPLETE').all()
+		#OBSs = s.query(Observation).all()
 		obsnums = [OBS.obsnum for OBS in OBSs]
 		stdscr.addstr(curline,0,"Number of observations currently being processed {num}".format(num=len(obsnums)))
 		curline += 1
@@ -107,7 +108,10 @@ try:
 				row = j
 			else:
 				row = j%statheight
-			statusscr.addstr(row,col*colwidth,"{filename} {status} {still_host}".format(col=col,filename=os.path.basename(filename),status=status,still_host=still_host))
+			try:
+				statusscr.addstr(row,col*colwidth,"{filename} {status} {still_host}".format(col=col,filename=os.path.basename(filename),status=status,still_host=still_host))
+			except:
+				continue
 			#check for new filenames
 			if filename not in file_status.keys():
 				file_status.update({filename:status})
@@ -120,7 +124,7 @@ try:
 				file_log.append((filename,status,del_time,still_host,time_date))
 				file_status.update({filename:status})
 		write_file(file_log, file_data, '\n')
-		#write_db(usrnm, pswd, file_log)
+		write_db(usrnm, pswd, file_log)
 		s.close()
 		statusscr.refresh()
 		c = stdscr.getch()
