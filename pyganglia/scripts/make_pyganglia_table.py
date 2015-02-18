@@ -30,17 +30,17 @@ def make_monitor_files(cursor):
 def make_ram(cursor):
 	cursor.execute('''CREATE TABLE IF NOT EXISTS ram (
 	host VARCHAR(255) DEFAULT NULL,
-	total INT DEFAULT 0,
-	used INT DEFAULT 0,
-	free INT DEFAULT 0,
-	shared INT DEFAULT 0,
-	buffers INT DEFAULT 0,
-	cached INT DEFAULT 0,
-	bc_used INT DEFAULT 0,
-	bc_free INT DEFAULT 0,
-	swap_total INT DEFAULT 0,
-	swap_used INT DEFAULT 0,
-	swap_free INT DEFAULT 0,
+	total BIGINT DEFAULT 0,
+	used BIGINT DEFAULT 0,
+	free BIGINT DEFAULT 0,
+	shared BIGINT DEFAULT 0,
+	buffers BIGINT DEFAULT 0,
+	cached BIGINT DEFAULT 0,
+	bc_used BIGINT DEFAULT 0,
+	bc_free BIGINT DEFAULT 0,
+	swap_total BIGINT DEFAULT 0,
+	swap_used BIGINT DEFAULT 0,
+	swap_free BIGINT DEFAULT 0,
 	time_date DECIMAL(13,6) DEFAULT 0.000000);''')
 
 	print 'Table ram created'
