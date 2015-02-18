@@ -16,7 +16,7 @@ import getpass
 def make_monitor_files(cursor):
 	# execute the SQL query using execute() method.
 	# Builds table by fields including defaults
-	cursor.execute('''CREATE TABLE monitor_files (
+	cursor.execute('''CREATE TABLE IF NOT EXISTS monitor_files (
 	filename VARCHAR(255) DEFAULT NULL,
 	status VARCHAR(255) DEFAULT NULL,
 	del_time INT DEFAULT 0,
@@ -28,7 +28,7 @@ def make_monitor_files(cursor):
 	return None
 
 def make_ram(cursor):
-	cursor.execute('''CREATE TABLE ram (
+	cursor.execute('''CREATE TABLE IF NOT EXISTS ram (
 	host VARCHAR(255) DEFAULT NULL,
 	total INT DEFAULT 0,
 	used INT DEFAULT 0,
@@ -48,14 +48,14 @@ def make_ram(cursor):
 	return None
 
 def make_iostat(cursor):
-	cursor.execute('''CREATE TABLE iostat (
+	cursor.execute('''CREATE TABLE IF NOT EXISTS iostat (
 	host VARCHAR(255) DEFAULT NULL,
 	device VARCHAR(100) DEFAULT NULL,
 	tps DECIMAL(7,2) DEFAULT 0.00,
 	read_s DECIMAL(7,2) DEFAULT 0.00,
 	write_s DECIMAL(7,2) DEFAULT 0.00,
-	reads INT DEFAULT 0,
-	writes INT DEFAULT 0,
+	bl_reads INT DEFAULT 0,
+	bl_writes INT DEFAULT 0,
 	time_date DECIMAL(13,6) DEFAULT 0.000000);''')
 
 	print 'Table iostat created'
@@ -63,7 +63,7 @@ def make_iostat(cursor):
 	return None
 
 def make_cpu(cursor):
-	cursor.execute('''CREATE TABLE cpu (
+	cursor.execute('''CREATE TABLE IF NOT EXISTS cpu (
 	host VARCHAR(255) DEFAULT NULL,
 	cpu INT DEFAULT 0,
 	user_perc DECIMAL(5,2) DEFAULT 0.00,

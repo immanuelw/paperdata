@@ -133,11 +133,11 @@ class iostat:
 		self.READS = 16
 		self.WRITES = 17
 		self.TIME_DATE = 18
-		self.db_list = ['host', 'device', 'tps', 'read_s', 'write_s', 'reads', 'writes', 'time_date']
-		self.db_dict = {self.HOST:'host', self.DEVICE:'device', self.TPS:'tps', self.READ_S:'read_s', self.WRITE_S:'write_s', self.READS:'reads', self.WRITES:'writes', self.TIME_DATE:'time_date'}
+		self.db_list = ['host', 'device', 'tps', 'read_s', 'write_s', 'bl_reads', 'bl_writes', 'time_date']
+		self.db_dict = {self.HOST:'host', self.DEVICE:'device', self.TPS:'tps', self.READ_S:'read_s', self.WRITE_S:'write_s', self.READS:'bl_reads', self.WRITES:'bl_writes', self.TIME_DATE:'time_date'}
 		self.var_flo = ['tps', 'read_s', 'write_s', 'time_date']
 		self.var_str = ['host', 'device']
-		self.var_int = ['reads', 'writes']
+		self.var_int = ['bl_reads', 'bl_writes']
 		self.table = 'iostat'
 		self.values = '%s,%s,%.2f,%.2f,%.2f,%d,%d,%.6f'
 
