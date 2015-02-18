@@ -14,7 +14,7 @@ def write_file(log_info, node_data, title):
 		wr.writerow(row)
 	dbr.close()
 	return None
-"""
+
 def write_db(usrnm, pswd, log_info):
 	# open a database connection
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'ganglia', local_infile=True)
@@ -35,7 +35,7 @@ def write_db(usrnm, pswd, log_info):
 	connection.close()
 
 	return None
-"""
+
 #user info
 usrnm = 'immwa'
 pswd = 'immwa3978'

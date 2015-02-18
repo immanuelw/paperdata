@@ -12,7 +12,7 @@ import glob
 import socket
 import time
 import subprocess
-#import pyganglia as pyg
+import pyganglia as pyg
 import sys
 import jdcal
 
@@ -133,8 +133,8 @@ def write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage
 	dbr.close()
 
 	return None
-"""
-def add_to_db(usrnm, pswd, usage, ram, cpu):
+
+def add_to_db(usrnm, pswd, host_name, time_date, usage, ram, cpu):
 
 	# open a database connection
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'ganglia', local_infile=True)
@@ -166,7 +166,7 @@ def add_to_db(usrnm, pswd, usage, ram, cpu):
 	connection.close()
 	
 	return None
-"""
+
 def data_out(time_date):
 	#Create output file
 	time_day = time.strftime('%d-%m-%Y')
@@ -215,7 +215,7 @@ def monitor(auto):
 
 		#write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu, pro)
 		write_file(usrnm, pswd, folio_data, time_date, folio_space, host_name, usage, ram, cpu)
-		#add_to_db(usrnm, pswd, usage, ram, cpu)
+		add_to_db(usrnm, pswd, host_name, time_date, usage, ram, cpu)
 		time.sleep(start_time + (i + 1) * interval - time.time())
 
 	if auto in ['y']:
