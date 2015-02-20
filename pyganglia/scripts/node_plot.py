@@ -46,10 +46,10 @@ def plot_nodes(auto):
 	figure_name = 'figure.pdf'
 
 	plt.plot(data_x, data_y, 'r') #list/tuple of matching points
-	#x_min = 
-	#x_max = 
-	#y_min = 
-	#y_max = 
+	x_min = min(data_x)
+	x_max = max(data_x)
+	y_min = min(data_y)
+	y_max = max(data_y)
 	plt.xlabel('Time')
 	plt.ylabel('Node Information')
 	plt.title('Node Title')
