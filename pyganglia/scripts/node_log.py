@@ -199,7 +199,8 @@ def monitor(auto):
 
 	folio_data = data_out(time_date)
 
-	for i in range(1440):
+	#run for 3 days
+	for i in range(4320):
 		time_date = time.strftime('%Y:%m:%d:%H:%M:%S')
 		temp_time = time_date.split(':')
 		time_date = jdcal.gcal2jd(temp_time[0],temp_time[1],temp_time[2],temp_time[3],temp_time[4],temp_time[5])
@@ -218,8 +219,8 @@ def monitor(auto):
 		add_to_db(usrnm, pswd, host_name, time_date, usage, ram, cpu)
 		time.sleep(start_time + (i + 1) * interval - time.time())
 
-	if auto in ['y']:
-		time.sleep(60)
+	#if auto in ['y']:
+	#	time.sleep(60)
 
 	return None
 if __name__ == '__main__':
