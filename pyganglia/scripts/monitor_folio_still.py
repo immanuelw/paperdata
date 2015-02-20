@@ -123,6 +123,7 @@ try:
 				del_time = time.time() - file_time[filename]
 				file_log.append((filename,status,del_time,still_host,time_date))
 				file_status.update({filename:status})
+				file_time.update({filename:time.time()})
 		write_file(file_log, file_data, '\n')
 		write_db(usrnm, pswd, file_log)
 		file_log = []
