@@ -60,30 +60,58 @@ def plot_nodes(auto):
 		time_dict[time] = file_info[1]
 
 	f, axarr = plt.subplots(3, sharex=True)
-	axarr[0].plot(x, y)
-	axarr[0].set_title(filename)
-	axarr[1].plot(x, y)
-	axarr[2].plot(x, y)
-
-	figure_name = 'figure.pdf'
-
-	#plt.figure(1)
 	plt.xticks(time_dict.keys(), time_dict.values())
-	plt.subplot(211)
 
-	plt.subplot(212)
-	plt.plot(data_x, data_y, 'r') #list/tuple of matching points
-	plt.subplot(212)
-	x_min = min(data_x)
-	x_max = max(data_x)
-	y_min = min(data_y)
-	y_max = max(data_y)
+	axarr[0].set_title(filename)
+
+	colors = {0:'b', 1:'g', 2:'r', 3:'c', 4:'m', 5:'y', 6:'k', 7:'w'}
+	lines = {0:'s', 1:'--', 2:'^', 3:''}
+
+	for plot in axarr[:3]:
+		go = plot.add_subplot(111)
+		if plot == axarr[0]:
+			go.ylabel('Ram values')
+			datx = table_info['ram'].keys()
+			daty = {}
+			for value in table_info['ram'].values():
+				#value is list of entries (ex: host, user_perc, sys_perc, etc.) -- so {0: (host, ...), 1:(...), ...}
+				for num in range(len(value) - 1):
+					mdaty = value[1:][num]
+					if num in daty.keys():
+						daty[num] += (mdaty,)
+					else:
+						daty[num] = (mdaty,)
+			for key, value in daty:
+				go.plot(datx, value, colors[key % 8] + lines[key % 4])
+		elif plot == axarr[1]:
+			go.ylabel('Iostat values')
+			datx = table_info['iostat'].keys()
+			for value in table_info['iostat'].values():
+				for num in range(len(value) - 2):
+					mdaty = value[2:][num]
+					if num in daty.keys():
+						daty[num] += (mdaty,)
+					else:
+						daty[num] = (mdaty,)
+			for key, value in daty:
+				go.plot(datx, value, colors[key % 8] + lines[key % 4])
+		elif plot == axarr[2]:
+			go.ylabel('CPU Percentages')
+			datx = table_info['cpu'].keys()
+			daty = {}
+			for value in table_info['cpu'].values():
+				for num in range(len(value) - 2):
+					mdaty = value[2:][num]
+					if num in daty.keys():
+						daty[num] += (mdaty,)
+					else:
+						daty[num] = (mdaty,)
+			for key, value in daty:
+				go.plot(datx, value, colors[key % 8] + lines[key % 4])
+
 	plt.xlabel('Stage')
-	plt.ylabel('Node Information')
-	plt.title(filename)
-	plt.axis([x_min, x_max, y_min, y_max])
 	plt.grid(True)
-	plt.savefig(figure_name)
+	plt.savefig(filename.replace('.uv', '.png'))
 	plt.show()
 
 	return None
