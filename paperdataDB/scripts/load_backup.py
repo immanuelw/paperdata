@@ -17,15 +17,13 @@ import paperdataDB as pdb
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-def load_backup_from_file(dbo, table, usrnm, pswd):
+def load_backup_from_file(read_file, table, usrnm, pswd):
 	#Load data into named database and table
 	# open a database connection
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, password = pswd, database = 'paperdata')
 
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor()
-
-	outfile = dbo %(table)
 
 	#execute the SQL query using execute() method.
 	insert_base = '''INSERT INTO %s VALUES(%s)'''
