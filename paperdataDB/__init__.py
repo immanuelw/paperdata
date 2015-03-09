@@ -123,7 +123,6 @@ class paperdata:
 						'restore_history', 'comments']
 		self.var_int = ['era', 'obsnum', 'julian_day', 'compressed', 'write_to_tape', 'delete_file']
 		self.table = 'paperdata'
-		#self.values = '%s,%d,%s,%d,%s,%d,%.5f,%s,%.5f,%s,%s,%s,%s,%s,%.2f,%.2f,%d,%d,%d,%s,%s'
 		self.values = '%s' + ',%s' * (len(self.db_list) - 1)
 
 class paperjunk:
@@ -141,7 +140,6 @@ class paperjunk:
 		self.var_str = ['junk_path', 'folio_path', 'uv_path']
 		self.var_int = ['junk_size_bytes', 'usb_number', 'renamed']
 		self.table = 'paperjunk'
-		#self.values = '%s,%s,%s,%d,%d,%d'
 		self.values = '%s' + ',%s' * (len(self.db_list) - 1)
 
 class paperrename:
@@ -158,7 +156,6 @@ class paperrename:
 		self.var_str = ['raw_path']
 		self.var_int = ['julian_day', 'actual_amount', 'expected_amount', 'moved']
 		self.table = 'paperrename'
-		#self.values = '%s,%d,%d,%d,%d'
 		self.values = '%s' + ',%s' * (len(self.db_list) - 1)
 
 class paperfeed:
@@ -172,7 +169,6 @@ class paperfeed:
 		self.var_str = ['raw_path']
 		self.var_int = ['julian_day', 'moved']
 		self.table = 'paperfeed'
-		#self.values = '%s,%d,%d'
 		self.values = '%s' + ',%s' * (len(self.db_list) - 1)
 
 #dictionary of instantiated classes
