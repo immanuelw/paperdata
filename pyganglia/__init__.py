@@ -32,13 +32,13 @@ classes = ['monitor_files', 'ram', 'iostat', 'cpu']
 def dbsearch_dict(query):
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
-	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'ganglia', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = 'immwa', passwd = 'immwa3978', db = 'ganglia', local_infile=True)
 
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor(cursorclass = MySQLdb.cursors.DictCursor)
 
 	# execute the SQL query using execute() method.
-	cursor.execute('%s', (query,))
+	cursor.execute('''%s''', (query,))
 	
 	#finds all rows outputted by query, prints them
 	results = cursor.fetchall()
@@ -65,13 +65,13 @@ def dbsearch_dict(query):
 def dbsearch(query):
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
-	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'ganglia', local_infile=True)
+	connection = MySQLdb.connect (host = 'shredder', user = 'immwa', passwd = 'immwa3978', db = 'ganglia', local_infile=True)
 
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor()
 
 	# execute the SQL query using execute() method.
-	cursor.execute('%s', (query,))
+	cursor.execute(query)
 
 	#finds all rows outputted by query, prints them
 	results = cursor.fetchall()

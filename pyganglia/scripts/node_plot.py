@@ -30,17 +30,20 @@ def data_parser(info_list, tab):
 	table = var_class.table
 
 	limit_query = pyg.fetch(info_list, db_dict, var_flo, var_str, var_int, table)
-	output = pyg.dbsearch(limit_query)
+	#print limit_query
+	#output = pyg.dbsearch(limit_query)
+	output = pyg.dbsearch('''SELECT filename, status, del_time, still_host, time_date FROM monitor_files WHERE filename = 'zen.2456664.54961.xy.uv' ''')
 
 	return output
 
 def plot_nodes(auto):
 	table_info = {}
-	filename = sys.args[1]
+	filename = sys.argv[1]
 	for tab in pyg.classes:
 		data = {}
-		if table in ['monitor_files']:
-			info_list = [(field, pyg.SEARCH, pyg.EXACT, [filename]) for field in tab.db_list]
+		if tab in ['monitor_files']:
+			info_list = [(field, pyg.SEARCH, pyg.EXACT, [filename]) if field in ['filename'] else (field, pyg.SEARCH, pyg.NONE, []) 
+						for field in pyg.instant_class[tab].db_list]
 			output = data_parser(info_list, tab)
 			for datum in output:
 				data[datum[-1]] = datum[:-1]
@@ -111,7 +114,7 @@ def plot_nodes(auto):
 
 	plt.xlabel('Stage')
 	plt.grid(True)
-	plt.savefig(filename.replace('.uv', '.png'))
+	#plt.savefig(filename.replace('.uv', '.png'))
 	plt.show()
 
 	return None
