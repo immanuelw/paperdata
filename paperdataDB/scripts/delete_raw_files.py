@@ -30,7 +30,7 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 		raw_path = items[1]
 		tape_path = items[2]
 		delete = int(items[3])
-		if delete == 1 and tape_path != 'NULL' and raw_path != 'NULL':
+		if delete == 1 and tape_path != 'NULL' and '2015' in tape_path and raw_path != 'NULL':
 			deletion.append([raw_path,obsnum,tape_path])
 
 	if confirm == 'y':
