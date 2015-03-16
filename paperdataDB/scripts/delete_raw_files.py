@@ -16,9 +16,6 @@ import csv
 ### Date: 8-20-14
 
 def delete_files(usrnm, pswd, confirm, failed_delete):
-	del_file = open(failed_delete,'wb')
-	del_file.close()
-
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 	cursor = connection.cursor()
 
@@ -52,9 +49,10 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 			if not os.path.isdir(item[0]):
 				cursor.execute('''
 				UPDATE paperdata
-				SET delete_file = 0, raw_location = 'ON TAPE'
-				WHERE obsnum = %d and raw_location = %s;
+				SET delete_file = 0, raw_path = 'ON TAPE'
+				WHERE obsnum = %d and raw_path = '%s';
 				''', (obsnum, raw_path))
+				del_file.close()
 			else:
 				fd.writerow([item[0], 'Not updated'])
 				print 'ERROR: uv file %s not updated' %(item[0])
