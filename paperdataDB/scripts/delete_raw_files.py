@@ -8,6 +8,7 @@ import sys
 import getpass
 import shutil
 import csv
+import os
 
 ### Script to delete files set by ISUS
 ### Looks through database for delete_file marker, deletes every directory and file in list
@@ -39,7 +40,17 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 			raw_path = item[0]
 			obsnum = item[1]
 			try:
-				shutil.rmtree(item[0])
+				confirmed = raw_input('Are you sure you want to delete %s (y/n) ?: '%(raw_path))
+				if confirmed == 'y':
+					shutil.rmtree(item[0])
+				else:
+					fd.writerow([item[0], 'Not removed by choice'])
+					print 'CHOSEN: uv file %s not removed' %(item[0])
+					del_file.close()
+					quit = raw_input('Do you want to quit (y/n)?: ')
+					if quit == 'y':
+						sys.exit()
+					continue
 			except:
 				fd.writerow([item[0], 'Not removed'])
 				print 'ERROR: uv file %s not removed' %(item[0])
