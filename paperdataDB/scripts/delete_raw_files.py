@@ -73,5 +73,5 @@ if __name__ == '__main__':
 	usrnm = raw_input('Root username: ')
 	pswd = getpass.getpass('Root password: ')
 	confirm = raw_input('Are you sure you want to delete (y/n) ?: ')
-	failed_delete = '/data2/home/immwa/scripts/paperdata/failed_deletion.psv'
+	failed_delete = '/data4/paper/paperoutput/failed_deletion.psv'
 	delete_files(usrnm, pswd, confirm, failed_delete)
