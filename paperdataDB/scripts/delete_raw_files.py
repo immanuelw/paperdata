@@ -39,25 +39,26 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 			fd = csv.writer(del_file, delimiter='|', dialect='excel')
 			raw_path = item[0]
 			obsnum = item[1]
+			tape_index = item[2]
 			try:
-				confirmed = raw_input('Are you sure you want to delete %s (y/n) ?: '%(raw_path))
+				confirmed = raw_input('Are you sure you want to delete %s [tape_index:%s] (y/n) ?: '%(raw_path.split('/')[-1], tape_index))
 				if confirmed == 'y':
-					shutil.rmtree(item[0])
+					shutil.rmtree(raw_path)
 				else:
-					fd.writerow([item[0], 'Not removed by choice'])
-					print 'CHOSEN: uv file %s not removed' %(item[0])
+					fd.writerow([raw_path, 'Not removed by choice'])
+					print 'CHOSEN: uv file %s not removed' %(raw_path)
 					del_file.close()
 					quit = raw_input('Do you want to quit (y/n)?: ')
 					if quit == 'y':
 						sys.exit()
 					continue
 			except:
-				fd.writerow([item[0], 'Not removed'])
-				print 'ERROR: uv file %s not removed' %(item[0])
+				fd.writerow([raw_path, 'Not removed'])
+				print 'ERROR: uv file %s not removed' %(raw_path)
 				del_file.close()
 				continue
 
-			if not os.path.isdir(item[0]):
+			if not os.path.isdir(raw_path):
 				cursor.execute('''
 				UPDATE paperdata
 				SET delete_file = 0, raw_path = 'ON TAPE'
@@ -65,8 +66,8 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 				''', (obsnum, raw_path))
 				del_file.close()
 			else:
-				fd.writerow([item[0], 'Not updated'])
-				print 'ERROR: uv file %s not updated' %(item[0])
+				fd.writerow([raw_path, 'Not updated'])
+				print 'ERROR: uv file %s not updated' %(raw_path)
 				del_file.close()
 				continue
 		print 'Table data updated.'
