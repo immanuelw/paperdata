@@ -40,23 +40,23 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 			raw_path = item[0]
 			obsnum = int(item[1])
 			tape_index = item[2]
-			try:
-				confirmed = raw_input('Are you sure you want to delete %s [tape_index:%s] (y/n) ?: '%(raw_path.split('/')[-1], tape_index))
-				if confirmed == 'y':
+			confirmed = raw_input('Are you sure you want to delete %s [tape_index:%s] (y/n) ?: '%(raw_path.split('/')[-1], tape_index))
+			if confirmed == 'y':
+				try:
 					print 'Deleting %s ...'%(raw_path.split(':')[1])
 					shutil.rmtree(raw_path.split(':')[1])
-				else:
-					fd.writerow([raw_path, 'Not removed by choice'])
-					print 'CHOSEN: uv file %s not removed' %(raw_path)
+				except:
+					fd.writerow([raw_path, 'Not removed'])
+					print 'ERROR: uv file %s not removed' %(raw_path)
 					del_file.close()
-					quit = raw_input('Do you want to quit (y/n)?: ')
-					if quit == 'y':
-						sys.exit()
 					continue
-			except:
-				fd.writerow([raw_path, 'Not removed'])
-				print 'ERROR: uv file %s not removed' %(raw_path)
+			else:
+				fd.writerow([raw_path, 'Not removed by choice'])
+				print 'CHOSEN: uv file %s not removed' %(raw_path)
 				del_file.close()
+				quit = raw_input('Do you want to quit (y/n)?: ')
+				if quit == 'y':
+					sys.exit()
 				continue
 
 			if not os.path.isdir(raw_path):
