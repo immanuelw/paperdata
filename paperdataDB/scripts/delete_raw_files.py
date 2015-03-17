@@ -61,6 +61,7 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 
 			if not os.path.isdir(raw_path):
 				try:
+					print obsnum
 					cursor.execute('''
 					UPDATE paperdata
 					SET delete_file = 0, raw_path = 'ON TAPE'
