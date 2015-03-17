@@ -64,7 +64,7 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 					print obsnum
 					cursor.execute('''
 					UPDATE paperdata
-					SET delete_file = 0, raw_path = 'ON TAPE'
+					SET delete_file = 0, raw_path = 'ON TAPE', write_to_tape = 0
 					WHERE obsnum = %d and raw_path = '%s';
 					'''%(obsnum, raw_path))
 					del_file.close()
