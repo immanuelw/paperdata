@@ -65,17 +65,17 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 					UPDATE paperdata
 					SET delete_file = 0, raw_path = 'ON TAPE'
 					WHERE obsnum = %d and raw_path = '%s';
-					''', (obsnum, raw_path))
+					'''%(obsnum, raw_path))
 					del_file.close()
 				except:
 					fd.writerow([raw_path, 'Not updated'])
-					print 'ERROR: uv file %s not updated' %(raw_path)
+					print 'ERROR: uv file %s not updated -- mysql failure' %(raw_path)
 					del_file.close()
 					continue
 					
 			else:
 				fd.writerow([raw_path, 'Not updated'])
-				print 'ERROR: uv file %s not updated' %(raw_path)
+				print 'ERROR: uv file %s not updated -- file does not exist' %(raw_path)
 				del_file.close()
 				continue
 		print 'Table data updated.'
