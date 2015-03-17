@@ -38,7 +38,7 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 			del_file = open(failed_delete,'ab')
 			fd = csv.writer(del_file, delimiter='|', dialect='excel')
 			raw_path = item[0]
-			obsnum = item[1]
+			obsnum = int(item[1])
 			tape_index = item[2]
 			try:
 				confirmed = raw_input('Are you sure you want to delete %s [tape_index:%s] (y/n) ?: '%(raw_path.split('/')[-1], tape_index))
@@ -60,12 +60,19 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 				continue
 
 			if not os.path.isdir(raw_path):
-				cursor.execute('''
-				UPDATE paperdata
-				SET delete_file = 0, raw_path = 'ON TAPE'
-				WHERE obsnum = %d and raw_path = '%s';
-				''', (obsnum, raw_path))
-				del_file.close()
+				try:
+					cursor.execute('''
+					UPDATE paperdata
+					SET delete_file = 0, raw_path = 'ON TAPE'
+					WHERE obsnum = %d and raw_path = '%s';
+					''', (obsnum, raw_path))
+					del_file.close()
+				except:
+					fd.writerow([raw_path, 'Not updated'])
+					print 'ERROR: uv file %s not updated' %(raw_path)
+					del_file.close()
+					continue
+					
 			else:
 				fd.writerow([raw_path, 'Not updated'])
 				print 'ERROR: uv file %s not updated' %(raw_path)
