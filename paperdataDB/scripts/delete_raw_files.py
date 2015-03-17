@@ -43,8 +43,8 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 			try:
 				confirmed = raw_input('Are you sure you want to delete %s [tape_index:%s] (y/n) ?: '%(raw_path.split('/')[-1], tape_index))
 				if confirmed == 'y':
-					print 'Deleting %s ...'%(raw_path.split('/')[1])
-					shutil.rmtree(raw_path.split('/')[1])
+					print 'Deleting %s ...'%(raw_path.split(':')[1])
+					shutil.rmtree(raw_path.split(':')[1])
 				else:
 					fd.writerow([raw_path, 'Not removed by choice'])
 					print 'CHOSEN: uv file %s not removed' %(raw_path)
