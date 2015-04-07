@@ -329,8 +329,8 @@ all_classes = (paperdata(), paperjunk(), paperrename(), paperfeed())
 # Generate strings to load into query 
 def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 	# Instantiate variables to use to generate query string
-	query = ()
-	searchstr = ()
+	query = []
+	searchstr = []
 
 	# Info list should be ((field_name, search_field, option, (more_info)), 
 	# Ex: (('paperfeed', NOSEARCH, EXACT, (2,)), ('user_perc', SEARCH, NONE, ()), ('intr_s', SEARCH, RANGE, (922, 935)))
@@ -340,20 +340,20 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			return None #HOW SHOULD I THROW ERRORS?
 
 		# Instantiates field variable
-		if isinstance(item(0), str):
-			field = item(0)
-		elif isinstance(item(0), int):
-			field = db_dict(item(0))
+		if isinstance(item[0], str):
+			field = item[0]
+		elif isinstance(item[0], int):
+			field = db_dict[item(0])
 
-		if item(2) == EXACT:
-			if len(item(3)) != 1:
+		if item[2] == EXACT:
+			if len(item[3]) != 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
 				return None #HOW SHOULD I THROW ERRORS?
 	
-			exact = item(3)(0)
+			exact = item[3][0]
 
 			# Adding info to lists to generate strings later
-			if item(1) == SEARCH:
+			if item[1] == SEARCH:
 				query.append(field)
 			if field in var_flo:
 				searchstr.append('%s = %.6f'%(field, exact))
@@ -362,15 +362,15 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			elif field in var_int:
 				searchstr.append('%s = %d'%(field, exact))
 
-		elif item(2) == MIN:
-			if len(item(3)) != 1:
+		elif item[2] == MIN:
+			if len(item[3]) != 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
 				return None #HOW SHOULD I THROW ERRORS?
 
-			min = item(3)(0)
+			min = item[3][0]
 
 			# Adding info to lists to generate strings later
-			if item(1) == SEARCH:
+			if item[1] == SEARCH:
 				query.append(field)
 			if field in var_flo:
 				searchstr.append('%s >= %.6f'%(field, min))
@@ -379,15 +379,15 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			elif field in var_int:
 				searchstr.append('%s >= %d'%(field, min))
 
-		elif item(2) == MAX:
-			if len(item(3)) != 1:
+		elif item[2] == MAX:
+			if len(item[3]) != 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
 				return None #HOW SHOULD I THROW ERRORS?
 
-			max = item(3)(0)
+			max = item[3][0]
 
 			# Adding info to lists to generate strings later
-			if item(1) == SEARCH:
+			if item[1] == SEARCH:
 				query.append(field)
 			if field in var_flo:
 				searchstr.append('%s <= %.6f'%(field, max))
@@ -396,16 +396,16 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			elif field in var_int:
 				searchstr.append('%s <= %d'%(field, max))
 
-		elif item(2) == RANGE:
-			if len(item(3)) != 2:
+		elif item[2] == RANGE:
+			if len(item[3]) != 2:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item) 
 				return None #HOW SHOULD I THROW ERRORS?
 
-			min = item(3)(0)
-			max = item(3)(1)
+			min = item[3][0]
+			max = item[3][1]
 
 			# Adding info to lists to generate strings later
-			if item(1) == SEARCH:
+			if item[1] == SEARCH:
 				query.append(field)
 			if field in var_flo:
 				searchstr.append('%s >= %.6f and %s <= %.6f'%(field, min, field, max))
@@ -414,53 +414,53 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			elif field in var_int:
 				searchstr.append('%s >= %d and %s <= %d'%(field, min, field, max))
 
-		elif item(2) == LIST:
-			if len(item(3)) <= 1:
+		elif item[2] == LIST:
+			if len(item[3]) <= 1:
 				print 'ERROR -- LIST %s does not have the right amount of entries' %(item)
 				return None #HOW SHOULD I THROW ERRORS?
 
-			if item(1) == SEARCH:
+			if item[1] == SEARCH:
 				query.append(field)
 			if field in var_flo:
-				for it in item(3):
-					if it == item(3)(0):
+				for it in item[3]:
+					if it == item[3][0]:
 						list_str = '(%s = %.6f' %(field, it)
-					elif it == item(3)(-1):
+					elif it == item[3][-1]:
 						list_str = list_str + ' or %s = %.6f)' %(field, it)
 					else:
 						list_str = list_str + ' or %s = %.6f' %(field, it)
 			elif field in var_str:
-				for it in item(3):
-					if it == item(3)(0):
+				for it in item[3]:
+					if it == item[3][0]:
 						list_str = "(%s = '%s'" %(field, it)
-					elif it == item(3)(-1):
+					elif it == item[3][-1]:
 						list_str = list_str + " or %s = '%s')" %(field, it)
 					else:
 						list_str = list_str + " or %s = '%s'" %(field, it)
 			elif field in var_int:
-				for it in item(3):
-					if it == item(3)(0):
+				for it in item[3]:
+					if it == item[3][0]:
 						list_str = '(%s = %d' %(field, it)
-					elif it == item(3)(-1):
+					elif it == item[3][-1]:
 						list_str = list_str + ' or %s = %d)' %(field, it)
 					else:
 						list_str = list_str + ' or %s = %d' %(field, it)
 			searchstr.append(list_str)
 
-		elif item(2) == NONE:
-			if len(item(3)) != 0:
+		elif item[2] == NONE:
+			if len(item[3]) != 0:
 				print 'ERROR -- LIST %s has too many entries' %(item) 
 				return None #HOW SHOULD I THROW ERRORS?
 
 			# Adding info to lists to generate strings later
-			if item(1) == SEARCH:
+			if item[1] == SEARCH:
 				query.append(field)
 
 		else:
 			return None #HOW SHOULD I THROW ERRORS?
 
 	for item in searchstr:
-		if item == searchstr(0):
+		if item == searchstr[0]:
 			qsearch = item
 		else:
 			qsearch = qsearch + ' and ' + item
@@ -472,9 +472,9 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 			else:
 				dbstr = 'SELECT ' + item + ' FROM ' + table + ' WHERE ' + qsearch
 		else:
-			if item == query(0):
+			if item == query[0]:
 				dbstr = 'SELECT ' + item + ', '
-			elif item == query(-1):
+			elif item == query[-1]:
 				dbstr = dbstr + item + ' FROM ' + table + ' WHERE ' + qsearch
 			else:
 				dbstr = dbstr + item + ', '
