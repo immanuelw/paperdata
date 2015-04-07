@@ -35,7 +35,7 @@ if __name__ == '__main__':
 	#inputs for user to access database
 	usrnm = raw_input('Username: ')
 	pswd = getpass.getpass('Password: ')
-	table = raw_input('Create which table (user_info, user_pref, user_recipes, all)? :')
+	table = raw_input('Create which table (paperdata, paperjunk, paperrename, paperfeed, all)? :')
 
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
