@@ -324,6 +324,7 @@ class paperfeed:
 
 #dictionary of instantiated classes
 instant_class = {'paperdata':paperdata(), 'paperjunk':paperjunk(), 'paperrename':paperrename(), 'paperfeed':paperfeed()}
+all_classes = (paperdata(), paperjunk(), paperrename(), paperfeed())
 
 # Generate strings to load into query 
 def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
