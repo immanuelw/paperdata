@@ -87,44 +87,53 @@ def dbsearch(query):
 
 class monitor_files:
 	def __init__(self):
-		self.FILENAME = 11
-		self.STATUS = 12
-		self.DEL_TIME = 13
-		self.STILL_HOST = 14
-		self.TIME_DATE = 15
 		self.db_list = ('filename',
 						'status',
 						'del_time',
+						'time_start',
+						'time_end',
 						'still_host',
 						'time_date')
+		(self.FILENAME,
+		self.STATUS,
+		self.DEL_TIME,
+		self.TIME_START,
+		self.TIME_END,
+		self.STILL_HOST,
+		self.TIME_DATE) = range(10, 10 + len(self.db_list))
 		self.db_dict = {self.FILENAME:'filename',
 						self.STATUS:'status',
 						self.DEL_TIME:'del_time',
+						self.TIME_START:'time_start',
+						self.TIME_END:'time_end',
 						self.STILL_HOST:'still_host',
 						self.TIME_DATE:'time_date'}
+		self.db_inst = {'filename':('VARCHAR(255)', 'NULL'),
+						'status':('VARCHAR(255)', 'NULL'),
+						'del_time':('BIGINT', '0'),
+						'time_start':('BIGINT', '0'),
+						'time_end':('BIGINT', '0'),
+						'still_host'('VARCHAR(255)', 'NULL'),
+						'time_date':('DECIMAL(13,6)', '0.000000')}
+		self.db_descr = {'filename':'name/path of uv file being compressed',
+						'status':'state of compression file is currently doing',
+						'del_time':'time taken to finish step',
+						'time_start':'time process started as a integer',
+						'time_end':'time process ended as an integer',
+						'still_host':'node that uv file is being compressed on',
+						'time_date':'time and date entry was updated'}
 		self.var_flo = ('time_date',)
 		self.var_str = ('filename',
 						'status',
 						'still_host')
-		self.var_int = ('del_time',)
+		self.var_int = ('del_time',
+						'time_start',
+						'time_end')
 		self.table = 'monitor_files'
 		self.values = '%s' + ',%s' * (len(self.db_list) - 1)
 
 class ram:
 	def __init__(self):
-		self.HOST = 11
-		self.TOTAL = 12
-		self.USED = 13
-		self.FREE = 14
-		self.SHARED = 15
-		self.BUFFERS = 16
-		self.CACHED = 17
-		self.BC_USED = 18
-		self.BC_FREE = 19
-		self.SWAP_TOTAL = 20
-		self.SWAP_USED = 21
-		self.SWAP_FREE = 22
-		self.TIME_DATE = 23
 		self.db_list = ('host',
 						'total',
 						'used',
@@ -138,6 +147,19 @@ class ram:
 						'swap_used',
 						'swap_free',
 						'time_date')
+		(self.HOST,
+		self.TOTAL,
+		self.USED,
+		self.FREE,
+		self.SHARED,
+		self.BUFFERS,
+		self.CACHED,
+		self.BC_USED,
+		self.BC_FREE,
+		self.SWAP_TOTAL,
+		self.SWAP_USED,
+		self.SWAP_FREE,
+		self.TIME_DATE) = range(10, 10 + len(self.db_list))
 		self.db_dict = {self.HOST:'host',
 						self.TOTAL:'total',
 						self.USED:'used',
@@ -151,6 +173,32 @@ class ram:
 						self.SWAP_TOTAL:'swap_used',
 						self.SWAP_FREE:'swap_free',
 						self.TIME_DATE:'time_date'}
+		self.db_inst = {'host':('VARCHAR(255)', 'NULL'),
+						'total':('BIGINT', '0'),
+						'used':('BIGINT', '0'),
+						'free':('BIGINT', '0'),
+						'shared':('BIGINT', '0'),
+						'buffers':('BIGINT', '0'),
+						'cached':('BIGINT', '0'),
+						'bc_used':('BIGINT', '0'),
+						'bc_free':('BIGINT', '0'),
+						'swap_total':('BIGINT', '0'),
+						'swap_used':('BIGINT', '0'),
+						'swap_free':('BIGINT', '0'),
+						'time_date':('DECIMAL(13,6)', '0.000000')}
+		self.db_descr = {'host':'system that is being monitored',
+						'total':'total ram',
+						'used':'used ram',
+						'free':'free ram',
+						'shared':'shared ram',
+						'buffers':'buffers',
+						'cached':'cached ram',
+						'bc_used':'',
+						'bc_free':'',
+						'swap_total':'',
+						'swap_used':'',
+						'swap_free':'',
+						'time_date':'time and date entry was updated'}
 		self.var_flo = ('time_date',)
 		self.var_str = ('host',)
 		self.var_int = ('total',
@@ -169,14 +217,6 @@ class ram:
 
 class iostat:
 	def __init__(self):
-		self.HOST = 11
-		self.DEVICE = 12
-		self.TPS = 13
-		self.READ_S = 14
-		self.WRITE_S = 15
-		self.READS = 16
-		self.WRITES = 17
-		self.TIME_DATE = 18
 		self.db_list = ('host',
 						'device',
 						'tps',
@@ -185,6 +225,14 @@ class iostat:
 						'bl_reads',
 						'bl_writes',
 						'time_date')
+		(self.HOST,
+		self.DEVICE,
+		self.TPS,
+		self.READ_S,
+		self.WRITE_S,
+		self.READS,
+		self.WRITES,
+		self.TIME_DATE) = range(10, 10 + len(self.db_list))
 		self.db_dict = {self.HOST:'host',
 						self.DEVICE:'device',
 						self.TPS:'tps',
@@ -193,6 +241,22 @@ class iostat:
 						self.READS:'bl_reads',
 						self.WRITES:'bl_writes',
 						self.TIME_DATE:'time_date'}
+		self.db_inst = {'host':('VARCHAR(255)', 'NULL'),
+						'device':('VARCHAR(100)', 'NULL'),
+						'tps':('DECIMAL(7,2)', '0.00'),
+						'read_s':('DECIMAL(7,2)', '0.00'),
+						'write_s':('DECIMAL(7,2)', '0.00'),
+						'bl_reads':('BIGINT' '0'),
+						'bl_writes':('BIGINT' '0'),
+						'time_date':('DECIMAL(13,6)', '0.000000')}
+		self.db_descr = {'host':'system that is being monitored',
+						'device':'',
+						'tps':'',
+						'read_s':'reads per second',
+						'write_s':'writes per second',
+						'bl_reads':'block reads',
+						'bl_writes':'block writes',
+						'time_date':'time and date entry was updated'}
 		self.var_flo = ('tps',
 						'read_s',
 						'write_s',
@@ -206,21 +270,22 @@ class iostat:
 
 class cpu:
 	def __init__(self):
-		self.HOST = 11
-		self.CPU = 12
-		self.USER_PERC = 13
-		self.SYS_PERC = 14
-		self.IOWAIT_PERC = 15
-		self.IDLE_PERC = 16
-		self.INTR_S = 17
-		self.TIME_DATE = 18
-		self.db_list = ('host','cpu',
+		self.db_list = ('host',
+						'cpu',
 						'user_perc',
 						'sys_perc',
 						'iowait_perc',
 						'idle_perc',
 						'intr_s',
 						'time_date')
+		(self.HOST,
+		self.CPU,
+		self.USER_PERC,
+		self.SYS_PERC,
+		self.IOWAIT_PERC,
+		self.IDLE_PERC,
+		self.INTR_S,
+		self.TIME_DATE) = range(10, 10 + len(self.db_list))
 		self.db_dict = {self.HOST:'host',
 						self.CPU:'cpu',
 						self.USER_PERC:'user_perc',
@@ -229,6 +294,22 @@ class cpu:
 						self.IDLE_PERC:'idle_perc',
 						self.INTR_S:'intr_s',
 						self.TIME_DATE:'time_date'}
+		self.db_inst = {'host':('VARCHAR(255)', 'NULL'),
+						'cpu':('INT', '0'),
+						'user_perc':('DECIMAL(5,2)', '0.00'),
+						'sys_perc':('DECIMAL(5,2)', '0.00'),
+						'iowait_perc':('DECIMAL(5,2)', '0.00'),
+						'idle_perc':('DECIMAL(5,2)', '0.00'),
+						'intr_s':('INT', '0'),
+						'time_date':('DECIMAL(13,6)', '0.000000')}
+		self.db_descr = {'host':'system that is being monitored',
+						'cpu':'number of cpu/processor being monitored',
+						'user_perc':'percent of cpu being used by user',
+						'sys_perc':'percent of cpu being used by system',
+						'iowait_perc':'percent of cpu waiting',
+						'idle_perc':'percent of cpu that is idle',
+						'intr_s':'instructions (per second?)',
+						'time_date':'time and date entry was updated'}
 		self.var_flo = ('user_perc',
 						'sys_perc',
 						'iowait_perc',
@@ -251,7 +332,7 @@ def fetch(info_list, db_dict, var_flo, var_str, var_int, table):
 	searchstr = []
 
 	# Info list should be ((field_name, search_field, option, (more_info)), 
-	# Ex: (('cpu', NOSEARCH, EXACT, (2)), ('user_perc', SEARCH, NONE, ()), ('intr_s', SEARCH, RANGE, (922, 935)))
+	# Ex: (('cpu', NOSEARCH, EXACT, (2,)), ('user_perc', SEARCH, NONE, ()), ('intr_s', SEARCH, RANGE, (922, 935)))
 	for item in info_list:
 		if len(item) != 4:
 			print 'ERROR -- LIST %s does not have enough entries' %(item)
