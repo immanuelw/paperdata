@@ -119,16 +119,16 @@ try:
 			#check for new filenames
 			if filename not in file_pid.keys():
 				file_pid.update({filename:current_pid})
-				time_start = time.time()
+				time_start = int(time.time())
 				file_start.update({filename:time_start})
 				file_end.update({filename:-1})
 			if file_pid[filename] not in [current_pid]:
-				time_end = time.time()
+				time_end = int(time.time())
 				file_end.update({filename:time_end})
 				del_time = -1
 				file_log.append((filename, status, del_time, file_start[filename], file_end[filename], still_host, time_date))
 				file_pid.update({filename:current_pid})
-				time_start = time.time()
+				time_start = int(time.time())
 				file_start.update({filename:time_start})
 				file_end.update({filename:-1})
 			if filename not in file_status.keys():
