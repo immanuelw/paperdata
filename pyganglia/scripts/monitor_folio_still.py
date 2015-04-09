@@ -48,6 +48,9 @@ file_data = '/data4/paper/paperoutput/monitor_folio_log_%s.psv' %(time_d)
 file_log = []
 file_status = {}
 file_time = {}
+file_pid = {}
+file_start = {}
+file_end = {}
 
 #setup my curses stuff following
 # https://docs.python.org/2/howto/curses.html
@@ -99,6 +102,7 @@ try:
 				host,path,filename= dbi.get_input_file(obsnum)
 				status = dbi.get_obs_status(obsnum)
 				still_host = dbi.get_obs_still_host(obsnum)
+				current_pid = dbi.get_obs_pid(obsnum)
 			except:
 				host,path,filename = 'host','/path/to/','zen.2345672.23245.uv'
 				status = 'WTF'
@@ -113,15 +117,29 @@ try:
 			except:
 				continue
 			#check for new filenames
+			if filename not in file_pid.keys():
+				file_pid.update({filename:current_pid})
+				time_start = time.time()
+				file_start.update({filename:time_start})
+				file_end.update({filename:-1})
+			if file_pid[filename] not in [current_pid]:
+				time_end = time.time()
+				file_end.update({filename:time_end})
+				del_time = -1
+				file_log.append((filename, status, del_time, file_start[filename], file_end[filename], still_host, time_date))
+				file_pid.update({filename:current_pid})
+				time_start = time.time()
+				file_start.update({filename:time_start})
+				file_end.update({filename:-1})
 			if filename not in file_status.keys():
 				file_status.update({filename:status})
 				del_time = 0
-				file_log.append((filename,status,del_time,still_host,time_date))
+				file_log.append((filename, status, del_time, file_start[filename], file_end[filename], still_host, time_date))
 				file_time.update({filename:time.time()})
 			#write output log
 			if file_status[filename] not in [status]:
 				del_time = time.time() - file_time[filename]
-				file_log.append((filename,status,del_time,still_host,time_date))
+				file_log.append((filename, status, del_time, file_start[filename], file_end[filename], still_host, time_date))
 				file_status.update({filename:status})
 				file_time.update({filename:time.time()})
 		write_file(file_log, file_data, '\n')

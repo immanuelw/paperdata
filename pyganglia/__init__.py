@@ -117,9 +117,9 @@ class monitor_files:
 						'time_date':('DECIMAL(13,6)', '0.000000')}
 		self.db_descr = {'filename':'name/path of uv file being compressed',
 						'status':'state of compression file is currently doing',
-						'del_time':'time taken to finish step',
-						'time_start':'time process started as a integer',
-						'time_end':'time process ended as an integer',
+						'del_time':'time taken to finish step -- status transition',
+						'time_start':'time process started as a integer -- process transition',
+						'time_end':'time process ended as an integer -- process transition',
 						'still_host':'node that uv file is being compressed on',
 						'time_date':'time and date entry was updated'}
 		self.var_flo = ('time_date',)
