@@ -1467,13 +1467,6 @@ def main():
 	connection.close()
 
 	x = PrettyTable(["Era", "Julian Day", "Raw Path", "Compressed Path", "Type(R/C/B)", "Amount"])
-	#x.sortby = "Population"
-	#x.reversesort = True
-	#x.int_format["Area"] = "04d"
-	#x.float_format = "6.1f"
-	#x.align["City name"] = "l" # Left align city names
-	#x.add_row(["Perth", 5386, 1554769, 869.4])
-	#print(x)
 	for item in results:
 	if item[2] != 'NULL' and item[3] == 'NULL':
 		file_type = 'R'
