@@ -4,6 +4,7 @@
 import time
 import paperbackup
 import paperbridge
+import paperfeed
 import paperjunk
 import paperrename
 import papermd5
@@ -37,6 +38,15 @@ def bridge():
 		pass
 	return None
 
+def feed():
+	try:
+		while True:
+			auto = 'y'
+			paperfeed.paperfeed(auto)
+	except KeyboardInterrupt:
+		pass
+	return None
+
 def junk():
 	try:
 		while True:
@@ -66,12 +76,14 @@ def md5():
 	return None
 
 if __name__ == '__main__':
-	daemon = raw_input('Which daemon [backup, bridge, junk, rename, md5]')
-	if daemon in ('backup', 'bridge', 'junk', 'rename', 'md5'):
+	daemon = raw_input('Which daemon [backup, bridge, feed, junk, rename, md5]')
+	if daemon in ('backup', 'bridge', 'feed', 'junk', 'rename', 'md5'):
 		if daemon == 'backup':
 			backup()
 		elif daemon == 'bridge':
 			bridge()
+		elif daemon == 'feed':
+			feed()
 		elif daemon == 'junk':
 			junk()
 		elif daemon == 'rename':
