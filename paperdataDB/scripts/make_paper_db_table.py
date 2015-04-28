@@ -6,7 +6,7 @@
 import MySQLdb
 import sys
 import getpass
-import eatwell.userdb as udb
+import paperdataDB as pdb
 
 ### Script to recreate paperdata table format
 ### Opens MySQL through module, creates table through input name
@@ -39,7 +39,7 @@ if __name__ == '__main__':
 
 	# open a database connection
 	# be sure to change the host IP address, username, password and database name to match your own
-	connection = MySQLdb.connect(host = 'shredder', user = usrnm, passwd = pswd, database = 'paperdata', local_infile=True))
+	connection = MySQLdb.connect(host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 
 	# prepare a cursor object using cursor() method
 	cursor = connection.cursor()
