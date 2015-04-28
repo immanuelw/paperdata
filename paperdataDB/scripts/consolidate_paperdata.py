@@ -26,8 +26,13 @@ def clean_paperdata(usrnm, pswd):
 	for item in results:
 		for key, some_path in enumerate(item):				
 			if os.path.islink(some_path.split(':')[1]):
-			if not os.path.isdir(some_path.split(':')[1]):
-				cursor.execute('''UPDATE paperdata SET %s = 'NULL' where %s = '%s' ''', (path_dict[key], path_dict[key], some_path))
+				real_path = some_path.split(':')[0] + ':' + os.path.real_path(some_path.split(':')[1])
+				cursor.execute('''UPDATE paperdata SET %s = '%s' where %s = '%s' ''', (path_dict[key], real_path, path_dict[key], some_path))
+				if not os.path.isdir(real_path.split(':')[1]):
+					cursor.execute('''UPDATE paperdata SET %s = 'NULL' where %s = '%s' ''', (path_dict[key], path_dict[key], some_path))
+			else:
+				if not os.path.isdir(some_path.split(':')[1]):
+					cursor.execute('''UPDATE paperdata SET %s = 'NULL' where %s = '%s' ''', (path_dict[key], path_dict[key], some_path))
 
 
 	cursor.execute('''DELETE FROM paperdata where raw_path = 'NULL' and path = 'NULL' and final_product_path = 'NULL' ''')
@@ -39,12 +44,13 @@ def clean_paperdata(usrnm, pswd):
 	return None
 
 def generate_entry_1(item):
+	host = socket.gethostname()
 	if item[0] in ['NULL', 'ON TAPE']:
 		path = item[0]
 	else:
 		compr_host = item[0].split(':')[0]
 		compr = item[0].split(':')[1]
-		if compr_host == 'folio' and not os.path.isdir(compr):
+		if compr_host == host and not os.path.isdir(compr):
 			path = 'NULL'
 		else:
 			path = item[0]
@@ -53,7 +59,7 @@ def generate_entry_1(item):
 	else:
 		raw_host = item[9].split(':')[0]
 		raw = item[9].split(':')[1]
-		if raw_host == 'folio' and not os.path.isdir(raw):
+		if raw_host == host and not os.path.isdir(raw):
 			raw_path = 'NULL'
 		else:
 			raw_path = item[9]
@@ -76,11 +82,33 @@ def generate_entry_1(item):
 	except:
 		tape = item[13]
 
-	it = (path,item[1],item[2],item[3],item[4],item[5],item[6],item[7],item[8],raw_path,item[10],item[11],item[12],tape,compr_sz,raw_sz,item[16],item[17],item[18],item[19],item[20],item[21])
+	it = (path,
+			item[1],
+			item[2],
+			item[3],
+			item[4],
+			item[5],
+			item[6],
+			item[7],
+			item[8],
+			raw_path,
+			item[10],
+			item[11],
+			item[12],
+			tape,
+			compr_sz,
+			raw_sz,
+			item[16],
+			item[17],
+			item[18],
+			item[19],
+			item[20],
+			item[21])
 
 	return it
 
 def generate_entry_2(item, ra):
+	host = socket.gethostname()
 	if ra[8] == 0.00000:
 		length = item[8]
 	else:
@@ -96,7 +124,7 @@ def generate_entry_2(item, ra):
 	else:
 		compr_host = item[0].split(':')[0]
 		compr = item[0].split(':')[1]
-		if compr_host == 'folio' and not os.path.isdir(compr):
+		if compr_host == host and not os.path.isdir(compr):
 			path = 'NULL'
 			obsnum = ra[3]
 		else:
@@ -107,7 +135,7 @@ def generate_entry_2(item, ra):
 	else:
 		raw_host = ra[9].split(':')[0]
 		raw = ra[9].split(':')[1]
-		if raw_host == 'folio' and not os.path.isdir(raw):
+		if raw_host == host and not os.path.isdir(raw):
 			raw_path = 'NULL'
 		else:
 			raw_path = ra[9]
@@ -130,7 +158,28 @@ def generate_entry_2(item, ra):
 	except:
 		tape = ra[13]
 
-	it = (path,item[1],item[2],obsnum,ra[4],ra[5],ra[6],ra[7],length,raw_path,cal,item[11],item[12],tape,compr_sz,raw_sz,item[16],ra[17],ra[18],ra[19],ra[20],item[21])
+	it = (path,
+			item[1],
+			item[2],
+			obsnum,
+			ra[4],
+			ra[5],
+			ra[6],
+			ra[7],
+			length,
+			raw_path,
+			cal,
+			item[11],
+			item[12],
+			tape,
+			compr_sz,
+			raw_sz,
+			item[16],
+			ra[17],
+			ra[18],
+			ra[19],
+			ra[20],
+			item[21])
 	return it
 
 def consolidate(dbo):
@@ -142,11 +191,6 @@ def consolidate(dbo):
 
 	back = []
 	front = []
-
-	#path is [0]
-	#jday is [5]
-	#jdate is [6]
-	#raw_location is [9]
 
 	cursor.execute('SELECT * from paperdata where compressed = 1 order by julian_date asc')
 	resa = cursor.fetchall()
@@ -208,6 +252,10 @@ def consolidate(dbo):
 				else:
 					front.append(it)
 	#Takes only unique entries
+	#path is [0]
+	#jday is [5]
+	#jdate is [6]
+	#raw_location is [9]
 	total = tuple(back + front)
 	backup = set(total)
 	backup = sorted(backup, key=lambda x: (x[6], x[9], x[0]))
