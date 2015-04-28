@@ -7,28 +7,30 @@ import sys
 import getpass
 import os
 import csv
+import socket
 
 def clean_paperdata(usrnm, pswd):
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 	cursor = connection.cursor()
 
-	cursor.execute('''SELECT path, raw_path, npz_path, final_product_path from paperdata where (path like 'folio%' or raw_path like 'folio%')''')
+	host = socket.gethostname()
+	query = '''SELECT path, raw_path, npz_path, final_product_path from paperdata where (path like '{0}%' or raw_path like '{1}%')'''.format(host, host)
+	cursor.execute(query)
 	results = cursor.fetchall()
-	for item in results:
-		path = item[0]
-		raw_path = item[1]
-		npz_path = item[2]
-		final_product_path = item[3]
-		if not os.path.isdir(path.split(':')[1]):
-			cursor.execute('''UPDATE paperdata SET path = 'NULL' where path = %s ''', (path,))
-		if not os.path.isdir(raw_path.split(':')[1]):
-			cursor.execute('''UPDATE paperdata SET raw_path = 'NULL' where raw_path = %s ''', (raw_path,))
-		if not os.path.isfile(npz_path.split(':')[1]):
-			cursor.execute('''UPDATE paperdata SET npz_path = 'NULL' where npz_path = %s ''', (npz_path,))
-		if not os.path.isdir(final_product_path.split(':')[1]):
-			cursor.execute('''UPDATE paperdata SET final_product_path = 'NULL' where final_product_path = %s ''', (final_product_path,))
 
-	cursor.execute('''DELETE FROM paperdata where raw_path = 'NULL' and path = 'NULL' ''')
+	path_dict = {0:'path',
+				1:'raw_path',
+				2:'npz_path',
+				3:'final_product_path'}
+				
+	for item in results:
+		for key, some_path in enumerate(item):				
+			if os.path.islink(some_path.split(':')[1]):
+			if not os.path.isdir(some_path.split(':')[1]):
+				cursor.execute('''UPDATE paperdata SET %s = 'NULL' where %s = '%s' ''', (path_dict[key], path_dict[key], some_path))
+
+
+	cursor.execute('''DELETE FROM paperdata where raw_path = 'NULL' and path = 'NULL' and final_product_path = 'NULL' ''')
 	# Close and save database
 	cursor.close()
 	connection.commit()
