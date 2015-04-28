@@ -288,7 +288,28 @@ def gen_data_from_paperdistiller(results, obsnums, dbnum, dbe):
 		comment = ''
 
 		#create list of important data and open csv file
-		databs = [compr_full_path,era,era_type,obsnum,md5,jday,jdate,polarization,length,raw_full_path,cal_path,npz_path,final_product_path,tape_index,compr_sz,raw_sz,compressed,edge,write_to_tape,delete_file,restore_history,comment]
+		databs = (compr_full_path,
+					era,
+					era_type,
+					obsnum,
+					md5,
+					jday,
+					jdate,
+					polarization,
+					length,
+					raw_full_path,
+					cal_path,
+					npz_path,
+					final_product_path,
+					tape_index,
+					compr_sz,
+					raw_sz,
+					compressed,
+					edge,
+					write_to_tape,
+					delete_file,
+					restore_history,
+					comment)
 		print databs 
 
 		#write to csv file by item in list
