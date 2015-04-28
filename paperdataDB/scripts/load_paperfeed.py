@@ -136,7 +136,9 @@ def gen_paperfeed(dirs, dbo, dbe):
 		moved = 0
 
 		#create list of important data and open csv file
-		databs = [raw_full_path, jday, moved]
+		databs = (raw_full_path,
+					jday,
+					moved)
 		print databs
 
 		#write to csv file

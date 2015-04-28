@@ -139,7 +139,11 @@ def gen_paperrename(dirs, dbo, dbe):
 		moved = 0
 
 		#create list of important data and open csv file
-		databs = [raw_full_path, jday, actual_num, expected_num, moved]
+		databs = (raw_full_path,
+					jday,
+					actual_num,
+					expected_num,
+					moved)
 		print databs
 
 		#write to csv file
