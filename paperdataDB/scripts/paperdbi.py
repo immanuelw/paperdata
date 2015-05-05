@@ -1,27 +1,26 @@
-from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float,func,DateTime,Enum,BigInteger,Numeric,Text
-from sqlalchemy.orm import relationship, backref,sessionmaker
+from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
+from sqlalchemy.orm import relationship, backref, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
-from sqlalchemy.pool import StaticPool,QueuePool
+from sqlalchemy.pool import StaticPool, QueuePool
 from ddr_compress.scheduler import FILE_PROCESSING_STAGES
-import aipy as a, os, numpy as n,sys,logging
+import aipy as a, os, numpy as n, sys, logging
 import configparser
 #Based on example here: http://www.pythoncentral.io/overview-sqlalchemys-expression-language-orm-queries/
 Base = declarative_base()
 logger = logging.getLogger('dbi')
 
-dbinfo = {'username':'obs',
-		  'password':'\x50\x39\x6c\x73\x34\x52\x2a\x40',
-		  'hostip':'qmaster',
+dbinfo = {'username':'immwa',
+		  'password':'\x69\x6d\x6d\x77\x61\x33\x39\x37\x38',
+		  'hostip':'shredder',
 		  'port':3306,
-		  'dbname':'test'}
-
+		  'dbname':'paperdata'}
 
 #########
 #
 #   Useful helper functions
 #
-#####
+#########
 def jdpol2obsnum(jd,pol,djd):
 	"""
 	input: julian date float, pol string. and length of obs in fraction of julian date
@@ -39,8 +38,9 @@ def updateobsnum(context):
 	used to calculate the obsnum on creation of the record
 	"""
 	return jdpol2obsnum(context.current_parameters['julian_date'],
-						context.current_parameters['pol'],
+						context.current_parameters['polarization'],
 						context.current_parameters['length'])
+
 def md5sum(fname):
 	"""
 	calculate the md5 checksum of a file whose filename entry is fname.
@@ -57,99 +57,50 @@ def md5sum(fname):
 		hasher.update(buf)
 		buf=afile.read(BLOCKSIZE)
 	return hasher.hexdigest()
+
 def gethostname():
 	from subprocess import Popen,PIPE
 	hn = Popen(['bash','-cl','hostname'], stdout=PIPE).communicate()[0].strip()
 	return hn
+
 #############
 #
 #   The basic definition of our database
 #
-########
+#############
 
 class Observation(Base):
 	__tablename__ = 'observation'
 	obsnum = Column(BigInteger, default=updateobsnum, primary_key=True)
 	julian_date = Column(Numeric(12,5))
 	polarization = Column(String(4))
+	julian_day = Column(Integer)
 	era = Column(Integer)
+	era_type = Column(String(20))
 	length = Column(Numeric(6,5)) #length of observation in fraction of a day
 	outputhost = Column(String(100))
 
 class File(Base):
 	__tablename__ = 'file'
 	filenum = Column(Integer, primary_key=True)
-	filename = Column(String(100))
 	host = Column(String(100))
+	filename = Column(String(100))
 	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
 	filesize = Column(Numeric(7,2))
 	md5sum = Column(Integer)
+	tape_index = Column(String(100))
 	prev_obs = Column(BigInteger, ForeignKey('observation.obsnum'))
 	next_obs = Column(BigInteger, ForeignKey('observation.obsnum'))
+	### maybe unnecessary fields
+	status = Column(String(20))
+	calibration_path = Column(String(100))
+	compressed = Column(Boolean)
+	edge = Column(Boolean)
+	write_to_tape = Column(Boolean)
+	delete_file = Column(Boolean)
 	#this next line creates an attribute Observation.files which is the list of all
 	#  files associated with this observation
 	observation = relationship(Observation, backref=backref('files', uselist=True))
-
-
-neighbors = Table("neighbors", Base.metadata,
-	Column("low_neighbor_id", BigInteger, ForeignKey("observation.obsnum"), primary_key=True),
-	Column("high_neighbor_id", BigInteger, ForeignKey("observation.obsnum"), primary_key=True)
-)
-
-class Observation(Base):
-	__tablename__ = 'observation'
-	julian_date = Column(Numeric(16,8))
-	pol = Column(String(4))
-	obsnum = Column(BigInteger,default=updateobsnum,primary_key=True)
-	status = Column(Enum(*FILE_PROCESSING_STAGES,name='FILE_PROCESSING_STAGES'))
-	#last_update = Column(DateTime,server_default=func.now(),onupdate=func.current_timestamp())
-	length = Column(Float) #length of observation in fraction of a day
-	currentpid = Column(Integer)
-	stillhost = Column(String(100))
-	stillpath = Column(String(100))
-	outputpath = Column(String(100))
-	outputhost = Column(String(100))
-	high_neighbors = relationship("Observation",
-						secondary=neighbors,
-						primaryjoin=obsnum==neighbors.c.low_neighbor_id,
-						secondaryjoin=obsnum==neighbors.c.high_neighbor_id,
-						backref="low_neighbors")
-
-class File(Base):
-	__tablename__ = 'file'
-	filenum = Column(Integer, primary_key=True)
-	filename = Column(String(100))
-	host = Column(String(100))
-	obsnum=Column(BigInteger,ForeignKey('observation.obsnum'))
-	#this next line creates an attribute Observation.files which is the list of all
-	#  files associated with this observation
-	observation = relationship(Observation,backref=backref('files',uselist=True))
-	md5sum = Column(Integer)
-
-class Log(Base):
-	__tablename__ = 'log'
-	lognum = Column(Integer,primary_key=True)
-	obsnum = Column(BigInteger,ForeignKey('observation.obsnum'))
-	stage = Column(Enum(*FILE_PROCESSING_STAGES,name='FILE_PROCESSING_STAGES'))
-	exit_status = Column(Integer)
-	timestamp = Column(DateTime,nullable=False,default=func.current_timestamp())
-	logtext = Column(Text)
-#note the Cal object/table is added here
-#to provide support for omnical.
-# the DataBaseInterface Class does not currently support Cal
-class Cal(Base):
-	__tablename__='cal'
-	calnum = Column(Integer,primary_key=True)
-	obsnum = Column(BigInteger,ForeignKey('observation.obsnum'))
-	last_activity = Column(DateTime,nullable=False,default=func.current_timestamp())
-	cal_date = Column(DateTime)
-	calfile = Column(Text)
-	output_dir = Column(Text)
-	input_file = Column(Text)
-	logtext = Column(Text)
-	observation = relationship(Observation,backref=backref('cals',uselist=True))
-
-
 
 class DataBaseInterface(object):
 	def __init__(self,configfile='~/.ddr_compress/still.cfg',test=False):
@@ -183,19 +134,7 @@ class DataBaseInterface(object):
 								pool_size=20,
 								max_overflow=40)
 		self.Session = sessionmaker(bind=self.engine)
-	def test_db(self):
-		tables = Base.metadata.tables.keys()
-		print "found %i tables"%len(tables)
-		s = self.Session()
-		count = s.query(Observation).count()
-		print "found %i records"%(count)
-		return (len(tables)==3)
-	def list_observations(self):
-		s = self.Session()
-		 #todo tests
-		obsnums = [obs.obsnum for obs in s.query(Observation).filter(Observation.status!='NEW')]
-		s.close()
-		return obsnums
+
 	def get_obs(self,obsnum):
 		"""
 		retrieves an observation object.
@@ -208,17 +147,6 @@ class DataBaseInterface(object):
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
 		s.close()
 		return OBS
-	def update_obs(self,OBS):
-		"""
-		Sends an observation object back to the db
-
-		todo:test
-		"""
-		s = self.Session()
-		s.add(OBS)
-		s.commit()
-		s.close()
-		return True
 
 	def createdb(self):
 		"""
@@ -227,67 +155,13 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		Base.metadata.create_all()
 
-	def add_log(self,obsnum,status,logtext,exit_status):
-		"""
-		add a log entry about an obsnum
-		"""
-		LOG = Log(obsnum=obsnum,stage=status,logtext=logtext,exit_status=exit_status)
-		s = self.Session()
-		s.add(LOG)
-		s.commit()
-		s.close()
-	def update_log(self,obsnum,status=None,logtext=None,exit_status=None,append=True):
-		"""
-		replace the contents of the most recent log
-		"""
-		s = self.Session()
-		if s.query(Log).filter(Log.obsnum==obsnum).count()==0:
-			s.close()
-			self.add_log(obsnum,status,logtext,exit_status)
-			return
-		LOG = s.query(Log).filter(Log.obsnum==obsnum).order_by(Log.timestamp.desc()).limit(1).one()
-		if not exit_status is None:
-			LOG.exit_status = exit_status
-		if not logtext is None:
-			if append:
-				LOG.logtext += logtext
-			else:
-				LOG.logtext = logtext
-		if not status is None: LOG.status = status
-		print "LOG.exit_status = ",LOG.exit_status
-		s.add(LOG)
-		s.commit()
-		s.close()
-		return None
-	def get_logs(self,obsnum,good_only=True):
-		"""
-		return
-		"""
-		s = self.Session()
-		if good_only:
-			LOGs = s.query(Log).filter(Log.obsnum==obsnum,Log.exit_status==0)
-		LOGs = s.query(Log).filter(Log.obsnum== obsnum)
-		logtext = '\n'.join([LOG.logtext for LOG in LOGs])
-		s.close()
-		return logtext #maybe this isn't the best format to be giving the logs
-	def get_terminal_obs(self,nfail=5):
-		"""
-		Get the obsids of things that have failed nfail times or more (and never completed).
-		select obsnum from (select obsnum as obsnum, count(obsnum) as cnt from log where exit_status!=0 group by obsnum) as myalias where cnt>5
-		"""
-		s = self.Session()
-		FAILED_LOG_COUNT_Q = s.query(Log.obsnum,func.count('*').label('cnt')).filter(Log.exit_status!=0).group_by(Log.obsnum).subquery()
-		FAILED_LOGS = s.query(FAILED_LOG_COUNT_Q).filter(FAILED_LOG_COUNT_Q.c.cnt>=nfail)
-		FAILED_OBSNUMS =  map(int,[FAILED_LOG.obsnum for FAILED_LOG in FAILED_LOGS])
-		s.close()
-		return FAILED_OBSNUMS
-	def add_observation(self,julian_date,pol,filename,host,length=10/60./24,status='UV_POT'):
+	def add_observation(self,julian_date,polarization,filename,host,length=10/60./24):
 		"""
 		create a new observation entry.
 		returns: obsnum  (see jdpol2obsnum)
 		Note: does not link up neighbors!
 		"""
-		OBS = Observation(julian_date=julian_date,pol=pol,status=status,length=length)
+		OBS = Observation(julian_date=julian_date,polarization=polarization,length=length)
 		s = self.Session()
 		s.add(OBS)
 		s.commit()
@@ -297,11 +171,11 @@ class DataBaseInterface(object):
 		sys.stdout.flush()
 		return obsnum
 
-	def add_file(self,obsnum,host,filename):
+	def add_file(self,obsnum,host,filename,filetype):
 		"""
 		Add a file to the database and associate it with an observation.
 		"""
-		FILE = File(filename=filename,host=host)
+		FILE = File(filename=filename,host=host,filetype=filetype)
 		#get the observation corresponding to this file
 		s = self.Session()
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
@@ -355,6 +229,7 @@ class DataBaseInterface(object):
 			s.commit()
 		s.close()
 		return neighbors.keys()
+
 	def get_neighbors(self,obsnum):
 		"""
 		get the neighbors given the input obsnum
@@ -373,48 +248,12 @@ class DataBaseInterface(object):
 		s.close()
 		return (low,high)
 
-
-	#todo this functions
-	def get_obs_still_host(self,obsnum):
-		"""
-		input: obsnum
-		output: host
-		"""
-
-		OBS = self.get_obs(obsnum)
-		return OBS.stillhost
-	def set_obs_still_host(self,obsnum,host):
-		"""
-		input: obsnum, still host
-		retuns: True for success, False for failure
-		"""
-		OBS = self.get_obs(obsnum)
-		OBS.stillhost=host
-		yay = self.update_obs(OBS)
-		return yay
-
-	def get_obs_still_path(self,obsnum):
-		"""
-		input: obsnum
-		returns: path to assigned scratch space on still
-		"""
-		OBS = self.get_obs(obsnum)
-		return OBS.stillpath
-	def set_obs_still_path(self,obsnum,path):
-		"""
-		input: obsnum, path to assigned scratch space on still
-		returns: True for success, False for failure
-		"""
-		OBS = self.get_obs(obsnum)
-		OBS.stillpath = path
-		yay = self.update_obs(OBS)
-		return yay
-	def get_obs_pid(self,obsnum):
+	def get_obs_path(self,obsnum):
 		"""
 		todo
 		"""
 		OBS = self.get_obs(obsnum)
-		return OBS.currentpid
+		return OBS.path
 
 	def set_obs_pid(self,obsnum,pid):
 		"""
@@ -424,6 +263,7 @@ class DataBaseInterface(object):
 		OBS.currentpid = pid
 		yay = self.update_obs(OBS)
 		return yay
+
 	def get_input_file(self,obsnum):
 		"""
 		input:observation number
@@ -441,6 +281,7 @@ class DataBaseInterface(object):
 		path = os.path.dirname(POTFILE.filename)
 		file = os.path.basename(POTFILE.filename)
 		return host,path,file
+
 	def get_output_location(self,obsnum):
 		"""
 		input: observation number
@@ -452,23 +293,3 @@ class DataBaseInterface(object):
 		host,path,inputfile = self.get_input_file(obsnum)
 		return host,path
 
-
-	def set_obs_status(self,obsnum,status):
-		"""
-		change the satus of obsnum to status
-		input: obsnum (key into the observation table, returned by add_observation and others)
-		"""
-		OBS = self.get_obs(obsnum)
-		OBS.status = status
-		self.update_obs(OBS)
-		return True
-
-
-
-	def get_obs_status(self,obsnum):
-		"""
-		retrieve the status of an observation
-		"""
-		OBS = self.get_obs(obsnum)
-		status = OBS.status
-		return status
