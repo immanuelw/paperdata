@@ -3,12 +3,12 @@ from sqlalchemy.orm import relationship, backref, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool, QueuePool
-from ddr_compress.scheduler import FILE_PROCESSING_STAGES
 import aipy as a, os, numpy as n, sys, logging
 import configparser
+import hashlib
 #Based on example here: http://www.pythoncentral.io/overview-sqlalchemys-expression-language-orm-queries/
 Base = declarative_base()
-logger = logging.getLogger('dbi')
+logger = logging.getLogger('paperdata_dbi')
 
 dbinfo = {'username':'immwa',
 		  'password':'\x69\x6d\x6d\x77\x61\x33\x39\x37\x38',
@@ -41,7 +41,7 @@ def updateobsnum(context):
 						context.current_parameters['polarization'],
 						context.current_parameters['length'])
 
-def md5sum(fname):
+def get_md5sum(fname):
 	"""
 	calculate the md5 checksum of a file whose filename entry is fname.
 	"""
@@ -135,7 +135,7 @@ class DataBaseInterface(object):
 								max_overflow=40)
 		self.Session = sessionmaker(bind=self.engine)
 
-	def get_obs(self,obsnum):
+	def get_obs(self, obsnum):
 		"""
 		retrieves an observation object.
 		Errors if there are more than one of the same obsnum in the db. This is bad and should
@@ -148,6 +148,19 @@ class DataBaseInterface(object):
 		s.close()
 		return OBS
 
+	def get_file(self, filenum):
+		"""
+		retrieves an file object.
+		Errors if there are more than one of the same file in the db. This is bad and should
+		never happen
+
+		todo:test
+		"""
+		s = self.Session()
+		OBS = s.query(File).filter(File.filenum==filenum).one()
+		s.close()
+		return FILE
+
 	def createdb(self):
 		"""
 		creates the tables in the database.
@@ -155,7 +168,7 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		Base.metadata.create_all()
 
-	def add_observation(self,julian_date,polarization,filename,host,length=10/60./24):
+	def add_observation(self,julian_date,polarization,filename,host,filetype,length=10/60./24):
 		"""
 		create a new observation entry.
 		returns: obsnum  (see jdpol2obsnum)
@@ -167,11 +180,11 @@ class DataBaseInterface(object):
 		s.commit()
 		obsnum = OBS.obsnum
 		s.close()
-		self.add_file(obsnum,host,filename)#todo test.
+		self.add_file(obsnum, host, filename, filetype)#todo test.
 		sys.stdout.flush()
 		return obsnum
 
-	def add_file(self,obsnum,host,filename,filetype):
+	def add_file(self, obsnum, host, filename, filetype):
 		"""
 		Add a file to the database and associate it with an observation.
 		"""
@@ -179,7 +192,7 @@ class DataBaseInterface(object):
 		#get the observation corresponding to this file
 		s = self.Session()
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
-		FILE.observation =OBS  #associate the file with an observation
+		FILE.observation = OBS  #associate the file with an observation
 		s.add(FILE)
 		s.commit()
 		filenum = FILE.filenum #we gotta grab this before we close the session.
@@ -248,20 +261,84 @@ class DataBaseInterface(object):
 		s.close()
 		return (low,high)
 
-	def get_obs_path(self,obsnum):
+	def get_file_path(self, filenum):
 		"""
 		todo
 		"""
-		OBS = self.get_obs(obsnum)
-		return OBS.path
+		FILE = self.get_file(filenum)
+		return FILE.path
 
-	def set_obs_pid(self,obsnum,pid):
+	def set_file_path(self, filenum, path):
 		"""
-		set to -1 if no task is running
+		todo
 		"""
-		OBS = self.get_obs(obsnum)
-		OBS.currentpid = pid
-		yay = self.update_obs(OBS)
+		FILE = self.get_file(filename)
+		FILE.path = path
+		yay = self.update_file(FILE)
+		return yay
+
+	def get_file_host(self, filenum):
+		"""
+		todo
+		"""
+		FILE = self.get_file(filenum)
+		return FILE.host
+
+	def set_file_host(self, filenum, host):
+		"""
+		todo
+		"""
+		FILE = self.get_file(filename)
+		FILE.host = host
+		yay = self.update_file(FILE)
+		return yay
+
+	def get_file_md5sum(self, filenum):
+		"""
+		todo
+		"""
+		FILE = self.get_file(filenum)
+		return FILE.md5sum
+
+	def set_file_md5sum(self, filenum, md5sum):
+		"""
+		todo
+		"""
+		FILE = self.get_file(filename)
+		FILE.md5sum = md5sum
+		yay = self.update_file(FILE)
+		return yay
+
+	def get_file_prev_obs(self, filenum):
+		"""
+		todo
+		"""
+		FILE = self.get_file(filenum)
+		return FILE.prev_obs
+
+	def set_file_prev_obs(self, filenum, prev_obs):
+		"""
+		todo
+		"""
+		FILE = self.get_file(filename)
+		FILE.prev_obs = prev_obs
+		yay = self.update_file(FILE)
+		return yay
+
+	def get_file_next_obs(self, filenum):
+		"""
+		todo
+		"""
+		FILE = self.get_file(filenum)
+		return FILE.next_obs
+
+	def set_file_next_obs(self, filenum, next_obs):
+		"""
+		todo
+		"""
+		FILE = self.get_file(filename)
+		FILE.next_obs = next_obs
+		yay = self.update_file(FILE)
 		return yay
 
 	def get_input_file(self,obsnum):
