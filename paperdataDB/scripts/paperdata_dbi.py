@@ -1,4 +1,5 @@
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
+from sqlalchemy import event, DDL, UniqueConstraint
 from sqlalchemy.orm import relationship, backref, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
@@ -78,22 +79,34 @@ class Observation(Base):
 	era = Column(Integer)
 	era_type = Column(String(20))
 	length = Column(Numeric(6,5)) #length of observation in fraction of a day
-	outputhost = Column(String(100))
 
 class File(Base):
 	__tablename__ = 'file'
 	filenum = Column(Integer, primary_key=True)
 	host = Column(String(100))
-	filename = Column(String(100))
+	path = Column(String(100)) #directory
+	filename = Column(String(100)) #zen.*.*.uv/uvcRRE/uvcRREzx...
+	filetype = Column(String(20)) #uv, uvcRRE, etc.
+	###
+	#UniqueConstraint('host', 'path', 'filename', name='full_path')
+	###
 	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
 	filesize = Column(Numeric(7,2))
 	md5sum = Column(Integer)
 	tape_index = Column(String(100))
+	###
+	#full_path = Column(String(200))
+	#use trigger!!!
+	###
+	time_start = Column(Numeric(12,5))
+	time_end = Column(Numeric(12,5))
+	delta_time = Column(Numeric(12,5))
 	prev_obs = Column(BigInteger, ForeignKey('observation.obsnum'))
 	next_obs = Column(BigInteger, ForeignKey('observation.obsnum'))
 	### maybe unnecessary fields
 	status = Column(String(20))
 	calibration_path = Column(String(100))
+	#history?
 	compressed = Column(Boolean)
 	edge = Column(Boolean)
 	write_to_tape = Column(Boolean)
@@ -148,7 +161,7 @@ class DataBaseInterface(object):
 		s.close()
 		return OBS
 
-	def get_file(self, filenum):
+	def get_file(self, filename):
 		"""
 		retrieves an file object.
 		Errors if there are more than one of the same file in the db. This is bad and should
@@ -157,7 +170,7 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
-		OBS = s.query(File).filter(File.filenum==filenum).one()
+		OBS = s.query(File).filter(File.filename==filename).one()
 		s.close()
 		return FILE
 
@@ -168,13 +181,13 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		Base.metadata.create_all()
 
-	def add_observation(self,julian_date,polarization,filename,host,filetype,length=10/60./24):
+	def add_observation(self, julian_date, polarization, host, path, filename, filetype, length=10/60./24):
 		"""
 		create a new observation entry.
 		returns: obsnum  (see jdpol2obsnum)
 		Note: does not link up neighbors!
 		"""
-		OBS = Observation(julian_date=julian_date,polarization=polarization,length=length)
+		OBS = Observation(julian_date=julian_date, polarization=polarization, length=length)
 		s = self.Session()
 		s.add(OBS)
 		s.commit()
@@ -184,11 +197,11 @@ class DataBaseInterface(object):
 		sys.stdout.flush()
 		return obsnum
 
-	def add_file(self, obsnum, host, filename, filetype):
+	def add_file(self, obsnum, host, path, filename, filetype):
 		"""
 		Add a file to the database and associate it with an observation.
 		"""
-		FILE = File(filename=filename,host=host,filetype=filetype)
+		FILE = File(filename=filename,host=host,path=path,filetype=filetype)
 		#get the observation corresponding to this file
 		s = self.Session()
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
@@ -199,7 +212,7 @@ class DataBaseInterface(object):
 		s.close() #close the session
 		return filenum
 
-	def add_observations(self,obslist,status='UV_POT'):
+	def add_observations(self, obslist, status='UV_POT'):
 		"""
 		Add a whole set of observations.
 		Handles linking neighboring observations.
@@ -243,7 +256,7 @@ class DataBaseInterface(object):
 		s.close()
 		return neighbors.keys()
 
-	def get_neighbors(self,obsnum):
+	def get_neighbors(self, obsnum):
 		"""
 		get the neighbors given the input obsnum
 		input: obsnum
@@ -261,14 +274,14 @@ class DataBaseInterface(object):
 		s.close()
 		return (low,high)
 
-	def get_file_path(self, filenum):
+	def get_file_path(self, filename):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filenum)
+		FILE = self.get_file(filename)
 		return FILE.path
 
-	def set_file_path(self, filenum, path):
+	def set_file_path(self, filename, path):
 		"""
 		todo
 		"""
@@ -277,14 +290,14 @@ class DataBaseInterface(object):
 		yay = self.update_file(FILE)
 		return yay
 
-	def get_file_host(self, filenum):
+	def get_file_host(self, filename):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filenum)
+		FILE = self.get_file(filename)
 		return FILE.host
 
-	def set_file_host(self, filenum, host):
+	def set_file_host(self, filename, host):
 		"""
 		todo
 		"""
@@ -293,14 +306,14 @@ class DataBaseInterface(object):
 		yay = self.update_file(FILE)
 		return yay
 
-	def get_file_md5sum(self, filenum):
+	def get_file_md5sum(self, filename):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filenum)
+		FILE = self.get_file(filename)
 		return FILE.md5sum
 
-	def set_file_md5sum(self, filenum, md5sum):
+	def set_file_md5sum(self, filename, md5sum):
 		"""
 		todo
 		"""
@@ -309,14 +322,14 @@ class DataBaseInterface(object):
 		yay = self.update_file(FILE)
 		return yay
 
-	def get_file_prev_obs(self, filenum):
+	def get_file_prev_obs(self, filename):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filenum)
+		FILE = self.get_file(filename)
 		return FILE.prev_obs
 
-	def set_file_prev_obs(self, filenum, prev_obs):
+	def set_file_prev_obs(self, filename, prev_obs):
 		"""
 		todo
 		"""
@@ -325,14 +338,14 @@ class DataBaseInterface(object):
 		yay = self.update_file(FILE)
 		return yay
 
-	def get_file_next_obs(self, filenum):
+	def get_file_next_obs(self, filename):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filenum)
+		FILE = self.get_file(filename)
 		return FILE.next_obs
 
-	def set_file_next_obs(self, filenum, next_obs):
+	def set_file_next_obs(self, filename, next_obs):
 		"""
 		todo
 		"""
