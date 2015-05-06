@@ -116,7 +116,6 @@ def get_next_obs(obsnum):
 def calc_times(host, path, filename):
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
-	print full_path
 	times =  ('NULL', 'NULL', 'NULL')
 	if named_host == host:
 		#allows uv access
@@ -224,7 +223,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 
 		if dbnum == dbnum2:
 			#host, path, filename, filetype, obsnum, filesize, md5sum, tape_index
-			cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/', -1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/z', 1), SUBSTRING_INDEX(raw_path, '.', -1), obsnum, raw_file_size_MB, md5sum, tape_index FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
+			cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/', -1), md5sum, tape_index FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
 			#need time_start, time_end, delta_time, prev_obs, next_obs functions
@@ -250,7 +249,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 
 		elif dbnum == dbnum3:
 			#host, path, filename, filetype, obsnum, filesize
-			cursor.execute('''SELECT SUBSTRING_INDEX(path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/', -1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/z', 1), SUBSTRING_INDEX(path, '.', -1), obsnum, compr_file_size_MB FROM paperdata where path != 'NULL' group by path order by julian_date asc, polarization asc''')
+			cursor.execute('''SELECT SUBSTRING_INDEX(path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/', -1), SUBSTRING_INDEX(path, '.', -1), obsnum, compr_file_size_MB FROM paperdata where path != 'NULL' group by path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
 			#need md5sum, tape_index, time_start, time_end, delta_time, prev_obs, next_obs functions
@@ -276,7 +275,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 
 		elif dbnum == dbnum4:
 			#host, npz_path, filename, filetype, obsnum
-			cursor.execute('''SELECT SUBSTRING_INDEX(npz_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(npz_path, ':', -1), '/', -1), SUBSTRING_INDEX(SUBSTRING_INDEX(npz_path, ':', -1), '/z', 1), SUBSTRING_INDEX(npz_path, '.', -1), obsnum FROM paperdata where npz_path != 'NULL' group by npz_path order by julian_date asc, polarization asc''')
+			cursor.execute('''SELECT SUBSTRING_INDEX(npz_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(npz_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(npz_path, ':', -1), '/', -1), SUBSTRING_INDEX(npz_path, '.', -1), obsnum FROM paperdata where npz_path != 'NULL' group by npz_path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
 			#need filesize, md5sum, tape_index, time_start, time_end, delta_time, prev_obs, next_obs functions
@@ -302,7 +301,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 
 		elif dbnum == dbnum5:
 			#host, final_product_path, filename, filetype, obsnum
-			cursor.execute('''SELECT SUBSTRING_INDEX(final_product_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(final_product_path, ':', -1), '/', -1), SUBSTRING_INDEX(SUBSTRING_INDEX(final_product_path, ':', -1), '/z', 1), SUBSTRING_INDEX(final_product_path, '.', -1), obsnum FROM paperdata where final_product_path != 'NULL' group by final_product_path order by julian_date asc, polarization asc''')
+			cursor.execute('''SELECT SUBSTRING_INDEX(final_product_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(final_product_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(final_product_path, ':', -1), '/', -1), SUBSTRING_INDEX(final_product_path, '.', -1), obsnum FROM paperdata where final_product_path != 'NULL' group by final_product_path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
 			#need filesize, md5sum, tape_index, time_start, time_end, delta_time, prev_obs, next_obs functions
