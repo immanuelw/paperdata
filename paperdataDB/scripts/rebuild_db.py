@@ -116,6 +116,7 @@ def get_next_obs(obsnum):
 def calc_times(host, path, filename):
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
+	print full_path
 	times =  ('NULL', 'NULL', 'NULL')
 	if named_host == host:
 		#allows uv access
