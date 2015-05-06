@@ -84,7 +84,7 @@ def get_prev_obs(obsnum):
 	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
 	cursor = connection.cursor()
 
-	cursor.execute('''SELECT obsnum FROM paperdata where obsnum = {0} group by obsnum order by obsnum asc limit 1'''.format(int(obsnum) - 1)
+	cursor.execute('''SELECT obsnum FROM paperdata where obsnum = {0} group by obsnum order by obsnum asc limit 1'''.format(int(obsnum) - 1))
 	results = cursor.fetchall()
 	cursor.close()
 	connection.close()
@@ -100,7 +100,7 @@ def get_next_obs(obsnum):
 	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
 	cursor = connection.cursor()
 
-	cursor.execute('''SELECT obsnum FROM paperdata where obsnum = {0} group by obsnum order by obsnum asc limit 1'''.format(int(obsnum) + 1)
+	cursor.execute('''SELECT obsnum FROM paperdata where obsnum = {0} group by obsnum order by obsnum asc limit 1'''.format(int(obsnum) + 1))
 	results = cursor.fetchall()
 	cursor.close()
 	connection.close()
