@@ -13,6 +13,7 @@ import aipy as A
 import hashlib
 import glob
 import socket
+import os
 
 ### Script to rebuild paperdata database
 ### Finds time and date and writes table into .psv file
