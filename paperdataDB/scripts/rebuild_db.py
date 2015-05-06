@@ -60,6 +60,8 @@ def md5sum(fname):
 def calc_size(host, path, filename):
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
+	#DEFAULT VALUE
+	size = 0
 	if named_host == host:
 		size = round(float(sizeof_fmt(get_size(full_path))), 1)
 	#else:
@@ -72,6 +74,8 @@ def calc_size(host, path, filename):
 def calc_md5sum(host, path, filename):
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
+	#DEFAULT VALUE
+	md5 = 'NULL'
 	if named_host == host:
 		md5 = md5sum(full_path)
 	#else:
