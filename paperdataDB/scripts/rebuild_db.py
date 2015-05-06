@@ -9,12 +9,127 @@ import getpass
 import time
 import csv
 import subprocess
+import aipy as A
+import hashlib
+import glob
+import socket
 
 ### Script to rebuild paperdata database
 ### Finds time and date and writes table into .psv file
 
 ### Author: Immanuel Washington
 ### Date: 05-06-15
+
+#Functions which simply find the file size
+def get_size(start_path):
+	total_size = 0
+	for dirpath, dirnames, filenames in os.walk(start_path):
+		for f in filenames:
+			fp = os.path.join(dirpath, f)
+			total_size += os.path.getsize(fp)
+	return total_size
+
+def sizeof_fmt(num):
+	for x in ['bytes','KB','MB']:
+		if num < 1024.0:
+			return "%3.1f" % (num)
+		num /= 1024.0
+	num *= 1024.0
+	return "%3.1f" % (num)
+
+### other functions
+
+def md5sum(fname):
+	"""
+	calculate the md5 checksum of a file whose filename entry is fname.
+	"""
+	fname = fname.split(':')[-1]
+	BLOCKSIZE = 65536
+	hasher = hashlib.md5()
+	try:
+		afile = open(fname, 'rb')
+	except(IOError):
+		afile = open("%s/visdata"%fname, 'rb')
+	buf = afile.read(BLOCKSIZE)
+	while len(buf) >0:
+		hasher.update(buf)
+		buf = afile.read(BLOCKSIZE)
+	return hasher.hexdigest()
+
+def calc_size(host, path, filename):
+	named_host = socket.gethostname()
+	full_path = os.path.join(path, filename)
+	if named_host == host:
+		size = round(float(sizeof_fmt(get_size(full_path))), 1)
+	#else:
+		##SSH INTO CORRECT HOST -- PARAMIKO??
+			#size = round(float(sizeof_fmt(get_size(full_path))), 1)
+		###EXIT??
+
+	return size
+
+def calc_md5sum(host, path, filename):
+	named_host = socket.gethostname()
+	full_path = os.path.join(path, filename)
+	if named_host == host:
+		md5 = md5sum(full_path)
+	#else:
+		##SSH INTO CORRECT HOST -- PARAMIKO??
+			#size = md5sum(full_path)
+		###EXIT??
+
+	return md5
+
+def get_prev_obs(obsnum):
+	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
+
+	cursor.execute('''SELECT obsnum FROM paperdata where obsnum = {0} group by obsnum order by obsnum asc limit 1'''.format(int(obsnum) - 1)
+	results = cursor.fetchall()
+	cursor.close()
+	connection.close()
+
+	if len(results) == 0:
+		prev_obs = 'NULL' #XXXX --- should it be 0 or maybe empty?
+	else:
+		prev_obs = int(results[0][0])
+	return prev_obs
+
+def get_next_obs(obsnum):
+	connection = MySQLdb.connect (host = 'shredder', user = 'paperboy', passwd = 'paperboy', db = 'paperdata', local_infile=True)
+	cursor = connection.cursor()
+
+	cursor.execute('''SELECT obsnum FROM paperdata where obsnum = {0} group by obsnum order by obsnum asc limit 1'''.format(int(obsnum) + 1)
+	results = cursor.fetchall()
+	cursor.close()
+	connection.close()
+
+	if len(results) == 0:
+		next_obs = 'NULL' #XXXX --- should it be 0 or maybe empty?
+	else:
+		next_obs = int(results[0][0])
+	return next_obs
+
+def idk(host, path, filename):
+	named_host = socket.gethostname()
+	full_path = os.path.join(path, filename)
+	if named_host == host:
+		#do stuff
+	#else:
+		##SSH INTO CORRECT HOST -- PARAMIKO??
+			#also do stuff
+		###EXIT??
+
+	#allows uv access
+	try:
+		uv = A.miriad.UV(path)
+	except:
+		item = [path,'Cannot access .uv file']
+		ewr.writerow(item)
+		error_file.close()
+		continue	
+
+### Backup Functions
 
 def backup_observations(dbnum, time_date):
 	print dbnum

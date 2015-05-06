@@ -104,10 +104,8 @@ class File(Base):
 	prev_obs = Column(BigInteger, ForeignKey('observation.obsnum'))
 	next_obs = Column(BigInteger, ForeignKey('observation.obsnum'))
 	### maybe unnecessary fields
-	status = Column(String(20))
 	calibration_path = Column(String(100))
 	#history?
-	compressed = Column(Boolean)
 	edge = Column(Boolean)
 	write_to_tape = Column(Boolean)
 	delete_file = Column(Boolean)
@@ -173,6 +171,17 @@ class DataBaseInterface(object):
 		OBS = s.query(File).filter(File.filename==filename).one()
 		s.close()
 		return FILE
+
+	def update_file(self, FILE):
+		"""
+		updates file object field
+		***NEED TO TEST
+		"""
+		s = self.Session()
+		s.add(FILE)
+		s.commit()
+		s.close()
+		return True
 
 	def createdb(self):
 		"""
@@ -353,33 +362,3 @@ class DataBaseInterface(object):
 		FILE.next_obs = next_obs
 		yay = self.update_file(FILE)
 		return yay
-
-	def get_input_file(self,obsnum):
-		"""
-		input:observation number
-		return: host,path (the host and path of the initial data set on the pot)
-
-		todo:test
-		"""
-		s = self.Session()
-		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
-		POTFILE = s.query(File).filter(
-			File.observation==OBS,
-			#File.host.like('%pot%'), # XXX temporarily commenting this out.  need a better solution for finding original file
-			File.filename.like('%uv')).one()
-		host = POTFILE.host
-		path = os.path.dirname(POTFILE.filename)
-		file = os.path.basename(POTFILE.filename)
-		return host,path,file
-
-	def get_output_location(self,obsnum):
-		"""
-		input: observation number
-		return: host,path
-		TODO: test
-		"""
-		#right now we're pointing the output at the input location (nominally whatever pot
-		#	the data came from
-		host,path,inputfile = self.get_input_file(obsnum)
-		return host,path
-
