@@ -26,15 +26,19 @@ def dupe_check(input_host, input_paths):
 	dbi = paperdata_dbi.DataBaseInterface()
 	s = dbi.Session()
 	FILEs = s.query(dbi.File).all()
-	filenames = tuple(FILE.host, FILE.path, FILE.filename for FILE in FILEs)
 	s.close()
+	#all files on same host
+	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs if FILE.host == input_host)
 
-	for some_file in filenames:
-		if some_file[0] == input_host:
-			if os.path.join(*some_path[1:]) not in input_paths:
-				return False 
+	#for each input file, check if in filenames
+	duplicates = tuple(input_path for input_path in input_paths if input_path in filenames)
+		
+	if len(duplicates) > 0:
+		return False
 
 	return True
+
+swd
 
 if __name__ == '__main__':
 	input_host = raw_input('Source directory host: ')
