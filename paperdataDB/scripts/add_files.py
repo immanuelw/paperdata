@@ -38,8 +38,6 @@ def dupe_check(input_host, input_paths):
 
 	return True
 
-swd
-
 if __name__ == '__main__':
 	input_host = raw_input('Source directory host: ')
 	input_paths = glob.glob(raw_input('Source directory path: '))
