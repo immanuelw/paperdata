@@ -57,6 +57,18 @@ def sizeof_fmt(num):
 
 ### other functions
 
+#create function to uniquely identify files
+def jdpol2obsnum(jd,pol,djd):
+	"""
+	input: julian date float, pol string. and length of obs in fraction of julian date
+	output: a unique index
+	"""
+	dublinjd = jd - 2415020  #use Dublin Julian Date
+	obsint = int(dublinjd/djd)  #divide up by length of obs
+	polnum = A.miriad.str2pol[pol]+10
+	assert(obsint < 2**31)
+	return int(obsint + polnum*(2**32))
+
 def md5sum(fname):
 	"""
 	calculate the md5 checksum of a file whose filename entry is fname.
@@ -106,107 +118,116 @@ def calc_md5sum(host, path, filename):
 		sftp.close()
 		ssh.close()
 
-def calc_uv_data(host, path, filename):
-	named_host = socket.gethostname()
-	full_path = os.path.join(path, filename)
-	times =  ('NULL', 'NULL', 'NULL')
+def calc_obs_data(host, full_path):
 	#Dictionary of polarizations
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
 
+	#allows uv access
+	try:
+		uv = A.miriad.UV(full_path)
+	except:
+		return None
+
+	#indicates julian date
+	julian_date = round(uv['time'], 5)
+
+	#indicates julian day and set of data
+	if julian_date < 2456100:
+		era = 32
+	elif julian_date < 2456400:
+		era = 64
+	else:
+		era = 128
+
+	julian_day = int(str(julian_date)[3:7])
+
+	#indicates type of file in era
+	era_type = 'NULL'
+
+	#assign letters to each polarization
+	if uv['npol'] == 1:
+		polarization = pol_dict[uv['pol']]
+	elif uv['npol'] == 4:
+	#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
+		polarization = 'yy'
+
+	time_start = 0
+	time_end = 0
+	n_times = 0
+	c_time = 0
+
+	try:
+		for (uvw, t, (i,j)),d in uv.all():
+			if time_start == 0 or t < time_start:
+				time_start = t
+			if time_end == 0 or t > time_end:
+				time_end = t
+			if c_time != t:
+				c_time = t
+				n_times += 1
+	except:
+		return None
+
+	if n_times > 1:
+		delta_time = -(time_start - time_end)/(n_times - 1)
+	else:
+		delta_time = -(time_start - time_end)/(n_times)
+
+	length = round(n_times * delta_time, 5)
+
+	#gives each file unique id
+	if length > 0:
+		obsnum = jdpol2obsnum(julian_date, polarization, length)
+	else:
+		obsnum = 0
+
+	#location of calibrate files
+	if era == 32:
+		cal_path = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
+	elif era == 64:
+		cal_path = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
+	elif era == 128:
+		cal_path = 'NULL'
+
+	#unknown prev/next observation
+	#XXXX Fix to check for prev/next observation
+	prev_obs = 'NULL'
+	next_obs = 'NULL'
+	edge = 0
+
+	#mostly file data
+	host = host
+	path = os.path.dirname(full_path)
+	filename = os.path.basename(full_path)
+	filetype = filename.split('.')[-1]
+
+	filesize = calc_size(host, path, filename)
+	md5 = calc_md5sum(host, path, filename)
+	tape_index = 'NULL'
+
+	write_to_tape = 0
+	delete_file = 0
+
+	obs_data = (obsnum, julian_date, polarization, julian_day, era, era_type, length)
+	file_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, time_start, time_end, delta_time,
+					prev_obs, next_obs, edge, write_to_tape, delete_file) #cal_path?? XXXX
+
+	return obs, file_data
+
+def calc_uv_data(host, path, filename):
+	named_host = socket.gethostname()
+	full_path = os.path.join(path, filename)
+
 	if named_host == host:
-		#allows uv access
-		try:
-			uv = A.miriad.UV(full_path)
-		except:
-			return times
-
-		#indicates julian date
-		jdate = round(uv['time'], 5)
-
-		#indicates julian day and set of data
-		if jdate < 2456100:
-			era = 32
-		elif jdate < 2456400:
-			era = 64
-		else:
-			era = 128
-
-		jday = int(str(jdate)[3:7])
-
-		#indicates type of file in era
-		era_type = 'NULL'
-
-		#assign letters to each polarization
-		if uv['npol'] == 1:
-			polarization = pol_dict[uv['pol']]
-		elif uv['npol'] == 4:
-		#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
-			polarization = 'yy'
-
-		time_start = 0
-		time_end = 0
-		n_times = 0
-		c_time = 0
-
-		try:
-			for (uvw, t, (i,j)),d in uv.all():
-				if time_start == 0 or t < time_start:
-					time_start = t
-				if time_end == 0 or t > time_end:
-					time_end = t
-				if c_time != t:
-					c_time = t
-					n_times += 1
-		except:
-			return times
-
-		if n_times > 1:
-			delta_time = -(time_start - time_end)/(n_times - 1)
-		else:
-			delta_time = -(time_start - time_end)/(n_times)
-
-		times = (time_start, time_end, delta_time)
-
-		length = round(n_times * delta_time, 5)
+		obs_data, file_data = calc_obs_data(host, full_path)
 	else:
 		ssh = login_ssh(host)
 		sftp = ssh.open_sftp()
 		#allows uv access
 		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??
 		remote_path = sftp.file(full_path, mode='r')
-		try:
-			uv = A.miriad.UV(remote_path)
-		except:
-			return times
-
-		time_start = 0
-		time_end = 0
-		n_times = 0
-		c_time = 0
-
-		try:
-			for (uvw, t, (i,j)),d in uv.all():
-				if time_start == 0 or t < time_start:
-				time_start = t
-				if time_end == 0 or t > time_end:
-				time_end = t
-				if c_time != t:
-				c_time = t
-				n_times += 1
-		except:
-			return times
-
-		if n_times > 1:
-			delta_time = -(time_start - time_end)/(n_times - 1)
-		else:
-			delta_time = -(time_start - time_end)/(n_times)
-
-		times = (time_start, time_end, delta_time)
-
-		sftp.close()
-		ssh.close()
-
-	return times
+		obs_data, file_data = calc_obs_data(host, remote_path)
+	return obs
 
 def dupe_check(input_host, input_paths):
 	dbi = paperdata_dbi.DataBaseInterface()
