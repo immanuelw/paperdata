@@ -183,12 +183,19 @@ class DataBaseInterface(object):
 		s.close()
 		return True
 
-	def createdb(self):
+	def create_db(self):
 		"""
 		creates the tables in the database.
 		"""
 		Base.metadata.bind = self.engine
 		Base.metadata.create_all()
+
+	def drop_db(self):
+		"""
+		drops the tables in the database.
+		"""
+		Base.metadata.bind = self.engine
+		Base.metadata.drop_all()
 
 	def add_observation(self, julian_date, polarization, host, path, filename, filetype, length=10/60./24):
 		"""
