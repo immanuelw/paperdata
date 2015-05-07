@@ -14,12 +14,29 @@ import hashlib
 import glob
 import socket
 import os
+import paramiko
 
 ### Script to rebuild paperdata database
 ### Finds time and date and writes table into .psv file
 
 ### Author: Immanuel Washington
 ### Date: 05-06-15
+
+#SSH/SFTP Function
+#Need private key so don't need username/password
+def login_ssh(host, username=None, password=None):
+	ssh = paramiko.SSHClient()
+	ssh.load_system_host_keys()
+	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+	try:
+		ssh.connect(host)
+	except:
+		try:
+			ssh.connect(host, username=username, password=password)
+		except:
+			return None
+
+	return ssh
 
 #Functions which simply find the file size
 def get_size(start_path):
@@ -64,10 +81,13 @@ def calc_size(host, path, filename):
 	size = 0
 	if named_host == host:
 		size = round(float(sizeof_fmt(get_size(full_path))), 1)
-	#else:
-		##SSH INTO CORRECT HOST -- PARAMIKO??
-			#size = round(float(sizeof_fmt(get_size(full_path))), 1)
-		###EXIT??
+	else:
+		ssh = login_ssh(host)
+		sftp = ssh.open_sftp()
+		size_bytes = sftp.stat(full_path).st_size
+		size = round(float(sizeof_fmt(size_bytes)), 1)
+		sftp.close()
+		ssh.close()
 
 	return size
 
@@ -78,10 +98,13 @@ def calc_md5sum(host, path, filename):
 	md5 = 'NULL'
 	if named_host == host:
 		md5 = md5sum(full_path)
-	#else:
-		##SSH INTO CORRECT HOST -- PARAMIKO??
-			#size = md5sum(full_path)
-		###EXIT??
+	else:
+		ssh = login_ssh(host)
+		sftp = ssh.open_sftp()
+		remote_path = sftp.file(full_path, mode='r')
+		md5 = remote_path.check('md5', block_size=65536)
+		sftp.close()
+		ssh.close()
 
 	return md5
 
@@ -123,8 +146,10 @@ def calc_times(host, path, filename):
 	times =  ('NULL', 'NULL', 'NULL')
 	if named_host == host:
 		#allows uv access
+		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??
+		remote_path = sftp.file(full_path, mode='r')
 		try:
-			uv = A.miriad.UV(full_path)
+			uv = A.miriad.UV(remote_path)
 		except:
 			return times
 
@@ -151,39 +176,41 @@ def calc_times(host, path, filename):
 			delta_time = -(time_start - time_end)/(n_times)
 
 		times = (time_start, time_end, delta_time)
-	#else:
-		##SSH INTO CORRECT HOST -- PARAMIKO??
-			#allows uv access
-			#try:
-			#	uv = A.miriad.UV(full_path)
-			#except:
-			#	return times
+	else:
+		ssh = login_ssh(host)
+		sftp = ssh.open_sftp()
+		#allows uv access
+		try:
+			uv = A.miriad.UV(full_path)
+		except:
+			return times
 
-			#time_start = 0
-			#time_end = 0
-			#n_times = 0
-			#c_time = 0
+		time_start = 0
+		time_end = 0
+		n_times = 0
+		c_time = 0
 
-			#try:
-			#	for (uvw, t, (i,j)),d in uv.all():
-			#		if time_start == 0 or t < time_start:
-			#			#time_start = t
-			#		if time_end == 0 or t > time_end:
-			#			#time_end = t
-			#		if c_time != t:
-			#			#c_time = t
-			#			#n_times += 1
-			#except:
-			#	return times
+		try:
+			for (uvw, t, (i,j)),d in uv.all():
+				if time_start == 0 or t < time_start:
+				time_start = t
+				if time_end == 0 or t > time_end:
+				time_end = t
+				if c_time != t:
+				c_time = t
+				n_times += 1
+		except:
+			return times
 
-			#if n_times > 1:
-			#	delta_time = -(time_start - time_end)/(n_times - 1)
-			#else:
-			#	delta_time = -(time_start - time_end)/(n_times)
+		if n_times > 1:
+			delta_time = -(time_start - time_end)/(n_times - 1)
+		else:
+			delta_time = -(time_start - time_end)/(n_times)
 
-			#times = (time_start, time_end, delta_time)
-	
-		###EXIT??
+		times = (time_start, time_end, delta_time)
+
+		sftp.close()
+		ssh.close()
 
 	return times
 
@@ -245,7 +272,6 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			#edge, write_to_tape, delete_file
 			cursor.execute('''SELECT edge, write_to_tape, delete_file FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
 			res3 = cursor.fetchall()
-			#XXXX zip time_start tuple as well zip(res1, res2, res3)
 			resu = zip(res1, res2, res3)
 			for item in resu:
 				if len(item) >= 2 and type(item[0]) is tuple:
@@ -271,7 +297,6 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			#edge, write_to_tape, delete_file
 			cursor.execute('''SELECT edge, write_to_tape, delete_file FROM paperdata where path != 'NULL' group by path order by julian_date asc, polarization asc''')
 			res3 = cursor.fetchall()
-			#XXXX zip time_start tuple as well zip(res1, res2, res3)
 			resu = zip(res1, res2, res3)
 			for item in resu:
 				if len(item) >= 2 and type(item[0]) is tuple:
@@ -297,7 +322,6 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			#edge, write_to_tape, delete_file
 			cursor.execute('''SELECT edge, write_to_tape, delete_file FROM paperdata where npz_path != 'NULL' group by npz_path order by julian_date asc, polarization asc''')
 			res3 = cursor.fetchall()
-			#XXXX zip time_start tuple as well zip(res1, res2, res3)
 			resu = zip(res1, res2, res3)
 			for item in resu:
 				if len(item) >= 2 and type(item[0]) is tuple:
@@ -323,7 +347,6 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			#edge, write_to_tape, delete_file
 			cursor.execute('''SELECT edge, write_to_tape, delete_file FROM paperdata where final_product_path != 'NULL' group by final_product_path order by julian_date asc, polarization asc''')
 			res3 = cursor.fetchall()
-			#XXXX zip time_start tuple as well zip(res1, res2, res3)
 			resu = zip(res1, res2, res3)
 			for item in resu:
 				if len(item) >= 2 and type(item[0]) is tuple:
