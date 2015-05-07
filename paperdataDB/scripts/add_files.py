@@ -106,18 +106,42 @@ def calc_md5sum(host, path, filename):
 		sftp.close()
 		ssh.close()
 
-def calc_times(host, path, filename):
+def calc_uv_data(host, path, filename):
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
 	times =  ('NULL', 'NULL', 'NULL')
+	#Dictionary of polarizations
+	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
+
 	if named_host == host:
 		#allows uv access
-		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??
-		remote_path = sftp.file(full_path, mode='r')
 		try:
-			uv = A.miriad.UV(remote_path)
+			uv = A.miriad.UV(full_path)
 		except:
 			return times
+
+		#indicates julian date
+		jdate = round(uv['time'], 5)
+
+		#indicates julian day and set of data
+		if jdate < 2456100:
+			era = 32
+		elif jdate < 2456400:
+			era = 64
+		else:
+			era = 128
+
+		jday = int(str(jdate)[3:7])
+
+		#indicates type of file in era
+		era_type = 'NULL'
+
+		#assign letters to each polarization
+		if uv['npol'] == 1:
+			polarization = pol_dict[uv['pol']]
+		elif uv['npol'] == 4:
+		#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
+			polarization = 'yy'
 
 		time_start = 0
 		time_end = 0
@@ -142,12 +166,16 @@ def calc_times(host, path, filename):
 			delta_time = -(time_start - time_end)/(n_times)
 
 		times = (time_start, time_end, delta_time)
+
+		length = round(n_times * delta_time, 5)
 	else:
 		ssh = login_ssh(host)
 		sftp = ssh.open_sftp()
 		#allows uv access
+		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??
+		remote_path = sftp.file(full_path, mode='r')
 		try:
-			uv = A.miriad.UV(full_path)
+			uv = A.miriad.UV(remote_path)
 		except:
 			return times
 
