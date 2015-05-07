@@ -146,10 +146,8 @@ def calc_times(host, path, filename):
 	times =  ('NULL', 'NULL', 'NULL')
 	if named_host == host:
 		#allows uv access
-		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??
-		remote_path = sftp.file(full_path, mode='r')
 		try:
-			uv = A.miriad.UV(remote_path)
+			uv = A.miriad.UV(full_path)
 		except:
 			return times
 
@@ -180,8 +178,10 @@ def calc_times(host, path, filename):
 		ssh = login_ssh(host)
 		sftp = ssh.open_sftp()
 		#allows uv access
+		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??
+		remote_path = sftp.file(full_path, mode='r')
 		try:
-			uv = A.miriad.UV(full_path)
+			uv = A.miriad.UV(remote_path)
 		except:
 			return times
 
