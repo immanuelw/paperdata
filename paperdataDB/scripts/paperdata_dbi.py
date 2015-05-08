@@ -87,6 +87,7 @@ class File(Base):
 	path = Column(String(100)) #directory
 	filename = Column(String(100)) #zen.*.*.uv/uvcRRE/uvcRREzx...
 	filetype = Column(String(20)) #uv, uvcRRE, etc.
+	full_path = Column(String(200), unique=True)
 	###
 	#UniqueConstraint('host', 'path', 'filename', name='full_path')
 	###
@@ -94,9 +95,6 @@ class File(Base):
 	filesize = Column(Numeric(7,2))
 	md5sum = Column(Integer)
 	tape_index = Column(String(100))
-	###
-	#full_path = Column(String(200))
-	#use trigger!!!
 	###
 	time_start = Column(Numeric(12,5))
 	time_end = Column(Numeric(12,5))
@@ -137,7 +135,7 @@ class DataBaseInterface(object):
 			self.engine = create_engine('sqlite:///',
 										connect_args={'check_same_thread':False},
 										poolclass=StaticPool)
-			self.createdb()
+			self.create_db()
 		else:
 			self.engine = create_engine(
 					'mysql://{username}:{password}@{hostip}:{port}/{dbname}'.format(
@@ -188,6 +186,12 @@ class DataBaseInterface(object):
 		creates the tables in the database.
 		"""
 		Base.metadata.bind = self.engine
+		table = File.__table__
+		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_tigger
+										after INSERT or UPDATE on File
+										FOR EACH ROW
+										SET NEW.full_path = concat(NEW.host, ':', NEW.path, '/', NEW.filename)''')
+		event.listen(table, 'after_create', insert_update_trigger)
 		Base.metadata.create_all()
 
 	def drop_db(self):
