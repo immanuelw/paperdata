@@ -192,7 +192,6 @@ def calc_obs_data(host, full_path):
 	#	cal_path = 'NULL'
 
 	#unknown prev/next observation
-	#XXXX Fix to check for prev/next observation
 	dbi = paperdata_dbi.DataBaseInterface()
 	s = dbi.Session()
 	PREV_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum-1).one()
@@ -278,14 +277,28 @@ def update_obsnums():
 		if PREV_OBS is not None:
 			prev_obs = PREV_OBS.obsnum
 			dbi.set_prev_obs(OBS.obsnum, prev_obs)
+		else:
+			prev_time = OBS.time_start - OBS.delta_time
+			pol = OBS.polarization
+			PREV_OBS = s.query(dbi.Observation).filter(dbi.Observation.julian_date==prev_time).filter(dbi.Observation.polarization==pol).one()
+			if PREV_OBS is not None:
+				prev_obs = PREV_OBS.obsnum
+				dbi.set_prev_obs(OBS.obsnum, prev_obs)
 
 		NEXT_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==OBS.obsnum+1).one()
 		if NEXT_OBS is not None:
 			next_obs = NEXT_OBS.obsnum
 			dbi.set_next_obs(OBS.obsnum, next_obs)
+		else:
+			next_time = OBS.time_end + OBS.delta_time
+			pol = OBS.polarization
+			NEXT_OBS = s.query(dbi.Observation).filter(dbi.Observation.julian_date==next_time).filter(dbi.Observation.polarization==pol).one()
+			if NEXT_OBS is not None:
+				next_obs = NEXT_OBS.obsnum
+				dbi.set_next_obs(OBS.obsnum, next_obs)
 
-		if None in (PREV_OBS, NEXT_OBS):
-			dbi.set_edge(OBS.obsnum, edge=True)
+		#sets edge 
+		dbi.set_edge(OBS.obsnum, edge=(None in (PREV_OBS, NEXT_OBS)))
 
 	return None
 
@@ -301,8 +314,16 @@ def add_files(input_host, input_paths):
 	return None
 
 if __name__ == '__main__':
-	input_host = raw_input('Source directory host: ')
-	input_paths = glob.glob(raw_input('Source directory path: '))
+	if len(sys.argv) == 2:
+		input_host = sys.argv[1].split(':')[0]
+		input_paths = glob.glob(sys.argv[1].split(':')[1])
+	elif len(sys.argv) == 3:
+		input_host = sys.argv[1]
+		input_paths = glob.glob(sys.argv[2])
+	else:
+		input_host = raw_input('Source directory host: ')
+		input_paths = glob.glob(raw_input('Source directory path: '))
+
 	input_paths.sort()
 	dupes = dupe_check(input_host, input_paths)
 	if not dupes:
