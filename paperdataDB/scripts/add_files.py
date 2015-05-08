@@ -184,18 +184,29 @@ def calc_obs_data(host, full_path):
 		obsnum = 0
 
 	#location of calibrate files
-	if era == 32:
-		cal_path = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
-	elif era == 64:
-		cal_path = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
-	elif era == 128:
-		cal_path = 'NULL'
+	#if era == 32:
+	#	cal_path = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
+	#elif era == 64:
+	#	cal_path = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
+	#elif era == 128:
+	#	cal_path = 'NULL'
 
 	#unknown prev/next observation
 	#XXXX Fix to check for prev/next observation
-	prev_obs = 'NULL'
-	next_obs = 'NULL'
-	edge = 0
+	dbi = paperdata_dbi.DataBaseInterface()
+	s = dbi.Session()
+	PREV_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum-1).one()
+	if PREV_OBS is not None:
+		prev_obs = PREV_OBS.obsnum
+	else:
+		prev_obs = None
+	NEXT_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum+1).one()
+	if NEXT_OBS is not None:
+		next_obs = NEXT_OBS.obsnum
+	else:
+		next_obs = None
+	s.close()
+	edge = (None in (prev_obs, next_obs))
 
 	#mostly file data
 	host = host
@@ -210,9 +221,8 @@ def calc_obs_data(host, full_path):
 	write_to_tape = 0
 	delete_file = 0
 
-	obs_data = (obsnum, julian_date, polarization, julian_day, era, era_type, length)
-	file_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, time_start, time_end, delta_time,
-					prev_obs, next_obs, edge, write_to_tape, delete_file) #cal_path?? XXXX
+	obs_data = (obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time, prev_obs, next_obs, edge)
+	file_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file) #cal_path?? XXXX
 
 	return obs_data, file_data
 
@@ -258,16 +268,35 @@ def obsnum_list(obsnum):
 
 	return obsnums
 
-def add_files(input_host, input_paths):
+def update_obsnums():
 	dbi = paperdata_dbi.DataBaseInterface()
 	s = dbi.Session()
+	OBSs = s.query(dbi.Observation).all()
+	s.close()
+	for OBS in OBSs:
+		PREV_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==OBS.obsnum-1).one()
+		if PREV_OBS is not None:
+			prev_obs = PREV_OBS.obsnum
+			dbi.set_prev_obs(OBS.obsnum, prev_obs)
+
+		NEXT_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==OBS.obsnum+1).one()
+		if NEXT_OBS is not None:
+			next_obs = NEXT_OBS.obsnum
+			dbi.set_next_obs(OBS.obsnum, next_obs)
+
+		if None in (PREV_OBS, NEXT_OBS):
+			dbi.set_edge(OBS.obsnum, edge=True)
+
+	return None
+
+def add_files(input_host, input_paths):
+	dbi = paperdata_dbi.DataBaseInterface()
 	for input_path in input_paths:
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
 		obs_data, file_data = calc_uv_data(input_host, path, filename)
 		dbi.add_observation(*obs_data)
 		dbi.add_file(*file_data)
-	s.close()
 
 	return None
 
@@ -281,3 +310,4 @@ if __name__ == '__main__':
 		print 'Duplicate found'
 		sys.exit()
 	add_files(input_host, input_paths)
+	update_obsnums()
