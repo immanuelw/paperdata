@@ -71,8 +71,8 @@ def move_files(input_host, input_paths, output_host, output_dir):
 				#change in database
 				full_path = input_host + ':' + source
 				FILE = dbi.get_file(full_path)
-				s.set_file_host(FILE.full_path, output_host)
-				s.set_file_path(FILE.full_path, output_dir)
+				dbi.set_file_host(FILE.full_path, output_host)
+				dbi.set_file_path(FILE.full_path, output_dir)
 			s.close()
 		else:
 			dbi = paperdata_dbi.DataBaseInterface()
@@ -81,8 +81,8 @@ def move_files(input_host, input_paths, output_host, output_dir):
 				rsync_m(source, destination)
 				full_path = input_host + ':' + source
 				FILE = dbi.get_file(full_path)
-				s.set_file_host(FILE.full_path, output_host)
-				s.set_file_path(FILE.full_path, output_dir)
+				dbi.set_file_host(FILE.full_path, output_host)
+				dbi.set_file_path(FILE.full_path, output_dir)
 			s.close()
 	else:
 		if input_host == output_host:
@@ -94,8 +94,8 @@ def move_files(input_host, input_paths, output_host, output_dir):
 				sftp.rename(source, output_dir)
 				full_path = input_host + ':' + source
 				FILE = dbi.get_file(full_path)
-				s.set_file_host(FILE.full_path, output_host)
-				s.set_file_path(FILE.full_path, output_dir)
+				dbi.set_file_host(FILE.full_path, output_host)
+				dbi.set_file_path(FILE.full_path, output_dir)
 			sftp.close()
 			ssh.close()
 			s.close()
@@ -108,8 +108,8 @@ def move_files(input_host, input_paths, output_host, output_dir):
 				ssh.exec_command(rsync_move)
 				full_path = input_host + ':' + source
 				FILE = dbi.get_file(full_path)
-				s.set_file_host(FILE.full_path, output_host)
-				s.set_file_path(FILE.full_path, output_dir)
+				dbi.set_file_host(FILE.full_path, output_host)
+				dbi.set_file_path(FILE.full_path, output_dir)
 			ssh.close()
 			s.close()
 
