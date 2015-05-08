@@ -226,6 +226,8 @@ def backup_observations(dbnum, time_date):
 
 	cursor.execute('SELECT obsnum, julian_date, polarization, julian_day, era, era_type, data_length FROM paperdata group by obsnum order by obsnum asc')
 	res1 = cursor.fetchall()
+	#reset polarization
+	res1 = tuple((i[0], i[1], i[2], i[3], i[4], i[5], i[6]) if int(i[4]) > 100 else (i[0], i[1], 'all', i[3], i[4], i[5], i[6]) for i in res1)
 	#need time_start, time_end, delta_time, prev_obs, next_obs functions
 	cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/', -1), SUBSTRING_INDEX(raw_path, '.', -1), obsnum FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
 	res = cursor.fetchall()
