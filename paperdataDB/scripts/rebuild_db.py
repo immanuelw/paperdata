@@ -276,23 +276,12 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/', -1), SUBSTRING_INDEX(raw_path, '.', -1), raw_path, obsnum, raw_file_size_MB, md5sum, tape_index FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
-			#need time_start, time_end, delta_time, prev_obs, next_obs functions
-			res2 = []
-			for item in res:
-				host = item[0]
-				path = item[1]
-				filename = item[2]
-				obsnum = item[5]
-
-				res2.append(calc_times(host, path, filename) + (get_prev_obs(obsnum), get_next_obs(obsnum)))
-			#convert back to tuple
-			res2 = tuple(res2)
 			#
 			#write_to_tape, delete_file
 			cursor.execute('''SELECT write_to_tape, delete_file FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
 			res3 = cursor.fetchall()
 			res3 = tuple((bool(i[0]), bool(i[1]))) for i in res3)
-			resu = zip(res1, res2, res3)
+			resu = zip(res1, res3)
 			for item in resu:
 				if len(item) >= 2 and type(item[0]) is tuple:
 					if results is ():
@@ -305,7 +294,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			cursor.execute('''SELECT SUBSTRING_INDEX(path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/', -1), SUBSTRING_INDEX(path, '.', -1), path, obsnum, compr_file_size_MB FROM paperdata where path != 'NULL' group by path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
-			#need md5sum, tape_index, time_start, time_end, delta_time, prev_obs, next_obs functions
+			#need md5sum, tape_index
 			res2 = []
 			for item in res:
 				host = item[0]
@@ -313,7 +302,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 				filename = item[2]
 				obsnum = item[5]
 
-				res2.append((calc_md5sum(host, path, filename), 'NULL') + calc_times(host, path, filename) + (get_prev_obs(obsnum), get_next_obs(obsnum)))
+				res2.append((calc_md5sum(host, path, filename), 'NULL'))
 			#convert back to tuple
 			res2 = tuple(res2)
 			#
@@ -335,7 +324,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			cursor.execute('''SELECT SUBSTRING_INDEX(npz_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(npz_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(npz_path, ':', -1), '/', -1), SUBSTRING_INDEX(npz_path, '.', -1), npz_path, obsnum FROM paperdata where npz_path != 'NULL' group by npz_path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
-			#need filesize, md5sum, tape_index, time_start, time_end, delta_time, prev_obs, next_obs functions
+			#need filesize, md5sum, tape_index
 			res2 = []
 			for item in res:
 				host = item[0]
@@ -343,7 +332,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 				filename = item[2]
 				obsnum = item[5]
 
-				res2.append((calc_size(host, name, filename), calc_md5sum(host, path, filename), 'NULL') + calc_times(host, path, filename) + (get_prev_obs(obsnum), get_next_obs(obsnum)))
+				res2.append((calc_size(host, name, filename), calc_md5sum(host, path, filename), 'NULL'))
 			#convert back to tuple
 			res2 = tuple(res2)
 			#
@@ -365,7 +354,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			cursor.execute('''SELECT SUBSTRING_INDEX(final_product_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(final_product_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(final_product_path, ':', -1), '/', -1), SUBSTRING_INDEX(final_product_path, '.', -1), final_product_path, obsnum FROM paperdata where final_product_path != 'NULL' group by final_product_path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
-			#need filesize, md5sum, tape_index, time_start, time_end, delta_time, prev_obs, next_obs functions
+			#need filesize, md5sum, tape_index
 			res2 = []
 			for item in res:
 				host = item[0]
@@ -373,7 +362,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 				filename = item[2]
 				obsnum = item[5]
 
-				res2.append((calc_size(host, name, filename), calc_md5sum(host, path, filename), 'NULL') + calc_times(host, path, filename) + (get_prev_obs(obsnum), get_next_obs(obsnum)))
+				res2.append((calc_size(host, name, filename), calc_md5sum(host, path, filename), 'NULL'))
 			#convert back to tuple
 			res2 = tuple(res2)
 			#
