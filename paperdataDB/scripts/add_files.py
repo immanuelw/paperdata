@@ -121,17 +121,83 @@ def calc_md5sum(host, path, filename):
 	return md5
 
 def calc_obs_data(host, full_path):
+	#mostly file data
+	host = host
+	path = os.path.dirname(full_path)
+	filename = os.path.basename(full_path)
+	filetype = filename.split('.')[-1]
+
 	#Dictionary of polarizations
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
 
 	#allows uv access
-	try:
-		uv = A.miriad.UV(full_path)
-	except:
-		return None
+	if filetype in ('uv', 'uvcRRE'):
+		try:
+			uv = A.miriad.UV(full_path)
+		except:
+			return None
 
-	#indicates julian date
-	julian_date = round(uv['time'], 5)
+		#indicates julian date
+		julian_date = round(uv['time'], 5)
+
+		#assign letters to each polarization
+		if uv['npol'] == 1:
+			polarization = pol_dict[uv['pol']]
+		elif uv['npol'] == 4:
+			polarization = 'all'
+
+		time_start = 0
+		time_end = 0
+		n_times = 0
+		c_time = 0
+
+		try:
+			for (uvw, t, (i,j)),d in uv.all():
+				if time_start == 0 or t < time_start:
+					time_start = t
+				if time_end == 0 or t > time_end:
+					time_end = t
+				if c_time != t:
+					c_time = t
+					n_times += 1
+		except:
+			return None
+
+		if n_times > 1:
+			delta_time = -(time_start - time_end)/(n_times - 1)
+		else:
+			delta_time = -(time_start - time_end)/(n_times)
+
+		length = round(n_times * delta_time, 5)
+
+		#gives each file unique id
+		if length > 0:
+			obsnum = jdpol2obsnum(julian_date, polarization, length)
+		else:
+			obsnum = 0
+
+	elif filetype in ('npz',):
+		#filename is zen.2456640.24456.xx.uvcRE.npz or zen.2456243.24456.uvcRE.npz
+		jdate = filename.split('.')[1] + '.' + filename.split('.')[2]
+		julian_date = round(float(jdate, 5)
+
+		dbi = paperdata_dbi.DataBaseInterface()
+		s = dbi.Session()
+		if len(filename.split('.')) == 5:
+			polarization = 'all'
+			pol = polarization
+		elif len(filename.split('.')) == 6:
+			polarization = filename.split('.')[3]
+			pol = polarization
+		OBS = s.query(dbi.Observation).filter(dbi.Observation.julian_date==julian_date).filter(dbi.Observation.polarization==pol).one()
+
+		time_start = OBS.time_start		
+		time_end = OBS.time_end
+		delta_time_start = OBS.delta_time		
+		length = OBS.length
+		obsnum = OBS.obsnum		
+
+		s.close()
 
 	#indicates julian day and set of data
 	if julian_date < 2456100:
@@ -145,43 +211,6 @@ def calc_obs_data(host, full_path):
 
 	#indicates type of file in era
 	era_type = 'NULL'
-
-	#assign letters to each polarization
-	if uv['npol'] == 1:
-		polarization = pol_dict[uv['pol']]
-	elif uv['npol'] == 4:
-	#	polarization = 'all' #default to 'yy' as 'all' is not a key for jdpol2obsnum
-		polarization = 'yy'
-
-	time_start = 0
-	time_end = 0
-	n_times = 0
-	c_time = 0
-
-	try:
-		for (uvw, t, (i,j)),d in uv.all():
-			if time_start == 0 or t < time_start:
-				time_start = t
-			if time_end == 0 or t > time_end:
-				time_end = t
-			if c_time != t:
-				c_time = t
-				n_times += 1
-	except:
-		return None
-
-	if n_times > 1:
-		delta_time = -(time_start - time_end)/(n_times - 1)
-	else:
-		delta_time = -(time_start - time_end)/(n_times)
-
-	length = round(n_times * delta_time, 5)
-
-	#gives each file unique id
-	if length > 0:
-		obsnum = jdpol2obsnum(julian_date, polarization, length)
-	else:
-		obsnum = 0
 
 	#location of calibrate files
 	#if era == 32:
@@ -206,12 +235,6 @@ def calc_obs_data(host, full_path):
 		next_obs = None
 	s.close()
 	edge = (None in (prev_obs, next_obs))
-
-	#mostly file data
-	host = host
-	path = os.path.dirname(full_path)
-	filename = os.path.basename(full_path)
-	filetype = filename.split('.')[-1]
 
 	filesize = calc_size(host, path, filename)
 	md5 = calc_md5sum(host, path, filename)
