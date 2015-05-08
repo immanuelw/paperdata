@@ -157,7 +157,7 @@ class DataBaseInterface(object):
 		s.close()
 		return OBS
 
-	def get_file(self, filename):
+	def get_file(self, full_path):
 		"""
 		retrieves an file object.
 		Errors if there are more than one of the same file in the db. This is bad and should
@@ -166,7 +166,7 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
-		OBS = s.query(File).filter(File.filename==filename).one()
+		OBS = s.query(File).filter(File.full_path==full_path).one()
 		s.close()
 		return FILE
 
@@ -201,80 +201,37 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
-	def add_observation(self, julian_date, polarization, host, path, filename, filetype, length=10/60./24):
+	def add_observation(self, obsnum, julian_date, polarization, julian_day, era, era_type, length):
 		"""
 		create a new observation entry.
 		returns: obsnum  (see jdpol2obsnum)
 		Note: does not link up neighbors!
 		"""
-		OBS = Observation(julian_date=julian_date, polarization=polarization, length=length)
+		OBS = Observation(obsnum, julian_date, polarization, julian_day, era, era_type, length)
 		s = self.Session()
 		s.add(OBS)
 		s.commit()
 		obsnum = OBS.obsnum
 		s.close()
-		self.add_file(obsnum, host, filename, filetype)#todo test.
 		sys.stdout.flush()
 		return obsnum
 
-	def add_file(self, obsnum, host, path, filename, filetype):
+	def add_file(self, host, path, filename, filetype, obsnum, filesize, md5, tape_index, time_start, time_end, delta_time,
+					prev_obs, next_obs, edge, write_to_tape, delete_file): #cal_path?? XXXX
 		"""
 		Add a file to the database and associate it with an observation.
 		"""
-		FILE = File(filename=filename,host=host,path=path,filetype=filetype)
+		FILE = File(host, path, filename, filetype, obsnum, filesize, md5, tape_index, time_start, time_end, delta_time,
+					prev_obs, next_obs, edge, write_to_tape, delete_file) #cal_path?? XXXX
 		#get the observation corresponding to this file
 		s = self.Session()
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
 		FILE.observation = OBS  #associate the file with an observation
 		s.add(FILE)
 		s.commit()
-		filenum = FILE.filenum #we gotta grab this before we close the session.
+		#filenum = FILE.filenum #we gotta grab this before we close the session.
 		s.close() #close the session
 		return filenum
-
-	def add_observations(self, obslist, status='UV_POT'):
-		"""
-		Add a whole set of observations.
-		Handles linking neighboring observations.
-
-		input: list of dicts where the dict has the parameters needed as inputs to add_observation:
-		julian_date
-		pol (anything in a.miriad.str2pol)
-		host
-		file
-		length (in fractional jd)
-		neighbor_high (julian_date)
-		neighbor_low  (julian_date)
-
-		What it does:
-		adds observations with status NEW
-		Links neighboring observations in the database
-		"""
-		neighbors = {}
-		for obs in obslist:
-			obsnum = self.add_observation(obs['julian_date'],obs['pol'],
-							obs['filename'],obs['host'],
-							length=obs['length'],status='NEW')
-			neighbors[obsnum] = (obs.get('neighbor_low',None),obs.get('neighbor_high',None))
-		s = self.Session()
-		for middleobsnum in neighbors:
-			OBS = s.query(Observation).filter(Observation.obsnum==middleobsnum).one()
-			if not neighbors[middleobsnum][0] is None:
-				L = s.query(Observation).filter(
-						Observation.julian_date==neighbors[middleobsnum][0],
-						Observation.pol == OBS.pol).one()
-				OBS.low_neighbors = [L]
-			if not neighbors[middleobsnum][1] is None:
-				H = s.query(Observation).filter(
-						Observation.julian_date==neighbors[middleobsnum][1],
-						Observation.pol == OBS.pol).one()
-				OBS.high_neighbors = [H]
-				sys.stdout.flush()
-			OBS.status = status
-			s.add(OBS)
-			s.commit()
-		s.close()
-		return neighbors.keys()
 
 	def get_neighbors(self, obsnum):
 		"""
@@ -294,82 +251,82 @@ class DataBaseInterface(object):
 		s.close()
 		return (low,high)
 
-	def get_file_path(self, filename):
+	def get_file_path(self, full_path):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filename)
+		FILE = self.get_file(full_path)
 		return FILE.path
 
-	def set_file_path(self, filename, path):
+	def set_file_path(self, full_path, path):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filename)
+		FILE = self.get_file(full_path)
 		FILE.path = path
 		yay = self.update_file(FILE)
 		return yay
 
-	def get_file_host(self, filename):
+	def get_file_host(self, full_path):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filename)
+		FILE = self.get_file(full_path)
 		return FILE.host
 
-	def set_file_host(self, filename, host):
+	def set_file_host(self, full_path, host):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filename)
+		FILE = self.get_file(full_path)
 		FILE.host = host
 		yay = self.update_file(FILE)
 		return yay
 
-	def get_file_md5sum(self, filename):
+	def get_file_md5sum(self, full_path):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filename)
+		FILE = self.get_file(full_path)
 		return FILE.md5sum
 
-	def set_file_md5sum(self, filename, md5sum):
+	def set_file_md5sum(self, full_path, md5sum):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filename)
+		FILE = self.get_file(full_path)
 		FILE.md5sum = md5sum
 		yay = self.update_file(FILE)
 		return yay
 
-	def get_file_prev_obs(self, filename):
+	def get_file_prev_obs(self, full_path):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filename)
+		FILE = self.get_file(full_path)
 		return FILE.prev_obs
 
-	def set_file_prev_obs(self, filename, prev_obs):
+	def set_file_prev_obs(self, full_path, prev_obs):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filename)
+		FILE = self.get_file(full_path)
 		FILE.prev_obs = prev_obs
 		yay = self.update_file(FILE)
 		return yay
 
-	def get_file_next_obs(self, filename):
+	def get_file_next_obs(self, full_path):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filename)
+		FILE = self.get_file(full_path)
 		return FILE.next_obs
 
-	def set_file_next_obs(self, filename, next_obs):
+	def set_file_next_obs(self, full_path, next_obs):
 		"""
 		todo
 		"""
-		FILE = self.get_file(filename)
+		FILE = self.get_file(full_path)
 		FILE.next_obs = next_obs
 		yay = self.update_file(FILE)
 		return yay
