@@ -118,6 +118,8 @@ def calc_md5sum(host, path, filename):
 		sftp.close()
 		ssh.close()
 
+	return md5
+
 def calc_obs_data(host, full_path):
 	#Dictionary of polarizations
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
@@ -256,8 +258,9 @@ def obsnum_list(obsnum):
 
 	return obsnums
 
-def add_files(input_host, input_path)
+def add_files(input_host, input_path):
 
+	return None
 
 if __name__ == '__main__':
 	input_host = raw_input('Source directory host: ')
