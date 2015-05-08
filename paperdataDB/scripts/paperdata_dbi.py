@@ -155,6 +155,17 @@ class DataBaseInterface(object):
 		s.close()
 		return OBS
 
+	def update_obs(self, OBS):
+		"""
+		updates file object field
+		***NEED TO TEST
+		"""
+		s = self.Session()
+		s.add(OBS)
+		s.commit()
+		s.close()
+		return True
+
 	def get_file(self, full_path):
 		"""
 		retrieves an file object.
@@ -281,50 +292,34 @@ class DataBaseInterface(object):
 		yay = self.update_file(FILE)
 		return yay
 
-	def get_file_md5sum(self, full_path):
+	def get_prev_obs(self, obsnum):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
-		return FILE.md5sum
+		OBS = self.get_obs(obsnum)
+		return OBS.prev_obs
 
-	def set_file_md5sum(self, full_path, md5sum):
+	def set_prev_obs(self, obsnum, prev_obs):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
-		FILE.md5sum = md5sum
-		yay = self.update_file(FILE)
+		OBS = self.get_obs(obsnum)
+		OBS.prev_obs = prev_obs
+		yay = self.update_obs(OBS)
 		return yay
 
-	def get_file_prev_obs(self, full_path):
+	def get_next_obs(self, obsnum):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
-		return FILE.prev_obs
+		OBS = self.get_obs(obsnum)
+		return OBS.next_obs
 
-	def set_file_prev_obs(self, full_path, prev_obs):
+	def set_next_obs(self, obsnum, next_obs):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
-		FILE.prev_obs = prev_obs
-		yay = self.update_file(FILE)
-		return yay
-
-	def get_file_next_obs(self, full_path):
-		"""
-		todo
-		"""
-		FILE = self.get_file(full_path)
-		return FILE.next_obs
-
-	def set_file_next_obs(self, full_path, next_obs):
-		"""
-		todo
-		"""
-		FILE = self.get_file(full_path)
-		FILE.next_obs = next_obs
-		yay = self.update_file(FILE)
+		OBS = self.get_obs(obsnum)
+		OBS.next_obs = next_obs
+		yay = self.update_obs(OBS)
 		return yay
