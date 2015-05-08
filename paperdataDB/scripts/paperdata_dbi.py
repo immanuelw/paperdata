@@ -79,6 +79,13 @@ class Observation(Base):
 	era = Column(Integer)
 	era_type = Column(String(20))
 	length = Column(Numeric(6,5)) #length of observation in fraction of a day
+	###
+	time_start = Column(Numeric(12,5))
+	time_end = Column(Numeric(12,5))
+	delta_time = Column(Numeric(12,5))
+	prev_obs = Column(BigInteger, unique=True)
+	next_obs = Column(BigInteger, unique=True)
+	edge = Column(Boolean)
 
 class File(Base):
 	__tablename__ = 'file'
@@ -89,22 +96,13 @@ class File(Base):
 	filetype = Column(String(20)) #uv, uvcRRE, etc.
 	full_path = Column(String(200), unique=True)
 	###
-	#UniqueConstraint('host', 'path', 'filename', name='full_path')
-	###
 	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
 	filesize = Column(Numeric(7,2))
 	md5sum = Column(Integer)
 	tape_index = Column(String(100))
-	###
-	time_start = Column(Numeric(12,5))
-	time_end = Column(Numeric(12,5))
-	delta_time = Column(Numeric(12,5))
-	prev_obs = Column(BigInteger, ForeignKey('observation.obsnum'))
-	next_obs = Column(BigInteger, ForeignKey('observation.obsnum'))
 	### maybe unnecessary fields
-	calibration_path = Column(String(100))
+	#calibration_path = Column(String(100))
 	#history?
-	edge = Column(Boolean)
 	write_to_tape = Column(Boolean)
 	delete_file = Column(Boolean)
 	#this next line creates an attribute Observation.files which is the list of all
@@ -201,13 +199,15 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
-	def add_observation(self, obsnum, julian_date, polarization, julian_day, era, era_type, length):
+	def add_observation(self, obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time,
+						prev_obs, next_obs, edge):
 		"""
 		create a new observation entry.
 		returns: obsnum  (see jdpol2obsnum)
 		Note: does not link up neighbors!
 		"""
-		OBS = Observation(obsnum, julian_date, polarization, julian_day, era, era_type, length)
+		OBS = Observation(obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time,
+							prev_obs, next_obs, edge)
 		s = self.Session()
 		s.add(OBS)
 		s.commit()
@@ -216,13 +216,11 @@ class DataBaseInterface(object):
 		sys.stdout.flush()
 		return obsnum
 
-	def add_file(self, host, path, filename, filetype, obsnum, filesize, md5, tape_index, time_start, time_end, delta_time,
-					prev_obs, next_obs, edge, write_to_tape, delete_file): #cal_path?? XXXX
+	def add_file(self, host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file): #cal_path?? XXXX
 		"""
 		Add a file to the database and associate it with an observation.
 		"""
-		FILE = File(host, path, filename, filetype, obsnum, filesize, md5, tape_index, time_start, time_end, delta_time,
-					prev_obs, next_obs, edge, write_to_tape, delete_file) #cal_path?? XXXX
+		FILE = File(host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file) #cal_path?? XXXX
 		#get the observation corresponding to this file
 		s = self.Session()
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
