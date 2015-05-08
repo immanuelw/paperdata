@@ -316,6 +316,9 @@ def add_files(input_host, input_paths):
 if __name__ == '__main__':
 	if len(sys.argv) == 2:
 		input_host = sys.argv[1].split(':')[0]
+		if input_host == sys.argv[1]:
+			print 'Needs host'
+			sys.exit()
 		input_paths = glob.glob(sys.argv[1].split(':')[1])
 	elif len(sys.argv) == 3:
 		input_host = sys.argv[1]
