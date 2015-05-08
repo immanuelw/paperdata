@@ -323,3 +323,19 @@ class DataBaseInterface(object):
 		OBS.next_obs = next_obs
 		yay = self.update_obs(OBS)
 		return yay
+
+	def get_edge(self, obsnum):
+		"""
+		todo
+		"""
+		OBS = self.get_obs(obsnum)
+		return OBS.edge
+
+	def set_edge(self, obsnum, edge):
+		"""
+		todo
+		"""
+		OBS = self.get_obs(obsnum)
+		OBS.edge = edge
+		yay = self.update_obs(OBS)
+		return yay
