@@ -125,6 +125,6 @@ if __name__ == '__main__':
 	nulls = null_check(input_host, input_paths)
 	if not null:
 		#if any copies, don't load anything
-		print 'File not found'
+		print 'File(s) not in database'
 		sys.exit()
 	move_files(host, input_paths, output_host, output_dir)
