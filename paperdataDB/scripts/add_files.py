@@ -214,7 +214,7 @@ def calc_obs_data(host, full_path):
 	file_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, time_start, time_end, delta_time,
 					prev_obs, next_obs, edge, write_to_tape, delete_file) #cal_path?? XXXX
 
-	return obs, file_data
+	return obs_data, file_data
 
 def calc_uv_data(host, path, filename):
 	named_host = socket.gethostname()
@@ -230,7 +230,7 @@ def calc_uv_data(host, path, filename):
 		remote_path = sftp.file(full_path, mode='r')
 		obs_data, file_data = calc_obs_data(host, remote_path)
 
-	return obs
+	return obs_data, file_data
 
 def dupe_check(input_host, input_paths):
 	dbi = paperdata_dbi.DataBaseInterface()
@@ -258,7 +258,16 @@ def obsnum_list(obsnum):
 
 	return obsnums
 
-def add_files(input_host, input_path):
+def add_files(input_host, input_paths):
+	dbi = paperdata_dbi.DataBaseInterface()
+	s = dbi.Session()
+	for input_path in input_paths:
+		path = os.path.dirname(input_path)
+		filename = os.path.basename(input_path)
+		obs_data, file_data = calc_uv_data(input_host, path, filename)
+		dbi.add_observation(*obs_data)
+		dbi.add_file(*file_data)
+	s.close()
 
 	return None
 
@@ -271,4 +280,4 @@ if __name__ == '__main__':
 		#if any copies, don't load anything
 		print 'Duplicate found'
 		sys.exit()
-	add_files(input_host, input_path)
+	add_files(input_host, input_paths)
