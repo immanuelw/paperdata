@@ -356,5 +356,10 @@ if __name__ == '__main__':
 		#if any copies, don't load anything
 		print 'Duplicate found'
 		sys.exit()
+	npz_paths = [npz_path for npz_path in input_paths if '.npz' in npz_path]
+	npz_paths.sort()
+	input_paths = [input_path for input_path in input_paths if '.npz' not in input_path]
+	input_paths.sort()
 	add_files(input_host, input_paths)
+	add_files(input_host, npz_paths)
 	update_obsnums()
