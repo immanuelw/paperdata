@@ -24,15 +24,15 @@ import paperdata_dbi
 
 #SSH/SFTP Function
 #Need private key so don't need username/password
-def login_ssh(host, username=None, password=None):
+def login_ssh(host, username=None):
 	ssh = paramiko.SSHClient()
 	ssh.load_system_host_keys()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 	try:
-		ssh.connect(host)
+		ssh.connect(host, key_filename='~/.ssh/id_rsa')
 	except:
 		try:
-			ssh.connect(host, username=username, password=password)
+			ssh.connect(host, username=username, key_filename='~/.ssh/id_rsa')
 		except:
 			return None
 
