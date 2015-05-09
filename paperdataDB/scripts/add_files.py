@@ -29,10 +29,10 @@ def login_ssh(host, username=None):
 	ssh.load_system_host_keys()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 	try:
-		ssh.connect(host, key_filename='~/.ssh/id_rsa')
+		ssh.connect(host, username=username, key_filename='~/.ssh/id_rsa')
 	except:
 		try:
-			ssh.connect(host, username=username, key_filename='~/.ssh/id_rsa')
+			ssh.connect(host, key_filename='~/.ssh/id_rsa')
 		except:
 			return None
 
