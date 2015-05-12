@@ -34,8 +34,6 @@ if __name__ == '__main__':
 		if input_host == sys.argv[1]:
 			print 'Needs host'
 			sys.exit()
-	elif len(sys.argv) == 3:
-		input_host = sys.argv[1]
 	else:
 		input_host = raw_input('Source directory host: ')
 
