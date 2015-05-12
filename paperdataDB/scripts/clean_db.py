@@ -12,10 +12,10 @@ import paperdata_dbi
 def check_files(input_host):
 	dbi = paperdata_dbi.DataBaseInterface()
 	s = dbi.Session()
-	FILES = s.query(dbi.File).filter(dbi.File.host==input_host).filter(dbi.File.tape_index!=).all()
+	FILES = s.query(dbi.File).filter(dbi.File.host==input_host).filter(dbi.File.tape_index!=None).all()
 	s.close()
 	#tuple of path without host, and tuple of path and filename
-	file_paths = tuple((os.path.join(FILE.path, FILE.filename), (FILE.path, FILE.filename))  for FILE in FILES)
+	file_paths = tuple((os.path.join(FILE.path, FILE.filename), (FILE.path, FILE.filename)) for FILE in FILES)
 
 	ssh = paperdata_dbi.login_ssh(input_host)
 	#check if files exist on host
