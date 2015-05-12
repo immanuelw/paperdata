@@ -273,12 +273,9 @@ def dupe_check(input_host, input_paths):
 	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs if FILE.host == input_host)
 
 	#for each input file, check if in filenames
-	duplicates = tuple(input_path for input_path in input_paths if input_path in filenames)
+	unique_paths = tuple(input_path for input_path in input_paths if input_path not in filenames)
 		
-	if len(duplicates) > 0:
-		return False
-
-	return True
+	return unique_paths
 
 def obsnum_list(obsnum):
 	dbi = paperdata_dbi.DataBaseInterface()
@@ -350,12 +347,8 @@ if __name__ == '__main__':
 		input_host = raw_input('Source directory host: ')
 		input_paths = glob.glob(raw_input('Source directory path: '))
 
+	input_paths = dupe_check(input_host, input_paths)
 	input_paths.sort()
-	dupes = dupe_check(input_host, input_paths)
-	if not dupes:
-		#if any copies, don't load anything
-		print 'Duplicate found'
-		sys.exit()
 	npz_paths = [npz_path for npz_path in input_paths if '.npz' in npz_path]
 	npz_paths.sort()
 	input_paths = [input_path for input_path in input_paths if '.npz' not in input_path]
