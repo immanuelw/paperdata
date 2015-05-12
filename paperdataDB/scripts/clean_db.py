@@ -17,19 +17,25 @@ def check_files(input_host):
 	#tuple of path without host, and tuple of path and filename
 	file_paths = tuple((os.path.join(FILE.path, FILE.filename), (FILE.path, FILE.filename)) for FILE in FILES)
 
-	ssh = paperdata_dbi.login_ssh(input_host)
-	#check if files exist on host
-	#return those who do not
-	sftp = ssh.open_sftp()
-	delete_paths = []
-	for path in file_paths:
-		try:
-			if sftp.stat(path[0]):
-				continue
-		except IOError:
-			delete_paths.append(path[1])
-	sftp.close()
-	ssh.close()
+	host = socket.gethostname()
+	if host == input_host:
+		for path in file_paths:
+			if not os.path.isdir(path[0]) and not os.path.isfile(path[0]):
+				delete_paths.append(path[1])
+	else:
+		ssh = paperdata_dbi.login_ssh(input_host)
+		#check if files exist on host
+		#return those who do not
+		sftp = ssh.open_sftp()
+		delete_paths = []
+		for path in file_paths:
+			try:
+				if sftp.stat(path[0]):
+					continue
+			except IOError:
+				delete_paths.append(path[1])
+		sftp.close()
+		ssh.close()
 
 	delete_paths.sort()
 	delete_paths = tuple(delete_paths)
