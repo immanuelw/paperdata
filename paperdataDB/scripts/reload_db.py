@@ -12,7 +12,8 @@ import os
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def find_paths():
+def find_paths(input_host):
+	ssh = add_files.login_ssh(input_host)
 	input_paths = []
 	for root, dirs, files in os.walk('/'):
 		for direc in dirs:
@@ -23,7 +24,8 @@ def find_paths():
 		for file_path in files:
 			if file_path.endswith('npz'):
 				 npz_paths.append(os.path.join(root, file_path))
-			
+	ssh.close()			
+
 	return (input_paths, npz_paths)
 
 if __name__ == '__main__':
@@ -37,7 +39,7 @@ if __name__ == '__main__':
 	else:
 		input_host = raw_input('Source directory host: ')
 
-	input_paths, npz_paths = find_paths()
+	input_paths, npz_paths = find_paths(input_host)
 	input_paths = add_files.dupe_check(input_host, input_paths)
 	input_paths.sort()
 	npz_paths = add_files.dupe_check(input_host, npz_paths)
