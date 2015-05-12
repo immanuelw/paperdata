@@ -26,10 +26,10 @@ import shutil
 def null_check(input_host, input_paths):
 	dbi = paperdata_dbi.DataBaseInterface()
 	s = dbi.Session()
-	FILEs = s.query(dbi.File).all()
+	FILEs = s.query(dbi.File).filter(dbi.File.host==input_host).all()
 	s.close()
 	#all files on same host
-	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs if FILE.host == input_host)
+	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
 
 	#for each input file, check if in filenames
 	nulls = tuple(input_path for input_path in input_paths if input_path not in filenames)
