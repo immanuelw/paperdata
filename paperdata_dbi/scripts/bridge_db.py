@@ -105,10 +105,27 @@ def gen_data():
 
 		obsnum = OBS.obsnum
 		julian_date = OBS.julian_date
-		polarization = OBS.pol
+		if julian_date < 2456400:
+			polarization = 'all'
+		else:
+			polarization = OBS.pol
 		julian_day = int(str(julian_date)[3:7])
+		length = round(OBS.length, 5)
 	
-		#time_start, time_end, delta_time, length = uv_data()
+		host = FILE.host
+		full_path = FILE.filename
+		path = os.path.dirname(full_path)
+		filename = os.path.basename(full_path)
+		filetype = filename.split('.')[-1]
+
+		ssh = paperdata_dbi.login_ssh(host)
+		uv_data_script = './uv_data.py'
+		sftp = ssh.open_sftp()
+		sftp.put(uv_data_script, './')
+		sftp.close()
+		stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(uv_data_script, host, full_path))
+		time_start, time_end, delta_time = [float(info) for info in uv_data.split(',')]
+		ssh.close()
 		
 		#indicates julian day and set of data
 		if julian_date < 2456100:
@@ -129,22 +146,18 @@ def gen_data():
 		#elif era == 128:
 		#	cal_path = 'NULL'
 
-		PREV_OBS = sp.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum-1).one()
+		PREV_OBS = sp.query(data_dbi.Observation).filter(data_dbi.Observation.obsnum==obsnum-1).one()
 		if PREV_OBS is not None:
 			prev_obs = PREV_OBS.obsnum
 		else:
 			prev_obs = None
-		NEXT_OBS = sp.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum+1).one()
+		NEXT_OBS = sp.query(data_dbi.Observation).filter(data_dbi.Observation.obsnum==obsnum+1).one()
 		if NEXT_OBS is not None:
 			next_obs = NEXT_OBS.obsnum
 		else:
 			next_obs = None
 		edge = (None in (prev_obs, next_obs))
 
-		host = FILE.host
-		full_path = FILE.filename
-		path = os.path.dirname(full_path)
-		filename = os.path.basename(full_path)
 		filesize = add_files.calc_size(host, path, filename)
 		md5 = add_files.calc_md5sum(host, path, filename)
 		tape_index = None
