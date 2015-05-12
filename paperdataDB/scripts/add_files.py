@@ -261,6 +261,8 @@ def calc_uv_data(host, path, filename):
 		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??
 		remote_path = sftp.file(full_path, mode='r')
 		obs_data, file_data = calc_obs_data(host, remote_path)
+		sftp.close()
+		ssh.close()
 
 	return obs_data, file_data
 
