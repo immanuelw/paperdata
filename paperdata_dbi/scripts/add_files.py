@@ -238,10 +238,10 @@ def calc_obs_data(host, full_path):
 
 	filesize = calc_size(host, path, filename)
 	md5 = calc_md5sum(host, path, filename)
-	tape_index = 'NULL'
+	tape_index = None
 
-	write_to_tape = 0
-	delete_file = 0
+	write_to_tape = False
+	delete_file = False
 
 	obs_data = (obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time, prev_obs, next_obs, edge)
 	file_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file) #cal_path?? XXXX
