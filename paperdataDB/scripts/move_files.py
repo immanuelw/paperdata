@@ -111,4 +111,4 @@ if __name__ == '__main__':
 		#if any file not in db -- don't move anything
 		print 'File(s) not in database'
 		sys.exit()
-	move_files(host, input_paths, output_host, output_dir)
+	move_files(input_host, input_paths, output_host, output_dir)
