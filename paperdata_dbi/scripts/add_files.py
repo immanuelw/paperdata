@@ -22,22 +22,6 @@ import paperdata_dbi
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-#SSH/SFTP Function
-#Need private key so don't need username/password
-def paperdata_dbi.login_ssh(host, username=None):
-	ssh = paramiko.SSHClient()
-	ssh.load_system_host_keys()
-	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-	try:
-		ssh.connect(host, username=username, key_filename='/home/{0}/.ssh/id_rsa'.format(username))
-	except:
-		try:
-			ssh.connect(host, key_filename='/home/{0}/.ssh/id_rsa'.format(username))
-		except:
-			return None
-
-	return ssh
-
 #Functions which simply find the file size
 def get_size(start_path):
 	total_size = 0
