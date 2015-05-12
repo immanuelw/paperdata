@@ -26,7 +26,7 @@ import shutil
 def delete_check(input_host):
 	dbi = paperdata_dbi.DataBaseInterface()
 	s = dbi.Session()
-	FILEs = s.query(dbi.File).filter(dbi.File.delete_file==True).filter(dbi.File.host==input_host).all()
+	FILEs = s.query(dbi.File).filter(dbi.File.delete_file==True).filter(dbi.File.tape_index!=None).filter(dbi.File.host==input_host).all()
 	s.close()
 	#all files on same host
 	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
