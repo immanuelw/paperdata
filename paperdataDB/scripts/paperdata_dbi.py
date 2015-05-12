@@ -308,6 +308,22 @@ class DataBaseInterface(object):
 		yay = self.update_file(FILE)
 		return yay
 
+	def get_file_delete(self, full_path):
+		"""
+		todo
+		"""
+		FILE = self.get_file(full_path)
+		return FILE.delete_file
+
+	def set_file_delete(self, full_path, delete_file):
+		"""
+		todo
+		"""
+		FILE = self.get_file(full_path)
+		FILE.delete_file = delete_file
+		yay = self.update_file(FILE)
+		return yay
+
 	def get_prev_obs(self, obsnum):
 		"""
 		todo
