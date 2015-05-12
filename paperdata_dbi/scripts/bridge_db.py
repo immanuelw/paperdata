@@ -124,7 +124,7 @@ def gen_data():
 		sftp.put(uv_data_script, './')
 		sftp.close()
 		stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(uv_data_script, host, full_path))
-		time_start, time_end, delta_time = [float(info) for info in uv_data.split(',')]
+		time_start, time_end, delta_time = [float(info) for info in uv_data.read().split(',')]
 		ssh.close()
 		
 		#indicates julian day and set of data
