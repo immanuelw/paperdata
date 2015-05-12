@@ -24,7 +24,7 @@ import paperdata_dbi
 
 #SSH/SFTP Function
 #Need private key so don't need username/password
-def login_ssh(host, username=None):
+def paperdata_dbi.login_ssh(host, username=None):
 	ssh = paramiko.SSHClient()
 	ssh.load_system_host_keys()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -94,7 +94,7 @@ def calc_size(host, path, filename):
 	if named_host == host:
 		size = round(float(sizeof_fmt(get_size(full_path))), 1)
 	else:
-		ssh = login_ssh(host)
+		ssh = paperdata_dbi.login_ssh(host)
 		sftp = ssh.open_sftp()
 		size_bytes = sftp.stat(full_path).st_size
 		size = round(float(sizeof_fmt(size_bytes)), 1)
@@ -111,7 +111,7 @@ def calc_md5sum(host, path, filename):
 	if named_host == host:
 		md5 = md5sum(full_path)
 	else:
-		ssh = login_ssh(host)
+		ssh = paperdata_dbi.login_ssh(host)
 		sftp = ssh.open_sftp()
 		remote_path = sftp.file(full_path, mode='r')
 		md5 = remote_path.check('md5', block_size=65536)
@@ -255,7 +255,7 @@ def calc_uv_data(host, path, filename):
 	if named_host == host:
 		obs_data, file_data = calc_obs_data(host, full_path)
 	else:
-		ssh = login_ssh(host)
+		ssh = paperdata_dbi.login_ssh(host)
 		sftp = ssh.open_sftp()
 		#allows uv access
 		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??

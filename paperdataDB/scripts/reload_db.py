@@ -13,7 +13,7 @@ import os
 ### Date: 5-06-15
 
 def find_paths(input_host):
-	ssh = add_files.login_ssh(input_host)
+	ssh = paperdata_dbi.login_ssh(input_host)
 	input_paths = []
 	for root, dirs, files in os.walk('/'):
 		for direc in dirs:

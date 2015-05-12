@@ -64,6 +64,22 @@ def gethostname():
 	hn = Popen(['bash','-cl','hostname'], stdout=PIPE).communicate()[0].strip()
 	return hn
 
+#SSH/SFTP Function
+#Need private key so don't need username/password
+def login_ssh(host, username=None):
+	ssh = paramiko.SSHClient()
+	ssh.load_system_host_keys()
+	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+	try:
+		ssh.connect(host, username=username, key_filename='/home/{0}/.ssh/id_rsa'.format(username))
+	except:
+		try:
+			ssh.connect(host, key_filename='/home/{0}/.ssh/id_rsa'.format(username))
+		except:
+			return None
+
+	return ssh
+
 #############
 #
 #   The basic definition of our database

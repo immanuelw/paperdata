@@ -25,7 +25,7 @@ import shutil
 
 #SSH/SFTP Function
 #Need private key so don't need username/password
-def login_ssh(host, username=None):
+def paperdata_dbi.login_ssh(host, username=None):
 	ssh = paramiko.SSHClient()
 	ssh.load_system_host_keys()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -88,7 +88,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 		if input_host == output_host:
 			dbi = paperdata_dbi.DataBaseInterface()
 			s = dbi.Session()
-			ssh = login_ssh(host)
+			ssh = paperdata_dbi.login_ssh(host)
 			sftp = ssh.open_sftp()
 			for source in input_paths:
 				sftp.rename(source, output_dir)
@@ -102,7 +102,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 		else:
 			dbi = paperdata_dbi.DataBaseInterface()
 			s = dbi.Session()
-			ssh = login_ssh(host)
+			ssh = paperdata_dbi.login_ssh(host)
 			for source in input_paths:
 				rsync_move = '''rsync -a --remove-source-files {source} {destination}'''.format(source=source, destination=destination)
 				ssh.exec_command(rsync_move)
