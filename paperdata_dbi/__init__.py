@@ -308,6 +308,22 @@ class DataBaseInterface(object):
 		yay = self.update_file(FILE)
 		return yay
 
+	def get_file_md5(self, full_path):
+		"""
+		todo
+		"""
+		FILE = self.get_file(full_path)
+		return FILE.md5sum
+
+	def set_file_md5(self, full_path, md5):
+		"""
+		todo
+		"""
+		FILE = self.get_file(full_path)
+		FILE.md5sum = md5
+		yay = self.update_file(FILE)
+		return yay
+
 	def get_file_delete(self, full_path):
 		"""
 		todo

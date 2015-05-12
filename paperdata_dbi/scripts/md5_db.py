@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Create paperdata tables
 
+from ddr_compress import dbi as pdbi
 import paperdata_dbi
 import add_files
 
