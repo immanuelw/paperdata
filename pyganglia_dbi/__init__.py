@@ -15,7 +15,7 @@ dbinfo = {'username':'immwa',
 		  'password':'\x69\x6d\x6d\x77\x61\x33\x39\x37\x38',
 		  'hostip':'shredder',
 		  'port':3306,
-		  'dbname':'pyganglia'}
+		  'dbname':'ganglia'}
 
 #########
 #

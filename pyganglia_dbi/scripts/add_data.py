@@ -36,6 +36,78 @@ def login_ssh(host, username=None):
 
 	return ssh
 
+def calculate_folio_space(dir):
+	#Calculates the free space left on input dir
+	folio = subprocess.check_output(['df', '-B', '1'])
+	#/data4 should be filesystem
+	#Amount of available bytes should be free_space
+
+	folio_space = 0
+	for output in folio.split('\n'):
+		filesystem = output.split(' ')[-1]
+		if filesystem in ['/data4']:
+			folio_space = int(output.split(' ')[-4])
+
+	return folio_space
+
+def iostat():
+	#Calculates cpu usage on folio nodes
+	folio = subprocess.check_output(['iostat'])
+
+	folio_use = []
+	folio_name = folio.split('\n')[0].split(' ')[2].strip('()')
+	for output in folio.split('\n'):
+		device = output.split(' ')[0]
+		if device in ['Device:', 'sda', 'sda1', 'sda2','dm-0', 'dm-1']:
+			line = output[:].split(' ')
+			new_line = filter(lambda a: a not in [''], line)
+			folio_use.append(new_line)
+
+	device = ['Device:', 'sda', 'sda1', 'sda2','dm-0', 'dm-1']
+	#Convert all numbers to floats, keep words as strings
+	folio_use = [[float(i) if i not in device else i for i in j] for j in folio_use[1:]]
+
+	return [folio_name, folio_use]
+
+def ram_free():
+	#Calculates ram usage on folio
+	folio = subprocess.check_output(['free', '-b'])
+	ram = []
+	for output in folio.split('\n'):
+		line = output[:].split(' ')
+		new_line = filter(lambda a: a not in [''], line)
+		ram.append(new_line)	
+
+	reram = []
+	for key, row in enumerate(ram[1:-1]):
+		if key in [0,2]:
+				reram.extend([int(i) for i in row[1:]])
+		if key in [1]:
+				reram.extend([int(i) for i in row[2:]])
+
+	return [reram]
+
+def cpu_perc():
+	#Calculates cpu usage on folio
+	folio = subprocess.check_output(['mpstat', '-P', 'ALL', '1', '1'])
+	cpu = []
+	for output in folio.split('\n'):
+		if output in [folio.split('\n')[0],folio.split('\n')[1]]:
+			continue
+		line = output[:].split(' ')
+		new_line = filter(lambda a: a not in [''], line)
+		if new_line[0] not in ['Average:']:
+			cpu.append(new_line)
+
+	recpu = []
+	for row in cpu[2:]:
+		dummy_cpu = []
+		for key, item in enumerate(row):
+			if key in [2,3,5,6,10,11]:
+				dummy_cpu.append(float(item))
+		recpu.append(dummy_cpu)
+
+	return recpu
 
 def calc_size(host, path, filename):
 	named_host = socket.gethostname()
@@ -66,25 +138,9 @@ def add_data(input_host, input_paths):
 	return None
 
 if __name__ == '__main__':
-	if len(sys.argv) == 2:
-		input_host = sys.argv[1].split(':')[0]
-		if input_host == sys.argv[1]:
-			print 'Needs host'
-			sys.exit()
-		input_paths = glob.glob(sys.argv[1].split(':')[1])
-	elif len(sys.argv) == 3:
-		input_host = sys.argv[1]
-		input_paths = glob.glob(sys.argv[2])
-	else:
-		input_host = raw_input('Source directory host: ')
-		input_paths = glob.glob(raw_input('Source directory path: '))
+	hosts = ('folio', 'node01', 'node02', 'node03', 'node04', 'node05', 'node06', 'node07', 'node08', 'node09', 'node10')
 
-	input_paths = dupe_check(input_host, input_paths)
-	input_paths.sort()
-	npz_paths = [npz_path for npz_path in input_paths if '.npz' in npz_path]
-	npz_paths.sort()
-	input_paths = [input_path for input_path in input_paths if '.npz' not in input_path]
-	input_paths.sort()
-	add_files(input_host, input_paths)
-	add_files(input_host, npz_paths)
-	update_obsnums()
+	for host in hosts:
+		ssh = login_ssh(host)
+		#run functions
+		ssh.close()
