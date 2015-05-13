@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Create paperdata tables
 
-from ddr_compress import dbi as pdbi
+from ddr_compress.dbi import DataBaseInterface, File, Observation
 import paperdata_dbi
 import add_files
 
@@ -14,15 +14,40 @@ import add_files
 ### Date: 5-06-15
 
 def md5_db():
-	dbi = paperdata_dbi.DataBaseInterface()
+	data_dbi = paperdata_dbi.DataBaseInterface()
+	s = data_dbi.Session()
+	FILEs = s.query(data_dbi.File).filter(data_dbi.File.md5sum==None).all()
+	s.close()
+	for FILE in FILEs:
+		md5 = add_files.calc_md5sum(FILE.host, FILE.path, FILE.filename)
+		data_dbi.set_file_md5(FILE.full_path, md5)
+
+	return None
+
+def md5_distiller():
+	dbi = DataBaseInterface()
 	s = dbi.Session()
 	FILEs = s.query(dbi.File).filter(dbi.File.md5sum==None).all()
 	s.close()
 	for FILE in FILEs:
-		md5 = add_files.calc_md5sum(FILE.host, FILE.path, FILE.filename)
-		dbi.set_file_md5(FILE.full_path, md5)
+		full_path = FILE.path
+		path = os.path.dirname(full_path)
+		filename = os.path.basename(full_path)
+		md5 = add_files.calc_md5sum(FILE.host, path, filename)
+		FILE.md5sum = md5
+		s = dbi.Session()
+		s.add(FILE)
+		s.commit()
+		s.close()
 
 	return None
 
 if __name__ == '__main__':
-	md5_db()
+	if len(sys.argv) != 2:
+		print('Input argument -- [paperdata/paperdistiller] to select which database to update md5sums')
+	elif sys.argv[1] == 'paperdata':
+		md5_db()
+	elif sys.argv[1] == 'paperdistiller':
+		md5_distiller()
+	else:
+		print('Unallowed argument(s)')
