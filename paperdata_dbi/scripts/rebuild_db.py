@@ -143,13 +143,12 @@ def get_next_obs(obsnum):
 def calc_times(host, path, filename):
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
-	times =  ('NULL', 'NULL', 'NULL')
+	named_host = socket.gethostname()
 	if named_host == host:
-		#allows uv access
 		try:
 			uv = A.miriad.UV(full_path)
 		except:
-			return times
+			return None
 
 		time_start = 0
 		time_end = 0
@@ -166,52 +165,23 @@ def calc_times(host, path, filename):
 					c_time = t
 					n_times += 1
 		except:
-			return times
+			return None
 
 		if n_times > 1:
 			delta_time = -(time_start - time_end)/(n_times - 1)
 		else:
 			delta_time = -(time_start - time_end)/(n_times)
-
-		times = (time_start, time_end, delta_time)
 	else:
-		ssh = login_ssh(host)
+		ssh = paperdata_dbi.login_ssh(host)
+		uv_data_script = './uv_data.py'
 		sftp = ssh.open_sftp()
-		#allows uv access
-		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??
-		remote_path = sftp.file(full_path, mode='r')
-		try:
-			uv = A.miriad.UV(remote_path)
-		except:
-			return times
-
-		time_start = 0
-		time_end = 0
-		n_times = 0
-		c_time = 0
-
-		try:
-			for (uvw, t, (i,j)),d in uv.all():
-				if time_start == 0 or t < time_start:
-				time_start = t
-				if time_end == 0 or t > time_end:
-				time_end = t
-				if c_time != t:
-				c_time = t
-				n_times += 1
-		except:
-			return times
-
-		if n_times > 1:
-			delta_time = -(time_start - time_end)/(n_times - 1)
-		else:
-			delta_time = -(time_start - time_end)/(n_times)
-
-		times = (time_start, time_end, delta_time)
-
+		sftp.put(uv_data_script, './')
 		sftp.close()
+		stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(uv_data_script, host, full_path))
+		time_start, time_end, delta_time = [float(info) for info in uv_data.read().split(',')]
 		ssh.close()
 
+	times = (time_start, time_end, delta_time)
 	return times
 
 ### Backup Functions
