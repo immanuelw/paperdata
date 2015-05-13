@@ -3,9 +3,7 @@
 # Load data into MySQL table 
 
 # import the MySQLdb and sys modules
-import MySQLdb
 import sys
-import getpass
 import os
 import csv
 import time
@@ -15,7 +13,6 @@ import shutil
 import socket
 import aipy as A
 import hashlib
-import base64
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
@@ -24,6 +21,7 @@ from sqlalchemy import func
 import paperdata_dbi
 import add_files
 import uv_data
+import move_files
 
 ### Script to load infromation quickly from paperdistiller database into paperdata
 ### Queries paperdistiller for relevant information, loads paperdata with complete info
@@ -31,9 +29,9 @@ import uv_data
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-def calculate_free_space(dir):
+def calculate_free_space(direc):
 	#Calculates the free space left on input dir
-	folio = subprocess.check_output(['du', '-bs', dir])
+	folio = subprocess.check_output(['du', '-bs', direc])
 	#Amount of available bytes should be free_space
 
 	#Do not surpass this amount ~1.2TiB
@@ -69,7 +67,7 @@ def email_space(table):
 
 	return None
 
-def gen_data():
+def add_data():
 	dbi = DataBaseInterface()
 	s = dbi.Session()
 	#do stuff
@@ -88,10 +86,10 @@ def gen_data():
 
 	#tuple list of all complete days
 	complete_jdays = tuple(day for day in count_days.keys() if count_day[day]==all_day[day])
-	complete_OBSs = []
+	raw_OBSs = []
 	for OBS, jday in j_days.items():
 		if jday in complete_jdays:
-			complete_OBSs.append(OBS)
+			raw_OBSs.append(OBS)
 	
 	#check if day complete
 	#if so ignore if already in db
@@ -100,7 +98,10 @@ def gen_data():
 	#If not, add obs to paperdata, attempt to add files later
 	#then create list of tuples of path, filename, other info to load into paperdata
 
-	for OBS in complete_OBSs:
+	#need to keep list of files to move of each type -- (host, path, filename, filetype)
+	movable_paths = []
+
+	for OBS in raw_OBSs:
 		FILE = s.query(File).filter(File.obsnum==OBS.obsnum).one()
 
 		obsnum = OBS.obsnum
@@ -118,14 +119,43 @@ def gen_data():
 		filename = os.path.basename(full_path)
 		filetype = filename.split('.')[-1]
 
-		ssh = paperdata_dbi.login_ssh(host)
-		uv_data_script = './uv_data.py'
-		sftp = ssh.open_sftp()
-		sftp.put(uv_data_script, './')
-		sftp.close()
-		stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(uv_data_script, host, full_path))
-		time_start, time_end, delta_time = [float(info) for info in uv_data.read().split(',')]
-		ssh.close()
+		named_host = socket.gethostname()
+		if named_host == host:
+			try:
+				uv = A.miriad.UV(full_path)
+			except:
+				continue
+
+			time_start = 0
+			time_end = 0
+			n_times = 0
+			c_time = 0
+
+			try:
+				for (uvw, t, (i,j)),d in uv.all():
+					if time_start == 0 or t < time_start:
+						time_start = t
+					if time_end == 0 or t > time_end:
+						time_end = t
+					if c_time != t:
+						c_time = t
+						n_times += 1
+			except:
+				continue
+
+			if n_times > 1:
+				delta_time = -(time_start - time_end)/(n_times - 1)
+			else:
+				delta_time = -(time_start - time_end)/(n_times)
+		else:
+			ssh = paperdata_dbi.login_ssh(host)
+			uv_data_script = './uv_data.py'
+			sftp = ssh.open_sftp()
+			sftp.put(uv_data_script, './')
+			sftp.close()
+			stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(uv_data_script, host, full_path))
+			time_start, time_end, delta_time = [float(info) for info in uv_data.read().split(',')]
+			ssh.close()
 		
 		#indicates julian day and set of data
 		if julian_date < 2456100:
@@ -162,195 +192,55 @@ def gen_data():
 		md5 = add_files.calc_md5sum(host, path, filename)
 		tape_index = None
 
-		write_to_tape = False
+		write_to_tape = True
 		delete_file = False
 
 		obs_data = (obsnum, julian_date, polarization, julian_day, era, era_type,
 					length, time_start, time_end, delta_time, prev_obs, next_obs, edge)
 		data_dbi.add_observation(*obs_data)
-		file_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file) #cal_path?? XXXX
-		data_dbi.add_file(*file_data)
+		raw_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file) #cal_path?? XXXX
+		data_dbi.add_file(*raw_data)
+		movable_paths.append((host, path, filename, filetype))
+
+
+		compr_filename = filename + 'cRRE'
+		compr_filetype = 'uvcRRE'
+		compr_filesize = add_files.calc_size(host, path, compr_filename)
+		compr_md5 = add_files.calc_md5sum(host, path, compr_filename)
+		compr_write_to_tape = False
+		if os.path.isdir(compr_filename):
+			compr_data = (host, path, compr_filename, compr_filetype, obsnum,
+							compr_filesize, compr_md5, tape_index, compr_write_to_tape, delete_file)
+			data_dbi.add_file(*compr_data)
+			movable_paths.append((host, path, compr_filename, compr_filetype))
+
+		npz_filename = filename + 'cRE.npz'
+		npz_filetype = 'npz'
+		npz_filesize = add_files.calc_size(host, path, npz_filename)
+		npz_md5 = add_files.calc_md5sum(host, path, npz_filename)
+		npz_write_to_tape = False
+		if os.path.isfile(npz_filename):
+			npz_data = (host, path, npz_filename, npz_filetype, obsnum, npz_filesize, npz_md5, tape_index, npz_write_to_tape, delete_file)
+			data_dbi.add_file(*npz_data)
+			movable_paths.append((host, npz_path, npz_filename, npz_filetype))
+
 	s.close()
 	sp.close()
 
-	return file_paths
+	return movable_paths
 
-def move_files(infile_list, outfile, move_data, usrnm, pswd):
-	host = 'folio'
+def bridge_move(input_host, movable_paths, raw_host, raw_dir, compr_host, compr_dir, npz_host, npz_dir):
+	raw_paths = [os.path.join(path[1], path[2]) for path in movable_paths if path[3] == 'uv']
+	compr_paths = [os.path.join(path[1], path[2]) for path in movable_paths if path[3] == 'uvcRRE']
+	npz_paths = [os.path.join(path[1], path[2]) for path in movable_paths if path[3] == 'npz']
 
-	#create file to log movement data	   
-	dbo = os.path.join(outfile, move_data)
-	dbr = open(dbo,'wb')
-	dbr.close()
+	move_files.move_files(input_host, raw_paths, output_host, raw_dir)
+	move_files.move_files(input_host, compr_paths, output_host, compr_dir)
+	move_files.move_files(input_host, npz_paths, output_host, npz_dir)
 
-	o_dict = {}
-	for file in infile_list:
-		zen = file.split('/')[-1]
-		psa = file.split('.')[-4]
+	return True
 
-		subdir = os.path.join(psa,zen)
-		outdir = os.path.join(outfile,psa)
-
-		if not os.path.isdir(outdir):
-			os.mkdir(outdir)
-
-		out = os.path.join(outfile,subdir)
-
-		o_dict.update({file:out})
-
-	#Load data into named database and table
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-	cursor = connection.cursor()
-
-	#Load into db
-	for infile in infile_list:
-		if infile.split('.')[-1] != 'uv':
-			print 'Invalid file type'
-			sys.exit()
-
-		outfile = o_dict[infile]
-
-		#Opens file to append to
-		dbr = open(dbo, 'ab')
-		wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
-
-		#"moves" file
-		try:
-			inner = infile.split(':')[1]
-			shutil.move(inner, outfile)
-			wr.writerow([infile,outfile])
-			print infile, outfile
-			dbr.close()
-		except:
-			dbr.close()
-			continue
-		# execute the SQL query using execute() method, updates new location
-		infile_path = infile
-		outfile_path = host + ':' + o_dict[infile]
-		if infile.split('.')[-1] == 'uv':
-			cursor.execute('''UPDATE paperdata set raw_path = %s, write_to_tape = 1 where raw_path = %s ''', (outfile_path, infile_path))
-
-	print 'File(s) moved and updated'
-
-	#Close database and save changes
-	cursor.close()
-	connection.commit()
-	connection.close()
-
-	return None
-
-def move_compressed_files(infile_list, outfile, move_data, usrnm, pswd):
-	host = 'folio'
-
-	#create file to log movement data	   
-	dbo = os.path.join(outfile, move_data)
-	dbr = open(dbo,'wb')
-	dbr.close()
-
-	o_dict = {}
-	for file in infile_list:
-		zen = file.split('/')[-1]
-		psa = file.split('.')[-4]
-
-		subdir = os.path.join(psa,zen)
-		outdir = os.path.join(outfile,psa)
-
-		if not os.path.isdir(outdir):
-			os.mkdir(outdir)
-
-		out = os.path.join(outfile,subdir)
-
-		o_dict.update({file:out})
-
-	#Load data into named database and table
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-	cursor = connection.cursor()
-
-	#Load into db
-	for infile in infile_list:
-		if infile.split('.')[-1] != 'uvcRRE':
-			print 'Invalid file type'
-			sys.exit()
-
-		infile_npz = infile.split('uvcRRE')[0] + 'uvcRE.npz'
-		infile_final_product = infile.split('uvcRRE')[0] + 'uvcRREzCPSBx'
-
-		infile_npz_path = ''
-		infile_final_path = ''
-
-		outfile = o_dict[infile]
-
-		#Opens file to append to
-		dbr = open(dbo, 'ab')
-		wr = csv.writer(dbr, delimiter='|', lineterminator='\n', dialect='excel')
-
-		npz_path = outfile.split('uvcRRE')[0] + 'uvcRE.npz'
-		final_product_path = outfile.split('uvcRRE')[0] + 'uvcRREzCPSBx'
-
-		#"moves" file
-		try:
-			inner = infile.split(':')[1]
-			shutil.move(inner, outfile)
-			wr.writerow([infile,outfile])
-			print infile, outfile
-			try:
-				if os.path.isfile(infile_npz):
-					inner_npz = infile_npz.split(':')[1]
-					shutil.move(inner_npz, npz_path)
-					wr.writerow([inner_npz,npz_path])
-					print inner_npz, npz_path
-				else:
-					infile_npz_path = 'NULL'
-					outfile_npz_path = 'NULL'
-				if os.path.isdir(infile_final_product):
-					inner_final = infile_final_product.split(':')[1]
-					shutil.move(inner_final, final_product_path)
-					wr.writerow([inner_final,final_product_path])
-					print inner_final, final_product_path
-				else:
-					infile_final_path = 'NULL'
-					outfile_final_path = 'NULL'
-				dbr.close()
-			except:
-				dbr.close()
-				continue
-		except:
-			dbr.close()
-			continue
-		# execute the SQL query using execute() method, updates new location
-		infile_path = infile
-		outfile_path = host + ':' + o_dict[infile]
-		if infile_npz_path != 'NULL':
-			infile_npz_path = infile_npz
-			outfile_npz_path = host + ':' + npz_path
-		if infile_final_path != 'NULL':
-			infile_final_path = infile_final_product
-			outfile_final_path = host + ':' + final_product_path
-		if infile.split('.')[-1] == 'uvcRRE':
-			cursor.execute('''UPDATE paperdata set path = %s, npz_path = %s, final_product_path = %s where path = %s and npz_path = %s and final_product_path = %s ''', (outfile_path, outfile_npz_path, outfile_final_path, infile_path, infile_npz_path, infile_final_path))
-
-	print 'File(s) moved and updated'
-
-	#Close database and save changes
-	cursor.close()
-	connection.commit()
-	connection.close()
-
-	return None
-
-def paperbridge(auto):
-	#User input information
-	if auto != 'y':
-		usrnm = raw_input('Username: ')
-		pswd = getpass.getpass('Password: ')
-
-		auto_load = raw_input('Automatically load into paperdata? (y/n): ')
-
-	else:
-		usrnm = 'jaguirre'
-		pswd = base64.b64decode('amFndWlycmU2OTE5')
-		auto_load = 'y'
-
+def paperbridge():
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 	dbnum = '/data4/paper/paperdistiller_output/paperdistiller_output_%s.psv'%(time_date)
 	dbe = '/data4/paper/paperdistiller_output/paperdistiller_error_%s.psv'%(time_date)
@@ -359,29 +249,21 @@ def paperbridge(auto):
 	required_space = 1112661213184
 
 	#Amount of space free in directory
-	dir = '/data4/paper/raw_to_tape/'
-	free_space = calculate_free_space(dir)
+	direc = '/data4/paper/raw_to_tape/'
+	free_space = calculate_free_space(direc)
 
 	if free_space <= required_space:
-		#Pull information from paperdistiler
-		results, obsnums, filenames, filenames_c = gen_data_list(usrnm,pswd)
+		input_host = raw_input('Source directory host: ')
+		#Add observations and paths from paperdistiller
+		movable_paths = add_data()
+		raw_host = raw_input('Raw destination directory host: ')
+		raw_dir = raw_input('Raw destination directory: ')
+		compr_host = raw_input('Compressed destination directory host: ')
+		compr_dir = raw_input('Compressed destination directory: ')
+		npz_host = raw_input('Npz destination directory host: ')
+		npz_dir = raw_input('Npz destination directory: ')
 
-		#Generate data from info pulled
-		gen_data_from_paperdistiller(results, obsnums, dbnum, dbe)
-
-		#check if auto-loading
-		if auto_load == 'y':
-			#Load information into paperdata
-			table = 'paperdata'
-			load_paperdata.load_db_from_file(dbnum, table, usrnm, pswd)
-			#Update paperdata and move data
-			move_data = 'moved_data_%s.psv'%(time_date)	
-			#outfile = '/data4/paper/raw_to_tape'
-			#move_files(filenames, outfile, move_data, usrnm, pswd)
-			#outfile_c = '/data4/paper/2013EoR'
-			#move_compressed_files(filenames_c, outfile_c, move_data, usrnm, pswd)
-		else:
-			print '''Information logged into '%s' ''' %(dbnum)
+		bridge_move(input_host, movable_paths, raw_host, raw_dir, compr_host, compr_dir, npz_host, npz_dir)
 
 	else:
 		table = 'paperdistiller'
