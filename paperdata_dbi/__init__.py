@@ -324,6 +324,22 @@ class DataBaseInterface(object):
 		yay = self.update_file(FILE)
 		return yay
 
+	def get_file_write(self, full_path):
+		"""
+		todo
+		"""
+		FILE = self.get_file(full_path)
+		return FILE.write_to_tape
+
+	def set_file_write(self, full_path, write_to_tape):
+		"""
+		todo
+		"""
+		FILE = self.get_file(full_path)
+		FILE.write_to_tape = write_to_tape
+		yay = self.update_file(FILE)
+		return yay
+
 	def get_file_delete(self, full_path):
 		"""
 		todo
