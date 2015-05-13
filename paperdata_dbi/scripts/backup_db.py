@@ -29,29 +29,29 @@ def paperbackup(time_date, usrnm, pswd):
 
 	#Create separate files for each directory
 
-	db1 = 'paperdata_backup_%s.psv'%(time_date)
+	db1 = 'paper_observation_backup_%s.psv'%(time_date)
 	dbo1 = os.path.join(backup_dir,db1)
 	print dbo1
 	data_file1 = open(dbo1,'wb')
 	wr1 = csv.writer(data_file1, delimiter='|', lineterminator='\n', dialect='excel')
 
-	db2 = 'paperjunk_backup_%s.psv'%(time_date)
+	db2 = 'paper_file_backup_%s.psv'%(time_date)
 	dbo2 = os.path.join(backup_dir,db2)
 	print dbo2
 	data_file2 = open(dbo2,'wb')
 	wr2 = csv.writer(data_file2, delimiter='|', lineterminator='\n', dialect='excel')
 
-	db3 = 'paperrename_backup_%s.psv'%(time_date)
-	dbo3 = os.path.join(backup_dir,db3)
-	print dbo3
-	data_file3 = open(dbo3,'wb')
-	wr3 = csv.writer(data_file3, delimiter='|', lineterminator='\n', dialect='excel')
+	#db3 = 'paperrename_backup_%s.psv'%(time_date)
+	#dbo3 = os.path.join(backup_dir,db3)
+	#print dbo3
+	#data_file3 = open(dbo3,'wb')
+	#wr3 = csv.writer(data_file3, delimiter='|', lineterminator='\n', dialect='excel')
 
-	db4 = 'paperfeed_backup_%s.psv'%(time_date)
-	dbo4 = os.path.join(backup_dir,db4)
-	print dbo4
-	data_file4 = open(dbo4,'wb')
-	wr4 = csv.writer(data_file4, delimiter='|', lineterminator='\n', dialect='excel')
+	#db4 = 'paperfeed_backup_%s.psv'%(time_date)
+	#dbo4 = os.path.join(backup_dir,db4)
+	#print dbo4
+	#data_file4 = open(dbo4,'wb')
+	#wr4 = csv.writer(data_file4, delimiter='|', lineterminator='\n', dialect='excel')
 
 	#Load data into named database and table
 	# open a database connection
@@ -61,33 +61,33 @@ def paperbackup(time_date, usrnm, pswd):
 	cursor = connection.cursor()
 
 	# execute the SQL query using execute() method.
-	cursor.execute('SELECT * FROM paperdata order by julian_date asc, raw_path asc, path asc')
+	cursor.execute('SELECT * FROM Observation order by julian_date asc, polarization asc')
 	results = cursor.fetchall()
 
 	for item in results:
 		wr1.writerow(item)
 	data_file1.close()
 
-	cursor.execute('SELECT * FROM paperjunk order by junk_path asc, usb_number asc')
+	cursor.execute('SELECT * FROM File order by obsnum asc, filename asc')
 	results = cursor.fetchall()
 
 	for item in results:
 		wr2.writerow(item)
 	data_file2.close()
 
-	cursor.execute('SELECT * FROM paperrename order by julian_day asc, raw_path asc')
-	results = cursor.fetchall()
+	#cursor.execute('SELECT * FROM paperrename order by julian_day asc, raw_path asc')
+	#results = cursor.fetchall()
 
-	for item in results:
-		wr3.writerow(item)
-	data_file3.close()
+	#for item in results:
+	#	#wr3.writerow(item)
+	#data_file3.close()
 
-	cursor.execute('SELECT * FROM paperfeed order by julian_day asc, raw_path asc')
-	results = cursor.fetchall()
+	#cursor.execute('SELECT * FROM paperfeed order by julian_day asc, raw_path asc')
+	#results = cursor.fetchall()
 
-	for item in results:
-		wr4.writerow(item)
-	data_file4.close()
+	#for item in results:
+	#	#wr4.writerow(item)
+	#data_file4.close()
 
 	print time_date
 	print 'Table data backup saved'
@@ -144,8 +144,8 @@ if __name__ == '__main__':
 		pswd = getpass.getpass('Password: ')
 		sql_backup(dbnum, time_date, usrnm, pswd)
 	else:
-		usrnm = raw_input('Username: ')
-		pswd = getpass.getpass('Password: ')
+		usrnm = 'paperboy'
+		pswd = 'paperboy'
 		paperbackup(time_date, usrnm, pswd)
 		backup_file = '/data4/paper/paperdata_backup/%s/paperdata_backup_%s.psv' %(time_date, time_date)
 		email_backup(backup_file)
