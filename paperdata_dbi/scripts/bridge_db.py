@@ -6,7 +6,6 @@
 import sys
 import os
 import csv
-import time
 import subprocess
 import smtplib
 import shutil
@@ -238,13 +237,9 @@ def bridge_move(input_host, movable_paths, raw_host, raw_dir, compr_host, compr_
 	move_files.move_files(input_host, compr_paths, output_host, compr_dir)
 	move_files.move_files(input_host, npz_paths, output_host, npz_dir)
 
-	return True
+	return None
 
 def paperbridge():
-	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-	dbnum = '/data4/paper/paperdistiller_output/paperdistiller_output_%s.psv'%(time_date)
-	dbe = '/data4/paper/paperdistiller_output/paperdistiller_error_%s.psv'%(time_date)
-
 	#Calculate amount of space needed to move a day ~1.1TB
 	required_space = 1112661213184
 
