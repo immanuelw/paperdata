@@ -84,6 +84,7 @@ class Feed:
 						'filename',
 						'full_path',
 						'julian_day',
+						'ready_to_move',
 						'moved_to_distill')
 		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'host of file system that file is located on'),
 						'path':('VARCHAR(100)', 'None', 'No', 'directory that file is located in'),
@@ -92,6 +93,7 @@ class Feed:
 										identifier for each file'),
 						'julian_day':('INTEGER', 'None', 'No',
 										'integer value -- the last 4 digits for any julian date to separate into days: ex:(2456601 -> 6601)'),
+						'ready_to_move':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file is ready to be moved to distill')}
 						'moved_to_distill':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file has been moved to distill yet')}
 
 #dictionary of instantiated classes

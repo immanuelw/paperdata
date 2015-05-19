@@ -132,6 +132,7 @@ class Feed(Base):
 	filename = Column(String(100)) #zen.*.*.uv
 	full_path = Column(String(200), unique=True)
 	julian_day = Column(Integer)
+	ready_to_move = Column(Boolean)
 	moved_to_distill = Column(Boolean)
 
 class DataBaseInterface(object):
@@ -482,5 +483,21 @@ class DataBaseInterface(object):
 		"""
 		FEED = self.get_feed(full_path)
 		FEED.moved_to_distill = move
+		yay = self.update_feed(FEED)
+		return yay
+
+	def get_feed_ready(self, full_path):
+		"""
+		todo
+		"""
+		FEED = self.get_feed(full_path)
+		return FEED.ready_to_move
+
+	def set_feed_ready(self, full_path, ready):
+		"""
+		todo
+		"""
+		FEED = self.get_feed(full_path)
+		FEED.ready_to_move = ready
 		yay = self.update_feed(FEED)
 		return yay
