@@ -136,7 +136,7 @@ class Feed(Base):
 	moved_to_distill = Column(Boolean)
 
 class DataBaseInterface(object):
-	def __init__(self,configfile='~/.ddr_compress/still.cfg',test=False):
+	def __init__(self,configfile='./still.cfg',test=False):
 		"""
 		Connect to the database and initiate a session creator.
 		 or
