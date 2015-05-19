@@ -105,7 +105,7 @@ class Observation(Base):
 
 class File(Base):
 	__tablename__ = 'file'
-	filenum = Column(Integer, primary_key=True)
+	#filenum = Column(Integer, primary_key=True)
 	host = Column(String(100))
 	path = Column(String(100)) #directory
 	filename = Column(String(100)) #zen.*.*.uv/uvcRRE/uvcRREzx...
@@ -303,24 +303,6 @@ class DataBaseInterface(object):
 		s.commit()
 		s.close() #close the session
 		return None
-
-	def get_neighbors(self, obsnum):
-		"""
-		get the neighbors given the input obsnum
-		input: obsnum
-		return: list of two obsnums
-		If no neighbor, returns None the list entry
-
-		Todo: test. no close!!
-		"""
-		s = self.Session()
-		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
-		try: high = OBS.high_neighbors[0].obsnum
-		except(IndexError):high = None
-		try: low = OBS.low_neighbors[0].obsnum
-		except(IndexError):low=None
-		s.close()
-		return (low,high)
 
 	def get_file_path(self, full_path):
 		"""
