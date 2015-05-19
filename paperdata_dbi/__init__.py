@@ -125,6 +125,15 @@ class File(Base):
 	#  files associated with this observation
 	observation = relationship(Observation, backref=backref('files', uselist=True))
 
+class Feed(Base):
+	__tablename__ = 'feed'
+	host = Column(String(100))
+	path = Column(String(100)) #directory
+	filename = Column(String(100)) #zen.*.*.uv
+	full_path = Column(String(200), unique=True)
+	julian_day = Column(Integer)
+	moved_to_distill = Column(Boolean)
+
 class DataBaseInterface(object):
 	def __init__(self,configfile='~/.ddr_compress/still.cfg',test=False):
 		"""
@@ -191,7 +200,7 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
-		OBS = s.query(File).filter(File.full_path==full_path).one()
+		FILE = s.query(File).filter(File.full_path==full_path).one()
 		s.close()
 		return FILE
 
@@ -202,6 +211,30 @@ class DataBaseInterface(object):
 		"""
 		s = self.Session()
 		s.add(FILE)
+		s.commit()
+		s.close()
+		return True
+
+	def get_feed(self, full_path):
+		"""
+		retrieves an feed object.
+		Errors if there are more than one of the same feed in the db. This is bad and should
+		never happen
+
+		todo:test
+		"""
+		s = self.Session()
+		FEED = s.query(Feed).filter(Feed.full_path==full_path).one()
+		s.close()
+		return FEED
+
+	def update_feed(self, FEED):
+		"""
+		updates feed object field
+		***NEED TO TEST
+		"""
+		s = self.Session()
+		s.add(FEED)
 		s.commit()
 		s.close()
 		return True
@@ -402,4 +435,52 @@ class DataBaseInterface(object):
 		OBS = self.get_obs(obsnum)
 		OBS.edge = edge
 		yay = self.update_obs(OBS)
+		return yay
+
+	def get_feed_path(self, full_path):
+		"""
+		todo
+		"""
+		FEED = self.get_feed(full_path)
+		return FEED.path
+
+	def set_feed_path(self, full_path, path):
+		"""
+		todo
+		"""
+		FEED = self.get_feed(full_path)
+		FEED.path = path
+		yay = self.update_feed(FEED)
+		return yay
+
+	def get_feed_host(self, full_path):
+		"""
+		todo
+		"""
+		FEED = self.get_feed(full_path)
+		return FEED.host
+
+	def set_feed_host(self, full_path, host):
+		"""
+		todo
+		"""
+		FEED = self.get_feed(full_path)
+		FEED.host = host
+		yay = self.update_feed(FEED)
+		return yay
+
+	def get_feed_move(self, full_path):
+		"""
+		todo
+		"""
+		FEED = self.get_feed(full_path)
+		return FEED.moved_to_distill
+
+	def set_feed_move(self, full_path, move):
+		"""
+		todo
+		"""
+		FEED = self.get_feed(full_path)
+		FEED.moved_to_distill = move
+		yay = self.update_feed(FEED)
 		return yay
