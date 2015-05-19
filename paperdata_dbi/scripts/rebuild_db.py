@@ -320,7 +320,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 						results = (tuple(i for i in item),)
 					else:
 						results += tuple(i for i in item)
-
+		"""
 		elif dbnum == dbnum5:
 			#host, final_product_path, filename, filetype, full_path, obsnum
 			cursor.execute('''SELECT SUBSTRING_INDEX(final_product_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(final_product_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(final_product_path, ':', -1), '/', -1), SUBSTRING_INDEX(final_product_path, '.', -1), final_product_path, obsnum FROM paperdata where final_product_path != 'NULL' group by final_product_path order by julian_date asc, polarization asc''')
@@ -351,7 +351,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 					else:
 						results += tuple(i for i in item)
 
-
+		"""
 		resultFile = open(dbnum,'ab')
 		wr = csv.writer(resultFile, delimiter='|', lineterminator='\n', dialect='excel')
 
