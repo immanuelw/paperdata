@@ -76,9 +76,27 @@ class Observation:
 						'next_obs':('BIGINT', 'None', 'Unique', 'observation number of next observation'),
 						'edge':('BOOLEAN', 'None', 'No', 'boolean value indicating if observation at beginning/end of night or not')}
 
+class Feed:
+	def __init__(self):
+		self.table = 'Feed'
+		self.db_list = ('host',
+						'path',
+						'filename',
+						'full_path',
+						'julian_day',
+						'moved_to_distill')
+		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'host of file system that file is located on'),
+						'path':('VARCHAR(100)', 'None', 'No', 'directory that file is located in'),
+						'filename':('VARCHAR(100)', 'None', 'No', 'name of file (ex: zen.2446321.16617.uvcRRE)'),
+						'full_path':('VARCHAR(200)', 'None', 'Unique', 'combination of host, path, and filename which is a unique
+										identifier for each file'),
+						'julian_day':('INTEGER', 'None', 'No',
+										'integer value -- the last 4 digits for any julian date to separate into days: ex:(2456601 -> 6601)'),
+						'moved_to_distill':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file has been moved to distill yet')}
+
 #dictionary of instantiated classes
-instant_class = {'File':File(), 'Observation':Observation()}
-all_classes = (File(), Observation())
+instant_class = {'File':File(), 'Observation':Observation(), 'Feed':Feed()}
+all_classes = (File(), Observation(), Feed())
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':
