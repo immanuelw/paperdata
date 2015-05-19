@@ -290,7 +290,19 @@ class DataBaseInterface(object):
 		s.commit()
 		#filenum = FILE.filenum #we gotta grab this before we close the session.
 		s.close() #close the session
-		return filenum
+		#return filenum
+		return None
+
+	def add_feed(self, host, path, filename, ready_to_move, moved_to_distill):
+		"""
+		Add a feed to the database
+		"""
+		FEED = Feed(self, host, path, filename, ready_to_move, moved_to_distill)
+		s = self.Session()
+		s.add(FEED)
+		s.commit()
+		s.close() #close the session
+		return None
 
 	def get_neighbors(self, obsnum):
 		"""
