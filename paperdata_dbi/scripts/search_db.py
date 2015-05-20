@@ -8,6 +8,7 @@ import paperdata_dbi
 import decimal
 import sys
 import time
+import csv
 
 ### Script to create GUI to easily search paperdata database
 ### Has fields to enter to search for any and all which match certain parameters
