@@ -2,14 +2,7 @@
 # -*- coding: utf-8 -*-
 # Add files to pyganglia
 
-import MySQLdb
 import sys
-import getpass
-import time
-import csv
-import subprocess
-import glob
-import socket
 import os
 import paramiko
 import pyganglia_dbi
@@ -36,9 +29,10 @@ def login_ssh(host, username=None):
 
 	return ssh
 
-def calculate_folio_space(dir):
+def calculate_folio_space(ssh):
 	#Calculates the free space left on input dir
-	folio = subprocess.check_output(['df', '-B', '1'])
+	stdin, folio, stderr = ssh.exec_command('df -B 1')
+
 	#/data4 should be filesystem
 	#Amount of available bytes should be free_space
 
@@ -50,9 +44,9 @@ def calculate_folio_space(dir):
 
 	return folio_space
 
-def iostat():
+def iostat(ssh):
 	#Calculates cpu usage on folio nodes
-	folio = subprocess.check_output(['iostat'])
+	stdin, folio, stderr = ssh.exec_command('iostat')
 
 	folio_use = []
 	folio_name = folio.split('\n')[0].split(' ')[2].strip('()')
@@ -69,9 +63,9 @@ def iostat():
 
 	return [folio_name, folio_use]
 
-def ram_free():
+def ram_free(ssh):
 	#Calculates ram usage on folio
-	folio = subprocess.check_output(['free', '-b'])
+	stdin, folio, stderr = ssh.exec_command('free -b')
 	ram = []
 	for output in folio.split('\n'):
 		line = output[:].split(' ')
@@ -87,9 +81,9 @@ def ram_free():
 
 	return [reram]
 
-def cpu_perc():
+def cpu_perc(ssh):
 	#Calculates cpu usage on folio
-	folio = subprocess.check_output(['mpstat', '-P', 'ALL', '1', '1'])
+	stdin, folio, stderr = ssh.exec_command('mpstat -P ALL 1 1')
 	cpu = []
 	for output in folio.split('\n'):
 		if output in [folio.split('\n')[0],folio.split('\n')[1]]:
@@ -109,31 +103,14 @@ def cpu_perc():
 
 	return recpu
 
-def calc_size(host, path, filename):
-	named_host = socket.gethostname()
-	full_path = os.path.join(path, filename)
-	#DEFAULT VALUE
-	size = 0
-	if named_host == host:
-		size = round(float(sizeof_fmt(get_size(full_path))), 1)
-	else:
-		ssh = login_ssh(host)
-		sftp = ssh.open_sftp()
-		size_bytes = sftp.stat(full_path).st_size
-		size = round(float(sizeof_fmt(size_bytes)), 1)
-		sftp.close()
-		ssh.close()
-
-	return size
-
-def add_data(input_host, input_paths):
+def add_data(ssh):
 	dbi = pyganglia_dbi.DataBaseInterface()
-	for input_path in input_paths:
-		path = os.path.dirname(input_path)
-		filename = os.path.basename(input_path)
-		obs_data, file_data = calc_uv_data(input_host, path, filename)
-		dbi.add_observation(*obs_data)
-		dbi.add_file(*file_data)
+	iostat_data = iostat(ssh)
+	ram_data = ram_free(ssh)
+	cpu_data = cpu_perc(ssh)
+	dbi.add_iostat(*iostat_data)
+	dbi.add_ram(*ram_data)
+	dbi.add_cpu(*cpu_data)
 
 	return None
 
@@ -142,5 +119,5 @@ if __name__ == '__main__':
 
 	for host in hosts:
 		ssh = login_ssh(host)
-		#run functions
+		add_data(ssh)
 		ssh.close()
