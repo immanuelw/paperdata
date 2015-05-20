@@ -7,6 +7,7 @@ import paperdata_db as pdb
 import paperdata_dbi
 import decimal
 import sys
+import time
 
 ### Script to create GUI to easily search paperdata database
 ### Has fields to enter to search for any and all which match certain parameters
@@ -50,7 +51,7 @@ def makeform(root, fields, file_fields, obs_fields):
 		d = Checkbutton(row3, text=field, variable=jvar, onvalue=True, offvalue=False)
 		d.var = jvar
 		d.pack(side=LEFT)
-		output.append((field, d.var, ent2))
+		file_output.append((field, d.var, ent2))
 	ent2.pack(side=RIGHT, expand=YES, fill=X)
 
 	row4 = Frame(root)
@@ -64,10 +65,10 @@ def makeform(root, fields, file_fields, obs_fields):
 		e = Checkbutton(row4, text=field, variable=kvar, onvalue=True, offvalue=False)
 		e.var = kvar
 		e.pack(side=LEFT)
-		output.append((field, e.var, ent3))
+		obs_output.append((field, e.var, ent3))
 	ent3.pack(side=RIGHT, expand=YES, fill=X)
 
-	return (entries, output)
+	return (entries, file_output, obs_output)
 
 def convert(entries):
 	info_list = []
@@ -231,6 +232,24 @@ def sql_query(output, info_list, tab):
 	sql_output = tuple(sql_output)
 	return sql_output
 
+def write_to_file(data, table)
+	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
+	file_name = './paper_{0}_output_{1}.psv'.format(table, time_date)
+	data_file = open(file_name,'wb')
+	wr = csv.writer(data_file, delimiter='|', lineterminator='\n', dialect='excel')
+	for item in data:
+		wr.writerow(item)
+	data_file.close()
+
+	print file_name + ' saved'
+	return None
+
+def print_data(data):
+	for item in data:
+		print ', '.join(map(str, item))
+
+	return None
+
 if __name__ == '__main__':
 	#Decide which table to search
 	if len(sys.argv) > 1:
@@ -256,20 +275,19 @@ if __name__ == '__main__':
 	#Generate GUI
 	root = Tk()
 	root.title('Paperdata Query')
-	ents, output_conv = makeform(root, fields, file_fields, obs_fields)
-	output = tuple(field[0] for field in output_conv if field[1].get() is True)
+	ents, file_output_conv, obs_output_conv = makeform(root, fields, file_fields, obs_fields)
+	file_output = tuple(field[0] for field in file_output_conv if field[1].get() is True)
+	obs_output = tuple(field[0] for field in obs_output_conv if field[1].get() is True)
 	info_list = convert(ents)
-	b1 = Button(root, text='Output Files', command=(lambda e=ents: sql_query(output, convert(e), tab)))
-	root.bind('<Return>', (lambda event, e=ents: convert(e, sql_string)))
-	#b1 = Button(root, text='Output Files', command=(lambda e=ents: convert(e, sql_string, db_dict, var_flo, var_str, var_int, table)))
-	b2 = Button(root, text='Output Observations', command=(lambda e=ents: convert(e, dbs_list, db_dict, var_flo, var_str, var_int, table)))
-	b3 = Button(root, text='Output Files as .psv', command=(lambda e=ents: convert(e, sql_string, db_dict, var_flo, var_str, var_int, table)))
-	b4 = Button(root, text='Output Observations as .psv', command=(lambda e=ents: convert(e, dbs_list, db_dict, var_flo, var_str, var_int, table)))
+	b1 = Button(root, text='Output Files', command=(lambda e=ents: print_data(sql_query(file_output, convert(e), tab))))
+	b2 = Button(root, text='Output Observations', command=(lambda e=ents: print_data(sql_query(obs_output, convert(e), tab))))
+	b3 = Button(root, text='Output Files as .psv', command=(lambda e=ents: write_to_file(sql_query(file_output, convert(e), tab), tab)))
+	b4 = Button(root, text='Output Observations as .psv', command=(lambda e=ents: write_to_file(sql_query(obs_output, convert(e), tab), tab)))
+	b5 = Button(root, text='Quit', command=root.quit)
 	b1.pack(side=LEFT, padx=5, pady=5)
 	b2.pack(side=LEFT, padx=5, pady=5)
 	b3.pack(side=LEFT, padx=5, pady=5)
 	b4.pack(side=LEFT, padx=5, pady=5)
-	b5 = Button(root, text='Quit', command=root.quit)
 	b5.pack(side=LEFT, padx=5, pady=5)
 	root.mainloop()
 
