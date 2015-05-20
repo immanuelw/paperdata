@@ -26,20 +26,25 @@ classes = ('monitor', 'ram', 'iostat', 'cpu')
 class monitor:
 	def __init__(self):
 		self.table = 'monitor'
-		self.db_list = ('filename',
+		self.db_list = ('still_host',
+						'path',
+						'filename',
+						'full_path',
 						'status',
 						'del_time',
 						'time_start',
 						'time_end',
-						'still_host',
 						'time_date')
-		self.db_descr = {'filename':('VARCHAR(100)', 'None', 'No', 'name/path of uv file being compressed'),
+		self.db_descr = {'still_host'('VARCHAR(100)', 'None', 'No', 'node that uv file is being compressed on'),
+						'path':('VARCHAR(100)', 'None', 'No', 'directory that file is located in'),
+						'filename':('VARCHAR(100)', 'None', 'No', 'name/path of uv file being compressed'),
+						'full_path':('VARCHAR(200)', 'None', 'Unique', 'combination of host, path, and filename which is a unique
+										identifier for each file'),
 						'status':('VARCHAR(100)', 'None', 'No', 'state of compression file is currently doing'),
 						'del_time':('BIGINT', 'None', 'No', 'time taken to finish step -- status transition'),
 						'time_start':('BIGINT', 'None', 'No', 'time process started as a integer -- process transition'),
 						'time_end':('BIGINT', 'None', 'No', 'time process ended as an integer -- process transition'),
-						'still_host'('VARCHAR(100)', 'None', 'No', 'node that uv file is being compressed on'),
-						'time_date':('DECIMAL(13,6)', 'None', 'No', 'time and date entry was updated'}
+						'time_date':('DECIMAL(13,6)', 'None', 'No', 'time and date entry was updated')}
 
 class ram:
 	def __init__(self):
