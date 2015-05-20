@@ -58,12 +58,41 @@ class Monitor(Base):
 
 class Ram(Base):
 	__tablename__ = 'ram'
+	host = Column(String(100))
+	total = Column(BigInteger)
+	used = Column(BigInteger)
+	free = Column(BigInteger)
+	shared = Column(BigInteger)
+	buffers = Column(BigInteger)
+	cached = Column(BigInteger)
+	bc_used = Column(BigInteger)
+	bc_free = Column(BigInteger)
+	swap_total = Column(BigInteger)
+	swap_used = Column(BigInteger)
+	swap_free = Column(BigInteger)
+	time_date = Column(Numeric(13,6))
 
 class Iostat(Base):
 	__tablename__ = 'iostat'
+	host = Column(String(100))
+	device = Column(String(100))
+	tps = Column(Numeric(7,2))
+	read_s = Column(Numeric(7,2))
+	write_s = Column(Numeric(7,2))
+	bl_reads = Column(BigInteger)
+	bl_writes = Column(BigInteger)
+	time_date = Column(Numeric(13,6))
 
 class Cpu(Base):
 	__tablename__ = 'cpu'
+	host = Column(String(100))
+	cpu = Column(Integer)
+	user_perc = Column(Numeric(5,2))
+	sys_perc = Column(Numeric(5,2))
+	iowait_perc = Column(Numeric(5,2))
+	idle_perc = Column(Numeric(5,2))
+	intr_s = Column(Integer)
+	time_date = Column(Numeric(13,6))
 
 class DataBaseInterface(object):
 	def __init__(self,configfile='./still.cfg',test=False):
@@ -98,74 +127,26 @@ class DataBaseInterface(object):
 								max_overflow=40)
 		self.Session = sessionmaker(bind=self.engine)
 
-	def get_obs(self, obsnum):
+	def get_monitor(self, full_path):
 		"""
-		retrieves an observation object.
-		Errors if there are more than one of the same obsnum in the db. This is bad and should
+		retrieves an monitor object.
+		Errors if there are more than one of the same monitor in the db. This is bad and should
 		never happen
 
 		todo:test
 		"""
 		s = self.Session()
-		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
+		MONITOR = s.query(Monitor).filter(Monitor.full_path==full_path).one()
 		s.close()
-		return OBS
+		return MONITOR
 
-	def update_obs(self, OBS):
+	def update_monitor(self, MONITOR):
 		"""
-		updates file object field
+		updates monitor object field
 		***NEED TO TEST
 		"""
 		s = self.Session()
-		s.add(OBS)
-		s.commit()
-		s.close()
-		return True
-
-	def get_file(self, full_path):
-		"""
-		retrieves an file object.
-		Errors if there are more than one of the same file in the db. This is bad and should
-		never happen
-
-		todo:test
-		"""
-		s = self.Session()
-		FILE = s.query(File).filter(File.full_path==full_path).one()
-		s.close()
-		return FILE
-
-	def update_file(self, FILE):
-		"""
-		updates file object field
-		***NEED TO TEST
-		"""
-		s = self.Session()
-		s.add(FILE)
-		s.commit()
-		s.close()
-		return True
-
-	def get_feed(self, full_path):
-		"""
-		retrieves an feed object.
-		Errors if there are more than one of the same feed in the db. This is bad and should
-		never happen
-
-		todo:test
-		"""
-		s = self.Session()
-		FEED = s.query(Feed).filter(Feed.full_path==full_path).one()
-		s.close()
-		return FEED
-
-	def update_feed(self, FEED):
-		"""
-		updates feed object field
-		***NEED TO TEST
-		"""
-		s = self.Session()
-		s.add(FEED)
+		s.add(MONITOR)
 		s.commit()
 		s.close()
 		return True
@@ -177,9 +158,9 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		table = File.__table__
 		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_tigger
-										after INSERT or UPDATE on File
+										after INSERT or UPDATE on Monitor
 										FOR EACH ROW
-										SET NEW.full_path = concat(NEW.host, ':', NEW.path, '/', NEW.filename)''')
+										SET NEW.full_path = concat(NEW.still_host, ':', NEW.path, '/', NEW.filename)''')
 		event.listen(table, 'after_create', insert_update_trigger)
 		Base.metadata.create_all()
 
@@ -190,62 +171,62 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
-	def add_observation(self, obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time,
-						prev_obs, next_obs, edge):
+	def add_monitor(self, host, path, filename, full_path, del_time, file_start, file_end, time_date):
 		"""
-		create a new observation entry.
-		returns: obsnum  (see jdpol2obsnum)
-		Note: does not link up neighbors!
+		create a new monitor entry.
 		"""
-		OBS = Observation(obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time,
-							prev_obs, next_obs, edge)
+		MONITOR = Monitor(host, path, filename, full_path, del_time, file_start, file_end, time_date)
 		s = self.Session()
-		s.add(OBS)
+		s.add(MONITOR)
 		s.commit()
-		obsnum = OBS.obsnum
 		s.close()
-		sys.stdout.flush()
-		return obsnum
-
-	def add_file(self, host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file): #cal_path?? XXXX
-		"""
-		Add a file to the database and associate it with an observation.
-		"""
-		FILE = File(host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file) #cal_path?? XXXX
-		#get the observation corresponding to this file
-		s = self.Session()
-		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
-		FILE.observation = OBS  #associate the file with an observation
-		s.add(FILE)
-		s.commit()
-		#filenum = FILE.filenum #we gotta grab this before we close the session.
-		s.close() #close the session
-		#return filenum
 		return None
 
-	def add_feed(self, host, path, filename, ready_to_move, moved_to_distill):
+	def add_ram(self, host, total, used, free, shared, buffers, cached, bc_used, bc_free, swap_total, swap_used, swap_free, time_date):
 		"""
-		Add a feed to the database
+		create a new ram entry.
 		"""
-		FEED = Feed(self, host, path, filename, ready_to_move, moved_to_distill)
+		RAM = Ram(host, total, used, free, shared, buffers, cached, bc_used, bc_free, swap_total, swap_used, swap_free, time_date)
 		s = self.Session()
-		s.add(FEED)
+		s.add(RAM)
 		s.commit()
-		s.close() #close the session
+		s.close()
 		return None
 
-	def get_file_path(self, full_path):
+	def add_iostat(self, host, device, tps, read_s, write_s, bl_reads, bl_writes, time_date):
+		"""
+		create a new iostat entry.
+		"""
+		IOSTAT = Iostat(host, device, tps, read_s, write_s, bl_reads, bl_writes, time_date)
+		s = self.Session()
+		s.add(IOSTAT)
+		s.commit()
+		s.close()
+		return None
+
+	def add_cpu(self, host, cpu, user_perc, sys_perc, iowait_perc, idle_perc, intr_s, time_date):
+		"""
+		create a new cpu entry.
+		"""
+		CPU = Cpu(host, cpu, user_perc, sys_perc, iowait_perc, idle_perc, intr_s, time_date)
+		s = self.Session()
+		s.add(CPU)
+		s.commit()
+		s.close()
+		return None
+
+	def get_monitor_path(self, full_path):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
-		return FILE.path
+		MONITOR = self.get_monitor(full_path)
+		return MONITOR.path
 
-	def set_file_path(self, full_path, path):
+	def set_monitor_path(self, full_path, path):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
-		FILE.path = path
-		yay = self.update_file(FILE)
+		MONITOR = self.get_monitor(full_path)
+		MONITOR.path = path
+		yay = self.update_monitor(MONITOR)
 		return yay

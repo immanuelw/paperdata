@@ -80,6 +80,9 @@ try:
 			except:
 				continue
 			#check for new filenames
+			path = os.path.dirname(filename)
+			file_name = os.path.basename(filename)
+			full_path = still_host + ':' + filename
 			if filename not in file_pid.keys():
 				file_pid.update({filename:current_pid})
 				time_start = int(time.time())
@@ -89,7 +92,7 @@ try:
 				time_end = int(time.time())
 				file_end.update({filename:time_end})
 				del_time = -1
-				file_log.append((filename, status, del_time, file_start[filename], file_end[filename], still_host, time_date))
+				file_log.append((still_host, path, file_name, full_path, del_time, file_start[filename], file_end[filename], time_date)
 				file_pid.update({filename:current_pid})
 				time_start = int(time.time())
 				file_start.update({filename:time_start})
@@ -97,12 +100,12 @@ try:
 			if filename not in file_status.keys():
 				file_status.update({filename:status})
 				del_time = 0
-				file_log.append((filename, status, del_time, file_start[filename], file_end[filename], still_host, time_date))
+				file_log.append((still_host, path, file_name, full_path, del_time, file_start[filename], file_end[filename], time_date)
 				file_time.update({filename:time.time()})
 			#write output log
 			if file_status[filename] not in [status]:
 				del_time = time.time() - file_time[filename]
-				file_log.append((filename, status, del_time, file_start[filename], file_end[filename], still_host, time_date))
+				file_log.append((still_host, path, file_name, full_path, del_time, file_start[filename], file_end[filename], time_date)
 				file_status.update({filename:status})
 				file_time.update({filename:time.time()})
 		pyg_dbi.add_monitor(*file_log)
