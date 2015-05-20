@@ -21,7 +21,7 @@ LIST = 6
 NONE = 7
 
 options = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
-classes = ('monitor_files', 'ram', 'iostat', 'cpu')
+classes = ('monitor', 'ram', 'iostat', 'cpu')
 
 class monitor:
 	def __init__(self):
@@ -112,8 +112,8 @@ class cpu:
 						'time_date':('DECIMAL(13,6)', 'None', 'No', 'time and date entry was updated')}
 
 #dictionary of instantiated classes
-instant_class = {'monitor_files':monitor_files(), 'ram':ram(), 'iostat':iostat(), 'cpu':cpu()}
-all_classes = (monitor_files(), ram(), iostat(), cpu())
+instant_class = {'monitor':monitor(), 'ram':ram(), 'iostat':iostat(), 'cpu':cpu()}
+all_classes = (monitor(), ram(), iostat(), cpu())
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':
