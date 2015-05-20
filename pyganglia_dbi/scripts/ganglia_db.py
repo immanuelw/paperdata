@@ -23,9 +23,9 @@ NONE = 7
 options = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
 classes = ('monitor_files', 'ram', 'iostat', 'cpu')
 
-class monitor_files:
+class monitor:
 	def __init__(self):
-		self.table = 'monitor_files'
+		self.table = 'monitor'
 		self.db_list = ('filename',
 						'status',
 						'del_time',
