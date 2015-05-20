@@ -33,12 +33,12 @@ class monitor_files:
 						'time_end',
 						'still_host',
 						'time_date')
-		self.db_descr = {'filename':('VARCHAR(255)', 'None', 'No', 'name/path of uv file being compressed'),
-						'status':('VARCHAR(255)', 'None', 'No', 'state of compression file is currently doing'),
+		self.db_descr = {'filename':('VARCHAR(100)', 'None', 'No', 'name/path of uv file being compressed'),
+						'status':('VARCHAR(100)', 'None', 'No', 'state of compression file is currently doing'),
 						'del_time':('BIGINT', 'None', 'No', 'time taken to finish step -- status transition'),
 						'time_start':('BIGINT', 'None', 'No', 'time process started as a integer -- process transition'),
 						'time_end':('BIGINT', 'None', 'No', 'time process ended as an integer -- process transition'),
-						'still_host'('VARCHAR(255)', 'None', 'No', 'node that uv file is being compressed on'),
+						'still_host'('VARCHAR(100)', 'None', 'No', 'node that uv file is being compressed on'),
 						'time_date':('DECIMAL(13,6)', 'None', 'No', 'time and date entry was updated'}
 
 class ram:
@@ -57,7 +57,7 @@ class ram:
 						'swap_used',
 						'swap_free',
 						'time_date')
-		self.db_descr = {'host':('VARCHAR(255)', 'None', 'No', 'system that is being monitored'),
+		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that is being monitored'),
 						'total':('BIGINT', 'None', 'No', 'total ram'),
 						'used':('BIGINT', 'None', 'No', 'used ram'),
 						'free':('BIGINT', 'None', 'No', 'free ram'),
@@ -82,7 +82,7 @@ class iostat:
 						'bl_reads',
 						'bl_writes',
 						'time_date')
-		self.db_descr = {'host':('VARCHAR(255)', 'None', 'No', 'system that is being monitored'),
+		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that is being monitored'),
 						'device':('VARCHAR(100)', 'None', 'No', ''),
 						'tps':('DECIMAL(7,2)', 'None', 'No', ''),
 						'read_s':('DECIMAL(7,2)', 'None', 'No', 'reads per second'),
@@ -102,7 +102,7 @@ class cpu:
 						'idle_perc',
 						'intr_s',
 						'time_date')
-		self.db_descr = {'host':('VARCHAR(255)', 'None', 'No', 'system that is being monitored'),
+		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that is being monitored'),
 						'cpu':('INT', 'None', 'No', 'No', 'number of cpu/processor being monitored'),
 						'user_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu being used by user)',
 						'sys_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu being used by system'),
