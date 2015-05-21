@@ -26,21 +26,23 @@ classes = ('monitor', 'ram', 'iostat', 'cpu')
 class monitor:
 	def __init__(self):
 		self.table = 'monitor'
-		self.db_list = ('still_host',
+		self.db_list = ('host',
 						'path',
 						'filename',
 						'full_path',
 						'status',
+						'full_stats',
 						'del_time',
 						'time_start',
 						'time_end',
 						'time_date')
-		self.db_descr = {'still_host'('VARCHAR(100)', 'None', 'No', 'node that uv file is being compressed on'),
+		self.db_descr = {'host'('VARCHAR(100)', 'None', 'No', 'node that uv file is being compressed on'),
 						'path':('VARCHAR(100)', 'None', 'No', 'directory that file is located in'),
 						'filename':('VARCHAR(100)', 'None', 'No', 'name/path of uv file being compressed'),
-						'full_path':('VARCHAR(200)', 'None', 'Unique', 'combination of host, path, and filename which is a unique
-										identifier for each file'),
+						'full_path':('VARCHAR(200)', 'None', 'No', 'combination of host, path, and filename'),
 						'status':('VARCHAR(100)', 'None', 'No', 'state of compression file is currently doing'),
+						'full_stats':('VARCHAR(200)', 'None', 'Unique', 'combination of full_path and status
+										which is a unique identifier for each file'),
 						'del_time':('BIGINT', 'None', 'No', 'time taken to finish step -- status transition'),
 						'time_start':('BIGINT', 'None', 'No', 'time process started as a integer -- process transition'),
 						'time_end':('BIGINT', 'None', 'No', 'time process ended as an integer -- process transition'),

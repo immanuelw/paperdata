@@ -49,8 +49,9 @@ class Monitor(Base):
 	host = Column(String(100))
 	path = Column(String(100))
 	filename = Column(String(100))
-	full_path = Column(String(200), unique=True)
+	full_path = Column(String(200))
 	status = Column(String(100))
+	full_stats = Column(String(200), unique=True)
 	del_time = Column(BigInteger)
 	time_start = Column(BigInteger)
 	time_end = Column(BigInteger)
@@ -160,8 +161,13 @@ class DataBaseInterface(object):
 		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_tigger
 										after INSERT or UPDATE on Monitor
 										FOR EACH ROW
-										SET NEW.full_path = concat(NEW.still_host, ':', NEW.path, '/', NEW.filename)''')
+										SET NEW.full_path = concat(NEW.host, ':', NEW.path, '/', NEW.filename)''')
 		event.listen(table, 'after_create', insert_update_trigger)
+		insert_update_trigger_2 = DDL('''CREATE TRIGGER insert_update_tigger
+										after INSERT or UPDATE on Monitor
+										FOR EACH ROW
+										SET NEW.full_stats = concat(NEW.full_path, '+', NEW.status)''')
+		event.listen(table, 'after_create', insert_update_trigger_2)
 		Base.metadata.create_all()
 
 	def drop_db(self):
@@ -171,11 +177,11 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
-	def add_monitor(self, host, path, filename, full_path, del_time, file_start, file_end, time_date):
+	def add_monitor(self, host, path, filename, full_path, status, full_stats, del_time, file_start, file_end, time_date):
 		"""
 		create a new monitor entry.
 		"""
-		MONITOR = Monitor(host, path, filename, full_path, del_time, file_start, file_end, time_date)
+		MONITOR = Monitor(host, path, filename, full_path, status, full_stats, del_time, file_start, file_end, time_date)
 		s = self.Session()
 		s.add(MONITOR)
 		s.commit()
@@ -215,18 +221,18 @@ class DataBaseInterface(object):
 		s.close()
 		return None
 
-	def get_monitor_path(self, full_path):
+	def get_monitor_path(self, full_stats):
 		"""
 		todo
 		"""
-		MONITOR = self.get_monitor(full_path)
+		MONITOR = self.get_monitor(full_stats)
 		return MONITOR.path
 
-	def set_monitor_path(self, full_path, path):
+	def set_monitor_path(self, full_stats, path):
 		"""
 		todo
 		"""
-		MONITOR = self.get_monitor(full_path)
+		MONITOR = self.get_monitor(full_stats)
 		MONITOR.path = path
 		yay = self.update_monitor(MONITOR)
 		return yay
