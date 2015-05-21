@@ -29,6 +29,7 @@ def plot_monitor(filenames):
 	for uv_file in filenames:
 		full_path = host + ':' + uv_file
 		MONITORs = s.query(dbi.Monitor).filter(dbi.Monitor.full_path==full_path).all()
+		file_host = s.query(dbi.Monitor).filter(dbi.Monitor.full_path==full_path).one().host
 		status_data = tuple((MONITOR.status, MONITOR.del_time) for MONITOR in MONITORs if MONITOR.del_time is not -1)
 		process_data = tuple((MONITOR.status, MONITOR.time_end-MONITOR.time_start) for MONITOR in MONITORs if MONITOR.del_time is -1)
 		status_plot = tuple((stage_dict[key], value) for key, value in status_data)
@@ -41,7 +42,7 @@ def plot_monitor(filenames):
 		plt.subplot(212)
 		plt.scatter(*zip(*process_plot), 'r')
 
-		plt.title(os.path.basename(uv_file))
+		plt.title(os.path.basename(uv_file) ' on ' + file_host)
 		plt.xticks(x_values, STAGEs)
 		plt.ylabel('Time Between stages')
 		plt.xlabel('Stage')
