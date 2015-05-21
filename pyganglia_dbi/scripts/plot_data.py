@@ -38,9 +38,12 @@ def plot_monitor(filenames):
 		plt.figure(1)
 		plt.subplot(211)
 		plt.scatter(*zip(*status_plot), 'b')
+		plt.axvline(xdata=x_values, linestyle='--')
 
 		plt.subplot(212)
 		plt.scatter(*zip(*process_plot), 'r')
+		plt.axvline(xdata=x_values, linestyle='--')
+
 
 		plt.title(os.path.basename(uv_file) ' on ' + file_host)
 		plt.xticks(x_values, STAGEs)
@@ -49,8 +52,7 @@ def plot_monitor(filenames):
 		plt.grid(True)
 		#plt.savefig(os.path.join('/data4/paper/monitor', uv_file.replace('.uv', '.png')))
 		plt.show()
-
-		
+	
 	s.close()
 	return None
 
