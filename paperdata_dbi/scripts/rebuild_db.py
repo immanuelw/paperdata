@@ -222,6 +222,7 @@ def backup_observations(dbnum, time_date):
 	wr = csv.writer(resultFile, delimiter='|', lineterminator='\n', dialect='excel')
 
 	for item in results:
+		print item
 		wr.writerow(item)
 	resultFile.close()
 
@@ -260,6 +261,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 						results = (tuple(i for i in item),)
 					else:
 						results += tuple(i for i in item)
+				print item
 
 		elif dbnum == dbnum3:
 			#host, path, filename, filetype, full_path, obsnum, filesize
@@ -290,6 +292,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 						results = (tuple(i for i in item),)
 					else:
 						results += tuple(i for i in item)
+				print item
 
 		elif dbnum == dbnum4:
 			#host, npz_path, filename, filetype, full_path, obsnum
@@ -320,6 +323,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 						results = (tuple(i for i in item),)
 					else:
 						results += tuple(i for i in item)
+				print item
 		"""
 		elif dbnum == dbnum5:
 			#host, final_product_path, filename, filetype, full_path, obsnum
@@ -376,4 +380,4 @@ if __name__ == '__main__':
 	dbnum4 = '/data2/home/immwa/scripts/paperdata/backups/paperdata_file_npz_backup_%s.psv'%(time_date)
 	dbnum5 = '/data2/home/immwa/scripts/paperdata/backups/paperdata_file_final_backup_%s.psv'%(time_date)
 	backup_observations(dbnum1, time_date)
-	backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date)
+	#backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date)
