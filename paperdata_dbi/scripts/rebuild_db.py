@@ -197,7 +197,7 @@ def backup_observations(dbnum, time_date):
 	cursor.execute('SELECT obsnum, julian_date, polarization, julian_day, era, era_type, data_length FROM paperdata group by obsnum order by obsnum asc')
 	res1 = cursor.fetchall()
 	#reset polarization
-	res1 = tuple((i[0], i[1], i[2], i[3], i[4], i[5], i[6]) if int(i[4]) > 100 else (i[0], i[1], 'all', i[3], i[4], i[5], i[6]) for i in res1)
+	res1 = tuple((i[0], i[1], i[2], i[3], i[4], i[5], i[6]) if int(i[3]) > 6100 else (i[0], i[1], 'all', i[3], i[4], i[5], i[6]) for i in res1)
 	#need time_start, time_end, delta_time, prev_obs, next_obs functions
 	cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/', -1), SUBSTRING_INDEX(raw_path, '.', -1), obsnum FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
 	res = cursor.fetchall()
@@ -253,7 +253,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			#write_to_tape, delete_file
 			cursor.execute('''SELECT write_to_tape, delete_file FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
 			res3 = cursor.fetchall()
-			res3 = tuple((bool(i[0]), bool(i[1]))) for i in res3)
+			res3 = tuple((bool(i[0]), bool(i[1])) for i in res3)
 			resu = zip(res1, res3)
 			for item in resu:
 				if len(item) >= 2 and type(item[0]) is tuple:
@@ -283,7 +283,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			#write_to_tape, delete_file
 			cursor.execute('''SELECT write_to_tape, delete_file FROM paperdata where path != 'NULL' group by path order by julian_date asc, polarization asc''')
 			res3 = cursor.fetchall()
-			#res3 = tuple((bool(i[0]), bool(i[1]))) for i in res3)
+			#res3 = tuple((bool(i[0]), bool(i[1])) for i in res3)
 			res3 = tuple((False, False) for i in res3)
 			resu = zip(res1, res2, res3)
 			for item in resu:
