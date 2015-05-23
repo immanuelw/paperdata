@@ -199,7 +199,7 @@ def backup_observations(dbnum, time_date):
 	#reset polarization
 	res1 = tuple((i[0], i[1], i[2], i[3], i[4], i[5], i[6]) if int(i[3]) > 6100 else (i[0], i[1], 'all', i[3], i[4], i[5], i[6]) for i in res1)
 	#need time_start, time_end, delta_time, prev_obs, next_obs functions
-	cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/', -1), SUBSTRING_INDEX(raw_path, '.', -1), obsnum FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
+	cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/', -1), SUBSTRING_INDEX(raw_path, '.', -1), obsnum FROM paperdata where raw_path != 'NULL' group by obsnum order by obsnum asc''')
 	res = cursor.fetchall()
 	res2 = []
 	for item in res:
@@ -213,15 +213,15 @@ def backup_observations(dbnum, time_date):
 	res2 = tuple(res2)
 	#
 	#edge
-	cursor.execute('''SELECT edge, comments FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
+	cursor.execute('''SELECT edge, comments FROM paperdata where raw_path != 'NULL' group by obsnum order by obsnum asc''')
 	res3 = cursor.fetchall()
 	res3 = tuple((bool(i[0]),) for i in res3)
-	resu = zip(res1, res2, res3)
+	resu = tuple(set(zip(res1, res2, res3)))
 
 	resultFile = open(dbnum,'ab')
 	wr = csv.writer(resultFile, delimiter='|', lineterminator='\n', dialect='excel')
 
-	for item in results:
+	for item in resu:
 		print item
 		wr.writerow(item)
 	resultFile.close()
