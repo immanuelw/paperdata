@@ -60,7 +60,6 @@ def plot_monitor(filenames):
 def plot_jd_vs_file():
 	dbi = pyg.DataBaseInterface()
 	s = dbi.Session()
-	host = socket.gethostname()
 	OBSs = s.query(dbi.Observation.julian_day, func.count(dbi.Observation.julian_day)).group_by(dbi.Observation.julian_day).all()
 	s.close()
 	jd_data = tuple((OBS[0], OBS[1]) for OBS in OBSs)
@@ -76,6 +75,84 @@ def plot_jd_vs_file():
 	
 	return None
 
+def plot_jd_vs_gaps():
+	dbi = pyg.DataBaseInterface()
+	s = dbi.Session()
+	OBSs = s.query(dbi.Observation.julian_day, func.count(dbi.Observation.julian_day)).group_by(dbi.Observation.julian_day).all()
+	s.close()
+	jd_data = tuple((OBS[0], 288 - OBS[1]) if OBS[0] = 128 else (OBS[0], 72 - OBS[1]) for OBS in OBSs)
+
+	plt.plot(*jd_data, 'r--')
+
+	plt.title('Number of Gaps in each Julian Day')
+	plt.ylabel('Number of Gaps')
+	plt.xlabel('Julian date')
+	plt.grid(True)
+	#plt.savefig('~/jd_vs_gaps.png')
+	plt.show()
+	
+	return None
+
+def table_jdate_vs_pol():
+	dbi = pyg.DataBaseInterface()
+	s = dbi.Session()
+	OBSs = s.query(dbi.Observation).all()
+	s.close()
+	jdate_data = tuple((OBS.julian_date, OBS.polarization) for OBS in OBSs)
+
+	POLs = ('xx', 'xy', 'yx', 'yy', 'all')
+	pol_dict = dict(zip(POLs, y_values))
+	jdate_plot = tuple((pol_dict[key], value) for key, value in jdate_data)
+	y_values = np.arange(1, len(POLs) + 1, 1)
+
+	plt.plot(*jdate_plot, 'r')
+	plt.axhline(ydata=y_values-.5, linestyle='--')
+
+	plt.title('Polarization of each Julian Date')
+	plt.yticks(y_values, POLs)
+	plt.ylabel('Polarization')
+	plt.xlabel('Julian Date')
+	plt.grid(True)
+	#plt.savefig('~/jdate_vs_pol_table.png')
+	plt.show()
+	
+	return None
+
+def table_jdate_vs_file():
+	dbi = pyg.DataBaseInterface()
+	s = dbi.Session()
+	FILEs = s.query(dbi.File).filter(dbi.File.filetype=='uv')
+	OBSs = s.query(dbi.Observation).all()
+	obsnums = tuple(OBS.obsnum for OBS in OBSs)
+	file_data = []
+	for obsnum in obsnums:
+		FILE = s.query(dbi.File).filter(dbi.File.obsnum==obsnum).filter(dbi.File.filetype=='uv').first()
+		OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum).one()
+		file_data.append((FILE.filename, str(OBS.julian_date) + OBS.polarization))
+
+	s.close()
+	file_data
+
+	JDATEs = tuple(value for key, value in file_data)
+
+	pol_dict = dict(zip(POLs, y_values))
+	jdate_plot = tuple((pol_dict[key], value) for key, value in jdate_data)
+	y_values = np.arange(1, len(POLs) + 1, 1)
+
+	plt.plot(*jdate_plot, 'r')
+	plt.axhline(ydata=y_values-.5, linestyle='--')
+
+	plt.title('Polarization of each Julian Date')
+	plt.xticks(x_values, POLs)
+	plt.yticks(y_values, POLs)
+	plt.ylabel('Polarization')
+	plt.xlabel('Julian Date')
+	plt.grid(True)
+	#plt.savefig('~/jdate_vs_file_table.png')
+	plt.show()
+	
+	return None
+
 if __name__ == '__main__':
 	if len(sys.argv) > 1:
 		filenames = glob.glob(sys.argv[1])
@@ -83,3 +160,4 @@ if __name__ == '__main__':
 		filenames = glob.glob(raw_input('Input filename to be plotted: '))
 	plot_monitor(filenames)
 	#plot_jd_vs_file()
+	#table_jdate_vs_pol()
