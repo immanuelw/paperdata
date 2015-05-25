@@ -3,6 +3,7 @@
 # Load data into MySQL table 
 
 import pyganglia_dbi as pyg
+from sqlalchemy import func
 import sys
 import os
 import glob
@@ -56,9 +57,29 @@ def plot_monitor(filenames):
 	s.close()
 	return None
 
+def plot_jd_vs_file():
+	dbi = pyg.DataBaseInterface()
+	s = dbi.Session()
+	host = socket.gethostname()
+	OBSs = s.query(dbi.Observation.julian_day, func.count(dbi.Observation.julian_day)).group_by(dbi.Observation.julian_day).all()
+	s.close()
+	jd_data = tuple((OBS[0], OBS[1]) for OBS in OBSs)
+
+	plt.plot(*jd_data, 'r--')
+
+	plt.title('Number of Files in each Julian Day')
+	plt.ylabel('Number of Files')
+	plt.xlabel('Julian date')
+	plt.grid(True)
+	#plt.savefig('~/jd_vs_file.png')
+	plt.show()
+	
+	return None
+
 if __name__ == '__main__':
 	if len(sys.argv) > 1:
 		filenames = glob.glob(sys.argv[1])
 	else:
 		filenames = glob.glob(raw_input('Input filename to be plotted: '))
 	plot_monitor(filenames)
+	#plot_jd_vs_file()
