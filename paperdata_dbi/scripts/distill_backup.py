@@ -50,25 +50,25 @@ def paperdistiller_backup(time_date):
 	s = dbi.Session()
 
 	quer = s.query(Observation).all()
-	results = 
+	results = tuple(ENTRY.__dict__.values() for ENTRY in quer)
 	for item in results:
 		wr1.writerow(item)
 	data_file1.close()
 
 	quer = s.query(File).all()
-	results = 
+	results = tuple(ENTRY.__dict__.values() for ENTRY in quer)
 	for item in results:
 		wr2.writerow(item)
 	data_file2.close()
 
 	quer = s.query(Neighbors).all()
-	results = 
+	results = tuple(ENTRY.__dict__.values() for ENTRY in quer)
 	for item in results:
 		wr3.writerow(item)
 	data_file3.close()
 
 	quer = s.query(Log).all()
-	results = 
+	results = tuple(ENTRY.__dict__.values() for ENTRY in quer)
 	for item in results:
 		wr4.writerow(item)
 	data_file4.close()
