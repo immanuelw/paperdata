@@ -110,7 +110,7 @@ class File(Base):
 	path = Column(String(100)) #directory
 	filename = Column(String(100)) #zen.*.*.uv/uvcRRE/uvcRREzx...
 	filetype = Column(String(20)) #uv, uvcRRE, etc.
-	full_path = Column(String(200), unique=True)
+	full_path = Column(String(200), primary_key=True)
 	###
 	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
 	filesize = Column(Numeric(7,2))
@@ -130,7 +130,7 @@ class Feed(Base):
 	host = Column(String(100))
 	path = Column(String(100)) #directory
 	filename = Column(String(100)) #zen.*.*.uv
-	full_path = Column(String(200), unique=True)
+	full_path = Column(String(200), primary_key=True)
 	julian_day = Column(Integer)
 	ready_to_move = Column(Boolean)
 	moved_to_distill = Column(Boolean)
