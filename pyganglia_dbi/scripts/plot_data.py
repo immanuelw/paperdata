@@ -3,6 +3,7 @@
 # Load data into MySQL table 
 
 import pyganglia_dbi as pyg
+import paperdata_dbi as pdb
 from sqlalchemy import func
 import sys
 import os
@@ -57,8 +58,212 @@ def plot_monitor(filenames):
 	s.close()
 	return None
 
-def plot_jd_vs_file():
+def plot_ram(host=None, time_min=None, time_max=None):
 	dbi = pyg.DataBaseInterface()
+	s = dbi.Session()
+	if host is None:
+			if time_min is None:
+				if time_max is None:
+					RAMs = s.query(dbi.Ram).all()
+				else:
+					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_max).all()
+			else:
+				if time_max is None:
+					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_min).all()
+				else:
+					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_max).filter(dbi.Ram.time_date<=time_min).all()
+	else:
+			if time_min is None:
+				if time_max is None:
+					RAMs = s.query(dbi.Ram).filter(dbi.Ram.host==host).all()
+				else:
+					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_max).filter(dbi.Ram.host==host).all()
+			else:
+				if time_max is None:
+					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_min).filter(dbi.Ram.host==host).all()
+				else:
+					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_max).filter(dbi.Ram.time_date<=time_min).filter(dbi.Ram.host==host).all()
+		
+	s.close()
+	total_data = tuple((RAM.time_date, RAM.total) for RAM in RAMs)
+	used_data = tuple((RAM.time_date, RAM.used) for RAM in RAMs)
+	free_data = tuple((RAM.time_date, RAM.free) for RAM in RAMs)
+	shared_data = tuple((RAM.time_date, RAM.shared) for RAM in RAMs)
+	buffers_data = tuple((RAM.time_date, RAM.buffers) for RAM in RAMs)
+	cached_data = tuple((RAM.time_date, RAM.cached) for RAM in RAMs)
+	bc_used_data = tuple((RAM.time_date, RAM.bc_used) for RAM in RAMs)
+	bc_free_data = tuple((RAM.time_date, RAM.bc_free) for RAM in RAMs)
+	swap_total_data = tuple((RAM.time_date, RAM.swap_total) for RAM in RAMs)
+	swap_used_data = tuple((RAM.time_date, RAM.swap_used) for RAM in RAMs)
+	swap_free_data = tuple((RAM.time_date, RAM.swap_free) for RAM in RAMs)
+
+	plt.plot(*total_data, 'b--')
+	plt.plot(*used_data, 'g--')
+	plt.plot(*free_data, 'r--')
+	plt.plot(*shared_data, 'c--')
+	plt.plot(*buffers_data, 'k--')
+	plt.plot(*cached_data, 'm--')
+	plt.plot(*bc_used_data, 'y--')
+	plt.plot(*bc_free_data, 'k--')
+	plt.plot(*swap_total_data, 'b--')
+	plt.plot(*swap_used_data, 'g--')
+	plt.plot(*swap_free_data, 'r--')
+
+	plt.title('Ram')
+	plt.ylabel('Amount')
+	plt.xlabel('Julian date')
+	plt.grid(True)
+	#plt.savefig('~/ram.png')
+	plt.show()
+
+	return None
+
+def plot_iostat(host=None, device=None, time_min=None, time_max=None):
+	dbi = pyg.DataBaseInterface()
+	s = dbi.Session()
+	if host is None:
+		if device is None:
+			if time_min is None:
+				if time_max is None:
+					IOSTATs = s.query(dbi.Iostat).all()
+				else:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).all()
+			else:
+				if time_max is None:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_min).all()
+				else:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.time_date<=time_min).all()
+		else:
+			if time_min is None:
+				if time_max is None:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.device==device).all()
+				else:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.device==device).all()
+			else:
+				if time_max is None:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.device==device).all()
+				else:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.device==device).all()
+	else:
+		if device is None:
+			if time_min is None:
+				if time_max is None:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.host==host).all()
+				else:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.host==host).all()
+			else:
+				if time_max is None:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.host==host).all()
+				else:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.host==host).all()
+		else:
+			if time_min is None:
+				if time_max is None:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.device==device).filter(dbi.Iostat.host==host).all()
+				else:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.device==device).filter(dbi.Iostat.host==host).all()
+			else:
+				if time_max is None:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.device==device).filter(dbi.Iostat.host==host).all()
+				else:
+					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.device==device).filter(dbi.Iostat.host==host).all()
+		
+	s.close()
+	tps_data = tuple((IOSTAT.time_date, IOSTAT.tps) for IOSTAT in IOSTATs)
+	reads_data = tuple((IOSTAT.time_date, IOSTAT.read_s) for IOSTAT in IOSTATs)
+	writes_data = tuple((IOSTAT.time_date, IOSTAT.write_s) for IOSTAT in IOSTATs)
+	block_read_data = tuple((IOSTAT.time_date, IOSTAT.bl_reads) for IOSTAT in IOSTATs)
+	block_write_data = tuple((IOSTAT.time_date, IOSTAT.bl_writes) for IOSTAT in IOSTATs)
+
+	plt.plot(*tps_data, 'b--')
+	plt.plot(*reads_data, 'g--')
+	plt.plot(*writes_data, 'r--')
+	plt.plot(*block_read_data, 'k--')
+	plt.plot(*block_write_data, 'm--')
+
+	plt.title('Iostat')
+	plt.ylabel('Amount')
+	plt.xlabel('Julian date')
+	plt.grid(True)
+	#plt.savefig('~/iostat.png')
+	plt.show()
+
+	return None
+
+def plot_cpu(host=None, cpu=None, time_min=None, time_max=None):
+	dbi = pyg.DataBaseInterface()
+	s = dbi.Session()
+	if host is None:
+		if cpu is None:
+			if time_min is None:
+				if time_max is None:
+					CPUs = s.query(dbi.Cpu).all()
+				else:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).all()
+			else:
+				if time_max is None:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_min).all()
+				else:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.time_date<=time_min).all()
+		else:
+			if time_min is None:
+				if time_max is None:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.cpu==cpu).all()
+				else:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.cpu==cpu).all()
+			else:
+				if time_max is None:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.cpu==cpu).all()
+				else:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.cpu==cpu).all()
+	else:
+		if cpu is None:
+			if time_min is None:
+				if time_max is None:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.host==host).all()
+				else:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.host==host).all()
+			else:
+				if time_max is None:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.host==host).all()
+				else:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.host==host).all()
+		else:
+			if time_min is None:
+				if time_max is None:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.cpu==cpu).filter(dbi.Cpu.host==host).all()
+				else:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.cpu==cpu).filter(dbi.Cpu.host==host).all()
+			else:
+				if time_max is None:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.cpu==cpu).filter(dbi.Cpu.host==host).all()
+				else:
+					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.cpu==cpu).filter(dbi.Cpu.host==host).all()
+		
+	s.close()
+	user_perc_data = tuple((CPU.time_date, CPU.user_perc) for CPU in CPUs)
+	sys_perc_data = tuple((CPU.time_date, CPU.sys_perc) for CPU in CPUs)
+	iowait_perc_data = tuple((CPU.time_date, CPU.iowait_perc) for CPU in CPUs)
+	idle_perc_data = tuple((CPU.time_date, CPU.idle_perc) for CPU in CPUs)
+	intr_s_data = tuple((CPU.time_date, CPU.intr_s) for CPU in CPUs)
+
+	plt.plot(*user_perc_data, 'b--')
+	plt.plot(*sys_perc_data, 'g--')
+	plt.plot(*iowait_perc_data, 'r--')
+	plt.plot(*idle_perc_data, 'k--')
+	plt.plot(*intr_s_data, 'm--')
+
+	plt.title('Cpu')
+	plt.ylabel('Amount')
+	plt.xlabel('Julian date')
+	plt.grid(True)
+	#plt.savefig('~/cpu.png')
+	plt.show()
+
+	return None
+
+def plot_jd_vs_file():
+	dbi = pdb.DataBaseInterface()
 	s = dbi.Session()
 	OBSs = s.query(dbi.Observation.julian_day, func.count(dbi.Observation.julian_day)).group_by(dbi.Observation.julian_day).all()
 	s.close()
@@ -76,7 +281,7 @@ def plot_jd_vs_file():
 	return None
 
 def plot_jd_vs_gaps():
-	dbi = pyg.DataBaseInterface()
+	dbi = pdb.DataBaseInterface()
 	s = dbi.Session()
 	OBSs = s.query(dbi.Observation.julian_day, func.count(dbi.Observation.julian_day)).group_by(dbi.Observation.julian_day).all()
 	s.close()
@@ -94,7 +299,7 @@ def plot_jd_vs_gaps():
 	return None
 
 def table_jdate_vs_pol():
-	dbi = pyg.DataBaseInterface()
+	dbi = pdb.DataBaseInterface()
 	s = dbi.Session()
 	OBSs = s.query(dbi.Observation).all()
 	s.close()
@@ -124,6 +329,9 @@ if __name__ == '__main__':
 	else:
 		filenames = glob.glob(raw_input('Input filename to be plotted: '))
 	plot_monitor(filenames)
+	#plot_cpu()
+	#plot_iostat()
+	#plot_ram()
 	#plot_jd_vs_file()
 	#plot_jd_vs_gaps()
 	#table_jdate_vs_pol()
