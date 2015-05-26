@@ -4,6 +4,7 @@ import sys
 import glob
 import socket
 import aipy as A
+import hashlib
 
 def md5sum(fname):
 	"""
@@ -70,7 +71,7 @@ def calc_times(host, path, filename):
 		else:
 			delta_time = -(time_start - time_end)/(n_times)
 	else:
-		ssh = paperdata_dbi.login_ssh(host)
+		ssh = login_ssh(host)
 		uv_data_script = './uv_data.py'
 		sftp = ssh.open_sftp()
 		sftp.put(uv_data_script, './')
@@ -90,7 +91,7 @@ def calc_md5sum(host, path, filename):
 	if named_host == host:
 		md5 = md5sum(full_path)
 	else:
-		ssh = paperdata_dbi.login_ssh(host)
+		ssh = login_ssh(host)
 		sftp = ssh.open_sftp()
 		try:
 			remote_path = sftp.file(full_path, mode='r')
@@ -123,4 +124,4 @@ if __name__ == '__main__':
 		filename = os.path.basename(input_path)
 		print input_path
 		print calc_md5sum(input_host, path, filename)
-		#print calc_times(input_host, path, filename)
+		print calc_times(input_host, path, filename)
