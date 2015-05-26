@@ -90,7 +90,7 @@ def calc_md5sum(host, path, filename):
 	if named_host == host:
 		md5 = md5sum(full_path)
 	else:
-		ssh = login_ssh(host)
+		ssh = paperdata_dbi.login_ssh(host)
 		sftp = ssh.open_sftp()
 		try:
 			remote_path = sftp.file(full_path, mode='r')
