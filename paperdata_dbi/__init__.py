@@ -252,11 +252,11 @@ class DataBaseInterface(object):
 		event.listen(table, 'after_create', insert_update_trigger)
 		Base.metadata.create_all()
 
-	def create_db(table):
+	def create_table(Table):
 		"""
 		creates a table in the database.
 		"""
-		table.create(bind=self.engine)
+		Table.__table__.create(bind=self.engine)
 
 	def drop_db(self):
 		"""
