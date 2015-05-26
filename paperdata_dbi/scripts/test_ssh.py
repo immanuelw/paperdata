@@ -74,7 +74,10 @@ def calc_times(host, path, filename):
 		ssh = login_ssh(host)
 		uv_data_script = './uv_data.py'
 		sftp = ssh.open_sftp()
-		sftp.put(uv_data_script, './')
+		try:
+			filestat = sftp.stat('./uv_data.py')
+		except(IOError):
+			sftp.put(uv_data_script, './')
 		sftp.close()
 		stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(uv_data_script, host, full_path))
 		time_start, time_end, delta_time = [float(info) for info in uv_data.read().split(',')]
@@ -104,7 +107,7 @@ def calc_md5sum(host, path, filename):
 		sftp.close()
 		ssh.close()
 
-	return md5
+	return md5.read()
 
 if __name__ == '__main__':	
 	if len(sys.argv) == 2:
