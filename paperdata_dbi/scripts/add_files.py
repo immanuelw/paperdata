@@ -90,15 +90,17 @@ def calc_md5sum(host, path, filename):
 	if named_host == host:
 		md5 = md5sum(full_path)
 	else:
-		ssh = paperdata_dbi.login_ssh(host)
+		ssh = login_ssh(host)
 		sftp = ssh.open_sftp()
 		try:
 			remote_path = sftp.file(full_path, mode='r')
 			md5 = remote_path.check('md5', block_size=65536)
 		except(IOError):
-			remote_path_2 =  sftp.file('{0}/visdata'.format(full_path), mode='r')
-			md5 = remote_path.check('md5', block_size=65536)
+			#remote_path_2 =  sftp.file('{0}/visdata'.format(full_path), mode='r')
+			#md5 = remote_path_2.check('md5', block_size=65536)
+			stdin, md5_out, stderr = ssh.exec_command('md5sum {0}/visdata'.format(full_path))
 			
+		md5 = md5_out.read().split(' ')[0]
 		sftp.close()
 		ssh.close()
 
