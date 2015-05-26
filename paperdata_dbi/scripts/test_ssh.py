@@ -107,7 +107,7 @@ def calc_md5sum(host, path, filename):
 		sftp.close()
 		ssh.close()
 
-	return md5.read()
+	return md5
 
 if __name__ == '__main__':	
 	if len(sys.argv) == 2:
@@ -127,5 +127,5 @@ if __name__ == '__main__':
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
 		print input_path
-		print calc_md5sum(input_host, path, filename)
+		print calc_md5sum(input_host, path, filename).read()
 		print calc_times(input_host, path, filename)
