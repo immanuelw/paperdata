@@ -2,12 +2,7 @@
 # -*- coding: utf-8 -*-
 # Add files to paperdata
 
-import MySQLdb
 import sys
-import getpass
-import time
-import csv
-import subprocess
 import aipy as A
 import hashlib
 import glob
