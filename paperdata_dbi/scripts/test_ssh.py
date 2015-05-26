@@ -72,14 +72,19 @@ def calc_times(host, path, filename):
 			delta_time = -(time_start - time_end)/(n_times)
 	else:
 		ssh = login_ssh(host)
-		uv_data_script = './uv_data.py'
+		uv_data_script = '/home/{0}/scripts/paperdata/paper/scripts/paperdata_dbi/scripts/uv_data.py'.format('immwa')
 		sftp = ssh.open_sftp()
+		moved_script = '/home/{0}/scripts/uv_data.py'.format('immwa')
 		try:
-			filestat = sftp.stat('./uv_data.py')
+			filestat = sftp.stat(uv_data_script)
 		except(IOError):
-			sftp.put(uv_data_script, './')
+			try:
+				filestat = sftp.stat(moved_script)
+			except(IOError):
+				sftp.put(uv_data_script, moved_script)
 		sftp.close()
-		stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(uv_data_script, host, full_path))
+		stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(moved_script, host, full_path))
+
 		time_start, time_end, delta_time = [float(info) for info in uv_data.read().split(',')]
 		ssh.close()
 
@@ -102,8 +107,9 @@ def calc_md5sum(host, path, filename):
 		except(IOError):
 			#remote_path_2 =  sftp.file('{0}/visdata'.format(full_path), mode='r')
 			#md5 = remote_path_2.check('md5', block_size=65536)
-			stdin, md5, stderr = ssh.exec_command('md5sum {0}/visdata'.format(full_path))
+			stdin, md5_out, stderr = ssh.exec_command('md5sum {0}/visdata'.format(full_path))
 			
+		md5 = md5_out.read().split(' ')[0]
 		sftp.close()
 		ssh.close()
 
@@ -127,5 +133,5 @@ if __name__ == '__main__':
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
 		print input_path
-		print calc_md5sum(input_host, path, filename).read()
+		print calc_md5sum(input_host, path, filename)
 		print calc_times(input_host, path, filename)
