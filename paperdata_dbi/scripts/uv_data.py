@@ -13,6 +13,7 @@ import os
 ### Date: 5-06-15
 
 def calc_uv_data(host, full_path):
+	filetype = full_path.split('.')[-1]
 	#allows uv access
 	if filetype in ('uv', 'uvcRRE'):
 		try:
@@ -54,6 +55,6 @@ if __name__ == '__main__':
 	if uv_data is None:
 		sys.exit()
 	output_string = str(uv_data[0])
-	for data in uv_data[1:]
+	for data in uv_data[1:]:
 		output_string += ',' + str(data)
 	print output_string
