@@ -245,13 +245,18 @@ class DataBaseInterface(object):
 		creates the tables in the database.
 		"""
 		Base.metadata.bind = self.engine
-		table = File.__table__
 		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_tigger
 										after INSERT or UPDATE on File
 										FOR EACH ROW
 										SET NEW.full_path = concat(NEW.host, ':', NEW.path, '/', NEW.filename)''')
 		event.listen(table, 'after_create', insert_update_trigger)
 		Base.metadata.create_all()
+
+	def create_db(table):
+		"""
+		creates a table in the database.
+		"""
+		table.create(bind=self.engine)
 
 	def drop_db(self):
 		"""
