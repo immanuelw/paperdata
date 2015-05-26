@@ -1,6 +1,26 @@
 import paramiko
 import os
 import sys
+import glob
+import socket
+import aipy as A
+
+def md5sum(fname):
+	"""
+	calculate the md5 checksum of a file whose filename entry is fname.
+	"""
+	fname = fname.split(':')[-1]
+	BLOCKSIZE = 65536
+	hasher = hashlib.md5()
+	try:
+		afile = open(fname, 'rb')
+	except(IOError):
+		afile = open("%s/visdata"%fname, 'rb')
+	buf = afile.read(BLOCKSIZE)
+	while len(buf) >0:
+		hasher.update(buf)
+		buf = afile.read(BLOCKSIZE)
+	return hasher.hexdigest()
 
 #SSH/SFTP Function
 #Need private key so don't need username/password
@@ -103,4 +123,4 @@ if __name__ == '__main__':
 		filename = os.path.basename(input_path)
 		print input_path
 		print calc_md5sum(input_host, path, filename)
-		print calc_times(input_host, path, filename)
+		#print calc_times(input_host, path, filename)
