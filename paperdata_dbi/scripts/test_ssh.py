@@ -72,20 +72,20 @@ def calc_times(host, path, filename):
 			delta_time = -(time_start - time_end)/(n_times)
 	else:
 		ssh = login_ssh(host)
-		uv_data_script = '/home/{0}/scripts/paperdata/paper/scripts/paperdata_dbi/scripts/uv_data.py'.format('immwa')
+		time_data_script = '/home/{0}/scripts/paperdata/paper/scripts/paperdata_dbi/scripts/time_data.py'.format('immwa')
 		sftp = ssh.open_sftp()
-		moved_script = '/home/{0}/scripts/uv_data.py'.format('immwa')
+		moved_script = '/home/{0}/scripts/time_data.py'.format('immwa')
 		try:
-			filestat = sftp.stat(uv_data_script)
+			filestat = sftp.stat(time_data_script)
 		except(IOError):
 			try:
 				filestat = sftp.stat(moved_script)
 			except(IOError):
-				sftp.put(uv_data_script, moved_script)
+				sftp.put(time_data_script, moved_script)
 		sftp.close()
-		stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(moved_script, host, full_path))
+		stdin, time_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(moved_script, host, full_path))
 
-		time_start, time_end, delta_time = [float(info) for info in uv_data.read().split(',')]
+		time_start, time_end, delta_time = [float(info) for info in time_data.read().split(',')]
 		ssh.close()
 
 	times = (time_start, time_end, delta_time)

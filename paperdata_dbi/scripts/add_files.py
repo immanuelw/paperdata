@@ -117,50 +117,70 @@ def calc_obs_data(host, full_path):
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
 
 	#allows uv access
+	named_host = socket.gethostname()
 	if filetype in ('uv', 'uvcRRE'):
-		try:
-			uv = A.miriad.UV(full_path)
-		except:
-			return None
+		if named_host == host:
+			try:
+				uv = A.miriad.UV(full_path)
+			except:
+				return None
 
-		#indicates julian date
-		julian_date = round(uv['time'], 5)
+			#indicates julian date
+			julian_date = round(uv['time'], 5)
 
-		#assign letters to each polarization
-		if uv['npol'] == 1:
-			polarization = pol_dict[uv['pol']]
-		elif uv['npol'] == 4:
-			polarization = 'all'
+			#assign letters to each polarization
+			if uv['npol'] == 1:
+				polarization = pol_dict[uv['pol']]
+			elif uv['npol'] == 4:
+				polarization = 'all'
 
-		time_start = 0
-		time_end = 0
-		n_times = 0
-		c_time = 0
+			time_start = 0
+			time_end = 0
+			n_times = 0
+			c_time = 0
 
-		try:
-			for (uvw, t, (i,j)),d in uv.all():
-				if time_start == 0 or t < time_start:
-					time_start = t
-				if time_end == 0 or t > time_end:
-					time_end = t
-				if c_time != t:
-					c_time = t
-					n_times += 1
-		except:
-			return None
+			try:
+				for (uvw, t, (i,j)),d in uv.all():
+					if time_start == 0 or t < time_start:
+						time_start = t
+					if time_end == 0 or t > time_end:
+						time_end = t
+					if c_time != t:
+						c_time = t
+						n_times += 1
+			except:
+				return None
 
-		if n_times > 1:
-			delta_time = -(time_start - time_end)/(n_times - 1)
+			if n_times > 1:
+				delta_time = -(time_start - time_end)/(n_times - 1)
+			else:
+				delta_time = -(time_start - time_end)/(n_times)
+
+			length = round(n_times * delta_time, 5)
+
+			#gives each file unique id
+			if length > 0:
+				obsnum = jdpol2obsnum(julian_date, polarization, length)
+			else:
+				obsnum = 0
+
 		else:
-			delta_time = -(time_start - time_end)/(n_times)
+			ssh = login_ssh(host)
+			uv_data_script = '/home/{0}/scripts/paperdata/paper/scripts/paperdata_dbi/scripts/uv_data.py'.format('immwa')
+			sftp = ssh.open_sftp()
+			moved_script = '/home/{0}/scripts/uv_data.py'.format('immwa')
+			try:
+				filestat = sftp.stat(uv_data_script)
+			except(IOError):
+				try:
+					filestat = sftp.stat(moved_script)
+				except(IOError):
+					sftp.put(uv_data_script, moved_script)
+			sftp.close()
+			stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(moved_script, host, full_path))
+			ssh.close()
 
-		length = round(n_times * delta_time, 5)
-
-		#gives each file unique id
-		if length > 0:
-			obsnum = jdpol2obsnum(julian_date, polarization, length)
-		else:
-			obsnum = 0
+			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [float(info) if key in (0,1,2) else round(float(info), 5) if key in (3,5) else int(info) if key is 6 else info for key, info in enumerate(uv_data.read().split(','))]
 
 	elif filetype in ('npz',):
 		#filename is zen.2456640.24456.xx.uvcRE.npz or zen.2456243.24456.uvcRE.npz
