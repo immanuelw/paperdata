@@ -1,11 +1,11 @@
 import sys
 import prettytable
-import ganglia_db as gdb
+import pyganglia_db as pyg
 
 def main():
 	with open('./schema.txt', 'wb') as df:
 		print 'Starting ..'
-	var_classes = gdb.all_classes
+	var_classes = pyg.all_classes
 
 	for var_class in var_classes:
 		x = prettytable.PrettyTable(['Field', 'Type', 'Default', 'Unique Key', 'Description'])
