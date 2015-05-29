@@ -8,6 +8,7 @@ import glob
 import socket
 import aipy as A
 import paperdata_dbi
+import move_files
 
 ### Script to load data from anywhere into paperfeed database
 ### Crawls folio or elsewhere and reads through .uv files to generate all field information
@@ -37,6 +38,46 @@ def gen_feed_data(host, full_path):
 	feed_data = (host, path, filename, full_path, julian_day, ready_to_move, moved_to_distill)
 
 	return feed_data
+
+def rsync_m(source, destination):
+	subprocess.check_output(['rsync', '-a', source, destination])
+	return None
+
+def move_files(input_host, input_paths, output_host, output_dir):
+	named_host = socket.gethostname()
+	destination = output_host + ':' + output_dir
+	input_filenames = tuple(os.path.basename(input_path) for input_path in input_paths)
+	moved_files = tuple(os.path.join(destination, input_filename) for input_file in input_filenames)
+	if named_host == input_host:
+		if input_host == output_host:
+			for source in input_paths:
+				shutil.move(source, output_dir)
+		else:
+			for source in input_paths:
+				rsync_m(source, destination)
+	else:
+		if input_host == output_host:
+			dbi = paperdata_dbi.DataBaseInterface()
+			s = dbi.Session()
+			ssh = paperdata_dbi.login_ssh(output_host)
+			sftp = ssh.open_sftp()
+			for source in input_paths:
+				sftp.rename(source, output_dir)
+			sftp.close()
+			ssh.close()
+			s.close()
+		else:
+			dbi = paperdata_dbi.DataBaseInterface()
+			s = dbi.Session()
+			ssh = paperdata_dbi.login_ssh(output_host)
+			for source in input_paths:
+				rsync_move = '''rsync -a {source} {destination}'''.format(source=source, destination=destination)
+				ssh.exec_command(rsync_move)
+			ssh.close()
+			s.close()
+
+	print 'Completed transfer'
+	return moved_files
 
 def dupe_check(input_host, input_paths):
 	dbi = paperdata_dbi.DataBaseInterface()
@@ -75,6 +116,9 @@ if __name__ == '__main__':
 		input_host = raw_input('Source directory host: ')
 		input_paths = glob.glob(raw_input('Source directory path: '))
 
+	output_host = 'folio'
+	feed_output = '/data4/paper/feed/'
 	input_paths = dupe_check(input_host, input_paths)
+	input_paths = move_files(input_host, input_paths, output_host, feed_output)
 	input_paths.sort()
 	add_feeds(input_host, input_paths)
