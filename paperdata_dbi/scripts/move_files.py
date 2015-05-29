@@ -72,7 +72,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 		if input_host == output_host:
 			dbi = paperdata_dbi.DataBaseInterface()
 			s = dbi.Session()
-			ssh = paperdata_dbi.login_ssh(host)
+			ssh = paperdata_dbi.login_ssh(output_host)
 			sftp = ssh.open_sftp()
 			for source in input_paths:
 				sftp.rename(source, output_dir)
@@ -86,7 +86,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 		else:
 			dbi = paperdata_dbi.DataBaseInterface()
 			s = dbi.Session()
-			ssh = paperdata_dbi.login_ssh(host)
+			ssh = paperdata_dbi.login_ssh(output_host)
 			for source in input_paths:
 				rsync_move = '''rsync -a --remove-source-files {source} {destination}'''.format(source=source, destination=destination)
 				ssh.exec_command(rsync_move)
