@@ -273,18 +273,13 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 
 		elif dbnum == dbnum3:
 			#host, path, filename, filetype, full_path, obsnum, filesize
-			cursor.execute('''SELECT SUBSTRING_INDEX(path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/', -1), SUBSTRING_INDEX(path, '.', -1), path, obsnum, compr_file_size_MB FROM paperdata where path != 'NULL' group by path order by julian_date asc, polarization asc''')
+			cursor.execute('''SELECT SUBSTRING_INDEX(path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/', -1), SUBSTRING_INDEX(path, '.', -1), path, obsnum, compr_file_size_MB, compr_md5sum FROM paperdata where path != 'NULL' group by path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
-			#need md5sum, tape_index
+			#need tape_index
 			res2 = []
 			for item in res:
-				host = item[0]
-				path = item[1]
-				filename = item[2]
-				obsnum = item[5]
-
-				res2.append((calc_md5sum(host, path, filename), 'NULL'))
+				res2.append(('NULL',))
 			#convert back to tuple
 			res2 = tuple(res2)
 			#
