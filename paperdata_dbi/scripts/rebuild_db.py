@@ -256,76 +256,54 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 			#host, path, filename, filetype, full_path, obsnum, filesize, md5sum, tape_index
 			cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/', -1), SUBSTRING_INDEX(raw_path, '.', -1), raw_path, obsnum, raw_file_size_MB, md5sum, tape_index FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
-			res1 = res
+			resA = {}
+			for key, value in enumerate(res):
+				resA[key] = value
 			#
 			#write_to_tape, delete_file
 			cursor.execute('''SELECT write_to_tape, delete_file FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
-			res3 = cursor.fetchall()
-			res3 = tuple((bool(i[0]), bool(i[1])) for i in res3)
-			resu = zip(res1, res3)
+			res2 = cursor.fetchall()
+			resB = {} 
+			res3 = tuple((bool(int(i[0])), bool(int(i[1]))) for i in res2)
+			for key, value in enumerate(res3):
+				resB[key] = value
+
+			resu = tuple(resA[key] + resB[key] for key, value in enumerate(res))
 			for item in resu:
-				if len(item) >= 2 and type(item[0]) is tuple:
-					if results is ():
-						results = (tuple(i for i in item),)
-					else:
-						results += tuple(i for i in item)
+				if results is ():
+					results = (item,)
+				else:
+					results += (item,)
 				print item
 
 		elif dbnum == dbnum3:
-			#host, path, filename, filetype, full_path, obsnum, filesize
-			cursor.execute('''SELECT SUBSTRING_INDEX(path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/', -1), SUBSTRING_INDEX(path, '.', -1), path, obsnum, compr_file_size_MB, compr_md5sum FROM paperdata where path != 'NULL' group by path order by julian_date asc, polarization asc''')
+			#host, path, filename, filetype, full_path, obsnum, filesize, md5sum
+			cursor.execute('''SELECT SUBSTRING_INDEX(path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(path, ':', -1), '/', -1), SUBSTRING_INDEX(path, '.', -1), path, obsnum, compr_file_size_MB, compr_md5sum FROM paperdata where path != 'NULL' and compr_md5sum != 'NULL' group by path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
-			#need tape_index
-			res2 = []
-			for item in res:
-				res2.append(('NULL',))
-			#convert back to tuple
-			res2 = tuple(res2)
+			#need tape_index, write_to_tape, delete_file
+			resu = tuple(item + ('NULL', False, False) for item in res)
 			#
-			#write_to_tape, delete_file
-			cursor.execute('''SELECT write_to_tape, delete_file FROM paperdata where path != 'NULL' group by path order by julian_date asc, polarization asc''')
-			res3 = cursor.fetchall()
-			#res3 = tuple((bool(i[0]), bool(i[1])) for i in res3)
-			res3 = tuple((False, False) for i in res3)
-			resu = zip(res1, res2, res3)
 			for item in resu:
-				if len(item) >= 2 and type(item[0]) is tuple:
-					if results is ():
-						results = (tuple(i for i in item),)
-					else:
-						results += tuple(i for i in item)
+				if results is ():
+					results = (item,)
+				else:
+					results += (item,)
 				print item
 
 		elif dbnum == dbnum4:
-			#host, npz_path, filename, filetype, full_path, obsnum
-			cursor.execute('''SELECT SUBSTRING_INDEX(npz_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(npz_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(npz_path, ':', -1), '/', -1), SUBSTRING_INDEX(npz_path, '.', -1), npz_path, obsnum FROM paperdata where npz_path != 'NULL' group by npz_path order by julian_date asc, polarization asc''')
+			#host, npz_path, filename, filetype, full_path, obsnum, filename, md5sum
+			cursor.execute('''SELECT SUBSTRING_INDEX(npz_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(npz_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(npz_path, ':', -1), '/', -1), SUBSTRING_INDEX(npz_path, '.', -1), npz_path, obsnum, npz_file_size_MB, npz_md5sum FROM paperdata where npz_path != 'NULL' and npz_md5sum != 'NULL' group by npz_path order by julian_date asc, polarization asc''')
 			res = cursor.fetchall()
 			res1 = res
-			#need filesize, md5sum, tape_index
-			res2 = []
-			for item in res:
-				host = item[0]
-				path = item[1]
-				filename = item[2]
-				obsnum = item[5]
-
-				res2.append((calc_size(host, name, filename), calc_md5sum(host, path, filename), 'NULL'))
-			#convert back to tuple
-			res2 = tuple(res2)
+			#need tape_index, write_to_tape, delete_file
+			resu = tuple(item + ('NULL', False, False) for item in res)
 			#
-			#write_to_tape, delete_file
-			cursor.execute('''SELECT write_to_tape, delete_file FROM paperdata where npz_path != 'NULL' group by npz_path order by julian_date asc, polarization asc''')
-			res3 = cursor.fetchall()
-			#res3 = tuple((bool(i[0]), bool(i[1]))) for i in res3)
-			res3 = tuple((False, False) for i in res3)
-			resu = zip(res1, res2, res3)
 			for item in resu:
-				if len(item) >= 2 and type(item[0]) is tuple:
-					if results is ():
-						results = (tuple(i for i in item),)
-					else:
-						results += tuple(i for i in item)
+				if results is ():
+					results = (item,)
+				else:
+					results += (item,)
 				print item
 		"""
 		elif dbnum == dbnum5:
@@ -362,6 +340,7 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 		resultFile = open(dbnum,'ab')
 		wr = csv.writer(resultFile, delimiter='|', lineterminator='\n', dialect='excel')
 
+		print results
 		for item in results:
 			wr.writerow(item)
 		resultFile.close()
@@ -377,10 +356,10 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 
 if __name__ == '__main__':
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-	dbnum1 = '/data2/home/immwa/scripts/paperdata/backups/paperdata_obs_backup_%s.psv'%(time_date)
-	dbnum2 = '/data2/home/immwa/scripts/paperdata/backups/paperdata_file_raw_backup_%s.psv'%(time_date)
-	dbnum3 = '/data2/home/immwa/scripts/paperdata/backups/paperdata_file_compressed_backup_%s.psv'%(time_date)
-	dbnum4 = '/data2/home/immwa/scripts/paperdata/backups/paperdata_file_npz_backup_%s.psv'%(time_date)
-	dbnum5 = '/data2/home/immwa/scripts/paperdata/backups/paperdata_file_final_backup_%s.psv'%(time_date)
-	backup_observations(dbnum1, time_date)
-	#backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date)
+	dbnum1 = '/home/immwa/papertest/backups/paperdata_obs_backup_%s.psv'%(time_date)
+	dbnum2 = '/home/immwa/papertest/backups/paperdata_file_raw_backup_%s.psv'%(time_date)
+	dbnum3 = '/home/immwa/papertest/backups/paperdata_file_compressed_backup_%s.psv'%(time_date)
+	dbnum4 = '/home/immwa/papertest/backups/paperdata_file_npz_backup_%s.psv'%(time_date)
+	dbnum5 = '/home/immwa/papertest/backups/paperdata_file_final_backup_%s.psv'%(time_date)
+	#backup_observations(dbnum1, time_date)
+	backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date)
