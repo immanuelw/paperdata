@@ -342,18 +342,28 @@ def add_files(input_host, input_paths):
 	return None
 
 if __name__ == '__main__':
+	named_host = socket.gethostname()
 	if len(sys.argv) == 2:
 		input_host = sys.argv[1].split(':')[0]
 		if input_host == sys.argv[1]:
 			print 'Needs host'
 			sys.exit()
-		input_paths = glob.glob(sys.argv[1].split(':')[1])
+		input_paths = sys.argv[1].split(':')[1]
 	elif len(sys.argv) == 3:
 		input_host = sys.argv[1]
-		input_paths = glob.glob(sys.argv[2])
+		input_paths = sys.argv[2]
 	else:
 		input_host = raw_input('Source directory host: ')
-		input_paths = glob.glob(raw_input('Source directory path: '))
+		input_paths = raw_input('Source directory path: ')
+
+	if named_host == input_host:
+		input_paths = glob.glob(input_paths)
+	else:
+		ssh = paperdata_dbi.login_ssh(input_host)
+		input_paths = raw_input('Source directory path: ')
+		stdin, path_out, stderr = ssh.exec_command('ls -d {0}'.format(input_paths))
+		input_paths = path_out.read().split('\n')[:-1]
+		ssh.close()
 
 	input_paths = dupe_check(input_host, input_paths)
 	input_paths.sort()

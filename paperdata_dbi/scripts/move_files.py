@@ -101,8 +101,17 @@ def move_files(input_host, input_paths, output_host, output_dir):
 	return None
 
 if __name__ == '__main__':
+	named_host = socket.gethostname()
 	input_host = raw_input('Source directory host: ')
-	input_paths = glob.glob(raw_input('Source directory path: '))
+	if named_host == input_host:
+		input_paths = glob.glob(raw_input('Source directory path: '))
+	else:
+		ssh = paperdata_dbi.login_ssh(input_host)
+		input_paths = raw_input('Source directory path: ')
+		stdin, path_out, stderr = ssh.exec_command('ls -d {0}'.format(input_paths))
+		input_paths = path_out.read().split('\n')[:-1]
+		ssh.close()
+		
 	input_paths.sort()
 	output_host = raw_input('Destination directory host: ')
 	output_dir = raw_input('Destination directory: ')
