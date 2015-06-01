@@ -20,7 +20,7 @@ def delete_files(usrnm, pswd, confirm, failed_delete):
 	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
 	cursor = connection.cursor()
 
-	cursor.execute('''SELECT obsnum, raw_path, tape_index, delete_file from paperdata where delete_file = 1 and tape_index like '%PAPR%PAPR%' order by julian_date asc''')
+	cursor.execute('''SELECT obsnum, raw_path, tape_index, delete_file from paperdata where delete_file = 1 and tape_index like '%PAPR%PAPR%' and raw_path != 'ON TAPE' order by julian_date asc''')
 	results = cursor.fetchall()
 
 	#results is a list of lists
