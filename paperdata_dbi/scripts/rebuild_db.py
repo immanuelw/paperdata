@@ -254,8 +254,11 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 
 		if dbnum == dbnum2:
 			#host, path, filename, filetype, full_path, obsnum, filesize, md5sum, tape_index
-			cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/', -1), SUBSTRING_INDEX(raw_path, '.', -1), raw_path, obsnum, raw_file_size_MB, md5sum, tape_index FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
-			res = cursor.fetchall()
+			cursor.execute('''SELECT 'folio', raw_path, CONCAT('zen.', julian_date, '.uv'), 'uv', CONCAT('folio', ':', raw_path, '/', 'zen.', julian_date, '.uv'), obsnum, raw_file_size_MB, md5sum, tape_index FROM paperdata where raw_path != 'NULL' and raw_path = 'ON TAPE' order by julian_date asc, polarization asc''')
+			res1 = cursor.fetchall()
+			cursor.execute('''SELECT SUBSTRING_INDEX(raw_path, ':', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/z', 1), SUBSTRING_INDEX(SUBSTRING_INDEX(raw_path, ':', -1), '/', -1), SUBSTRING_INDEX(raw_path, '.', -1), raw_path, obsnum, raw_file_size_MB, md5sum, tape_index FROM paperdata where raw_path != 'NULL' and raw_path != 'ON TAPE' group by raw_path order by julian_date asc, polarization asc''')
+			res2 = cursor.fetchall()
+			res = res1 + res2
 			resA = {}
 			for key, value in enumerate(res):
 				resA[key] = value
