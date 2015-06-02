@@ -97,14 +97,22 @@ def plot_ram(host=None, time_min=None, time_max=None):
 	swap_used_data = tuple((RAM.time_date, RAM.swap_used) for RAM in RAMs)
 	swap_free_data = tuple((RAM.time_date, RAM.swap_free) for RAM in RAMs)
 
+	plt.figure(1)
+	plt.subplot(211)
 	plt.plot(*total_data, 'b--')
 	plt.plot(*used_data, 'g--')
 	plt.plot(*free_data, 'r--')
 	plt.plot(*shared_data, 'c--')
+
+	plt.subplot(212)
 	plt.plot(*buffers_data, 'k--')
 	plt.plot(*cached_data, 'm--')
+
+	plt.subplot(213)
 	plt.plot(*bc_used_data, 'y--')
 	plt.plot(*bc_free_data, 'k--')
+
+	plt.subplot(214)
 	plt.plot(*swap_total_data, 'b--')
 	plt.plot(*swap_used_data, 'g--')
 	plt.plot(*swap_free_data, 'r--')
@@ -175,9 +183,15 @@ def plot_iostat(host=None, device=None, time_min=None, time_max=None):
 	block_read_data = tuple((IOSTAT.time_date, IOSTAT.bl_reads) for IOSTAT in IOSTATs)
 	block_write_data = tuple((IOSTAT.time_date, IOSTAT.bl_writes) for IOSTAT in IOSTATs)
 
+	plt.figure(1)
+	plt.subplot(211)
 	plt.plot(*tps_data, 'b--')
+
+	plt.subplot(212)
 	plt.plot(*reads_data, 'g--')
 	plt.plot(*writes_data, 'r--')
+
+	plt.subplot(213)
 	plt.plot(*block_read_data, 'k--')
 	plt.plot(*block_write_data, 'm--')
 
@@ -247,10 +261,14 @@ def plot_cpu(host=None, cpu=None, time_min=None, time_max=None):
 	idle_perc_data = tuple((CPU.time_date, CPU.idle_perc) for CPU in CPUs)
 	intr_s_data = tuple((CPU.time_date, CPU.intr_s) for CPU in CPUs)
 
+	plt.figure(1)
+	plt.subplot(211)
 	plt.plot(*user_perc_data, 'b--')
 	plt.plot(*sys_perc_data, 'g--')
 	plt.plot(*iowait_perc_data, 'r--')
 	plt.plot(*idle_perc_data, 'k--')
+
+	plt.subplot(212)
 	plt.plot(*intr_s_data, 'm--')
 
 	plt.title('Cpu')
