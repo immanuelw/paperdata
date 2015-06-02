@@ -12,6 +12,7 @@ import socket
 import time
 import numpy as np
 import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
 
 ### Script to plot the current status of compression nodes
 ### Reads in data files of each node and outputs relevant plots
@@ -45,7 +46,6 @@ def plot_monitor(filenames):
 		plt.subplot(212)
 		plt.scatter(*zip(*process_plot), 'r')
 		plt.axvline(xdata=x_values, linestyle='--')
-
 
 		plt.title(os.path.basename(uv_file) ' on ' + file_host)
 		plt.xticks(x_values, STAGEs)
@@ -104,18 +104,37 @@ def plot_ram(host=None, time_min=None, time_max=None):
 	plt.plot(*free_data, 'r--')
 	plt.plot(*shared_data, 'c--')
 
+	blue_patch = mpatches.Patch(color='blue', label='Total')
+	green_patch = mpatches.Patch(color='green', label='Used')
+	red_patch = mpatches.Patch(color='red', label='Free')
+	cyan_patch = mpatches.Patch(color='cyan', label='Shared')
+	plt.legend(handles=[blue_patch, green_patch, red_patch, cyan_patch])
+
 	plt.subplot(212)
 	plt.plot(*buffers_data, 'k--')
 	plt.plot(*cached_data, 'm--')
+
+	black_patch = mpatches.Patch(color='black', label='Buffered')
+	magenta_patch = mpatches.Patch(color='magenta', label='Cached')
+	plt.legend(handles=[black_patch, magenta_patch])
 
 	plt.subplot(213)
 	plt.plot(*bc_used_data, 'y--')
 	plt.plot(*bc_free_data, 'k--')
 
+	yellow_patch = mpatches.Patch(color='yellow', label='BC Used')
+	black_patch = mpatches.Patch(color='black', label='BC Free')
+	plt.legend(handles=[yellow_patch, black_patch])
+
 	plt.subplot(214)
 	plt.plot(*swap_total_data, 'b--')
 	plt.plot(*swap_used_data, 'g--')
 	plt.plot(*swap_free_data, 'r--')
+
+	blue_patch = mpatches.Patch(color='blue', label='Swap Total')
+	green_patch = mpatches.Patch(color='green', label='Swap Used')
+	red_patch = mpatches.Patch(color='red', label='Swap Free')
+	plt.legend(handles=[blue_patch, green_path, red_patch])
 
 	plt.title('Ram')
 	plt.ylabel('Amount')
@@ -187,13 +206,24 @@ def plot_iostat(host=None, device=None, time_min=None, time_max=None):
 	plt.subplot(211)
 	plt.plot(*tps_data, 'b--')
 
+	blue_patch = mpatches.Patch(color='blue', label='TPS')
+	plt.legend(handles=[blue_patch])
+
 	plt.subplot(212)
 	plt.plot(*reads_data, 'g--')
 	plt.plot(*writes_data, 'r--')
 
+	green_patch = mpatches.Patch(color='green', label='Reads')
+	red_patch = mpatches.Patch(color='red', label='Writes')
+	plt.legend(handles=[green_path, red_patch])
+
 	plt.subplot(213)
 	plt.plot(*block_read_data, 'k--')
 	plt.plot(*block_write_data, 'm--')
+
+	black_patch = mpatches.Patch(color='black', label='Reads per second')
+	magenta_patch = mpatches.Patch(color='magenta', label='Writes per second')
+	plt.legend(handles=[black_path, magenta_patch])
 
 	plt.title('Iostat')
 	plt.ylabel('Amount')
@@ -268,8 +298,17 @@ def plot_cpu(host=None, cpu=None, time_min=None, time_max=None):
 	plt.plot(*iowait_perc_data, 'r--')
 	plt.plot(*idle_perc_data, 'k--')
 
+	blue_patch = mpatches.Patch(color='blue', label='User')
+	green_patch = mpatches.Patch(color='green', label='System')
+	red_patch = mpatches.Patch(color='red', label='I/O wait')
+	black_patch = mpatches.Patch(color='black', label='Idle')
+	plt.legend(handles=[blue_patch, green_path, red_patch, black_patch])
+
 	plt.subplot(212)
 	plt.plot(*intr_s_data, 'm--')
+
+	magenta_patch = mpatches.Patch(color='magenta', label='Instuctions per second')
+	plt.legend(handles=[magenta_patch])
 
 	plt.title('Cpu')
 	plt.ylabel('Amount')
