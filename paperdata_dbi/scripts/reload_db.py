@@ -5,6 +5,7 @@
 import paperdata_dbi
 import add_files
 import os
+import socket
 
 ### Script to reload paperdata database
 ### Crawls all hosts for files
@@ -13,18 +14,32 @@ import os
 ### Date: 5-06-15
 
 def find_paths(input_host):
-	ssh = paperdata_dbi.login_ssh(input_host)
+	named_host = socket.gethostname()
 	input_paths = []
-	for root, dirs, files in os.walk('/'):
-		for direc in dirs:
+	npz_paths = []
+	if input_host == named_host:
+		for root, dirs, files in os.walk('/'):
+			for direc in dirs:
+				if direc.endswith('uv'):
+					 input_paths.append(os.path.join(root, direc))
+				elif direc.endswith('uvcRRE'):
+					 input_paths.append(os.path.join(root, direc))
+			for file_path in files:
+				if file_path.endswith('npz'):
+					 npz_paths.append(os.path.join(root, file_path))
+	else:
+		ssh = paperdata_dbi.login_ssh(input_host)
+		find = '''find / -name '*.uv' -o -name '*.uvcRRE' -o -name '*.npz' 2>/dev/null'''
+		stdin, all_paths, stderr = ssh.exec_command(find)
+		for path in all_paths.split('\n'):
 			if direc.endswith('uv'):
-				 input_paths.append(os.path.join(root, direc))
+				 input_paths.append(path)
 			elif direc.endswith('uvcRRE'):
-				 input_paths.append(os.path.join(root, direc))
-		for file_path in files:
-			if file_path.endswith('npz'):
-				 npz_paths.append(os.path.join(root, file_path))
-	ssh.close()			
+				 input_paths.append(path)
+			elif file_path.endswith('npz'):
+				 npz_paths.append(path)
+			
+		ssh.close()			
 
 	return (input_paths, npz_paths)
 
