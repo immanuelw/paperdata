@@ -21,12 +21,12 @@ def find_paths(input_host):
 		for root, dirs, files in os.walk('/'):
 			for direc in dirs:
 				if direc.endswith('uv'):
-					 input_paths.append(os.path.join(root, direc))
+					input_paths.append(os.path.join(root, direc))
 				elif direc.endswith('uvcRRE'):
-					 input_paths.append(os.path.join(root, direc))
+					input_paths.append(os.path.join(root, direc))
 			for file_path in files:
 				if file_path.endswith('npz'):
-					 npz_paths.append(os.path.join(root, file_path))
+					npz_paths.append(os.path.join(root, file_path))
 	else:
 		ssh = paperdata_dbi.login_ssh(input_host)
 		find = '''find / -name '*.uv' -o -name '*.uvcRRE' -o -name '*.npz' 2>/dev/null'''
