@@ -155,7 +155,7 @@ def dupe_check(input_paths):
 	resBX = tuple(res[0] for res in resB)
 	resCX = tuple(res[0] for res in resC)
 
-	filenames = resAX + resBX + res CX
+	filenames = resAX + resBX + resCX
 
 	#for each input file, check if in filenames
 	unique_paths = tuple(input_path for input_path in input_paths if input_path not in filenames)
@@ -180,9 +180,11 @@ def file_check():
 		for direc in dirs:
 			if direc.endswith(('uv', 'uvcRRE')):
 				input_paths.append(os.path.join(root, direc))
+				print direc
 		for file_path in files:
 			if file_path.endswith('npz'):
 				npz_paths.append(os.path.join(root, file_path))	
+				print file_paths
 
 	input_paths += npz_paths
 
