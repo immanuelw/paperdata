@@ -178,13 +178,13 @@ def file_check():
 	npz_paths = []
 	for root, dirs, files in os.walk('/'):
 		for direc in dirs:
-			if direc.endswith(('uv', 'uvcRRE')):
-				input_paths.append(os.path.join(root, direc))
-				print direc
-		for file_path in files:
-			if file_path.endswith('npz'):
-				npz_paths.append(os.path.join(root, file_path))	
-				print file_paths
+			if direc.startswith('zen') and direc.endswith(('uv', 'uvcRRE')):
+					input_paths.append(os.path.join(root, direc))
+					print direc
+			for file_path in files:
+				if file_path.startswith('zen') and file_path.endswith('npz'):
+					npz_paths.append(os.path.join(root, direc, file_path))
+					print file_path
 
 	input_paths += npz_paths
 
