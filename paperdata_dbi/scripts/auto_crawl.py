@@ -191,7 +191,7 @@ def file_check():
 	return input_paths
 
 def write_file(input_paths):
-	file_store = '/home/immwa/missed_file_list'
+	file_store = '/home/immwa/missed_file_list.psv'
 	data_X = open(file_store, 'ab')
 	wrX = csv.writer(data_X, delimiter='|', lineterminator='\n', dialect='excel')
 	
@@ -202,7 +202,7 @@ def write_file(input_paths):
 	return None
 
 def read_file():
-	file_store = '/home/immwa/missed_file_list'
+	file_store = '/home/immwa/missed_file_list.psv'
 	data_X = open(file_store, 'rb')
 	readX = csv.reader(data_X, delimiter='|', lineterminator='\n', dialect='excel')
 
