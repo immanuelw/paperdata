@@ -61,30 +61,17 @@ def plot_monitor(filenames):
 def plot_ram(host=None, time_min=None, time_max=None):
 	dbi = pyg.DataBaseInterface()
 	s = dbi.Session()
-	if host is None:
-			if time_min is None:
-				if time_max is None:
-					RAMs = s.query(dbi.Ram).all()
-				else:
-					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_max).all()
-			else:
-				if time_max is None:
-					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_min).all()
-				else:
-					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_max).filter(dbi.Ram.time_date<=time_min).all()
-	else:
-			if time_min is None:
-				if time_max is None:
-					RAMs = s.query(dbi.Ram).filter(dbi.Ram.host==host).all()
-				else:
-					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_max).filter(dbi.Ram.host==host).all()
-			else:
-				if time_max is None:
-					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_min).filter(dbi.Ram.host==host).all()
-				else:
-					RAMs = s.query(dbi.Ram).filter(dbi.Ram.time_date<=time_max).filter(dbi.Ram.time_date<=time_min).filter(dbi.Ram.host==host).all()
-		
+	RAMs = s.query(dbi.Ram)
+	if host is not None:
+		RAMs = RAMs.filter(dbi.Ram.host==host)
+	if time_min is not None:
+		RAMs = RAMs.filter(dbi.Ram.time_date<=time_min)
+	if time_max is not None:
+		RAMs = RAMs.filter(dbi.Ram.time_date<=time_max)
+
+	RAMs = RAMs.all()
 	s.close()
+
 	total_data = tuple((RAM.time_date, RAM.total) for RAM in RAMs)
 	used_data = tuple((RAM.time_date, RAM.used) for RAM in RAMs)
 	free_data = tuple((RAM.time_date, RAM.free) for RAM in RAMs)
@@ -148,54 +135,19 @@ def plot_ram(host=None, time_min=None, time_max=None):
 def plot_iostat(host=None, device=None, time_min=None, time_max=None):
 	dbi = pyg.DataBaseInterface()
 	s = dbi.Session()
-	if host is None:
-		if device is None:
-			if time_min is None:
-				if time_max is None:
-					IOSTATs = s.query(dbi.Iostat).all()
-				else:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).all()
-			else:
-				if time_max is None:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_min).all()
-				else:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.time_date<=time_min).all()
-		else:
-			if time_min is None:
-				if time_max is None:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.device==device).all()
-				else:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.device==device).all()
-			else:
-				if time_max is None:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.device==device).all()
-				else:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.device==device).all()
-	else:
-		if device is None:
-			if time_min is None:
-				if time_max is None:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.host==host).all()
-				else:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.host==host).all()
-			else:
-				if time_max is None:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.host==host).all()
-				else:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.host==host).all()
-		else:
-			if time_min is None:
-				if time_max is None:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.device==device).filter(dbi.Iostat.host==host).all()
-				else:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.device==device).filter(dbi.Iostat.host==host).all()
-			else:
-				if time_max is None:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.device==device).filter(dbi.Iostat.host==host).all()
-				else:
-					IOSTATs = s.query(dbi.Iostat).filter(dbi.Iostat.time_date<=time_max).filter(dbi.Iostat.time_date<=time_min).filter(dbi.Iostat.device==device).filter(dbi.Iostat.host==host).all()
-		
+	IOSTATs = s.query(dbi.Ram)
+	if host is not None:
+		IOSTATs = IOSTATs.filter(dbi.Iostat.host==host)
+	if device is not None:
+		IOSTATs = IOSTATs.filter(dbi.Iostat.device==device)
+	if time_min is not None:
+		IOSTATs = IOSTATs.filter(dbi.Iostat.time_date<=time_min)
+	if time_max is not None:
+		IOSTATs = IOSTATs.filter(dbi.Iostat.time_date<=time_max)
+
+	IOSTATs = IOSTATs.all()
 	s.close()
+
 	tps_data = tuple((IOSTAT.time_date, IOSTAT.tps) for IOSTAT in IOSTATs)
 	reads_data = tuple((IOSTAT.time_date, IOSTAT.read_s) for IOSTAT in IOSTATs)
 	writes_data = tuple((IOSTAT.time_date, IOSTAT.write_s) for IOSTAT in IOSTATs)
@@ -237,54 +189,19 @@ def plot_iostat(host=None, device=None, time_min=None, time_max=None):
 def plot_cpu(host=None, cpu=None, time_min=None, time_max=None):
 	dbi = pyg.DataBaseInterface()
 	s = dbi.Session()
-	if host is None:
-		if cpu is None:
-			if time_min is None:
-				if time_max is None:
-					CPUs = s.query(dbi.Cpu).all()
-				else:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).all()
-			else:
-				if time_max is None:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_min).all()
-				else:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.time_date<=time_min).all()
-		else:
-			if time_min is None:
-				if time_max is None:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.cpu==cpu).all()
-				else:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.cpu==cpu).all()
-			else:
-				if time_max is None:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.cpu==cpu).all()
-				else:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.cpu==cpu).all()
-	else:
-		if cpu is None:
-			if time_min is None:
-				if time_max is None:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.host==host).all()
-				else:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.host==host).all()
-			else:
-				if time_max is None:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.host==host).all()
-				else:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.host==host).all()
-		else:
-			if time_min is None:
-				if time_max is None:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.cpu==cpu).filter(dbi.Cpu.host==host).all()
-				else:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.cpu==cpu).filter(dbi.Cpu.host==host).all()
-			else:
-				if time_max is None:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.cpu==cpu).filter(dbi.Cpu.host==host).all()
-				else:
-					CPUs = s.query(dbi.Cpu).filter(dbi.Cpu.time_date<=time_max).filter(dbi.Cpu.time_date<=time_min).filter(dbi.Cpu.cpu==cpu).filter(dbi.Cpu.host==host).all()
-		
+	CPUs = s.query(dbi.Cpu)
+	if host is not None:
+		CPUs = CPUs.filter(dbi.Cpu.host==host)
+	if cpu is not None:
+		CPUs = CPUs.filter(dbi.Cpu.cpu==cpu)
+	if time_min is not None:
+		CPUs = CPUs.filter(dbi.Cpu.time_date<=time_min)
+	if time_max is not None:
+		CPUs = CPUs.filter(dbi.Cpu.time_date<=time_max)
+
+	CPUs = CPUs.all()
 	s.close()
+
 	user_perc_data = tuple((CPU.time_date, CPU.user_perc) for CPU in CPUs)
 	sys_perc_data = tuple((CPU.time_date, CPU.sys_perc) for CPU in CPUs)
 	iowait_perc_data = tuple((CPU.time_date, CPU.iowait_perc) for CPU in CPUs)
