@@ -168,7 +168,7 @@ def match(input_group, tab, field, value, equality):
 	elif equality is '<':
 		if tab in ('File',):
 			FILEs = input_group
-			elif field is 'obsnum':
+			if field is 'obsnum':
 				return tuple(FILE for FILE in FILEs if FILE.obsnum<=value)
 			elif field is 'filesize':
 				return tuple(FILE for FILE in FILEs if FILE.filesize<=value)
@@ -185,7 +185,7 @@ def match(input_group, tab, field, value, equality):
 	elif equality is '>':
 		if tab in ('File',):
 			FILEs = input_group
-			elif field is 'obsnum':
+			if field is 'obsnum':
 				return tuple(FILE for FILE in FILEs if FILE.obsnum>=value)
 			elif field is 'filesize':
 				return tuple(FILE for FILE in FILEs if FILE.filesize>=value)
