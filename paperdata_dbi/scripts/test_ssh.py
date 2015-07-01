@@ -95,7 +95,7 @@ def calc_md5sum(host, path, filename):
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
 	#DEFAULT VALUE
-	md5 = 'NULL'
+	md5 = None
 	if named_host == host:
 		md5 = md5sum(full_path)
 	else:
