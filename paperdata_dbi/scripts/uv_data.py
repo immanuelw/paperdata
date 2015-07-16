@@ -58,7 +58,7 @@ def calc_uv_data(host, full_path):
 		if length > 0:
 			obsnum = jdpol2obsnum(julian_date, polarization, length)
 		else:
-			obsnum = 0
+			obsnum = None
 
 	uv_info = (time_start, time_end, delta_time, julian_date, polarization, length, obsnum)
 

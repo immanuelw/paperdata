@@ -264,11 +264,14 @@ def backup_files(dbnum2, dbnum3, dbnum4, dbnum5, time_date):
 				resA[key] = value
 			#
 			#write_to_tape, delete_file
-			cursor.execute('''SELECT write_to_tape, delete_file FROM paperdata where raw_path != 'NULL' group by raw_path order by julian_date asc, polarization asc''')
-			res2 = cursor.fetchall()
+			cursor.execute('''SELECT write_to_tape, delete_file FROM paperdata where raw_path != 'NULL' and raw_path != 'ON TAPE' group by raw_path order by julian_date asc, polarization asc''')
+			res3 = cursor.fetchall()
+			cursor.execute('''SELECT write_to_tape, delete_file FROM paperdata where raw_path != 'NULL' and raw_path = 'ON TAPE' order by julian_date asc, polarization asc''')
+			res4 = cursor.fetchall()
+			res5 = res3 + res4
 			resB = {} 
-			res3 = tuple((bool(int(i[0])), bool(int(i[1]))) for i in res2)
-			for key, value in enumerate(res3):
+			res6 = tuple((bool(int(i[0])), bool(int(i[1]))) for i in res5)
+			for key, value in enumerate(res6):
 				resB[key] = value
 
 			resu = tuple(resA[key] + resB[key] for key, value in enumerate(res))
