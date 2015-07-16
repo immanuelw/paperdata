@@ -36,8 +36,8 @@ class File:
 						'path':('VARCHAR(100)', 'None', 'No', 'directory that file is located in'),
 						'filename':('VARCHAR(100)', 'None', 'No', 'name of file (ex: zen.2446321.16617.uvcRRE)'),
 						'filetype':('VARCHAR(20)', 'None', 'No', 'filetype (ex: uv, uvcRRE, npz)'),
-						'full_path':('VARCHAR(200)', 'None', 'Unique', 'combination of host, path, and filename which is a unique
-										identifier for each file'),
+						'full_path':('VARCHAR(200)', 'None', 'Unique',
+										'combination of host, path, and filename which is a unique identifier for each file'),
 						'obsnum':('BIGINT', 'None', 'Primary', 'observation number used to track files using integer'),
 						'filesize':('DECIMAL(7, 2)', 'None', 'No', 'size of file in megabytes'),
 						'md5sum':('INTEGER', 'None', 'No', '32-bit integer md5 checksum of file'),
@@ -67,8 +67,8 @@ class Observation:
 						'julian_day':('INTEGER', 'None', 'No',
 										'integer value -- the last 4 digits for any julian date to separate into days: ex:(2456601 -> 6601)'),
 						'era':('INTEGER', 'None', 'No', 'era of observation taken: 32, 64, 128'),
-						'era_type':('VARCHAR(20)'. 'None', 'No', 'type of observation taken: dual pol, etc.'),
-						'length':('DECIMAL(6, 5)', 'None'. 'No', 'length of time data was taken for particular observation'),
+						'era_type':('VARCHAR(20)', 'None', 'No', 'type of observation taken: dual pol, etc.'),
+						'length':('DECIMAL(6, 5)', 'None', 'No', 'length of time data was taken for particular observation'),
 						'time_start':('DECIMAL(12, 5)', 'None', 'No', 'start time of observation'),
 						'time_end':('DECIMAL(12, 5)', 'None', 'No', 'end time of observation'),
 						'delta_time':('DECIMAL(12, 5)', 'None', 'No', 'time step of observation'),
@@ -89,11 +89,11 @@ class Feed:
 		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'host of file system that file is located on'),
 						'path':('VARCHAR(100)', 'None', 'No', 'directory that file is located in'),
 						'filename':('VARCHAR(100)', 'None', 'No', 'name of file (ex: zen.2446321.16617.uvcRRE)'),
-						'full_path':('VARCHAR(200)', 'None', 'Unique', 'combination of host, path, and filename which is a unique
-										identifier for each file'),
+						'full_path':('VARCHAR(200)', 'None', 'Unique',
+										'combination of host, path, and filename which is a unique identifier for each file'),
 						'julian_day':('INTEGER', 'None', 'No',
 										'integer value -- the last 4 digits for any julian date to separate into days: ex:(2456601 -> 6601)'),
-						'ready_to_move':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file is ready to be moved to distill')}
+						'ready_to_move':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file is ready to be moved to distill'),
 						'moved_to_distill':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file has been moved to distill yet')}
 
 #dictionary of instantiated classes

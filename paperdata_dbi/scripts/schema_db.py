@@ -3,7 +3,7 @@ import prettytable
 import paperdata_db as pdb
 
 def main():
-	with open('./schema.txt', 'wb') as df:
+	with open('../src/schema.txt', 'wb') as df:
 		print 'Starting ..'
 	var_classes = pdb.all_classes
 
