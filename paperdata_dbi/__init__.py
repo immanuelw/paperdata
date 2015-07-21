@@ -114,7 +114,7 @@ class File(Base):
 	###
 	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
 	filesize = Column(Numeric(7,2))
-	md5sum = Column(Integer)
+	md5sum = Column(String(32))
 	tape_index = Column(String(100))
 	### maybe unnecessary fields
 	#calibration_path = Column(String(100))
