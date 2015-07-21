@@ -101,7 +101,7 @@ class Observation(Base):
 	delta_time = Column(Numeric(12,5))
 	prev_obs = Column(BigInteger, unique=True)
 	next_obs = Column(BigInteger, unique=True)
-	edge = Column(Boolean)
+	edge = Column(Boolean, default=False)
 
 class File(Base):
 	__tablename__ = 'file'
@@ -119,8 +119,8 @@ class File(Base):
 	### maybe unnecessary fields
 	#calibration_path = Column(String(100))
 	#history?
-	write_to_tape = Column(Boolean)
-	delete_file = Column(Boolean)
+	write_to_tape = Column(Boolean, default=False)
+	delete_file = Column(Boolean, default=False)
 	#this next line creates an attribute Observation.files which is the list of all
 	#  files associated with this observation
 	observation = relationship(Observation, backref=backref('files', uselist=True))
@@ -132,8 +132,8 @@ class Feed(Base):
 	filename = Column(String(100)) #zen.*.*.uv
 	full_path = Column(String(200), primary_key=True)
 	julian_day = Column(Integer)
-	ready_to_move = Column(Boolean)
-	moved_to_distill = Column(Boolean)
+	ready_to_move = Column(Boolean, default=False)
+	moved_to_distill = Column(Boolean, default=False)
 
 class DataBaseInterface(object):
 	def __init__(self,configfile='./still.cfg',test=False):
