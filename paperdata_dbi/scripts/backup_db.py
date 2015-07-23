@@ -3,25 +3,23 @@
 # Load data into MySQL table 
 
 # import the MySQLdb and sys modules
-import MySQLdb
 import sys
-import getpass
 import time
 import csv
-import base64
 import os
 import subprocess
 import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
+import paperdata_dbi as pdbi
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
-def paperbackup(time_date, usrnm, pswd):
+def paperbackup(time_date):
 
 	backup_dir = os.path.join('/data4/paper/paperdata_backup', time_date)
 	if not os.path.isdir(backup_dir):
@@ -29,65 +27,34 @@ def paperbackup(time_date, usrnm, pswd):
 
 	#Create separate files for each directory
 
-	db1 = 'paper_observation_backup_%s.psv'%(time_date)
+	db1 = 'obs_{0}.psv'.format(time_date)
 	dbo1 = os.path.join(backup_dir,db1)
 	print dbo1
 	data_file1 = open(dbo1,'wb')
 	wr1 = csv.writer(data_file1, delimiter='|', lineterminator='\n', dialect='excel')
 
-	db2 = 'paper_file_backup_%s.psv'%(time_date)
+	db2 = 'file_{0}.psv'.format(time_date)
 	dbo2 = os.path.join(backup_dir,db2)
 	print dbo2
 	data_file2 = open(dbo2,'wb')
 	wr2 = csv.writer(data_file2, delimiter='|', lineterminator='\n', dialect='excel')
 
-	#db3 = 'paperrename_backup_%s.psv'%(time_date)
-	#dbo3 = os.path.join(backup_dir,db3)
-	#print dbo3
-	#data_file3 = open(dbo3,'wb')
-	#wr3 = csv.writer(data_file3, delimiter='|', lineterminator='\n', dialect='excel')
-
-	#db4 = 'paperfeed_backup_%s.psv'%(time_date)
-	#dbo4 = os.path.join(backup_dir,db4)
-	#print dbo4
-	#data_file4 = open(dbo4,'wb')
-	#wr4 = csv.writer(data_file4, delimiter='|', lineterminator='\n', dialect='excel')
-
-	#Load data into named database and table
-	# open a database connection
-	connection = MySQLdb.connect (host = 'shredder', user = usrnm, passwd = pswd, db = 'paperdata', local_infile=True)
-
-	# prepare a cursor object using cursor() method
-	cursor = connection.cursor()
-
 	# execute the SQL query using execute() method.
-	cursor.execute('SELECT * FROM Observation order by julian_date asc, polarization asc')
-	results = cursor.fetchall()
+	OBSs = s.query(pdbi.Observation).order_by(pdbi.Observation.julian_date.asc(), pdbi.Observation.polarization.asc()).all()
 
-	for item in results:
+	for OBS in OBSs:
+		item = (OBS.obsnum, OBS.julian_date, OBS.polarization, OBS.julian_day, OBS.era, OBS.era_type, OBS.length,
+				OBS.time_start, OBS.time_end, OBS.delta_time, OBS.prev_obs, OBS.next_obs, OBS.edge)
 		wr1.writerow(item)
 	data_file1.close()
 
-	cursor.execute('SELECT * FROM File order by obsnum asc, filename asc')
-	results = cursor.fetchall()
+	FILEs = s.query(pdbi.File).order_by(pdbi.File.obsnum.asc(), pdbi.File.filename.asc()).all()
 
-	for item in results:
+	for FILE in FILEs:
+		item = (FILE.host, FILE.path, FILE.filename, FILE.filetype, FILE.full_path, FILE.obsnum, FILE.filesize, FILE.md5,
+				FILE.tape_index, FILE.write_to_tape, FILE.delete_file)
 		wr2.writerow(item)
 	data_file2.close()
-
-	#cursor.execute('SELECT * FROM paperrename order by julian_day asc, raw_path asc')
-	#results = cursor.fetchall()
-
-	#for item in results:
-	#	#wr3.writerow(item)
-	#data_file3.close()
-
-	#cursor.execute('SELECT * FROM paperfeed order by julian_day asc, raw_path asc')
-	#results = cursor.fetchall()
-
-	#for item in results:
-	#	#wr4.writerow(item)
-	#data_file4.close()
 
 	print time_date
 	print 'Table data backup saved'
@@ -144,8 +111,6 @@ if __name__ == '__main__':
 		pswd = getpass.getpass('Password: ')
 		sql_backup(dbnum, time_date, usrnm, pswd)
 	else:
-		usrnm = 'paperboy'
-		pswd = 'paperboy'
-		paperbackup(time_date, usrnm, pswd)
+		paperbackup(time_date)
 		backup_file = '/data4/paper/paperdata_backup/%s/paperdata_backup_%s.psv' %(time_date, time_date)
 		email_backup(backup_file)
