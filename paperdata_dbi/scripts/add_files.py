@@ -86,7 +86,7 @@ def calc_md5sum(host, path, filename):
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
 	#DEFAULT VALUE
-	md5 = 'NULL'
+	md5 = None
 	if named_host == host:
 		md5 = md5sum(full_path)
 	else:
@@ -162,7 +162,7 @@ def calc_obs_data(host, full_path):
 			if length > 0:
 				obsnum = jdpol2obsnum(julian_date, polarization, length)
 			else:
-				obsnum = 0
+				obsnum = None
 
 		else:
 			ssh = login_ssh(host)
@@ -216,7 +216,7 @@ def calc_obs_data(host, full_path):
 	julian_day = int(str(julian_date)[3:7])
 
 	#indicates type of file in era
-	era_type = 'NULL'
+	era_type = None
 
 	#location of calibrate files
 	#if era == 32:
@@ -224,23 +224,31 @@ def calc_obs_data(host, full_path):
 	#elif era == 64:
 	#	cal_path = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
 	#elif era == 128:
-	#	cal_path = 'NULL'
+	#	cal_path = None
 
 	#unknown prev/next observation
-	dbi = paperdata_dbi.DataBaseInterface()
-	s = dbi.Session()
-	PREV_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum-1).one()
-	if PREV_OBS is not None:
-		prev_obs = PREV_OBS.obsnum
-	else:
+	if obsnum == None:
 		prev_obs = None
-	NEXT_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum+1).one()
-	if NEXT_OBS is not None:
-		next_obs = NEXT_OBS.obsnum
-	else:
 		next_obs = None
-	s.close()
-	edge = (None in (prev_obs, next_obs))
+	else:
+		dbi = paperdata_dbi.DataBaseInterface()
+		s = dbi.Session()
+		PREV_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum-1).one()
+		if PREV_OBS is not None:
+			prev_obs = PREV_OBS.obsnum
+		else:
+			prev_obs = None
+		NEXT_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum+1).one()
+		if NEXT_OBS is not None:
+			next_obs = NEXT_OBS.obsnum
+		else:
+			next_obs = None
+		s.close()
+
+	if (prev_obs, next_obs) == (None, None):
+		edge = False
+	else:
+		edge = (None in (prev_obs, next_obs))
 
 	filesize = calc_size(host, path, filename)
 	md5 = calc_md5sum(host, path, filename)

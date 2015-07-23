@@ -60,7 +60,7 @@ def calc_uv_data(host, full_path):
 		else:
 			obsnum = None
 
-	uv_info = (time_start, time_end, delta_time, julian_date, polarization, length, obsnum)
+	uv_info = (round(time_start, 5), round(time_end, 5), round(delta_time, 5), julian_date, polarization, length, obsnum)
 
 	return uv_info
 

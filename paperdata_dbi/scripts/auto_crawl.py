@@ -9,6 +9,7 @@ import glob
 import socket
 import os
 import csv
+import MySQLdb
 
 ### Script to add files to paperdata database
 ### Adds files using dbi
@@ -26,11 +27,8 @@ def get_size(start_path):
 	return total_size
 
 def sizeof_fmt(num):
-	for x in ['bytes','KB','MB']:
-		if num < 1024.0:
-			return "%3.1f" % (num)
+	for x in ['KB', 'MB']:
 		num /= 1024.0
-	num *= 1024.0
 	return "%3.1f" % (num)
 
 ### other functions
@@ -71,6 +69,40 @@ def calc_obs_data(host, full_path):
 	filename = os.path.basename(full_path)
 	filetype = filename.split('.')[-1]
 
+	if os.path.isdir(full_path) or os.path.isfile(full_path):
+		pass
+	else:
+		print full_path + '|' + 'No Longer Exists'
+		return None
+
+	if full_path in ('/data3/data1/paper/psa/psa228/zen.2440587.69719.uv', '/data3/data1/paper/psa/psa228/zen.2455228.00925.uv',
+					'/data3/paper/jkris/560x/5600/zen.2455600.20624.uv', '/data3/paper/jkris/560x/5600/zen.2455600.22016.uv',
+					'/data3/paper/psa/Dec2010/zen.2455537.71473.uv', '/data4/paper/128_sim_data/sim4/zen.2456892.48252.xx.uv',
+					'/data4/paper/2013EoR/2456644/zen.2456644.18779.xy.uv', '/data4/paper/2013EoR/2456644/zen.2456644.19475.xx.uv',
+					'/data4/paper/2013EoR/2456710/zen.2456710.19470.yx.uvcRRE', '/data4/paper/2013EoR/2456711/zen.2456711.39657.yx.uvcRRE',
+					'/data4/paper/2013EoR/2456711/zen.2456711.50097.xy.uvcRRE', '/data4/paper/2013EoR/2456711/zen.2456711.58448.xy.uvcRRE',
+					'/data4/paper/2013EoR/2456713/zen.2456713.25039.xy.uvcRRE', '/data4/paper/2013EoR/2456713/zen.2456713.30607.xx.uvcRRE',
+					'/data4/paper/2013EoR/2456713/zen.2456713.50093.xy.uvcRRE', '/data4/paper/2013EoR/2456730/zen.2456730.22261.xx.uvcRRE',
+					'/data4/paper/2014EoR/pot2/data1/2456970/zen.2456970.41051.yx.uvcRRE',
+					'/data4/paper/dcj/psa128/calibration/zen.2456660.37569.yy.uv',
+					'/data4/raw_data/Dec2011/psa5842/raw_zenuv/zen.2455846.81133.uv',
+					'/data4/raw_data/EoR2013/psa6622/zen.2456622.20864.xx.uvcRRE',
+					'/data4/raw_data/EoR2013/psa6661/zen.2456661.55668.yx.uvcRRE'):
+		obsnum = 0
+		filesize = sizeof_fmt(get_size(full_path))
+		try:
+			md5 = md5sum(full_path)
+		except(IOError):
+			return None
+		tape_index = None
+
+		write_to_tape = False
+		delete_file = False
+
+		file_data = (host, path, filename, filetype, full_path, obsnum, filesize, md5, tape_index, write_to_tape, delete_file)
+
+		return file_data
+
 	#Dictionary of polarizations
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
 
@@ -81,7 +113,20 @@ def calc_obs_data(host, full_path):
 			try:
 				uv = A.miriad.UV(full_path)
 			except:
-				return None
+				obsnum = 0
+				filesize = sizeof_fmt(get_size(full_path))
+				try:
+					md5 = md5sum(full_path)
+				except(IOError):
+					return None
+				tape_index = None
+
+				write_to_tape = False
+				delete_file = False
+
+				file_data = (host, path, filename, filetype, full_path, obsnum, filesize, md5, tape_index, write_to_tape, delete_file)
+
+				return file_data
 
 			#indicates julian date
 			julian_date = round(uv['time'], 5)
@@ -107,7 +152,20 @@ def calc_obs_data(host, full_path):
 						c_time = t
 						n_times += 1
 			except:
-				return None
+				obsnum = 0
+				filesize = sizeof_fmt(get_size(full_path))
+				try:
+					md5 = md5sum(full_path)
+				except(IOError):
+					return None
+				tape_index = None
+
+				write_to_tape = False
+				delete_file = False
+
+				file_data = (host, path, filename, filetype, full_path, obsnum, filesize, md5, tape_index, write_to_tape, delete_file)
+
+				return file_data
 
 			if n_times > 1:
 				delta_time = -(time_start - time_end)/(n_times - 1)
@@ -118,21 +176,29 @@ def calc_obs_data(host, full_path):
 
 			#gives each file unique id
 			if length > 0:
-				obsnum = jdpol2obsnum(julian_date, polarization, length)
+				if polarization == 'all':
+					obsnum = jdpol2obsnum(julian_date, 'yy', length)
+				else:
+					obsnum = jdpol2obsnum(julian_date, polarization, length)
 			else:
 				obsnum = 0
 
+			filesize = sizeof_fmt(get_size(full_path))
+
 	elif filetype in ('npz',):
 		obsnum = 0
+		filesize = round(os.path.getsize(full_path) / 1024.0 / 1024.0, 1)
 
-	filesize = sizeof_fmt(get_size(full_path))
-	md5 = md5sum(full_path)
+	try:
+		md5 = md5sum(full_path)
+	except(IOError):
+		return None
 	tape_index = None
 
 	write_to_tape = False
 	delete_file = False
 
-	file_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file)
+	file_data = (host, path, filename, filetype, full_path, obsnum, filesize, md5, tape_index, write_to_tape, delete_file)
 
 	return file_data
 
@@ -164,27 +230,31 @@ def dupe_check(input_paths):
 
 def write_data(input_host, input_paths, data_f):
 
-	data_file = open(data_f, 'ab')
-	wr = csv.writer(data_file, delimiter='|', lineterminator='\n', dialect='excel')
 	for input_path in input_paths:
-		item = calc_obs_data(input_host, input_paths)
+		item = calc_obs_data(input_host, input_path)
+		if item is None:
+			continue
+		print item
+		data_file = open(data_f, 'ab')
+		wr = csv.writer(data_file, delimiter='|', lineterminator='\n', dialect='excel')
 		wr.writerow(item)
-	data_file.close()
+		data_file.close()
 
 	return None
 
 def file_check():
 	input_paths = []
 	npz_paths = []
-	for root, dirs, files in os.walk('/'):
+	host = 'folio:'
+	for root, dirs, files in os.walk('/data3/paper'):
 		for direc in dirs:
 			if direc.startswith('zen') and direc.endswith(('uv', 'uvcRRE')):
-					input_paths.append(os.path.join(root, direc))
+					input_paths.append(host + os.path.join(root, direc))
 					print direc
-			for file_path in files:
-				if file_path.startswith('zen') and file_path.endswith('npz'):
-					npz_paths.append(os.path.join(root, direc, file_path))
-					print file_path
+		for file_path in files:
+			if file_path.startswith('zen') and file_path.endswith('npz') and 'uvcRE' in file_path:
+				npz_paths.append(host + os.path.join(root, file_path))
+				print file_path
 
 	input_paths += npz_paths
 
@@ -196,19 +266,20 @@ def write_file(input_paths):
 	wrX = csv.writer(data_X, delimiter='|', lineterminator='\n', dialect='excel')
 	
 	for input_path in input_paths:
-		wrX.writerow(item)
+		wrX.writerow([input_path])
 	data_X.close()
 
 	return None
 
 def read_file():
-	file_store = '/home/immwa/missed_file_list.psv'
+	#file_store = '/home/immwa/missed_file_list.psv'
+	file_store = '/home/immwa/files_missed.psv'
 	data_X = open(file_store, 'rb')
 	readX = csv.reader(data_X, delimiter='|', lineterminator='\n', dialect='excel')
 
 	input_paths = []
 	for row in readX:
-		input_paths.append(row)
+		input_paths.append(row[0])
 
 	data_X.close()
 
@@ -217,12 +288,15 @@ def read_file():
 if __name__ == '__main__':
 	input_host = socket.gethostname()
 
-	input_paths = file_check()
-	input_paths = dupe_check(input_paths)
-	input_paths.sort()
- 
-	write_file(input_paths)
+	#input_paths = file_check()
+	#write_file(input_paths)
 
-	#input_paths = read_file()
-	#data_f = '/home/immwa/missed_paper.psv'
-	#write_data(input_paths, data_f)
+	input_paths = read_file()
+	#input_paths = dupe_check(input_paths)
+	#input_paths = tuple(sorted(input_paths))
+	#for input_path in input_paths:
+	#	print input_path
+ 
+	data_f = '/home/immwa/missed_paper.psv'
+	input_paths = tuple(input_path.split(':')[1] for input_path in input_paths)
+	write_data(input_host, input_paths, data_f)

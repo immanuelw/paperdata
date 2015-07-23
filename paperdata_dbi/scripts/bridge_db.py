@@ -165,7 +165,7 @@ def add_data():
 			era = 128
 
 		#indicates type of file in era
-		era_type = 'NULL'
+		era_type = None
 
 		#location of calibrate files
 		#if era == 32:
@@ -173,19 +173,27 @@ def add_data():
 		#elif era == 64:
 		#	cal_path = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
 		#elif era == 128:
-		#	cal_path = 'NULL'
+		#	cal_path = None
 
-		PREV_OBS = sp.query(data_dbi.Observation).filter(data_dbi.Observation.obsnum==obsnum-1).one()
-		if PREV_OBS is not None:
-			prev_obs = PREV_OBS.obsnum
-		else:
+		if obsnum == None:
 			prev_obs = None
-		NEXT_OBS = sp.query(data_dbi.Observation).filter(data_dbi.Observation.obsnum==obsnum+1).one()
-		if NEXT_OBS is not None:
-			next_obs = NEXT_OBS.obsnum
-		else:
 			next_obs = None
-		edge = (None in (prev_obs, next_obs))
+		else:
+			PREV_OBS = sp.query(data_dbi.Observation).filter(data_dbi.Observation.obsnum==obsnum-1).one()
+			if PREV_OBS is not None:
+				prev_obs = PREV_OBS.obsnum
+			else:
+				prev_obs = None
+			NEXT_OBS = sp.query(data_dbi.Observation).filter(data_dbi.Observation.obsnum==obsnum+1).one()
+			if NEXT_OBS is not None:
+				next_obs = NEXT_OBS.obsnum
+			else:
+				next_obs = None
+
+		if (prev_obs, next_obs) == (None, None):
+			edge = False
+		else:
+			edge = (None in (prev_obs, next_obs))
 
 		filesize = add_files.calc_size(host, path, filename)
 		md5 = add_files.calc_md5sum(host, path, filename)
