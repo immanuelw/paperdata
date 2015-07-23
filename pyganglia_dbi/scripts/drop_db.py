@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # Create pyganglia tables
 
-import pyganglia_dbi
-
+import pyganglia_dbi as pyg
 
 ### Script to drop pyganglia database
 ### Instantiates tables
@@ -12,7 +11,7 @@ import pyganglia_dbi
 ### Date: 5-06-15
 
 def drop_db():
-	dbi = pyganglia_dbi.DataBaseInterface()
+	dbi = pyg.DataBaseInterface()
 	dbi.drop_db()
 
 if __name__ == '__main__':

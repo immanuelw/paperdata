@@ -5,7 +5,7 @@
 import sys
 import os
 import paramiko
-import pyganglia_dbi
+import pyganglia_dbi as pyg
 
 ### Script to add info to pyganglia database
 ### Adds information using dbi
@@ -104,7 +104,7 @@ def cpu_perc(ssh):
 	return recpu
 
 def add_data(ssh):
-	dbi = pyganglia_dbi.DataBaseInterface()
+	dbi = pyg.DataBaseInterface()
 	iostat_data = iostat(ssh)
 	ram_data = ram_free(ssh)
 	cpu_data = cpu_perc(ssh)

@@ -11,12 +11,6 @@ import hashlib
 Base = declarative_base()
 logger = logging.getLogger('paperdata_dbi')
 
-dbinfo = {'username':'immwa',
-		  'password':'\x69\x6d\x6d\x77\x61\x33\x39\x37\x38',
-		  'hostip':'shredder',
-		  'port':3306,
-		  'dbname':'paperdata'}
-
 #########
 #
 #   Useful helper functions
@@ -136,7 +130,7 @@ class Feed(Base):
 	moved_to_distill = Column(Boolean, default=False)
 
 class DataBaseInterface(object):
-	def __init__(self,configfile='./still.cfg',test=False):
+	def __init__(self,configfile='~/still.cfg',test=False):
 		"""
 		Connect to the database and initiate a session creator.
 		 or
@@ -245,11 +239,11 @@ class DataBaseInterface(object):
 		creates the tables in the database.
 		"""
 		Base.metadata.bind = self.engine
-		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_tigger
-										after INSERT or UPDATE on File
-										FOR EACH ROW
+		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
+										after INSERT or UPDATE on File \
+										FOR EACH ROW \
 										SET NEW.full_path = concat(NEW.host, ':', NEW.path, '/', NEW.filename)''')
-		event.listen(table, 'after_create', insert_update_trigger)
+		event.listen(File.__table__, 'after_create', insert_update_trigger)
 		Base.metadata.create_all()
 
 	def create_table(Table):
@@ -272,8 +266,9 @@ class DataBaseInterface(object):
 		returns: obsnum  (see jdpol2obsnum)
 		Note: does not link up neighbors!
 		"""
-		OBS = Observation(obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time,
-							prev_obs, next_obs, edge)
+		OBS = Observation(obsnum=obsnum, julian_date=julian_date, polarization=polarization, julian_day=julian_day, era=era, era_type=era_type,
+							length=length, time_start=time_start, time_end=time_end, delta_time=delta_time,	prev_obs=prev_obs,
+							next_obs=next_obs, edge=edge)
 		s = self.Session()
 		s.add(OBS)
 		s.commit()
@@ -282,11 +277,12 @@ class DataBaseInterface(object):
 		sys.stdout.flush()
 		return obsnum
 
-	def add_file(self, host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file): #cal_path?? XXXX
+	def add_file(self, host, path, filename, filetype, full_path, obsnum, filesize, md5, tape_index, write_to_tape, delete_file): #cal_path?? XXXX
 		"""
 		Add a file to the database and associate it with an observation.
 		"""
-		FILE = File(host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file) #cal_path?? XXXX
+		FILE = File(host=host, path=path, filename=filename, filetype=filetype, full_path=full_path, obsnum=obsnum, filesize=filesize,
+					md5sum=md5, tape_index=tape_index, write_to_tape=write_to_tape, delete_file=delete_file)
 		#get the observation corresponding to this file
 		s = self.Session()
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()

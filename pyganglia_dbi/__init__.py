@@ -8,13 +8,7 @@ import os, numpy as n, sys, logging
 import configparser
 #Based on example here: http://www.pythoncentral.io/overview-sqlalchemys-expression-language-orm-queries/
 Base = declarative_base()
-logger = logging.getLogger('paperdata_dbi')
-
-dbinfo = {'username':'immwa',
-		  'password':'\x69\x6d\x6d\x77\x61\x33\x39\x37\x38',
-		  'hostip':'shredder',
-		  'port':3306,
-		  'dbname':'paperdata'}
+logger = logging.getLogger('pyganglia_dbi')
 
 #########
 #
@@ -96,7 +90,7 @@ class Cpu(Base):
 	time_date = Column(Numeric(13,6))
 
 class DataBaseInterface(object):
-	def __init__(self,configfile='./still.cfg',test=False):
+	def __init__(self,configfile='~/still.cfg',test=False):
 		"""
 		Connect to the database and initiate a session creator.
 		 or
@@ -128,7 +122,7 @@ class DataBaseInterface(object):
 								max_overflow=40)
 		self.Session = sessionmaker(bind=self.engine)
 
-	def get_monitor(self, full_path):
+	def get_monitor(self, full_stats):
 		"""
 		retrieves an monitor object.
 		Errors if there are more than one of the same monitor in the db. This is bad and should
@@ -137,7 +131,7 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
-		MONITOR = s.query(Monitor).filter(Monitor.full_path==full_path).one()
+		MONITOR = s.query(Monitor).filter(Monitor.full_stats==full_stats).one()
 		s.close()
 		return MONITOR
 
@@ -158,14 +152,14 @@ class DataBaseInterface(object):
 		"""
 		Base.metadata.bind = self.engine
 		table = File.__table__
-		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_tigger
-										after INSERT or UPDATE on Monitor
-										FOR EACH ROW
+		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
+										after INSERT or UPDATE on Monitor \
+										FOR EACH ROW \
 										SET NEW.full_path = concat(NEW.host, ':', NEW.path, '/', NEW.filename)''')
 		event.listen(table, 'after_create', insert_update_trigger)
-		insert_update_trigger_2 = DDL('''CREATE TRIGGER insert_update_tigger
-										after INSERT or UPDATE on Monitor
-										FOR EACH ROW
+		insert_update_trigger_2 = DDL('''CREATE TRIGGER insert_update_trigger \
+										after INSERT or UPDATE on Monitor \
+										FOR EACH ROW \
 										SET NEW.full_stats = concat(NEW.full_path, '+', NEW.status)''')
 		event.listen(table, 'after_create', insert_update_trigger_2)
 		Base.metadata.create_all()
@@ -181,7 +175,8 @@ class DataBaseInterface(object):
 		"""
 		create a new monitor entry.
 		"""
-		MONITOR = Monitor(host, path, filename, full_path, status, full_stats, del_time, file_start, file_end, time_date)
+		MONITOR = Monitor(host=host, path=path, filename=filename, full_path=full_path, status=status, full_stats=full_stats,
+							del_time=del_time, file_start=file_start, file_end=file_end, time_date=time_date)
 		s = self.Session()
 		s.add(MONITOR)
 		s.commit()
@@ -192,7 +187,8 @@ class DataBaseInterface(object):
 		"""
 		create a new ram entry.
 		"""
-		RAM = Ram(host, total, used, free, shared, buffers, cached, bc_used, bc_free, swap_total, swap_used, swap_free, time_date)
+		RAM = Ram(host=host, total=total, used=used, free=free, shared=shared, buffers=buffers, cached=cached, bc_used=bc_used, bc_free=bc_free,
+					swap_total=swap_total, swap_used=swap_used, swap_free=swap_free, time_date=time_date)
 		s = self.Session()
 		s.add(RAM)
 		s.commit()
@@ -203,7 +199,8 @@ class DataBaseInterface(object):
 		"""
 		create a new iostat entry.
 		"""
-		IOSTAT = Iostat(host, device, tps, read_s, write_s, bl_reads, bl_writes, time_date)
+		IOSTAT = Iostat(host=host, device=device, tps=tps, read_s=read_s, write_s=write_s, bl_reads=bl_reads, bl_writes=bl_writes,
+						time_date=time_date)
 		s = self.Session()
 		s.add(IOSTAT)
 		s.commit()
@@ -214,7 +211,7 @@ class DataBaseInterface(object):
 		"""
 		create a new cpu entry.
 		"""
-		CPU = Cpu(host, cpu, user_perc, sys_perc, iowait_perc, idle_perc, intr_s, time_date)
+		CPU = Cpu(host=host, cpu=cpu, user_perc=user_perc, sys_perc=sys_perc, iowait_perc=iowait_perc, idle_perc=idle_perc, intr_s=intr_s, time_date=time_date)
 		s = self.Session()
 		s.add(CPU)
 		s.commit()

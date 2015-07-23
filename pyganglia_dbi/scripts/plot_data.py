@@ -31,8 +31,8 @@ def plot_monitor(filenames):
 	stage_dict = dict(zip(STAGEs, x_values))
 	for uv_file in filenames:
 		full_path = host + ':' + uv_file
-		MONITORs = s.query(dbi.Monitor).filter(dbi.Monitor.full_path==full_path).all()
-		file_host = s.query(dbi.Monitor).filter(dbi.Monitor.full_path==full_path).one().host
+		MONITORs = s.query(pyg.Monitor).filter(pyg.Monitor.full_path==full_path).all()
+		file_host = s.query(pyg.Monitor).filter(pyg.Monitor.full_path==full_path).one().host
 		status_data = tuple((MONITOR.status, MONITOR.del_time) for MONITOR in MONITORs if MONITOR.del_time is not -1)
 		process_data = tuple((MONITOR.status, MONITOR.time_end-MONITOR.time_start) for MONITOR in MONITORs if MONITOR.del_time is -1)
 		status_plot = tuple((stage_dict[key], value) for key, value in status_data)
@@ -61,13 +61,13 @@ def plot_monitor(filenames):
 def plot_ram(host=None, time_min=None, time_max=None):
 	dbi = pyg.DataBaseInterface()
 	s = dbi.Session()
-	RAMs = s.query(dbi.Ram)
+	RAMs = s.query(pyg.Ram)
 	if host is not None:
-		RAMs = RAMs.filter(dbi.Ram.host==host)
+		RAMs = RAMs.filter(pyg.Ram.host==host)
 	if time_min is not None:
-		RAMs = RAMs.filter(dbi.Ram.time_date<=time_min)
+		RAMs = RAMs.filter(pyg.Ram.time_date<=time_min)
 	if time_max is not None:
-		RAMs = RAMs.filter(dbi.Ram.time_date<=time_max)
+		RAMs = RAMs.filter(pyg.Ram.time_date<=time_max)
 
 	RAMs = RAMs.all()
 	s.close()
@@ -135,15 +135,15 @@ def plot_ram(host=None, time_min=None, time_max=None):
 def plot_iostat(host=None, device=None, time_min=None, time_max=None):
 	dbi = pyg.DataBaseInterface()
 	s = dbi.Session()
-	IOSTATs = s.query(dbi.Ram)
+	IOSTATs = s.query(pyg.Ram)
 	if host is not None:
-		IOSTATs = IOSTATs.filter(dbi.Iostat.host==host)
+		IOSTATs = IOSTATs.filter(pyg.Iostat.host==host)
 	if device is not None:
-		IOSTATs = IOSTATs.filter(dbi.Iostat.device==device)
+		IOSTATs = IOSTATs.filter(pyg.Iostat.device==device)
 	if time_min is not None:
-		IOSTATs = IOSTATs.filter(dbi.Iostat.time_date<=time_min)
+		IOSTATs = IOSTATs.filter(pyg.Iostat.time_date<=time_min)
 	if time_max is not None:
-		IOSTATs = IOSTATs.filter(dbi.Iostat.time_date<=time_max)
+		IOSTATs = IOSTATs.filter(pyg.Iostat.time_date<=time_max)
 
 	IOSTATs = IOSTATs.all()
 	s.close()
@@ -189,15 +189,15 @@ def plot_iostat(host=None, device=None, time_min=None, time_max=None):
 def plot_cpu(host=None, cpu=None, time_min=None, time_max=None):
 	dbi = pyg.DataBaseInterface()
 	s = dbi.Session()
-	CPUs = s.query(dbi.Cpu)
+	CPUs = s.query(pyg.Cpu)
 	if host is not None:
-		CPUs = CPUs.filter(dbi.Cpu.host==host)
+		CPUs = CPUs.filter(pyg.Cpu.host==host)
 	if cpu is not None:
-		CPUs = CPUs.filter(dbi.Cpu.cpu==cpu)
+		CPUs = CPUs.filter(pyg.Cpu.cpu==cpu)
 	if time_min is not None:
-		CPUs = CPUs.filter(dbi.Cpu.time_date<=time_min)
+		CPUs = CPUs.filter(pyg.Cpu.time_date<=time_min)
 	if time_max is not None:
-		CPUs = CPUs.filter(dbi.Cpu.time_date<=time_max)
+		CPUs = CPUs.filter(pyg.Cpu.time_date<=time_max)
 
 	CPUs = CPUs.all()
 	s.close()
@@ -239,7 +239,7 @@ def plot_cpu(host=None, cpu=None, time_min=None, time_max=None):
 def plot_jd_vs_file():
 	dbi = pdb.DataBaseInterface()
 	s = dbi.Session()
-	OBSs = s.query(dbi.Observation.julian_day, func.count(dbi.Observation.julian_day)).group_by(dbi.Observation.julian_day).all()
+	OBSs = s.query(pyg.Observation.julian_day, func.count(pyg.Observation.julian_day)).group_by(pyg.Observation.julian_day).all()
 	s.close()
 	jd_data = tuple((OBS[0], OBS[1]) for OBS in OBSs)
 
@@ -257,7 +257,7 @@ def plot_jd_vs_file():
 def plot_jd_vs_gaps():
 	dbi = pdb.DataBaseInterface()
 	s = dbi.Session()
-	OBSs = s.query(dbi.Observation.julian_day, func.count(dbi.Observation.julian_day)).group_by(dbi.Observation.julian_day).all()
+	OBSs = s.query(pyg.Observation.julian_day, func.count(pyg.Observation.julian_day)).group_by(pyg.Observation.julian_day).all()
 	s.close()
 	jd_data = tuple((OBS[0], 288 - OBS[1]) if OBS[0] = 128 else (OBS[0], 72 - OBS[1]) for OBS in OBSs)
 
@@ -275,7 +275,7 @@ def plot_jd_vs_gaps():
 def table_jdate_vs_pol():
 	dbi = pdb.DataBaseInterface()
 	s = dbi.Session()
-	OBSs = s.query(dbi.Observation).all()
+	OBSs = s.query(pyg.Observation).all()
 	s.close()
 	jdate_data = tuple((OBS.julian_date, OBS.polarization) for OBS in OBSs)
 
