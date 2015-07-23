@@ -93,7 +93,7 @@ class Cpu(Base):
 	time_date = Column(Numeric(13,6))
 
 class DataBaseInterface(object):
-	def __init__(self,configfile='~/still.cfg',test=False):
+	def __init__(self,configfile='~/pyg_still.cfg',test=False):
 		"""
 		Connect to the database and initiate a session creator.
 		 or
