@@ -7,7 +7,7 @@ import os
 import glob
 import socket
 import aipy as A
-import paperdata_dbi
+import paperdata_dbi as pdbi
 import move_files
 
 ### Script to load data from anywhere into paperfeed database
@@ -57,9 +57,9 @@ def move_files(input_host, input_paths, output_host, output_dir):
 				rsync_m(source, destination)
 	else:
 		if input_host == output_host:
-			dbi = paperdata_dbi.DataBaseInterface()
+			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
-			ssh = paperdata_dbi.login_ssh(output_host)
+			ssh = pdbi.login_ssh(output_host)
 			sftp = ssh.open_sftp()
 			for source in input_paths:
 				sftp.rename(source, output_dir)
@@ -67,9 +67,9 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			ssh.close()
 			s.close()
 		else:
-			dbi = paperdata_dbi.DataBaseInterface()
+			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
-			ssh = paperdata_dbi.login_ssh(output_host)
+			ssh = pdbi.login_ssh(output_host)
 			for source in input_paths:
 				rsync_move = '''rsync -a {source} {destination}'''.format(source=source, destination=destination)
 				ssh.exec_command(rsync_move)
@@ -80,9 +80,9 @@ def move_files(input_host, input_paths, output_host, output_dir):
 	return moved_files
 
 def dupe_check(input_host, input_paths):
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FEEDs = s.query(dbi.Feed).all()
+	FEEDs = s.query(pdbi.Feed).all()
 	s.close()
 	#all files on same host
 	filenames = tuple(os.path.join(FEED.path, FEED.filename) for FEED in FEEDs if FEED.host==input_host)
@@ -93,7 +93,7 @@ def dupe_check(input_host, input_paths):
 	return unique_paths
 
 def add_feeds(input_host, input_paths):
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	for input_path in input_paths:
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(input_paths)
 	else:
-		ssh = paperdata_dbi.login_ssh(input_host)
+		ssh = pdbi.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
 		stdin, path_out, stderr = ssh.exec_command('ls -d {0}'.format(input_paths))
 		input_paths = path_out.read().split('\n')[:-1]

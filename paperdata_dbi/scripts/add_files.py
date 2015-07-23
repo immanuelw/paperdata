@@ -9,7 +9,7 @@ import glob
 import socket
 import os
 import paramiko
-import paperdata_dbi
+import paperdata_dbi as pdbi
 
 ### Script to add files to paperdata database
 ### Adds files using dbi
@@ -73,7 +73,7 @@ def calc_size(host, path, filename):
 	if named_host == host:
 		size = round(float(sizeof_fmt(get_size(full_path))), 1)
 	else:
-		ssh = paperdata_dbi.login_ssh(host)
+		ssh = pdbi.login_ssh(host)
 		sftp = ssh.open_sftp()
 		size_bytes = sftp.stat(full_path).st_size
 		size = round(float(sizeof_fmt(size_bytes)), 1)
@@ -90,7 +90,7 @@ def calc_md5sum(host, path, filename):
 	if named_host == host:
 		md5 = md5sum(full_path)
 	else:
-		ssh = paperdata_dbi.login_ssh(host)
+		ssh = pdbi.login_ssh(host)
 		sftp = ssh.open_sftp()
 		try:
 			remote_path = sftp.file(full_path, mode='r')
@@ -166,7 +166,7 @@ def calc_obs_data(host, full_path):
 
 		else:
 			ssh = login_ssh(host)
-			uv_data_script = '/home/{0}/scripts/paperdata/paper/scripts/paperdata_dbi/scripts/uv_data.py'.format('immwa')
+			uv_data_script = '/home/{0}/scripts/paperdata/paper/scripts/pdbi/scripts/uv_data.py'.format('immwa')
 			sftp = ssh.open_sftp()
 			moved_script = '/home/{0}/scripts/uv_data.py'.format('immwa')
 			try:
@@ -187,7 +187,7 @@ def calc_obs_data(host, full_path):
 		jdate = filename.split('.')[1] + '.' + filename.split('.')[2]
 		julian_date = round(float(jdate, 5)
 
-		dbi = paperdata_dbi.DataBaseInterface()
+		dbi = pdbi.DataBaseInterface()
 		s = dbi.Session()
 		if len(filename.split('.')) == 5:
 			polarization = 'all'
@@ -195,7 +195,7 @@ def calc_obs_data(host, full_path):
 		elif len(filename.split('.')) == 6:
 			polarization = filename.split('.')[3]
 			pol = polarization
-		OBS = s.query(dbi.Observation).filter(dbi.Observation.julian_date==julian_date).filter(dbi.Observation.polarization==pol).one()
+		OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date==julian_date).filter(pdbi.Observation.polarization==pol).one()
 
 		time_start = OBS.time_start		
 		time_end = OBS.time_end
@@ -231,14 +231,14 @@ def calc_obs_data(host, full_path):
 		prev_obs = None
 		next_obs = None
 	else:
-		dbi = paperdata_dbi.DataBaseInterface()
+		dbi = pdbi.DataBaseInterface()
 		s = dbi.Session()
-		PREV_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum-1).one()
+		PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum-1).one()
 		if PREV_OBS is not None:
 			prev_obs = PREV_OBS.obsnum
 		else:
 			prev_obs = None
-		NEXT_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==obsnum+1).one()
+		NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum+1).one()
 		if NEXT_OBS is not None:
 			next_obs = NEXT_OBS.obsnum
 		else:
@@ -269,7 +269,7 @@ def calc_uv_data(host, path, filename):
 	if named_host == host:
 		obs_data, file_data = calc_obs_data(host, full_path)
 	else:
-		ssh = paperdata_dbi.login_ssh(host)
+		ssh = pdbi.login_ssh(host)
 		sftp = ssh.open_sftp()
 		#allows uv access
 		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??
@@ -281,9 +281,9 @@ def calc_uv_data(host, path, filename):
 	return obs_data, file_data
 
 def dupe_check(input_host, input_paths):
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FILEs = s.query(dbi.File).all()
+	FILEs = s.query(pdbi.File).all()
 	s.close()
 	#all files on same host
 	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs if FILE.host == input_host)
@@ -294,9 +294,9 @@ def dupe_check(input_host, input_paths):
 	return unique_paths
 
 def obsnum_list(obsnum):
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	OBSs = s.query(dbi.Observation).all()
+	OBSs = s.query(pdbi.Observation).all()
 	s.close()
 	#all files on same host
 	obsnums = tuple(OBS.obsnum for OBS in OBSs)
@@ -304,31 +304,31 @@ def obsnum_list(obsnum):
 	return obsnums
 
 def update_obsnums():
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	OBSs = s.query(dbi.Observation).all()
+	OBSs = s.query(pdbi.Observation).all()
 	s.close()
 	for OBS in OBSs:
-		PREV_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==OBS.obsnum-1).one()
+		PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==OBS.obsnum-1).one()
 		if PREV_OBS is not None:
 			prev_obs = PREV_OBS.obsnum
 			dbi.set_prev_obs(OBS.obsnum, prev_obs)
 		else:
 			prev_time = OBS.time_start - OBS.delta_time
 			pol = OBS.polarization
-			PREV_OBS = s.query(dbi.Observation).filter(dbi.Observation.julian_date==prev_time).filter(dbi.Observation.polarization==pol).one()
+			PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date==prev_time).filter(pdbi.Observation.polarization==pol).one()
 			if PREV_OBS is not None:
 				prev_obs = PREV_OBS.obsnum
 				dbi.set_prev_obs(OBS.obsnum, prev_obs)
 
-		NEXT_OBS = s.query(dbi.Observation).filter(dbi.Observation.obsnum==OBS.obsnum+1).one()
+		NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==OBS.obsnum+1).one()
 		if NEXT_OBS is not None:
 			next_obs = NEXT_OBS.obsnum
 			dbi.set_next_obs(OBS.obsnum, next_obs)
 		else:
 			next_time = OBS.time_end + OBS.delta_time
 			pol = OBS.polarization
-			NEXT_OBS = s.query(dbi.Observation).filter(dbi.Observation.julian_date==next_time).filter(dbi.Observation.polarization==pol).one()
+			NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date==next_time).filter(pdbi.Observation.polarization==pol).one()
 			if NEXT_OBS is not None:
 				next_obs = NEXT_OBS.obsnum
 				dbi.set_next_obs(OBS.obsnum, next_obs)
@@ -339,7 +339,7 @@ def update_obsnums():
 	return None
 
 def add_files(input_host, input_paths):
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	for input_path in input_paths:
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
@@ -367,7 +367,7 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(input_paths)
 	else:
-		ssh = paperdata_dbi.login_ssh(input_host)
+		ssh = pdbi.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
 		stdin, path_out, stderr = ssh.exec_command('ls -d {0}'.format(input_paths))
 		input_paths = path_out.read().split('\n')[:-1]

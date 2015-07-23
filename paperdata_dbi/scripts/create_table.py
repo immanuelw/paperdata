@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Create paperdata table
 
-import paperdata_dbi
+import paperdata_dbi as pdbi
 import sys
 
 ### Script to create paperdata database
@@ -12,7 +12,7 @@ import sys
 ### Date: 5-06-15
 
 def create_table(table=None):
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	if table is None:
 		sys.exit()
 	#table = dbi.Final_Product

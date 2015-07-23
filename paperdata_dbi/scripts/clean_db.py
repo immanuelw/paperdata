@@ -7,12 +7,12 @@ import getpass
 import os
 import csv
 import socket
-import paperdata_dbi
+import paperdata_dbi as pdbi
 
 def check_files(input_host):
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FILES = s.query(dbi.File).filter(dbi.File.host==input_host).filter(dbi.File.tape_index!=None).all()
+	FILES = s.query(pdbi.File).filter(pdbi.File.host==input_host).filter(pdbi.File.tape_index!=None).all()
 	s.close()
 	#tuple of path without host, and tuple of path and filename
 	file_paths = tuple((os.path.join(FILE.path, FILE.filename), (FILE.path, FILE.filename)) for FILE in FILES)
@@ -23,7 +23,7 @@ def check_files(input_host):
 			if not os.path.isdir(path[0]) and not os.path.isfile(path[0]):
 				delete_paths.append(path[1])
 	else:
-		ssh = paperdata_dbi.login_ssh(input_host)
+		ssh = pdbi.login_ssh(input_host)
 		#check if files exist on host
 		#return those who do not
 		sftp = ssh.open_sftp()
@@ -43,10 +43,10 @@ def check_files(input_host):
 	return delete_paths
 
 def clean_db(input_host, delete_paths):
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	for path in delete_paths:
-		FILE = s.query(dbi.File).filter(dbi.File.host==input_host).filter(dbi.File.path==path[0]).filter(dbi.File.filename==path[1]).one()
+		FILE = s.query(pdbi.File).filter(pdbi.File.host==input_host).filter(pdbi.File.path==path[0]).filter(pdbi.File.filename==path[1]).one()
 		s.delete(FILE)
 	s.commit()
 	s.close()

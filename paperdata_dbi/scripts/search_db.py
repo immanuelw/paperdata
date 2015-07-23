@@ -4,7 +4,7 @@
 
 from Tkinter import *
 import paperdata_db as pdb
-import paperdata_dbi
+import paperdata_dbi as pdbi
 import decimal
 import sys
 import time
@@ -202,13 +202,13 @@ def match(input_group, tab, field, value, equality):
 
 def sql_query(output, info_list, tab):
 	eq_dict = {pdb.EXACT:'=', pdb.MAX:'<', pdb.MIN:'>'}
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	s.close()
 	if tab in ('File',):
-		QUERYs = s.query(dbi.File).all()
+		QUERYs = s.query(pdbi.File).all()
 	elif tab in ('Observation',):
-		QUERYs = s.query(dbi.Observation).all()
+		QUERYs = s.query(pdbi.Observation).all()
 	for item in info_list:
 		field = item[0]
 		range_spec = item[1]

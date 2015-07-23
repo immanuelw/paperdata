@@ -3,7 +3,7 @@
 # Load data into MySQL table 
 
 # import the MySQLdb and sys modules
-import paperdata_dbi
+import paperdata_dbi as pdbi
 from sqlalchemy import func
 from sqlalchemy.sql import label
 import move_files
@@ -42,10 +42,10 @@ def calculate_free_space(direc):
 	return free_space
 
 def count_days():
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	count_FEEDs = s.query(dbi.Feed.julian_day, label('count', func.count(dbi.Feed.julian_day))).group_by(dbi.Feed.julian_day).all()
-	all_FEEDs = s.query(dbi.Feed).all()
+	count_FEEDs = s.query(pdbi.Feed.julian_day, label('count', func.count(pdbi.Feed.julian_day))).group_by(pdbi.Feed.julian_day).all()
+	all_FEEDs = s.query(pdbi.Feed).all()
 	s.close()
 	good_days = tuple(FEED.julian_day for FEED in count_FEEDs if FEED.count==288 or FEED.count==72)
 	to_move = tuple(FEED.full_path for FEED in all_FEEDs if FEED.julian_day in good_days)
@@ -57,9 +57,9 @@ def count_days():
 	return None
 
 def find_data():
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FEEDs = s.query(dbi.Feed).filter(dbi.Feed.moved_to_distill==False).filter(dbi.Feed.ready_to_move==True).all()
+	FEEDs = s.query(pdbi.Feed).filter(pdbi.Feed.moved_to_distill==False).filter(pdbi.Feed.ready_to_move==True).all()
 	s.close()
 
 	feed_paths = tuple((FEED.host, os.path.join(FEED.path, FEED.filename)) for FEED in FEEDs if FEED.julian_Day==FEEDS[0].julian_day)

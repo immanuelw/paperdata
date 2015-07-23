@@ -2,8 +2,7 @@
 # -*- coding: utf-8 -*-
 # Create paperdata tables
 
-import paperdata_dbi
-
+import paperdata_dbi as pdbi
 
 ### Script to drop paperdata database
 ### Instantiates tables
@@ -12,7 +11,7 @@ import paperdata_dbi
 ### Date: 5-06-15
 
 def drop_db():
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	dbi.drop_db()
 
 if __name__ == '__main__':

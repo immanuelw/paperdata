@@ -1,15 +1,15 @@
 #!/usr/bin/env python
 import prettytable
-import paperdata_dbi
+import paperdata_dbi as pdbi
 from sqlalchemy import func
 from sqlalchemy.sql import label
 
 #script to show state of paperdata
 
 def main():
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	current_FILEs = s.query(dbi.File).all()
+	current_FILEs = s.query(pdbi.File).all()
 	s.close()
 	current = tuple((FILE.era, FILE.julian_day, FILE.host, FILE.path, FILE.filetype) for FILE in FILEs)
 

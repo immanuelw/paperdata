@@ -14,8 +14,8 @@ import glob
 import socket
 import os
 import paramiko
-import paperdata_dbi
 import shutil
+import paperdata_dbi as pdbi
 
 ### Script to move files and update paperdata database
 ### Move files and update db using dbi
@@ -24,9 +24,9 @@ import shutil
 ### Date: 5-06-15
 
 def null_check(input_host, input_paths):
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FILEs = s.query(dbi.File).filter(dbi.File.host==input_host).all()
+	FILEs = s.query(pdbi.File).filter(pdbi.File.host==input_host).all()
 	s.close()
 	#all files on same host
 	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
@@ -48,7 +48,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 	destination = output_host + ':' + output_dir
 	if named_host == input_host:
 		if input_host == output_host:
-			dbi = paperdata_dbi.DataBaseInterface()
+			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
 			for source in input_paths:
 				shutil.move(source, output_dir)
@@ -59,7 +59,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 				dbi.set_file_path(FILE.full_path, output_dir)
 			s.close()
 		else:
-			dbi = paperdata_dbi.DataBaseInterface()
+			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
 			for source in input_paths:
 				rsync_m(source, destination)
@@ -70,9 +70,9 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			s.close()
 	else:
 		if input_host == output_host:
-			dbi = paperdata_dbi.DataBaseInterface()
+			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
-			ssh = paperdata_dbi.login_ssh(output_host)
+			ssh = pdbi.login_ssh(output_host)
 			sftp = ssh.open_sftp()
 			for source in input_paths:
 				sftp.rename(source, output_dir)
@@ -84,9 +84,9 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			ssh.close()
 			s.close()
 		else:
-			dbi = paperdata_dbi.DataBaseInterface()
+			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
-			ssh = paperdata_dbi.login_ssh(output_host)
+			ssh = pdbi.login_ssh(output_host)
 			for source in input_paths:
 				rsync_move = '''rsync -a --remove-source-files {source} {destination}'''.format(source=source, destination=destination)
 				ssh.exec_command(rsync_move)
@@ -106,7 +106,7 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(raw_input('Source directory path: '))
 	else:
-		ssh = paperdata_dbi.login_ssh(input_host)
+		ssh = pdbi.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
 		stdin, path_out, stderr = ssh.exec_command('ls -d {0}'.format(input_paths))
 		input_paths = path_out.read().split('\n')[:-1]

@@ -14,8 +14,8 @@ import glob
 import socket
 import os
 import paramiko
-import paperdata_dbi
 import shutil
+import paperdata_dbi as pdbi
 
 ### Script to move files and update paperdata database
 ### Move files and update db using dbi
@@ -24,9 +24,9 @@ import shutil
 ### Date: 5-06-15
 
 def delete_check(input_host):
-	dbi = paperdata_dbi.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FILEs = s.query(dbi.File).filter(dbi.File.delete_file==True).filter(dbi.File.tape_index!=None).filter(dbi.File.host==input_host).all()
+	FILEs = s.query(pdbi.File).filter(pdbi.File.delete_file==True).filter(pdbi.File.tape_index!=None).filter(pdbi.File.host==input_host).all()
 	s.close()
 	#all files on same host
 	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
@@ -42,7 +42,7 @@ def delete_files(input_host, input_paths, output_host, output_dir):
 	destination = output_host + ':' + output_dir
 	if named_host == input_host:
 		if input_host == output_host:
-			dbi = paperdata_dbi.DataBaseInterface()
+			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
 			for source in input_paths:
 				shutil.move(source, output_dir)
@@ -54,7 +54,7 @@ def delete_files(input_host, input_paths, output_host, output_dir):
 				dbi.set_file_delete(FILE.full_path, False)
 			s.close()
 		else:
-			dbi = paperdata_dbi.DataBaseInterface()
+			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
 			for source in input_paths:
 				rsync_m(source, destination)
@@ -66,9 +66,9 @@ def delete_files(input_host, input_paths, output_host, output_dir):
 			s.close()
 	else:
 		if input_host == output_host:
-			dbi = paperdata_dbi.DataBaseInterface()
+			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
-			ssh = paperdata_dbi.login_ssh(host)
+			ssh = pdbi.login_ssh(host)
 			sftp = ssh.open_sftp()
 			for source in input_paths:
 				sftp.rename(source, output_dir)
@@ -85,9 +85,9 @@ def delete_files(input_host, input_paths, output_host, output_dir):
 			ssh.close()
 			s.close()
 		else:
-			dbi = paperdata_dbi.DataBaseInterface()
+			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
-			ssh = paperdata_dbi.login_ssh(host)
+			ssh = pdbi.login_ssh(host)
 			for source in input_paths:
 				rsync_move = '''rsync -a --remove-source-files {source} {destination}'''.format(source=source, destination=destination)
 				ssh.exec_command(rsync_move)

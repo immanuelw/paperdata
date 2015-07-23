@@ -17,7 +17,7 @@ from email.MIMEBase import MIMEBase
 from email import Encoders
 from ddr_compress.dbi import DataBaseInterface, Observation, File
 from sqlalchemy import func
-import paperdata_dbi
+import paperdata_dbi as pdbi
 import add_files
 import uv_data
 import move_files
@@ -92,7 +92,7 @@ def add_data():
 	
 	#check if day complete
 	#if so ignore if already in db
-	data_dbi = paperdata_dbi.DataBaseInterface()
+	data_dbi = pdbi.DataBaseInterface()
 	sp = data_dbi.Session()
 	#If not, add obs to paperdata, attempt to add files later
 	#then create list of tuples of path, filename, other info to load into paperdata
@@ -147,7 +147,7 @@ def add_data():
 			else:
 				delta_time = -(time_start - time_end)/(n_times)
 		else:
-			ssh = paperdata_dbi.login_ssh(host)
+			ssh = pdbi.login_ssh(host)
 			uv_data_script = './uv_data.py'
 			sftp = ssh.open_sftp()
 			sftp.put(uv_data_script, './')
@@ -179,12 +179,12 @@ def add_data():
 			prev_obs = None
 			next_obs = None
 		else:
-			PREV_OBS = sp.query(data_dbi.Observation).filter(data_dbi.Observation.obsnum==obsnum-1).one()
+			PREV_OBS = sp.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum-1).one()
 			if PREV_OBS is not None:
 				prev_obs = PREV_OBS.obsnum
 			else:
 				prev_obs = None
-			NEXT_OBS = sp.query(data_dbi.Observation).filter(data_dbi.Observation.obsnum==obsnum+1).one()
+			NEXT_OBS = sp.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum+1).one()
 			if NEXT_OBS is not None:
 				next_obs = NEXT_OBS.obsnum
 			else:
@@ -204,9 +204,9 @@ def add_data():
 
 		obs_data = (obsnum, julian_date, polarization, julian_day, era, era_type,
 					length, time_start, time_end, delta_time, prev_obs, next_obs, edge)
-		data_dbi.add_observation(*obs_data)
+		pdbi.add_observation(*obs_data)
 		raw_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file) #cal_path?? XXXX
-		data_dbi.add_file(*raw_data)
+		pdbi.add_file(*raw_data)
 		movable_paths.append((host, path, filename, filetype))
 
 
@@ -218,7 +218,7 @@ def add_data():
 		if os.path.isdir(compr_filename):
 			compr_data = (host, path, compr_filename, compr_filetype, obsnum,
 							compr_filesize, compr_md5, tape_index, compr_write_to_tape, delete_file)
-			data_dbi.add_file(*compr_data)
+			pdbi.add_file(*compr_data)
 			movable_paths.append((host, path, compr_filename, compr_filetype))
 
 		npz_filename = filename + 'cRE.npz'
@@ -228,7 +228,7 @@ def add_data():
 		npz_write_to_tape = False
 		if os.path.isfile(npz_filename):
 			npz_data = (host, path, npz_filename, npz_filetype, obsnum, npz_filesize, npz_md5, tape_index, npz_write_to_tape, delete_file)
-			data_dbi.add_file(*npz_data)
+			pdbi.add_file(*npz_data)
 			movable_paths.append((host, npz_path, npz_filename, npz_filetype))
 
 	s.close()

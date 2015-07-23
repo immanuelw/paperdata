@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Create paperdata tables
 
-import paperdata_dbi
+import paperdata_dbi as pdbi
 import add_files
 import os
 import socket
@@ -28,7 +28,7 @@ def find_paths(input_host):
 				if file_path.endswith('npz'):
 					npz_paths.append(os.path.join(root, file_path))
 	else:
-		ssh = paperdata_dbi.login_ssh(input_host)
+		ssh = pdbi.login_ssh(input_host)
 		find = '''find / -name '*.uv' -o -name '*.uvcRRE' -o -name '*.npz' 2>/dev/null'''
 		stdin, all_paths, stderr = ssh.exec_command(find)
 		for path in all_paths.split('\n'):

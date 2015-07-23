@@ -3,9 +3,8 @@
 # Create paperdata tables
 
 from ddr_compress.dbi import DataBaseInterface, File, Observation
-import paperdata_dbi
+import paperdata_dbi as pdbi
 import add_files
-
 
 ### Script to load md5sums into paperdata database
 ### Loads md5sums
@@ -14,7 +13,7 @@ import add_files
 ### Date: 5-06-15
 
 def md5_db():
-	data_dbi = paperdata_dbi.DataBaseInterface()
+	data_dbi = pdbi.DataBaseInterface()
 	s = data_dbi.Session()
 	FILEs = s.query(data_dbi.File).filter(data_dbi.File.md5sum==None).all()
 	s.close()
@@ -27,7 +26,7 @@ def md5_db():
 def md5_distiller():
 	dbi = DataBaseInterface()
 	s = dbi.Session()
-	FILEs = s.query(dbi.File).filter(dbi.File.md5sum==None).all()
+	FILEs = s.query(pdbi.File).filter(pdbi.File.md5sum==None).all()
 	s.close()
 	for FILE in FILEs:
 		full_path = FILE.path
