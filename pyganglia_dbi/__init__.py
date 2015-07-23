@@ -1,5 +1,5 @@
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
-from sqlalchemy import event, DDL, UniqueConstraint
+from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship, backref, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
@@ -45,7 +45,7 @@ class Monitor(Base):
 	filename = Column(String(100))
 	full_path = Column(String(200))
 	status = Column(String(100))
-	full_stats = Column(String(200), unique=True)
+	full_stats = Column(String(200), primary_key=True)
 	del_time = Column(BigInteger)
 	time_start = Column(BigInteger)
 	time_end = Column(BigInteger)
@@ -53,6 +53,7 @@ class Monitor(Base):
 
 class Ram(Base):
 	__tablename__ = 'ram'
+	__table_args__ = (PrimaryKeyConstraint('host', 'time_date', name='host_time'),)
 	host = Column(String(100))
 	total = Column(BigInteger)
 	used = Column(BigInteger)
@@ -69,6 +70,7 @@ class Ram(Base):
 
 class Iostat(Base):
 	__tablename__ = 'iostat'
+	__table_args__ = (PrimaryKeyConstraint('host', 'time_date', name='host_time'),)
 	host = Column(String(100))
 	device = Column(String(100))
 	tps = Column(Numeric(7,2))
@@ -80,6 +82,7 @@ class Iostat(Base):
 
 class Cpu(Base):
 	__tablename__ = 'cpu'
+	__table_args__ = (PrimaryKeyConstraint('host', 'time_date', name='host_time'),)
 	host = Column(String(100))
 	cpu = Column(Integer)
 	user_perc = Column(Numeric(5,2))
@@ -151,13 +154,13 @@ class DataBaseInterface(object):
 		creates the tables in the database.
 		"""
 		Base.metadata.bind = self.engine
-		table = File.__table__
+		table = Monitor.__table__
 		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
 										after INSERT or UPDATE on Monitor \
 										FOR EACH ROW \
 										SET NEW.full_path = concat(NEW.host, ':', NEW.path, '/', NEW.filename)''')
 		event.listen(table, 'after_create', insert_update_trigger)
-		insert_update_trigger_2 = DDL('''CREATE TRIGGER insert_update_trigger \
+		insert_update_trigger_2 = DDL('''CREATE TRIGGER insert_update_trigger_2 \
 										after INSERT or UPDATE on Monitor \
 										FOR EACH ROW \
 										SET NEW.full_stats = concat(NEW.full_path, '+', NEW.status)''')
