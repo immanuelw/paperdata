@@ -92,7 +92,9 @@ try:
 				time_end = int(time.time())
 				file_end.update({filename:time_end})
 				del_time = -1
-				file_log.append((still_host, path, file_name, full_path, del_time, file_start[filename], file_end[filename], time_date)
+				full_stats = ''.join(full_path, status)
+				file_log.append((still_host, path, file_name, full_path, status, full_stats, del_time, file_start[filename],
+								file_end[filename], time_date))
 				file_pid.update({filename:current_pid})
 				time_start = int(time.time())
 				file_start.update({filename:time_start})
@@ -100,12 +102,16 @@ try:
 			if filename not in file_status.keys():
 				file_status.update({filename:status})
 				del_time = 0
-				file_log.append((still_host, path, file_name, full_path, del_time, file_start[filename], file_end[filename], time_date)
+				full_stats = ''.join(full_path, status)
+				file_log.append((still_host, path, file_name, full_path, status, full_stats, del_time, file_start[filename],
+								file_end[filename], time_date))
 				file_time.update({filename:time.time()})
 			#write output log
 			if file_status[filename] not in [status]:
 				del_time = time.time() - file_time[filename]
-				file_log.append((still_host, path, file_name, full_path, del_time, file_start[filename], file_end[filename], time_date)
+				full_stats = ''.join(full_path, status)
+				file_log.append((still_host, path, file_name, full_path, status, full_stats, del_time, file_start[filename],
+								file_end[filename], time_date))
 				file_status.update({filename:status})
 				file_time.update({filename:time.time()})
 		pyg_dbi.add_monitor(*file_log)
