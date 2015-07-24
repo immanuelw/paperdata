@@ -16,7 +16,7 @@ LIST = 6
 NONE = 7
 
 options = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
-classes = ('File', 'Observation')
+classes = ('File', 'Observation', 'Feed')
 
 class File:
 	def __init__(self):
