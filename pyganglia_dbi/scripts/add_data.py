@@ -6,6 +6,7 @@ import sys
 import os
 import paramiko
 import pyganglia_dbi as pyg
+import psutil
 
 ### Script to add info to pyganglia database
 ### Adds information using dbi
@@ -30,6 +31,9 @@ def login_ssh(host, username=None):
 	return ssh
 
 def calculate_folio_space(ssh):
+	if ssh is None:
+		folio_space = psutil.disk_usage('/data4').free
+		return folio_space
 	#Calculates the free space left on input dir
 	stdin, folio, stderr = ssh.exec_command('df -B 1')
 
@@ -45,6 +49,15 @@ def calculate_folio_space(ssh):
 	return folio_space
 
 def iostat(ssh):
+	if ssh is None:
+		io = psutil.disk_io_counters(perdisk=True)
+		for name, value in io.items():
+			folio_name.append(name)
+			read_s = round(value.read_count / float(value.read_time), 2)
+			write_s = round(value.write_count / float(value.write_time), 2)
+			bl_reads = value.read_bytes
+			bl_writes = value.write_bytes
+			folio_use.append(None, read_s, write_s, bl_reads, bl_writes)
 	#Calculates cpu usage on folio nodes
 	stdin, folio, stderr = ssh.exec_command('iostat')
 
@@ -64,6 +77,14 @@ def iostat(ssh):
 	return [folio_name, folio_use]
 
 def ram_free(ssh):
+	if ssh is None:
+		ram1 = psutil.virtual_memory()
+		ram2 = psutil.swap_memory()
+		bc_used = ram1.used - (ram1.buffers + ram1.cached)
+		bc_free = ram1.total - bc.used
+		ram_all = [ram1.total, ram1.used, ram1.available, ram1.shared, ram1.buffers, ram1.cached, bc_used, bc_free,
+					ram2.total, ram2.used, ram2.free]
+		return [ram_all]
 	#Calculates ram usage on folio
 	stdin, folio, stderr = ssh.exec_command('free -b')
 	ram = []
@@ -82,6 +103,10 @@ def ram_free(ssh):
 	return [reram]
 
 def cpu_perc(ssh):
+	if ssh is None:
+		cpu_all = psutil.cpu_times_percent(interval=1, percpu=True)
+		cpu = [[key, value.user, value.system, value.iowait, value.idle, None] for key, value in enumerate(cpu_all)]
+		return [cpu]
 	#Calculates cpu usage on folio
 	stdin, folio, stderr = ssh.exec_command('mpstat -P ALL 1 1')
 	cpu = []
@@ -116,8 +141,10 @@ def add_data(ssh):
 
 if __name__ == '__main__':
 	hosts = ('folio', 'node01', 'node02', 'node03', 'node04', 'node05', 'node06', 'node07', 'node08', 'node09', 'node10')
-
+	named_host = socket.gethostname()
 	for host in hosts:
+		if host == named_host:
+			add_data(None)
 		ssh = login_ssh(host)
 		add_data(ssh)
 		ssh.close()
