@@ -39,63 +39,39 @@ def null_check(input_host, input_paths):
 
 	return True
 
-def rsync_m(source, destination):
-	subprocess.check_output(['rsync', '-a', '--remove-source-files', source, destination])
+def rsync_copy(source, destination):
+	subprocess.check_output(['rsync', '-ac', source, destination])
 	return None
 
 def move_files(input_host, input_paths, output_host, output_dir):
 	named_host = socket.gethostname()
 	destination = output_host + ':' + output_dir
 	if named_host == input_host:
-		if input_host == output_host:
-			dbi = pdbi.DataBaseInterface()
-			s = dbi.Session()
-			for source in input_paths:
-				shutil.move(source, output_dir)
-				#change in database
-				full_path = input_host + ':' + source
-				FILE = dbi.get_file(full_path)
-				dbi.set_file_host(FILE.full_path, output_host)
-				dbi.set_file_path(FILE.full_path, output_dir)
-			s.close()
-		else:
-			dbi = pdbi.DataBaseInterface()
-			s = dbi.Session()
-			for source in input_paths:
-				rsync_m(source, destination)
-				full_path = input_host + ':' + source
-				FILE = dbi.get_file(full_path)
-				dbi.set_file_host(FILE.full_path, output_host)
-				dbi.set_file_path(FILE.full_path, output_dir)
-			s.close()
+		dbi = pdbi.DataBaseInterface()
+		s = dbi.Session()
+		for source in input_paths:
+			rsync_move(source, destination)
+			full_path = input_host + ':' + source
+			FILE = dbi.get_file(full_path)
+			dbi.set_file_host(FILE.full_path, output_host)
+			dbi.set_file_path(FILE.full_path, output_dir)
+			shutil.rmtree(source)
+		s.close()
 	else:
-		if input_host == output_host:
-			dbi = pdbi.DataBaseInterface()
-			s = dbi.Session()
-			ssh = pdbi.login_ssh(output_host)
-			sftp = ssh.open_sftp()
-			for source in input_paths:
-				sftp.rename(source, output_dir)
-				full_path = input_host + ':' + source
-				FILE = dbi.get_file(full_path)
-				dbi.set_file_host(FILE.full_path, output_host)
-				dbi.set_file_path(FILE.full_path, output_dir)
-			sftp.close()
-			ssh.close()
-			s.close()
-		else:
-			dbi = pdbi.DataBaseInterface()
-			s = dbi.Session()
-			ssh = pdbi.login_ssh(output_host)
-			for source in input_paths:
-				rsync_move = '''rsync -a --remove-source-files {source} {destination}'''.format(source=source, destination=destination)
-				ssh.exec_command(rsync_move)
-				full_path = input_host + ':' + source
-				FILE = dbi.get_file(full_path)
-				dbi.set_file_host(FILE.full_path, output_host)
-				dbi.set_file_path(FILE.full_path, output_dir)
-			ssh.close()
-			s.close()
+		dbi = pdbi.DataBaseInterface()
+		s = dbi.Session()
+		ssh = pdbi.login_ssh(output_host)
+		for source in input_paths:
+			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
+			rsync_del_command = '''rm -r source'''
+			ssh.exec_command(rsync_copy_command)
+			full_path = input_host + ':' + source
+			FILE = dbi.get_file(full_path)
+			dbi.set_file_host(FILE.full_path, output_host)
+			dbi.set_file_path(FILE.full_path, output_dir)
+			ssh.exec_command(rsync_del_command)
+		ssh.close()
+		s.close()
 
 	print 'Completed transfer'
 	return None
