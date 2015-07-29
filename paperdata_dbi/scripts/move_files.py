@@ -63,7 +63,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 		ssh = pdbi.login_ssh(output_host)
 		for source in input_paths:
 			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
-			rsync_del_command = '''rm -r source'''
+			rsync_del_command = '''rm -r {source}'''.format(source=source)
 			ssh.exec_command(rsync_copy_command)
 			full_path = input_host + ':' + source
 			FILE = dbi.get_file(full_path)
@@ -84,7 +84,7 @@ if __name__ == '__main__':
 	else:
 		ssh = pdbi.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
-		stdin, path_out, stderr = ssh.exec_command('ls -d {0}'.format(input_paths))
+		stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]
 		ssh.close()
 		
