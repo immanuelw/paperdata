@@ -5,6 +5,8 @@
 import paperdata_dbi as pdbi
 import csv
 import sys
+import json
+import paperdata_db as pdb
 
 ### Script to create paperdata database
 ### Instantiates tables
@@ -14,31 +16,28 @@ import sys
 
 def load_backup_obs(backup_observation):
 	dbi = pdbi.DataBaseInterface()
-	with open(backup_observation, 'rb') as backup_obs:
-		read = csv.reader(backup_obs, delimiter='|', lineterminator='\n', dialect='excel')
+	with open(backup_observation, 'r') as backup_obs:
+		read = json.load(backup_obs)
+		OBS_class = pdb.Observation()
+		obs_list = OBS_class.db_list
 		for row in read:
-			fixed_row = []
-			for key, value in enumerate(row):
-				if value == '':
-					value = None
-				else:
-					if key in (0,3,4,10,11):
-						value = int(value)
-					elif key in (1,6,7,8,9):
-						value = round(float(value), 5)
-					elif key in (12,):
-						if value == 'True':
-							value = True
-						elif value == 'False':
-							value = False
-					else:
-						#item is string
-						pass
-				fixed_row.append(value)
-			val = tuple(fixed_row)
+			val = tuple(row[item] for item in obs_list)
 			print row
 			print val
 			dbi.add_observation(*val)
+	return None
+
+def load_backup_files(backup_fi):
+	dbi = pdbi.DataBaseInterface()
+	with open(backup_fi, 'r') as backup_file:
+		read = json.load(backup_file)
+		FILE_class = pdb.File()
+		file_list = FILE_class.db_list
+		for row in read:
+			val = tuple(row[item] for item in obs_list)
+			print row
+			print val
+			dbi.add_file(*val)
 	return None
 
 def check_row(row, s):
@@ -72,40 +71,6 @@ def check_row(row, s):
 	full_row = row[:5] + [obsnum] + row[6:]
 
 	return full_row
-
-def load_backup_files(backup_fi):
-	dbi = pdbi.DataBaseInterface()
-	with open(backup_fi, 'rb') as backup_file:
-		read = csv.reader(backup_file, delimiter='|', lineterminator='\n', dialect='excel')
-		s = dbi.Session()
-		for row in read:
-			# XXXX comment out once finished making show old files are fine
-			row = check_row(row, s)
-			if row is None:
-				continue
-			print row
-			fixed_row = []
-			for key, value in enumerate(row):
-				if value == '':
-					value = None
-				else:
-					if key in (5,):
-						value = int(value)
-					elif key in (6,):
-						value = round(float(value), 1)
-					elif key in (9,10):
-						if value == 'True':
-							value = True
-						elif value == 'False':
-							value = False
-					else:
-						#item is string
-						pass	
-				fixed_row.append(value)
-			val = tuple(fixed_row)
-			dbi.add_file(*val)
-		s.close()
-	return None
 
 if __name__ == '__main__':
 	if len(sys.argv) == 3:
