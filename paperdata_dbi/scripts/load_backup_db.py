@@ -21,10 +21,8 @@ def load_backup_obs(backup_observation):
 		OBS_class = pdb.Observation()
 		obs_list = OBS_class.db_list
 		for row in read:
-			val = tuple(row[item] for item in obs_list)
-			print row
-			print val
-			dbi.add_observation(*val)
+			print tuple(row)
+			dbi.add_observation(**row)
 	return None
 
 def load_backup_files(backup_fi):
@@ -34,10 +32,8 @@ def load_backup_files(backup_fi):
 		FILE_class = pdb.File()
 		file_list = FILE_class.db_list
 		for row in read:
-			val = tuple(row[item] for item in obs_list)
-			print row
-			print val
-			dbi.add_file(*val)
+			print tuple(row)
+			dbi.add_file(**row)
 	return None
 
 def check_row(row, s):
