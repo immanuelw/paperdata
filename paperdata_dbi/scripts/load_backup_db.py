@@ -3,10 +3,10 @@
 # Create paperdata tables
 
 import paperdata_dbi as pdbi
-import csv
 import sys
 import json
 import paperdata_db as pdb
+import glob
 
 ### Script to create paperdata database
 ### Instantiates tables
@@ -55,8 +55,15 @@ if __name__ == '__main__':
 		backup_obs = sys.argv[1]
 		backup_file = sys.argv[2]
 	else:
-		backup_obs = '/data4/paper/paperdata_backup/obs_v2.psv'
-		backup_file = '/data4/paper/paperdata_backup/file_v1.psv'
+		backup_list = glob.glob('/data4/paper/paperdata_backup/[0-9]*')
+		backup_list.sort(reverse=True)
+		backup_dir = backup_list[0]
+		time_date = int(backup_dir.split('/')[-1])
+		backup_obs = '/data4/paper/paperdata_backup/{time_date}/obs_{time_date}.json'.format(time_date=time_date)
+		backup_file = '/data4/paper/paperdata_backup/{time_date}/file_{time_date}.json'.format(time_date=time_date)
+		backup_feed = '/data4/paper/paperdata_backup/{time_date}/feed_{time_date}.json'.format(time_date=time_date)
+		
 	
 	#load_backup(backup_obs, table='observation')
 	load_backup(backup_file, table='file')
+	#load_backup(backup_feed, table='feed')

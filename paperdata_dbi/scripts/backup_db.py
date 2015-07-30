@@ -46,11 +46,11 @@ def paperbackup(time_date):
 
 	#Create separate files for each directory
 
-	db1 = 'obs_{0}.json'.format(time_date)
+	db1 = 'obs_{time_date}.json'.format(time_date=time_date)
 	dbo1 = os.path.join(backup_dir, db1)
 	print dbo1
 
-	db2 = 'file_{0}.json'.format(time_date)
+	db2 = 'file_{time_date}.json'.format(time_date=time_date)
 	dbo2 = os.path.join(backup_dir, db2)
 	print dbo2
 
@@ -103,8 +103,8 @@ def email_backup(backup_file):
 	return None
 
 if __name__ == '__main__':
-	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
+	time_date = int(time.time())
 
 	paperbackup(time_date)
-	#backup_file = '/data4/paper/paperdata_backup/%s/paperdata_backup_%s.psv' %(time_date, time_date)
+	#backup_file = '/data4/paper/paperdata_backup/{time_date}/paperdata_backup.psv'.format(time_date=time_date)
 	#email_backup(backup_file)
