@@ -1,80 +1,69 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Backup paperdistiller tables
+# Load data into MySQL table 
 
-from ddr_compress.dbi import DataBaseInterface, Observation, File, Neighbors, Log
+# import the MySQLdb and sys modules
 import sys
 import time
-import csv
 import os
+import subprocess
+from ddr_compress.dbi import DataBaseInterface, Observation, File, Neighbors, Log
+import json
 
-### Script to Backup paperdistiller database
+### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
-def paperdistiller_backup(time_date):
+
+import decimal
+def decimal_default(obj):
+	if isinstance(obj, decimal.Decimal):
+		return float(obj)
+
+def json_data(dbo, dump_objects):
+	data = []
+	with open(dbo, 'w') as f:
+		for ser_data in dump_objects.all():
+			s_dict = ser_data.__dict__
+			try:
+				s_dict.pop('_sa_instance_state')
+			except:
+				pass
+			data.append(s_dict)
+		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
+	return None
+
+def paperbackup(time_date):
 
 	backup_dir = os.path.join('/data4/paper/paperdistiller_backup', time_date)
 	if not os.path.isdir(backup_dir):
-		os.makedirs(backup_dir)
+		os.mkdir(backup_dir)
 
 	#Create separate files for each directory
 
-	db1 = 'file_backup_%s.psv'%(time_date)
-	dbo1 = os.path.join(backup_dir,db1)
-	print dbo1
-	data_file1 = open(dbo1,'wb')
-	wr1 = csv.writer(data_file1, delimiter='|', lineterminator='\n', dialect='excel')
+	db1 = 'obs_{0}.json'.format(time_date)
+	dbo1 = os.path.join(backup_dir, db1)
 
-	db2 = 'observation_backup_%s.psv'%(time_date)
-	dbo2 = os.path.join(backup_dir,db2)
-	print dbo2
-	data_file2 = open(dbo2,'wb')
-	wr2 = csv.writer(data_file2, delimiter='|', lineterminator='\n', dialect='excel')
+	db2 = 'file_{0}.json'.format(time_date)
+	dbo2 = os.path.join(backup_dir, db2)
 
-	db3 = 'neighbors_backup_%s.psv'%(time_date)
-	dbo3 = os.path.join(backup_dir,db3)
-	print dbo3
-	data_file3 = open(dbo3,'wb')
-	wr3 = csv.writer(data_file3, delimiter='|', lineterminator='\n', dialect='excel')
-
-	db4 = 'log_backup_%s.psv'%(time_date)
-	dbo4 = os.path.join(backup_dir,db4)
-	print dbo4
-	data_file4 = open(dbo4,'wb')
-	wr4 = csv.writer(data_file4, delimiter='|', lineterminator='\n', dialect='excel')
-
+	db3 = 'log_{0}.json'.format(time_date)
+	dbo3 = os.path.join(backup_dir, db3)
 
 	dbi = DataBaseInterface()
 	s = dbi.Session()
 
-	quer = s.query(Observation).all()
-	results = tuple(ENTRY.__dict__.values() for ENTRY in quer)
-	for item in results:
-		wr1.writerow(item)
-	data_file1.close()
+	OBS_dump = s.query(Observation).order_by(Observation.julian_date.asc(), Observation.pol.asc())
+	json_data(dbo1, OBS_dump)
 
-	quer = s.query(File).all()
-	results = tuple(ENTRY.__dict__.values() for ENTRY in quer)
-	for item in results:
-		wr2.writerow(item)
-	data_file2.close()
+	FILE_dump = s.query(File).order_by(File.obsnum.asc(), File.filename.asc())
+	json_data(dbo2, FILE_dump)
 
-	quer = s.query(Neighbors).all()
-	results = tuple(ENTRY.__dict__.values() for ENTRY in quer)
-	for item in results:
-		wr3.writerow(item)
-	data_file3.close()
-
-	quer = s.query(Log).all()
-	results = tuple(ENTRY.__dict__.values() for ENTRY in quer)
-	for item in results:
-		wr4.writerow(item)
-	data_file4.close()
+	LOG_dump = s.query(Log).order_by(Log.obsnum.asc(), Log.timestamp.asc())
+	json_data(dbo3, LOG_dump)
 
 	s.close()
-
 	print time_date
 	print 'Table data backup saved'
 
@@ -82,4 +71,4 @@ def paperdistiller_backup(time_date):
 
 if __name__ == '__main__':
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-	paperdistiller_backup(time_date)
+	paperbackup(time_date)

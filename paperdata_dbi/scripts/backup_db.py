@@ -5,7 +5,6 @@
 # import the MySQLdb and sys modules
 import sys
 import time
-import csv
 import os
 import subprocess
 import smtplib
@@ -25,7 +24,19 @@ import decimal
 def decimal_default(obj):
 	if isinstance(obj, decimal.Decimal):
 		return float(obj)
-	#raise TypeError
+
+def json_data(dbo, dump_objects):
+	data = []
+	with open(dbo, 'w') as f:
+		for ser_data in dump_objects.all():
+			s_dict = ser_data.__dict__
+			try:
+				s_dict.pop('_sa_instance_state')
+			except:
+				pass
+			data.append(s_dict)
+		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
+	return None
 
 def paperbackup(time_date):
 
@@ -36,38 +47,28 @@ def paperbackup(time_date):
 	#Create separate files for each directory
 
 	db1 = 'obs_{0}.json'.format(time_date)
-	dbo1 = os.path.join(backup_dir,db1)
+	dbo1 = os.path.join(backup_dir, db1)
 	print dbo1
 
 	db2 = 'file_{0}.json'.format(time_date)
-	dbo2 = os.path.join(backup_dir,db2)
+	dbo2 = os.path.join(backup_dir, db2)
 	print dbo2
+
+	#db3 = 'feed_{0}.json'.format(time_date)
+	#dbo3 = os.path.join(backup_dir, db3)
+	#print dbo3
 
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 
 	OBS_dump = s.query(pdbi.Observation).order_by(pdbi.Observation.julian_date.asc(), pdbi.Observation.polarization.asc())
-	data = []
-	with open(dbo1, 'w') as f:
-		for ser_data in OBS_dump.all():
-			s_dict = ser_data.__dict__
-			try:
-				s_dict.pop('_sa_instance_state')
-			except:
-				pass
-			data.append(s_dict)
-		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
+	json_data(dbo1, OBS_dump)
 
 	FILE_dump = s.query(pdbi.File).order_by(pdbi.File.obsnum.asc(), pdbi.File.filename.asc())
-	data = []
-	with open(dbo2, 'w') as f:
-		for ser_data in FILE_dump.all():
-			s_dict = ser_data.__dict__
-			try:
-				s_dict.pop('_sa_instance_state')
-			except:
-				pass
-		json.dump(s_dict, f, sort_keys=True, indent=1, default=decimal_default)
+	json_data(dbo2, FILE_dump)
+
+	#FEED_dump = s.query(pdbi.Feed).order_by(pdbi.Feed.julian_day.asc(), pdbi.Feed.filename.asc())
+	#json_data(dbo3, FEED_dump)
 
 	s.close()
 	print time_date

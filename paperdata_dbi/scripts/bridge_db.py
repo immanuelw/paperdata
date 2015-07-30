@@ -152,7 +152,7 @@ def add_data():
 			sftp = ssh.open_sftp()
 			sftp.put(uv_data_script, './')
 			sftp.close()
-			stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(uv_data_script, host, full_path))
+			stdin, uv_data, stderr = ssh.exec_command('python {uv_data_script} {host} {full_path}'.format(uv_data_script=moved_script, host=host, full_path=full_path))
 			time_start, time_end, delta_time = [float(info) for info in uv_data.read().split(',')]
 			ssh.close()
 		
@@ -202,11 +202,31 @@ def add_data():
 		write_to_tape = True
 		delete_file = False
 
-		obs_data = (obsnum, julian_date, polarization, julian_day, era, era_type,
-					length, time_start, time_end, delta_time, prev_obs, next_obs, edge)
-		pdbi.add_observation(*obs_data)
-		raw_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file) #cal_path?? XXXX
-		pdbi.add_file(*raw_data)
+		obs_data = {'obsnum':obsnum,
+					'julian_date':julian_date,
+					'polarization':polarization,
+					'julian_day':julian_day,
+					'era':era,
+					'era_type':era_type,
+					'length':length,
+					'time_start':time_start,
+					'time_end':time_end,
+					'delta_time':delta_time,
+					'prev_obs':prev_obs, 
+					'next_obs':next_obs,
+					'edge':edge}
+		raw_data = {'host':host,
+					'path':path,
+					'filename':filename,
+					'filetype':filetype,
+					'obsnum':obsnum,
+					'filesize':filesize,
+					'md5sum':md5,
+					'tape_index':tape_index,
+					'write_to_tape':write_to_tape,
+					'delete_file':delete_file}
+		pdbi.add_observation(**obs_data)
+		pdbi.add_file(**raw_data)
 		movable_paths.append((host, path, filename, filetype))
 
 
@@ -216,9 +236,17 @@ def add_data():
 		compr_md5 = add_files.calc_md5sum(host, path, compr_filename)
 		compr_write_to_tape = False
 		if os.path.isdir(compr_filename):
-			compr_data = (host, path, compr_filename, compr_filetype, obsnum,
-							compr_filesize, compr_md5, tape_index, compr_write_to_tape, delete_file)
-			pdbi.add_file(*compr_data)
+			compr_data = {'host':host,
+							'path':path,
+							'filename':compr_filename,
+							'filetype':compr_filetype,
+							'obsnum':obsnum,
+							'filesize':compr_filesize,
+							'md5sum':compr_md5,
+							'tape_index':tape_index,
+							'write_to_tape':compr_write_to_tape,
+							'delete_file':delete_file}
+			pdbi.add_file(**compr_data)
 			movable_paths.append((host, path, compr_filename, compr_filetype))
 
 		npz_filename = filename + 'cRE.npz'
@@ -227,8 +255,17 @@ def add_data():
 		npz_md5 = add_files.calc_md5sum(host, path, npz_filename)
 		npz_write_to_tape = False
 		if os.path.isfile(npz_filename):
-			npz_data = (host, path, npz_filename, npz_filetype, obsnum, npz_filesize, npz_md5, tape_index, npz_write_to_tape, delete_file)
-			pdbi.add_file(*npz_data)
+			npz_data = {'host':host,
+						'path':path,
+						'filename':npz_filename,
+						'filetype':npz_filetype,
+						'obsnum':obsnum,
+						'filesize':npz_filesize,
+						'md5sum':npz_md5,
+						'tape_index':tape_index,
+						'write_to_tape':npz_write_to_tape,
+						'delete_file':delete_file}
+			pdbi.add_file(**npz_data)
 			movable_paths.append((host, npz_path, npz_filename, npz_filetype))
 
 	s.close()

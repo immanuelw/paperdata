@@ -96,9 +96,9 @@ def calc_md5sum(host, path, filename):
 			remote_path = sftp.file(full_path, mode='r')
 			md5 = remote_path.check('md5', block_size=65536)
 		except(IOError):
-			#remote_path_2 =  sftp.file('{0}/visdata'.format(full_path), mode='r')
+			#remote_path_2 =  sftp.file('{full_path}/visdata'.format(full_path=full_path), mode='r')
 			#md5 = remote_path_2.check('md5', block_size=65536)
-			stdin, md5_out, stderr = ssh.exec_command('md5sum {0}/visdata'.format(full_path))
+			stdin, md5_out, stderr = ssh.exec_command('md5sum {full_path}/visdata'.format(full_path=full_path))
 			
 		md5 = md5_out.read().split(' ')[0]
 		sftp.close()
@@ -166,9 +166,9 @@ def calc_obs_data(host, full_path):
 
 		else:
 			ssh = login_ssh(host)
-			uv_data_script = '/home/{0}/scripts/paperdata/paper/scripts/pdbi/scripts/uv_data.py'.format('immwa')
+			uv_data_script = '/home/{user}/scripts/paperdata/paper/scripts/pdbi/scripts/uv_data.py'.format(user='immwa')
 			sftp = ssh.open_sftp()
-			moved_script = '/home/{0}/scripts/uv_data.py'.format('immwa')
+			moved_script = '/home/{user}/scripts/uv_data.py'.format(user='immwa')
 			try:
 				filestat = sftp.stat(uv_data_script)
 			except(IOError):
@@ -177,7 +177,7 @@ def calc_obs_data(host, full_path):
 				except(IOError):
 					sftp.put(uv_data_script, moved_script)
 			sftp.close()
-			stdin, uv_data, stderr = ssh.exec_command('python {0} {1} {2}'.format(moved_script, host, full_path))
+			stdin, uv_data, stderr = ssh.exec_command('python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path))
 			ssh.close()
 
 			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [float(info) if key in (0,1,2) else round(float(info), 5) if key in (3,5) else int(info) if key is 6 else info for key, info in enumerate(uv_data.read().split(','))]
@@ -246,7 +246,7 @@ def calc_obs_data(host, full_path):
 		s.close()
 
 	if (prev_obs, next_obs) == (None, None):
-		edge = False
+		edge = None
 	else:
 		edge = (None in (prev_obs, next_obs))
 
@@ -257,8 +257,29 @@ def calc_obs_data(host, full_path):
 	write_to_tape = False
 	delete_file = False
 
-	obs_data = (obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time, prev_obs, next_obs, edge)
-	file_data = (host, path, filename, filetype, obsnum, filesize, md5, tape_index, write_to_tape, delete_file) #cal_path?? XXXX
+	obs_data = {'obsnum':obsnum,
+				'julian_date':julian_date,
+				'polarization':polarization,
+				'julian_day':julian_day,
+				'era':era,
+				'era_type':era_type,
+				'length':length,
+				'time_start':time_start,
+				'time_end':time_end,
+				'delta_time':delta_time,
+				'prev_obs':prev_obs, 
+				'next_obs':next_obs,
+				'edge':edge}
+	file_data = {'host':host,
+				'path':path,
+				'filename':filename,
+				'filetype':filetype,
+				'obsnum':obsnum,
+				'filesize':filesize,
+				'md5sum':md5,
+				'tape_index':tape_index,
+				'write_to_tape':write_to_tape,
+				'delete_file':delete_file}
 
 	return obs_data, file_data
 
@@ -344,8 +365,8 @@ def add_files(input_host, input_paths):
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
 		obs_data, file_data = calc_uv_data(input_host, path, filename)
-		dbi.add_observation(*obs_data)
-		dbi.add_file(*file_data)
+		dbi.add_observation(**obs_data)
+		dbi.add_file(**file_data)
 
 	return None
 
@@ -369,7 +390,7 @@ if __name__ == '__main__':
 	else:
 		ssh = pdbi.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
-		stdin, path_out, stderr = ssh.exec_command('ls -d {0}'.format(input_paths))
+		stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]
 		ssh.close()
 

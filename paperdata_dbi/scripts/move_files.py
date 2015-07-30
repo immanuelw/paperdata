@@ -45,13 +45,13 @@ def rsync_copy(source, destination):
 
 def move_files(input_host, input_paths, output_host, output_dir):
 	named_host = socket.gethostname()
-	destination = output_host + ':' + output_dir
+	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
 		dbi = pdbi.DataBaseInterface()
 		s = dbi.Session()
 		for source in input_paths:
-			rsync_move(source, destination)
-			full_path = input_host + ':' + source
+			rsync_copy(source, destination)
+			full_path = ''.join((input_host, ':', source))
 			FILE = dbi.get_file(full_path)
 			dbi.set_file_host(FILE.full_path, output_host)
 			dbi.set_file_path(FILE.full_path, output_dir)
@@ -65,7 +65,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 			rsync_del_command = '''rm -r {source}'''.format(source=source)
 			ssh.exec_command(rsync_copy_command)
-			full_path = input_host + ':' + source
+			full_path = ''.join((input_host, ':', source))
 			FILE = dbi.get_file(full_path)
 			dbi.set_file_host(FILE.full_path, output_host)
 			dbi.set_file_path(FILE.full_path, output_dir)
