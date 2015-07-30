@@ -305,12 +305,12 @@ def dupe_check(input_host, input_paths):
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	FILEs = s.query(pdbi.File).all()
-	s.close()
 	#all files on same host
 	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs if FILE.host == input_host)
 
 	#for each input file, check if in filenames
 	unique_paths = tuple(input_path for input_path in input_paths if input_path not in filenames)
+	s.close()
 		
 	return unique_paths
 
@@ -365,8 +365,14 @@ def add_files(input_host, input_paths):
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
 		obs_data, file_data = calc_uv_data(input_host, path, filename)
-		dbi.add_observation(**obs_data)
-		dbi.add_file(**file_data)
+		try:
+			dbi.add_observation(**obs_data)
+		except:
+			print('Failed to load in obs ', path, filename)
+		try:
+			dbi.add_file(**file_data)
+		except:
+			print('Failed to load in file ', path, filename)
 
 	return None
 
