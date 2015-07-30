@@ -8,7 +8,6 @@ import glob
 import socket
 import aipy as A
 import paperdata_dbi as pdbi
-import move_files
 
 ### Script to load data from anywhere into paperfeed database
 ### Crawls folio or elsewhere and reads through .uv files to generate all field information
@@ -35,49 +34,47 @@ def gen_feed_data(host, full_path):
 	ready_to_move = False
 	moved_to_distill = False
 
-	feed_data = (host, path, filename, full_path, julian_day, ready_to_move, moved_to_distill)
+	feed_data = {'host':host,
+				'path':path,
+				'filename':filename,
+				'full_path':full_path,
+				'julian_day':julian_day,
+				'ready_to_move':ready_to_move,
+				'moved_to_distill':moved_to_distill}
 
 	return feed_data
 
-def rsync_m(source, destination):
-	subprocess.check_output(['rsync', '-a', source, destination])
+def rsync_copy(source, destination):
+	subprocess.check_output(['rsync', '-ac', source, destination])
 	return None
 
 def move_files(input_host, input_paths, output_host, output_dir):
+	#different from move_files, adds to feed
 	named_host = socket.gethostname()
-	destination = output_host + ':' + output_dir
-	input_filenames = tuple(os.path.basename(input_path) for input_path in input_paths)
-	moved_files = tuple(os.path.join(destination, input_filename) for input_file in input_filenames)
+	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
-		if input_host == output_host:
-			for source in input_paths:
-				shutil.move(source, output_dir)
-		else:
-			for source in input_paths:
-				rsync_m(source, destination)
+		dbi = pdbi.DataBaseInterface()
+		s = dbi.Session()
+		for source in input_paths:
+			rsync_copy(source, destination)
+			add_feed_to_db(input_host, source)
+			shutil.rmtree(source)
+		s.close()
 	else:
-		if input_host == output_host:
-			dbi = pdbi.DataBaseInterface()
-			s = dbi.Session()
-			ssh = pdbi.login_ssh(output_host)
-			sftp = ssh.open_sftp()
-			for source in input_paths:
-				sftp.rename(source, output_dir)
-			sftp.close()
-			ssh.close()
-			s.close()
-		else:
-			dbi = pdbi.DataBaseInterface()
-			s = dbi.Session()
-			ssh = pdbi.login_ssh(output_host)
-			for source in input_paths:
-				rsync_move = '''rsync -a {source} {destination}'''.format(source=source, destination=destination)
-				ssh.exec_command(rsync_move)
-			ssh.close()
-			s.close()
+		dbi = pdbi.DataBaseInterface()
+		s = dbi.Session()
+		ssh = pdbi.login_ssh(output_host)
+		for source in input_paths:
+			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
+			rsync_del_command = '''rm -r {source}'''.format(source=source)
+			ssh.exec_command(rsync_copy_command)
+			add_feed_to_db(input_host, source)
+			ssh.exec_command(rsync_del_command)
+		ssh.close()
+		s.close()
 
 	print 'Completed transfer'
-	return moved_files
+	return None
 
 def dupe_check(input_host, input_paths):
 	dbi = pdbi.DataBaseInterface()
@@ -92,13 +89,10 @@ def dupe_check(input_host, input_paths):
 		
 	return unique_paths
 
-def add_feeds(input_host, input_paths):
+def add_feed_to_db(input_host, full_path):
 	dbi = pdbi.DataBaseInterface()
-	for input_path in input_paths:
-		path = os.path.dirname(input_path)
-		filename = os.path.basename(input_path)
-		feed_data = gen_feed_data(input_host, path, filename)
-		dbi.add_observation(*feed_data)
+	feed_data = gen_feed_data(input_host, full_path)
+	dbi.add_feed(**feed_data)
 
 	return None
 
@@ -122,7 +116,7 @@ if __name__ == '__main__':
 	else:
 		ssh = pdbi.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
-		stdin, path_out, stderr = ssh.exec_command('ls -d {0}'.format(input_paths))
+		stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]
 		ssh.close()
 
