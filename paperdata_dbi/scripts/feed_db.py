@@ -139,7 +139,7 @@ def feed_db:
 				outfile_dirs.append(outfiles.split('z')[0])
 		for out_direc in outfile_dirs:
 			out_dir = os.path.join(out_direc,'zen.*.uv')
-			add_obs = 'add_observations.py %s'%(out_dir)
+			add_obs = 'add_observations.py {out_dir}'.format(out_dir)
 			subprocess.call(add_obs, shell=True)
 	else:
 		table = 'Feed'
