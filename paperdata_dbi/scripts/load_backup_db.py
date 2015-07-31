@@ -7,6 +7,7 @@ import sys
 import json
 import paperdata_db as pdb
 import glob
+import sqlalchemy.exc
 
 ### Script to create paperdata database
 ### Instantiates tables
@@ -24,7 +25,7 @@ def load_backup(backup, table=None):
 			OBS_class = pdb.Observation()
 			obs_list = OBS_class.db_list
 			for row in read:
-				print tuple(row)
+				print row.items()
 				try:
 					dbi.add_observation(**row)
 				except:
@@ -33,7 +34,7 @@ def load_backup(backup, table=None):
 			FILE_class = pdb.File()
 			file_list = FILE_class.db_list
 			for row in read:
-				print tuple(row)
+				print row.items()			
 				try:
 					dbi.add_file(**row)
 				except:
@@ -42,7 +43,7 @@ def load_backup(backup, table=None):
 		#	FEED_class = pdb.Feed()
 		#	feed_list = FEED_class.db_list
 		#	for row in read:
-		#		print tuple(row)
+		#		print row.items()
 		#		try:
 		#			dbi.add_file(**row)
 		#		except:

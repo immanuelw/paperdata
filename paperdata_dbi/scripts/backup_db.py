@@ -13,6 +13,7 @@ from email.MIMEBase import MIMEBase
 from email import Encoders
 import paperdata_dbi as pdbi
 import json
+import time
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
@@ -40,7 +41,7 @@ def json_data(dbo, dump_objects):
 
 def paperbackup(time_date):
 
-	backup_dir = os.path.join('/data4/paper/paperdata_backup', time_date)
+	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(time_date))
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 
@@ -48,15 +49,15 @@ def paperbackup(time_date):
 
 	db1 = 'obs_{time_date}.json'.format(time_date=time_date)
 	dbo1 = os.path.join(backup_dir, db1)
-	print dbo1
+	print(dbo1)
 
 	db2 = 'file_{time_date}.json'.format(time_date=time_date)
 	dbo2 = os.path.join(backup_dir, db2)
-	print dbo2
+	print(dbo2)
 
 	#db3 = 'feed_{0}.json'.format(time_date)
 	#dbo3 = os.path.join(backup_dir, db3)
-	#print dbo3
+	#print(dbo3)
 
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
@@ -71,7 +72,6 @@ def paperbackup(time_date):
 	#json_data(dbo3, FEED_dump)
 
 	s.close()
-	print time_date
 	print 'Table data backup saved'
 
 	return None
