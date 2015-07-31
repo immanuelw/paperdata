@@ -78,7 +78,7 @@ def add_data():
 	for jday in j_days.values():
 		count_days[jday] += 1
 
-	a_days = {OBS: int(str(OBS.julian_date)[3:7] for OBS in OBSs_all}
+	a_days = {OBS: int(str(OBS.julian_date)[3:7]) for OBS in OBSs_all}
 	all_days = {jday:0 for jday in a_days.values()}
 	for jday in a_days.values():
 		all_days[jday] += 1
