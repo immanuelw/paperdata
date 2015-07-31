@@ -1,5 +1,6 @@
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
 from sqlalchemy import event, DDL, UniqueConstraint
+from sqlalchemy import exc
 from sqlalchemy.orm import relationship, backref, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
@@ -270,38 +271,54 @@ class DataBaseInterface(object):
 							length=length, time_start=time_start, time_end=time_end, delta_time=delta_time,	prev_obs=prev_obs,
 							next_obs=next_obs, edge=edge)
 		s = self.Session()
-		s.add(OBS)
-		s.commit()
+		try:
+			s.add(OBS)
+			s.commit()
+		except (exc.IntegrityError):
+			s.rollback()
+			s.close()
+			print('Duplicate entry found ... skipping entry')
+			return None
 		obsnum = OBS.obsnum
 		s.close()
 		sys.stdout.flush()
 		return obsnum
 
-	def add_file(self, host, path, filename, filetype, full_path, obsnum, filesize, md5, tape_index, write_to_tape, delete_file): #cal_path?? XXXX
+	def add_file(self, host, path, filename, filetype, full_path, obsnum, filesize, md5sum, tape_index, write_to_tape, delete_file): #cal_path?? XXXX
 		"""
 		Add a file to the database and associate it with an observation.
 		"""
 		FILE = File(host=host, path=path, filename=filename, filetype=filetype, full_path=full_path, obsnum=obsnum, filesize=filesize,
-					md5sum=md5, tape_index=tape_index, write_to_tape=write_to_tape, delete_file=delete_file)
+					md5sum=md5sum, tape_index=tape_index, write_to_tape=write_to_tape, delete_file=delete_file)
 		#get the observation corresponding to this file
 		s = self.Session()
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
 		FILE.observation = OBS  #associate the file with an observation
-		s.add(FILE)
-		s.commit()
-		#filenum = FILE.filenum #we gotta grab this before we close the session.
+		try:
+			s.add(FILE)
+			s.commit()
+		except (exc.IntegrityError):
+			s.rollback()
+			s.close()
+			print('Duplicate entry found ... skipping entry')
+			return None
 		s.close() #close the session
-		#return filenum
 		return None
 
 	def add_feed(self, host, path, filename, ready_to_move, moved_to_distill):
 		"""
 		Add a feed to the database
 		"""
-		FEED = Feed(self, host, path, filename, ready_to_move, moved_to_distill)
+		FEED = Feed(host=host, path=path, filename=filename, ready_to_move=ready_to_move, moved_to_distill=moved_to_distill)
 		s = self.Session()
-		s.add(FEED)
-		s.commit()
+		try:
+			s.add(FEED)
+			s.commit()
+		except (exc.IntegrityError):
+			s.rollback()
+			s.close()
+			print('Duplicate entry found ... skipping entry')
+			return None
 		s.close() #close the session
 		return None
 
