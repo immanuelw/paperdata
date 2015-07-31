@@ -96,8 +96,6 @@ def calc_md5sum(host, path, filename):
 			remote_path = sftp.file(full_path, mode='r')
 			md5 = remote_path.check('md5', block_size=65536)
 		except(IOError):
-			#remote_path_2 =  sftp.file('{full_path}/visdata'.format(full_path=full_path), mode='r')
-			#md5 = remote_path_2.check('md5', block_size=65536)
 			stdin, md5_out, stderr = ssh.exec_command('md5sum {full_path}/visdata'.format(full_path=full_path))
 			
 		md5 = md5_out.read().split(' ')[0]
@@ -185,7 +183,7 @@ def calc_obs_data(host, full_path):
 	elif filetype in ('npz',):
 		#filename is zen.2456640.24456.xx.uvcRE.npz or zen.2456243.24456.uvcRE.npz
 		jdate = filename.split('.')[1] + '.' + filename.split('.')[2]
-		julian_date = round(float(jdate, 5)
+		julian_date = round(float(jdate, 5))
 
 		dbi = pdbi.DataBaseInterface()
 		s = dbi.Session()

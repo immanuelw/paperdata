@@ -233,7 +233,7 @@ def sql_query(output, info_list, tab):
 	sql_output = tuple(sql_output)
 	return sql_output
 
-def write_to_file(data, table)
+def write_to_file(data, table):
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
 	file_name = './paper_{0}_output_{1}.psv'.format(table, time_date)
 	data_file = open(file_name,'wb')
