@@ -47,6 +47,7 @@ class Filesystem(Base):
 	total_space = Column(BigInteger)
 	used_space = Column(BigInteger)
 	free_space = Column(BigInteger)
+	percent_space = Numeric(4,1)
 	time_date = Column(BigInteger) #seconds since 1970
 
 class Monitor(Base):
