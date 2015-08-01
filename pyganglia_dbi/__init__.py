@@ -1,6 +1,7 @@
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
 from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship, backref, sessionmaker
+from sqlalchemy import exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool, QueuePool
@@ -23,10 +24,10 @@ def login_ssh(host, username=None):
 	ssh.load_system_host_keys()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
 	try:
-		ssh.connect(host, username=username, key_filename='/home/{0}/.ssh/id_rsa'.format(username))
+		ssh.connect(host, username=username, key_filename='~/.ssh/id_rsa')
 	except:
 		try:
-			ssh.connect(host, key_filename='/home/{0}/.ssh/id_rsa'.format(username))
+			ssh.connect(host, key_filename='~/.ssh/id_rsa')
 		except:
 			return None
 
@@ -144,7 +145,10 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
-		MONITOR = s.query(Monitor).filter(Monitor.full_stats==full_stats).one()
+		try:
+			MONITOR = s.query(Monitor).filter(Monitor.full_stats==full_stats).one()
+		except:
+			return None
 		s.close()
 		return MONITOR
 
@@ -184,16 +188,26 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
+	def add_entry(self, ENTRY):
+		s = self.Session()
+		try:
+			s.add(ENTRY)
+			s.commit()
+		except (exc.IntegrityError):
+			s.rollback()
+			s.close()
+			print('Duplicate entry found ... skipping entry')
+			return None
+		s.close()
+		return None
+
 	def add_filesystem(self, host, system, total_space, used_space, free_space, time_date):
 		"""
 		create a new filesystem entry.
 		"""
 		FILESYSTEM = Filesystem(host=host, system=system, total_space=total_space, used_space=used_space, free_space=free_space,
 								time_date=time_date)
-		s = self.Session()
-		s.add(FILESYSTEM)
-		s.commit()
-		s.close()
+		self.add_entry(FILESYSTEM)
 		return None
 
 	def add_monitor(self, host, path, filename, full_path, status, full_stats, del_time, file_start, file_end, time_date):
@@ -202,10 +216,7 @@ class DataBaseInterface(object):
 		"""
 		MONITOR = Monitor(host=host, path=path, filename=filename, full_path=full_path, status=status, full_stats=full_stats,
 							del_time=del_time, file_start=file_start, file_end=file_end, time_date=time_date)
-		s = self.Session()
-		s.add(MONITOR)
-		s.commit()
-		s.close()
+		self.add_entry(MONITOR)
 		return None
 
 	def add_ram(self, host, total, used, free, shared, buffers, cached, bc_used, bc_free, swap_total, swap_used, swap_free, time_date):
@@ -214,10 +225,7 @@ class DataBaseInterface(object):
 		"""
 		RAM = Ram(host=host, total=total, used=used, free=free, shared=shared, buffers=buffers, cached=cached, bc_used=bc_used, bc_free=bc_free,
 					swap_total=swap_total, swap_used=swap_used, swap_free=swap_free, time_date=time_date)
-		s = self.Session()
-		s.add(RAM)
-		s.commit()
-		s.close()
+		self.add_entry(RAM)
 		return None
 
 	def add_iostat(self, host, device, tps, read_s, write_s, bl_reads, bl_writes, time_date):
@@ -226,10 +234,7 @@ class DataBaseInterface(object):
 		"""
 		IOSTAT = Iostat(host=host, device=device, tps=tps, read_s=read_s, write_s=write_s, bl_reads=bl_reads, bl_writes=bl_writes,
 						time_date=time_date)
-		s = self.Session()
-		s.add(IOSTAT)
-		s.commit()
-		s.close()
+		self.add_entry(IOSTAT)
 		return None
 
 	def add_cpu(self, host, cpu, user_perc, sys_perc, iowait_perc, idle_perc, intr_s, time_date):
@@ -237,10 +242,7 @@ class DataBaseInterface(object):
 		create a new cpu entry.
 		"""
 		CPU = Cpu(host=host, cpu=cpu, user_perc=user_perc, sys_perc=sys_perc, iowait_perc=iowait_perc, idle_perc=idle_perc, intr_s=intr_s, time_date=time_date)
-		s = self.Session()
-		s.add(CPU)
-		s.commit()
-		s.close()
+		self.add_entry(CPU)
 		return None
 
 	def get_monitor_path(self, full_stats):

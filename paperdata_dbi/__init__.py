@@ -172,7 +172,10 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
-		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
+		try:
+			OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
+		except:
+			return None
 		s.close()
 		return OBS
 
@@ -196,7 +199,10 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
-		FILE = s.query(File).filter(File.full_path==full_path).one()
+		try:
+			FILE = s.query(File).filter(File.full_path==full_path).one()
+		except:
+			return None
 		s.close()
 		return FILE
 
@@ -220,7 +226,10 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
-		FEED = s.query(Feed).filter(Feed.full_path==full_path).one()
+		try:
+			FEED = s.query(Feed).filter(Feed.full_path==full_path).one()
+		except:
+			return None
 		s.close()
 		return FEED
 
