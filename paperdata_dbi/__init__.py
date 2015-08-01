@@ -260,6 +260,19 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
+	def add_entry(self, ENTRY):
+		s = self.Session()
+		try:
+			s.add(ENTRY)
+			s.commit()
+		except (exc.IntegrityError):
+			s.rollback()
+			s.close()
+			print('Duplicate entry found ... skipping entry')
+			return None
+		s.close()
+		return None
+
 	def add_observation(self, obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time,
 						prev_obs, next_obs, edge):
 		"""
@@ -270,17 +283,8 @@ class DataBaseInterface(object):
 		OBS = Observation(obsnum=obsnum, julian_date=julian_date, polarization=polarization, julian_day=julian_day, era=era, era_type=era_type,
 							length=length, time_start=time_start, time_end=time_end, delta_time=delta_time,	prev_obs=prev_obs,
 							next_obs=next_obs, edge=edge)
-		s = self.Session()
-		try:
-			s.add(OBS)
-			s.commit()
-		except (exc.IntegrityError):
-			s.rollback()
-			s.close()
-			print('Duplicate entry found ... skipping entry')
-			return None
+		self.add_entry(OBS)
 		obsnum = OBS.obsnum
-		s.close()
 		sys.stdout.flush()
 		return obsnum
 
@@ -291,18 +295,9 @@ class DataBaseInterface(object):
 		FILE = File(host=host, path=path, filename=filename, filetype=filetype, full_path=full_path, obsnum=obsnum, filesize=filesize,
 					md5sum=md5sum, tape_index=tape_index, write_to_tape=write_to_tape, delete_file=delete_file)
 		#get the observation corresponding to this file
-		s = self.Session()
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
 		FILE.observation = OBS  #associate the file with an observation
-		try:
-			s.add(FILE)
-			s.commit()
-		except (exc.IntegrityError):
-			s.rollback()
-			s.close()
-			print('Duplicate entry found ... skipping entry')
-			return None
-		s.close() #close the session
+		self.add_entry(FILE)
 		return None
 
 	def add_feed(self, host, path, filename, ready_to_move, moved_to_distill):
@@ -310,16 +305,7 @@ class DataBaseInterface(object):
 		Add a feed to the database
 		"""
 		FEED = Feed(host=host, path=path, filename=filename, ready_to_move=ready_to_move, moved_to_distill=moved_to_distill)
-		s = self.Session()
-		try:
-			s.add(FEED)
-			s.commit()
-		except (exc.IntegrityError):
-			s.rollback()
-			s.close()
-			print('Duplicate entry found ... skipping entry')
-			return None
-		s.close() #close the session
+		self.add_entry(FILE)
 		return None
 
 	def get_file_path(self, full_path):
