@@ -38,6 +38,16 @@ def login_ssh(host, username=None):
 #
 #############
 
+class Filesystem(Base):
+	__tablename__ = 'filesystem'
+	__table_args__ = (PrimaryKeyConstraint('host', 'system', 'time_date', name='host_system_time'),)
+	host = Column(String(100)) #folio
+	system = Column(String(100)) #/data4
+	total_space = Column(BigInteger)
+	used_space = Column(BigInteger)
+	free_space = Column(BigInteger)
+	time_date = Column(BigInteger) #seconds since 1970
+
 class Monitor(Base):
 	__tablename__ = 'monitor'
 	host = Column(String(100))
@@ -49,7 +59,7 @@ class Monitor(Base):
 	del_time = Column(BigInteger)
 	time_start = Column(BigInteger)
 	time_end = Column(BigInteger)
-	time_date = Column(Numeric(13,6))
+	time_date = Column(BigInteger)
 
 class Ram(Base):
 	__tablename__ = 'ram'
@@ -66,7 +76,7 @@ class Ram(Base):
 	swap_total = Column(BigInteger)
 	swap_used = Column(BigInteger)
 	swap_free = Column(BigInteger)
-	time_date = Column(Numeric(13,6))
+	time_date = Column(BigInteger)
 
 class Iostat(Base):
 	__tablename__ = 'iostat'
@@ -78,7 +88,7 @@ class Iostat(Base):
 	write_s = Column(Numeric(7,2))
 	bl_reads = Column(BigInteger)
 	bl_writes = Column(BigInteger)
-	time_date = Column(Numeric(13,6))
+	time_date = Column(BigInteger)
 
 class Cpu(Base):
 	__tablename__ = 'cpu'
@@ -90,7 +100,7 @@ class Cpu(Base):
 	iowait_perc = Column(Numeric(5,2))
 	idle_perc = Column(Numeric(5,2))
 	intr_s = Column(Integer)
-	time_date = Column(Numeric(13,6))
+	time_date = Column(BigInteger)
 
 class DataBaseInterface(object):
 	def __init__(self,configfile='~/pyg_still.cfg',test=False):
@@ -173,6 +183,18 @@ class DataBaseInterface(object):
 		"""
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
+
+	def add_filesystem(self, host, system, total_space, used_space, free_space, time_date):
+		"""
+		create a new filesystem entry.
+		"""
+		FILESYSTEM = Filesystem(host=host, system=system, total_space=total_space, used_space=used_space, free_space=free_space,
+								time_date=time_date)
+		s = self.Session()
+		s.add(FILESYSTEM)
+		s.commit()
+		s.close()
+		return None
 
 	def add_monitor(self, host, path, filename, full_path, status, full_stats, del_time, file_start, file_end, time_date):
 		"""
