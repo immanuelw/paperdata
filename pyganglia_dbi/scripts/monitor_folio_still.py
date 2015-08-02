@@ -39,9 +39,7 @@ i=0
 stat = ['\\','|','/','-','.']
 try:
 	while(1):
-		time_date = time.strftime('%Y:%m:%d:%H:%M:%S')
-		temp_time = time_date.split(':')
-		time_date = jdcal.gcal2jd(temp_time[0],temp_time[1],temp_time[2],temp_time[3],temp_time[4],temp_time[5])
+		time_date = int(time.time())
 		log_info = []
 		#get the screen dimensions
 
