@@ -92,7 +92,7 @@ if __name__ == '__main__':
 	output_host = raw_input('Destination directory host: ')
 	output_dir = raw_input('Destination directory: ')
 	nulls = null_check(input_host, input_paths)
-	if not null:
+	if not nulls:
 		#if any file not in db -- don't move anything
 		print 'File(s) not in database'
 		sys.exit()
