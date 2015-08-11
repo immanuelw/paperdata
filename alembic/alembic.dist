@@ -32,10 +32,10 @@ script_location = ./alembic
 databases = paperdata, ganglia
 
 [paperdata]
-sqlalchemy.url = driver://user:pass@localhost/dbname
+sqlalchemy.url = mysql://user:pass@shredder/paperdata
 
 [ganglia]
-sqlalchemy.url = driver://user:pass@localhost/dbname
+sqlalchemy.url = mysql://user:pass@shredder/ganglia
 
 
 # Logging configuration
