@@ -115,8 +115,8 @@ class File(Base):
 	### maybe unnecessary fields
 	#calibration_path = Column(String(100))
 	#history?
-	write_to_tape = Column(Boolean, default=False)
-	delete_file = Column(Boolean, default=False)
+	write_to_tape = Column(Boolean)
+	delete_file = Column(Boolean)
 	timestamp = Column(BigInteger)
 	#this next line creates an attribute Observation.files which is the list of all
 	#  files associated with this observation
@@ -129,8 +129,8 @@ class Feed(Base):
 	filename = Column(String(100)) #zen.*.*.uv
 	full_path = Column(String(200), primary_key=True)
 	julian_day = Column(Integer)
-	ready_to_move = Column(Boolean, default=False)
-	moved_to_distill = Column(Boolean, default=False)
+	ready_to_move = Column(Boolean)
+	moved_to_distill = Column(Boolean)
 	timestamp = Column(BigInteger)
 
 class DataBaseInterface(object):
