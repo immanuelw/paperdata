@@ -25,12 +25,7 @@ def json_data(dbo, dump_objects):
 	data = []
 	with open(dbo, 'w') as f:
 		for ser_data in dump_objects.all():
-			s_dict = ser_data.__dict__
-			try:
-				s_dict.pop('_sa_instance_state')
-			except:
-				pass
-			data.append(s_dict)
+			data.append(ser_data.to_json())
 		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
 	return None
 

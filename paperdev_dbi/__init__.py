@@ -147,7 +147,7 @@ class File(Base):
 						'filetype':self.filetype,
 						'obsnum':self.obsnum,
 						'filesize':self.filesize,
-						'md5sum':self.md5,
+						'md5sum':self.md5sum,
 						'tape_index':self.tape_index,
 						'write_to_tape':self.write_to_tape,
 						'delete_file':self.delete_file,
