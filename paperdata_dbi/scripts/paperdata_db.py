@@ -68,7 +68,7 @@ class Observation:
 						'julian_date':('DECIMAL(12, 5)', 'None', 'No', 'julian date of observation'),
 						'polarization':('VARCHAR(4)', 'None', 'No', 'polarization of observation'),
 						'julian_day':('INTEGER', 'None', 'No',
-										'integer value -- the last 4 digits for any julian date to separate into days: ex:(2456601 -> 6601)'),
+										'the last 4 digits for any julian date to separate into days: ex:(2456601 -> 6601)'),
 						'era':('INTEGER', 'None', 'No', 'era of observation taken: 32, 64, 128'),
 						'era_type':('VARCHAR(20)', 'None', 'No', 'type of observation taken: dual pol, etc.'),
 						'length':('DECIMAL(6, 5)', 'None', 'No', 'length of time data was taken for particular observation'),
@@ -97,7 +97,7 @@ class Feed:
 						'full_path':('VARCHAR(200)', 'None', 'Unique',
 										'combination of host, path, and filename which is a unique identifier for each file'),
 						'julian_day':('INTEGER', 'None', 'No',
-										'integer value -- the last 4 digits for any julian date to separate into days: ex:(2456601 -> 6601)'),
+										'the last 4 digits for any julian date to separate into days: ex:(2456601 -> 6601)'),
 						'ready_to_move':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file is ready to be moved to distill'),
 						'moved_to_distill':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file has been moved to distill yet'),
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was last updated')}
