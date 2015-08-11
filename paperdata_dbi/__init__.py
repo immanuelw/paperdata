@@ -99,6 +99,23 @@ class Observation(Base):
 	edge = Column(Boolean)
 	timestamp = Column(BigInteger)
 
+	def to_json():
+		obs_data = {'obsnum':obsnum,
+					'julian_date':julian_date,
+					'polarization':polarization,
+					'julian_day':julian_day,
+					'era':era,
+					'era_type':era_type,
+					'length':length,
+					'time_start':time_start,
+					'time_end':time_end,
+					'delta_time':delta_time,
+					'prev_obs':prev_obs, 
+					'next_obs':next_obs,
+					'edge':edge,
+					'timestamp':timestamp}
+		return obs_data
+
 class File(Base):
 	__tablename__ = 'file'
 	#filenum = Column(Integer, primary_key=True)
@@ -122,6 +139,20 @@ class File(Base):
 	#  files associated with this observation
 	observation = relationship(Observation, backref=backref('files', uselist=True))
 
+	def to_json():
+		file_data = {'host':host,
+					'path':path,
+					'filename':filename,
+					'filetype':filetype,
+					'obsnum':obsnum,
+					'filesize':filesize,
+					'md5sum':md5,
+					'tape_index':tape_index,
+					'write_to_tape':write_to_tape,
+					'delete_file':delete_file,
+					'timestamp':timestamp}
+		return file_data
+
 class Feed(Base):
 	__tablename__ = 'feed'
 	host = Column(String(100))
@@ -132,6 +163,17 @@ class Feed(Base):
 	ready_to_move = Column(Boolean)
 	moved_to_distill = Column(Boolean)
 	timestamp = Column(BigInteger)
+
+	def to_json():
+		feed_data = {'host':host,
+					'path':path,
+					'filename':filename,
+					'full_path':full_path,
+					'julian_day':julian_day,
+					'ready_to_move':ready_to_move,
+					'moved_to_distill':moved_to_distill,
+					'timestamp':timestamp}
+		return feed_data
 
 class DataBaseInterface(object):
 	def __init__(self,configfile='~/paperdata.cfg',test=False):
