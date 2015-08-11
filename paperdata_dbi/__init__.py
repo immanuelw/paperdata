@@ -134,7 +134,7 @@ class Feed(Base):
 	timestamp = Column(BigInteger)
 
 class DataBaseInterface(object):
-	def __init__(self,configfile='~/pdbi_still.cfg',test=False):
+	def __init__(self,configfile='~/paperdata.cfg',test=False):
 		"""
 		Connect to the database and initiate a session creator.
 		 or

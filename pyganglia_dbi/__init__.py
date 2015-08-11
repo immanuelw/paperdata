@@ -105,7 +105,7 @@ class Cpu(Base):
 	time_date = Column(BigInteger)
 
 class DataBaseInterface(object):
-	def __init__(self,configfile='~/pyg_still.cfg',test=False):
+	def __init__(self,configfile='~/ganglia.cfg',test=False):
 		"""
 		Connect to the database and initiate a session creator.
 		 or
