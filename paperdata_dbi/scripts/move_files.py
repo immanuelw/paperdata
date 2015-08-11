@@ -2,11 +2,8 @@
 # -*- coding: utf-8 -*-
 # Add files to paperdata
 
-import MySQLdb
 import sys
-import getpass
 import time
-import csv
 import subprocess
 import aipy as A
 import hashlib
@@ -53,8 +50,10 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			rsync_copy(source, destination)
 			full_path = ''.join((input_host, ':', source))
 			FILE = dbi.get_file(full_path)
+			timestamp = int(time.time())
 			dbi.set_file_host(FILE.full_path, output_host)
 			dbi.set_file_path(FILE.full_path, output_dir)
+			dbi.set_file_time(FILE.full_path, timestamp)
 			shutil.rmtree(source)
 		s.close()
 	else:
@@ -67,8 +66,10 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			ssh.exec_command(rsync_copy_command)
 			full_path = ''.join((input_host, ':', source))
 			FILE = dbi.get_file(full_path)
+			timestamp = int(time.time())
 			dbi.set_file_host(FILE.full_path, output_host)
 			dbi.set_file_path(FILE.full_path, output_dir)
+			dbi.set_file_time(FILE.full_path, timestamp)
 			ssh.exec_command(rsync_del_command)
 		ssh.close()
 		s.close()

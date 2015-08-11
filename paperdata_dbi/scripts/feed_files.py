@@ -4,6 +4,7 @@
 
 import sys
 import os
+import time
 import glob
 import socket
 import aipy as A
@@ -34,13 +35,16 @@ def gen_feed_data(host, full_path):
 	ready_to_move = False
 	moved_to_distill = False
 
+	timestamp = int(time.time())
+
 	feed_data = {'host':host,
 				'path':path,
 				'filename':filename,
 				'full_path':full_path,
 				'julian_day':julian_day,
 				'ready_to_move':ready_to_move,
-				'moved_to_distill':moved_to_distill}
+				'moved_to_distill':moved_to_distill,
+				'timestamp':timestamp}
 
 	return feed_data
 

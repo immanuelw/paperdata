@@ -96,7 +96,8 @@ class Observation(Base):
 	delta_time = Column(Numeric(12,5))
 	prev_obs = Column(BigInteger, unique=True)
 	next_obs = Column(BigInteger, unique=True)
-	edge = Column(Boolean, default=False)
+	edge = Column(Boolean)
+	timestamp = Column(BigInteger)
 
 class File(Base):
 	__tablename__ = 'file'
@@ -116,6 +117,7 @@ class File(Base):
 	#history?
 	write_to_tape = Column(Boolean, default=False)
 	delete_file = Column(Boolean, default=False)
+	timestamp = Column(BigInteger)
 	#this next line creates an attribute Observation.files which is the list of all
 	#  files associated with this observation
 	observation = relationship(Observation, backref=backref('files', uselist=True))
@@ -129,6 +131,7 @@ class Feed(Base):
 	julian_day = Column(Integer)
 	ready_to_move = Column(Boolean, default=False)
 	moved_to_distill = Column(Boolean, default=False)
+	timestamp = Column(BigInteger)
 
 class DataBaseInterface(object):
 	def __init__(self,configfile='~/pdbi_still.cfg',test=False):
@@ -283,7 +286,7 @@ class DataBaseInterface(object):
 		return None
 
 	def add_observation(self, obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time,
-						prev_obs, next_obs, edge):
+						prev_obs, next_obs, edge, timestamp):
 		"""
 		create a new observation entry.
 		returns: obsnum  (see jdpol2obsnum)
@@ -291,29 +294,29 @@ class DataBaseInterface(object):
 		"""
 		OBS = Observation(obsnum=obsnum, julian_date=julian_date, polarization=polarization, julian_day=julian_day, era=era, era_type=era_type,
 							length=length, time_start=time_start, time_end=time_end, delta_time=delta_time,	prev_obs=prev_obs,
-							next_obs=next_obs, edge=edge)
+							next_obs=next_obs, edge=edge, timestamp=timestamp)
 		self.add_entry(OBS)
 		obsnum = OBS.obsnum
 		sys.stdout.flush()
 		return obsnum
 
-	def add_file(self, host, path, filename, filetype, full_path, obsnum, filesize, md5sum, tape_index, write_to_tape, delete_file): #cal_path?? XXXX
+	def add_file(self, host, path, filename, filetype, full_path, obsnum, filesize, md5sum, tape_index, write_to_tape, delete_file, timestamp):
 		"""
 		Add a file to the database and associate it with an observation.
 		"""
 		FILE = File(host=host, path=path, filename=filename, filetype=filetype, full_path=full_path, obsnum=obsnum, filesize=filesize,
-					md5sum=md5sum, tape_index=tape_index, write_to_tape=write_to_tape, delete_file=delete_file)
+					md5sum=md5sum, tape_index=tape_index, write_to_tape=write_to_tape, delete_file=delete_file, timestamp=timestamp)
 		#get the observation corresponding to this file
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
 		FILE.observation = OBS  #associate the file with an observation
 		self.add_entry(FILE)
 		return None
 
-	def add_feed(self, host, path, filename, ready_to_move, moved_to_distill):
+	def add_feed(self, host, path, filename, ready_to_move, moved_to_distill, timestamp):
 		"""
 		Add a feed to the database
 		"""
-		FEED = Feed(host=host, path=path, filename=filename, ready_to_move=ready_to_move, moved_to_distill=moved_to_distill)
+		FEED = Feed(host=host, path=path, filename=filename, ready_to_move=ready_to_move, moved_to_distill=moved_to_distill, timestamp=timestamp)
 		self.add_entry(FILE)
 		return None
 
@@ -397,6 +400,22 @@ class DataBaseInterface(object):
 		yay = self.update_file(FILE)
 		return yay
 
+	def get_file_time(self, full_path):
+		"""
+		todo
+		"""
+		FILE = self.get_file(full_path)
+		return FILE.timestamp
+
+	def set_file_time(self, full_path, timestamp):
+		"""
+		todo
+		"""
+		FILE = self.get_file(full_path)
+		FILE.timestamp = timestamp
+		yay = self.update_file(FILE)
+		return yay
+
 	def get_prev_obs(self, obsnum):
 		"""
 		todo
@@ -442,6 +461,22 @@ class DataBaseInterface(object):
 		"""
 		OBS = self.get_obs(obsnum)
 		OBS.edge = edge
+		yay = self.update_obs(OBS)
+		return yay
+
+	def get_obs_time(self, full_path):
+		"""
+		todo
+		"""
+		OBS = self.get_obs(full_path)
+		return OBS.timestamp
+
+	def set_obs_time(self, full_path, timestamp):
+		"""
+		todo
+		"""
+		OBS = self.get_obs(full_path)
+		OBS.timestamp = timestamp
 		yay = self.update_obs(OBS)
 		return yay
 
@@ -506,5 +541,21 @@ class DataBaseInterface(object):
 		"""
 		FEED = self.get_feed(full_path)
 		FEED.ready_to_move = ready
+		yay = self.update_feed(FEED)
+		return yay
+
+	def get_feed_time(self, full_path):
+		"""
+		todo
+		"""
+		FEED = self.get_feed(full_path)
+		return FEED.timestamp
+
+	def set_feed_time(self, full_path, timestamp):
+		"""
+		todo
+		"""
+		FEED = self.get_feed(full_path)
+		FEED.timestamp = timestamp
 		yay = self.update_feed(FEED)
 		return yay

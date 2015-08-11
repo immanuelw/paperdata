@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Create paperdata tables
 
+import time
 from ddr_compress.dbi import DataBaseInterface, File, Observation
 import paperdata_dbi as pdbi
 import add_files
@@ -19,7 +20,9 @@ def md5_db():
 	s.close()
 	for FILE in FILEs:
 		md5 = add_files.calc_md5sum(FILE.host, FILE.path, FILE.filename)
+		timestamp = int(time.time())
 		data_dbi.set_file_md5(FILE.full_path, md5)
+		data_dbi.set_file_time(FILE.full_path, timestamp)
 
 	return None
 

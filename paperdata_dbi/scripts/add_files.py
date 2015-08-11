@@ -10,6 +10,7 @@ import socket
 import os
 import paramiko
 import paperdata_dbi as pdbi
+import time
 
 ### Script to add files to paperdata database
 ### Adds files using dbi
@@ -255,6 +256,8 @@ def calc_obs_data(host, full_path):
 	write_to_tape = False
 	delete_file = False
 
+	timestamp = int(time.time())
+
 	obs_data = {'obsnum':obsnum,
 				'julian_date':julian_date,
 				'polarization':polarization,
@@ -267,7 +270,8 @@ def calc_obs_data(host, full_path):
 				'delta_time':delta_time,
 				'prev_obs':prev_obs, 
 				'next_obs':next_obs,
-				'edge':edge}
+				'edge':edge,
+				'timestamp':timestamp}
 	file_data = {'host':host,
 				'path':path,
 				'filename':filename,
@@ -277,7 +281,8 @@ def calc_obs_data(host, full_path):
 				'md5sum':md5,
 				'tape_index':tape_index,
 				'write_to_tape':write_to_tape,
-				'delete_file':delete_file}
+				'delete_file':delete_file,
+				'timestamp':timestamp}
 
 	return obs_data, file_data
 

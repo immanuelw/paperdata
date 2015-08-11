@@ -5,7 +5,7 @@
 # import the MySQLdb and sys modules
 import sys
 import os
-import csv
+import time
 import subprocess
 import smtplib
 import shutil
@@ -202,6 +202,8 @@ def add_data():
 		write_to_tape = True
 		delete_file = False
 
+		timestamp = int(time.time())
+
 		obs_data = {'obsnum':obsnum,
 					'julian_date':julian_date,
 					'polarization':polarization,
@@ -214,7 +216,8 @@ def add_data():
 					'delta_time':delta_time,
 					'prev_obs':prev_obs, 
 					'next_obs':next_obs,
-					'edge':edge}
+					'edge':edge,
+					'timestamp':timestamp}
 		raw_data = {'host':host,
 					'path':path,
 					'filename':filename,
@@ -224,7 +227,8 @@ def add_data():
 					'md5sum':md5,
 					'tape_index':tape_index,
 					'write_to_tape':write_to_tape,
-					'delete_file':delete_file}
+					'delete_file':delete_file,
+					'timestamp':timestamp}
 		pdbi.add_observation(**obs_data)
 		pdbi.add_file(**raw_data)
 		movable_paths.append((host, path, filename, filetype))
@@ -245,7 +249,8 @@ def add_data():
 							'md5sum':compr_md5,
 							'tape_index':tape_index,
 							'write_to_tape':compr_write_to_tape,
-							'delete_file':delete_file}
+							'delete_file':delete_file,
+							'timestamp':timestamp}
 			pdbi.add_file(**compr_data)
 			movable_paths.append((host, path, compr_filename, compr_filetype))
 
@@ -264,7 +269,8 @@ def add_data():
 						'md5sum':npz_md5,
 						'tape_index':tape_index,
 						'write_to_tape':npz_write_to_tape,
-						'delete_file':delete_file}
+						'delete_file':delete_file,
+						'timestamp':timestamp}
 			pdbi.add_file(**npz_data)
 			movable_paths.append((host, npz_path, npz_filename, npz_filetype))
 
