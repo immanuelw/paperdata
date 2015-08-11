@@ -1,1 +1,2 @@
 Rudimentary multi-database configuration.
+ADD alembic.dist to source directory -- change name to alembic.ini and add user credentials to relevant databases
