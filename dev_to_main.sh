@@ -1,2 +1,3 @@
-sed -i 's/paperdata/paperdev/g' paperdev/*.py
-sed -i 's/paperdata/paperdev/g' paperdev/scripts/*.py
+cp -r paperdev/ paperdata/
+sed -i 's/paperdev/paperdata/g' paperdata/*.py
+sed -i 's/paperdev/paperdata/g' paperdata/scripts/*.py
