@@ -46,7 +46,17 @@ def gen_feed_data(host, full_path):
 				'moved_to_distill':moved_to_distill,
 				'timestamp':timestamp}
 
-	return feed_data
+	action = 'add by feed'
+	table = 'feed'
+	log_data = {'action':action,
+				'table':table,
+				'obsnum':None,
+				'host':host,
+				'full_path':None,
+				'feed_path':full_path,
+				'timestamp':timestamp}
+
+	return feed_data, log_data
 
 def rsync_copy(source, destination):
 	subprocess.check_output(['rsync', '-ac', source, destination])
@@ -95,8 +105,9 @@ def dupe_check(input_host, input_paths):
 
 def add_feed_to_db(input_host, full_path):
 	dbi = pdbi.DataBaseInterface()
-	feed_data = gen_feed_data(input_host, full_path)
+	feed_data, log_data = gen_feed_data(input_host, full_path)
 	dbi.add_feed(feed_data)
+	dbi.add_log(log_data)
 
 	return None
 

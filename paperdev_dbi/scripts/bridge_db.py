@@ -167,14 +167,6 @@ def add_data():
 		#indicates type of file in era
 		era_type = None
 
-		#location of calibrate files
-		#if era == 32:
-		#	cal_path = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
-		#elif era == 64:
-		#	cal_path = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
-		#elif era == 128:
-		#	cal_path = None
-
 		if obsnum == None:
 			prev_obs = None
 			next_obs = None
@@ -222,6 +214,7 @@ def add_data():
 					'path':path,
 					'filename':filename,
 					'filetype':filetype,
+					'full_path':full_path,
 					'obsnum':obsnum,
 					'filesize':filesize,
 					'md5sum':md5,
@@ -229,8 +222,17 @@ def add_data():
 					'write_to_tape':write_to_tape,
 					'delete_file':delete_file,
 					'timestamp':timestamp}
+		action = 'add by bridge'
+		table = None
+		log_data = {'action':action,
+					'table':table,
+					'obsnum':obsnum,
+					'full_path':full_path,
+					'feed_path':None,
+					'timestamp':timestamp}
 		pdbi.add_observation(obs_data)
 		pdbi.add_file(raw_data)
+		pdbi.add_log(log_data)
 		movable_paths.append((host, path, filename, filetype))
 
 
@@ -244,6 +246,7 @@ def add_data():
 							'path':path,
 							'filename':compr_filename,
 							'filetype':compr_filetype,
+							'full_path':full_path,
 							'obsnum':obsnum,
 							'filesize':compr_filesize,
 							'md5sum':compr_md5,

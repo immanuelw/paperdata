@@ -54,6 +54,10 @@ def paperbackup(time_date):
 	#dbo3 = os.path.join(backup_dir, db3)
 	#print(dbo3)
 
+	db4 = 'log_{0}.json'.format(time_date)
+	dbo4 = os.path.join(backup_dir, db4)
+	print(dbo4)
+
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 
@@ -65,6 +69,9 @@ def paperbackup(time_date):
 
 	#FEED_dump = s.query(pdbi.Feed).order_by(pdbi.Feed.julian_day.asc(), pdbi.Feed.filename.asc())
 	#json_data(dbo3, FEED_dump)
+
+	LOG_dump = s.query(pdbi.Log).order_by(pdbi.Log.timestamp.asc(), pdbi.Log.action.asc())
+	json_data(dbo3, LOG_dump)
 
 	s.close()
 	print 'Table data backup saved'

@@ -16,7 +16,7 @@ LIST = 6
 NONE = 7
 
 options = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
-classes = ('File', 'Observation', 'Feed')
+classes = ('File', 'Observation', 'Feed', 'Log')
 
 class File:
 	def __init__(self):
@@ -39,7 +39,7 @@ class File:
 						'filetype':('VARCHAR(20)', 'None', 'No', 'filetype (ex: uv, uvcRRE, npz)'),
 						'full_path':('VARCHAR(200)', 'None', 'Unique',
 										'combination of host, path, and filename which is a unique identifier for each file'),
-						'obsnum':('BIGINT', 'None', 'Primary', 'observation number used to track files using integer'),
+						'obsnum':('BIGINT', 'None', 'Foreign', 'observation number used to track files using integer'),
 						'filesize':('DECIMAL(7, 2)', 'None', 'No', 'size of file in megabytes'),
 						'md5sum':('INTEGER', 'None', 'No', '32-bit integer md5 checksum of file'),
 						'tape_index':('VARCHAR(100)', 'None', 'No', 'indexed location of file on tape'),
@@ -102,9 +102,29 @@ class Feed:
 						'moved_to_distill':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file has been moved to distill yet'),
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was last updated')}
 
+class Log:
+	def __init__(self):
+		self.table = 'Log'
+		self.db_list = ('action',
+						'table',
+						'obsnum',
+						'host',
+						'full_path',
+						'feed_path',
+						'timestamp')
+		self.db_descr = {'action':('VARCHAR(100)', 'None', 'No', 'action taken by script'),
+						'table':('VARCHAR(100)', 'None', 'No', 'table script is acting on'),
+						'obsnum':('BIGINT', 'None', 'Foreign', 'observation number used to track files using integer'),
+						'host':('VARCHAR(100)', 'None', 'No', 'host of file system that file is located on'),
+						'full_path':('VARCHAR(200)', 'None', 'Foreign',
+										'combination of host, path, and filename which is a unique identifier for each file'),
+						'feed_path':('VARCHAR(200)', 'None', 'Foreign',
+										'combination of host, path, and filename which is a unique identifier for each file'),
+						'timestamp':('BIGINT', 'None', 'No', 'time action was taken')}
+
 #dictionary of instantiated classes
-instant_class = {'File':File(), 'Observation':Observation(), 'Feed':Feed()}
-all_classes = (File(), Observation(), Feed())
+instant_class = {'File':File(), 'Observation':Observation(), 'Feed':Feed(), 'Log':Log()}
+all_classes = (File(), Observation(), Feed(), Log())
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':

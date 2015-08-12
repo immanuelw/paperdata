@@ -217,14 +217,6 @@ def calc_obs_data(host, full_path):
 	#indicates type of file in era
 	era_type = None
 
-	#location of calibrate files
-	#if era == 32:
-	#	cal_path = '/usr/global/paper/capo/arp/calfiles/psa898_v003.py'
-	#elif era == 64:
-	#	cal_path = '/usr/global/paper/capo/zsa/calfiles/psa6240_v003.py'
-	#elif era == 128:
-	#	cal_path = None
-
 	#unknown prev/next observation
 	if obsnum == None:
 		prev_obs = None
@@ -276,6 +268,7 @@ def calc_obs_data(host, full_path):
 				'path':path,
 				'filename':filename,
 				'filetype':filetype,
+				'full_path':full_path,
 				'obsnum':obsnum,
 				'filesize':filesize,
 				'md5sum':md5,
@@ -284,7 +277,17 @@ def calc_obs_data(host, full_path):
 				'delete_file':delete_file,
 				'timestamp':timestamp}
 
-	return obs_data, file_data
+	action = 'add by scan'
+	table = None
+	log_data = {'action':action,
+				'table':table,
+				'obsnum':obsnum,
+				'host':host,
+				'full_path':full_path,
+				'feed_path':None,
+				'timestamp':timestamp}
+
+	return obs_data, file_data, log_data
 
 def calc_uv_data(host, path, filename):
 	named_host = socket.gethostname()
@@ -367,7 +370,7 @@ def add_files(input_host, input_paths):
 	for input_path in input_paths:
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
-		obs_data, file_data = calc_uv_data(input_host, path, filename)
+		obs_data, file_data, log_data = calc_uv_data(input_host, path, filename)
 		try:
 			dbi.add_observation(obs_data)
 		except:
@@ -376,6 +379,10 @@ def add_files(input_host, input_paths):
 			dbi.add_file(file_data)
 		except:
 			print('Failed to load in file ', path, filename)
+		try:
+			dbi.add_log(log_data)
+		except:
+			print('Failed to load in log ', path, filename)
 
 	return None
 
