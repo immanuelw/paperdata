@@ -1,0 +1,7 @@
+build
+output
+*pyc
+.*.swp
+.*.swo
+*.cfg
+*.ini
