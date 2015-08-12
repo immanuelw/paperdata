@@ -91,8 +91,17 @@ try:
 				file_end.update({filename:time_end})
 				del_time = -1
 				full_stats = ''.join(full_path, status)
-				file_log.append((still_host, path, file_name, full_path, status, full_stats, del_time, file_start[filename],
-								file_end[filename], time_date))
+				entry_dict = {'host':still_host,
+							'path':path,
+							'filename':file_name,
+							'full_path':full_path,
+							'status':status,
+							'full_stats':full_stats,
+							'del_time':del_time,
+							'time_start':file_start[filename],
+							'time_end':file_end[filename],
+							'time_date':time_date}
+				file_log.append(entry_dict)
 				file_pid.update({filename:current_pid})
 				time_start = int(time.time())
 				file_start.update({filename:time_start})
@@ -101,18 +110,37 @@ try:
 				file_status.update({filename:status})
 				del_time = 0
 				full_stats = ''.join(full_path, status)
-				file_log.append((still_host, path, file_name, full_path, status, full_stats, del_time, file_start[filename],
-								file_end[filename], time_date))
+				entry_dict = {'host':still_host,
+							'path':path,
+							'filename':file_name,
+							'full_path':full_path,
+							'status':status,
+							'full_stats':full_stats,
+							'del_time':del_time,
+							'time_start':file_start[filename],
+							'time_end':file_end[filename],
+							'time_date':time_date}
+				file_log.append(entry_dict)
 				file_time.update({filename:time.time()})
 			#write output log
 			if file_status[filename] not in [status]:
 				del_time = time.time() - file_time[filename]
 				full_stats = ''.join(full_path, status)
-				file_log.append((still_host, path, file_name, full_path, status, full_stats, del_time, file_start[filename],
-								file_end[filename], time_date))
+				entry_dict = {'host':still_host,
+							'path':path,
+							'filename':file_name,
+							'full_path':full_path,
+							'status':status,
+							'full_stats':full_stats,
+							'del_time':del_time,
+							'time_start':file_start[filename],
+							'time_end':file_end[filename],
+							'time_date':time_date}
+				file_log.append(entry_dict)
 				file_status.update({filename:status})
 				file_time.update({filename:time.time()})
-		pyg_dbi.add_monitor(*file_log)
+		for monitor_data in file_log:
+			pyg_dbi.add_monitor(monitor_data)
 		file_log = []
 		s.close()
 		statusscr.refresh()
