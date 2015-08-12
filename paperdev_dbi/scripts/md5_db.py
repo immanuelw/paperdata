@@ -23,6 +23,17 @@ def md5_db():
 		timestamp = int(time.time())
 		data_dbi.set_file_md5(FILE.full_path, md5)
 		data_dbi.set_file_time(FILE.full_path, timestamp)
+		action = 'update md5sum'
+		table = 'file'
+		log_data = {'action':action,
+					'table':table,
+					'obsnum':FILE.obsnum,
+					'host':FILE.host,
+					'full_path':FILE.full_path,
+					'feed_path':None,
+					'timestamp':timestamp}
+
+		data_dbi.add_log(log_data)
 
 	return None
 
