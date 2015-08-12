@@ -1,6 +1,6 @@
 import glob
 
-__version__ = '0.0.1'
+__version__ = '0.1.0'
 
 setup_args = {
 	'name': 'paperdata_dbi',
