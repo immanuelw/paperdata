@@ -298,7 +298,7 @@ def paperbridge():
 	direc = '/data4/paper/raw_to_tape/'
 	free_space = calculate_free_space(direc)
 
-	if free_space <= required_space:
+	if free_space >= required_space:
 		input_host = raw_input('Source directory host: ')
 		#Add observations and paths from paperdistiller
 		movable_paths = add_data()
