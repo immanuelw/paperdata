@@ -50,6 +50,16 @@ class Filesystem(Base):
 	percent_space = Numeric(4,1)
 	time_date = Column(BigInteger) #seconds since 1970
 
+	def to_json(self):
+		self.data_dict = {'host':self.host,
+						'system':self.system,
+						'total_space':self.total_space,
+						'used_space':self.used_space,
+						'free_space':self.free_space,
+						'percent_space':self.percent_space,
+						'time_date':self.time_date}
+		return self.data_dict
+
 class Monitor(Base):
 	__tablename__ = 'monitor'
 	host = Column(String(100))
@@ -62,6 +72,19 @@ class Monitor(Base):
 	time_start = Column(BigInteger)
 	time_end = Column(BigInteger)
 	time_date = Column(BigInteger)
+
+	def to_json(self):
+		self.data_dict = {'host':self.host,
+						'path':self.path,
+						'filename':self.filename,
+						'full_path':self.full_path,
+						'status':self.status,
+						'full_stats':self.full_stats,
+						'del_time':self.del_time,
+						'time_start':self.time_start,
+						'time_end':self.time_end,
+						'time_date':self.time_date}
+		return self.data_dict
 
 class Ram(Base):
 	__tablename__ = 'ram'
@@ -80,6 +103,22 @@ class Ram(Base):
 	swap_free = Column(BigInteger)
 	time_date = Column(BigInteger)
 
+	def to_json(self):
+		self.data_dict = {'host':self.host,
+						'total':self.total,
+						'used':self.used,
+						'free':self.free,
+						'shared':self.shared,
+						'buffers':self.buffers,
+						'cached':self.cached,
+						'bc_used':self.bc_used,
+						'bc_free':self.bc_free,
+						'swap_total':self.swap_total,
+						'swap_used':self.swap_used,
+						'swap_free':self.swap_free,
+						'time_date':self.time_date}
+		return self.data_dict
+
 class Iostat(Base):
 	__tablename__ = 'iostat'
 	__table_args__ = (PrimaryKeyConstraint('host', 'time_date', name='host_time'),)
@@ -92,6 +131,17 @@ class Iostat(Base):
 	bl_writes = Column(BigInteger)
 	time_date = Column(BigInteger)
 
+	def to_json(self):
+		self.data_dict = {'host':self.host,
+						'device':self.device,
+						'tps':self.tps,
+						'read_s':self.read_s,
+						'write_s':self.write_s,
+						'bl_reads':self.bl_reads,
+						'bl_writes':self.bl_writes,
+						'time_date':self.time_date}
+		return self.data_dict
+
 class Cpu(Base):
 	__tablename__ = 'cpu'
 	__table_args__ = (PrimaryKeyConstraint('host', 'time_date', name='host_time'),)
@@ -103,6 +153,17 @@ class Cpu(Base):
 	idle_perc = Column(Numeric(5,2))
 	intr_s = Column(Integer)
 	time_date = Column(BigInteger)
+
+	def to_json(self):
+		self.data_dict = {'host':self.host,
+						'cpu':self.cpu,
+						'user_perc':self.user_perc,
+						'sys_perc':self.sys_perc,
+						'iowait_perc':self.iowait_perc,
+						'idle_perc':self.idle_perc,
+						'intr_s':self.intr_s,
+						'time_date':self.time_date}
+		return self.data_dict
 
 class DataBaseInterface(object):
 	def __init__(self,configfile='~/ganglia.cfg',test=False):
@@ -202,47 +263,43 @@ class DataBaseInterface(object):
 		s.close()
 		return None
 
-	def add_filesystem(self, host, system, total_space, used_space, free_space, time_date):
+	def add_filesystem(self, entry_dict):
 		"""
 		create a new filesystem entry.
 		"""
-		FILESYSTEM = Filesystem(host=host, system=system, total_space=total_space, used_space=used_space, free_space=free_space,
-								time_date=time_date)
+		FILESYSTEM = Filesystem(**entry_dict)
 		self.add_entry(FILESYSTEM)
 		return None
 
-	def add_monitor(self, host, path, filename, full_path, status, full_stats, del_time, file_start, file_end, time_date):
+	def add_monitor(self, entry_dict):
 		"""
 		create a new monitor entry.
 		"""
-		MONITOR = Monitor(host=host, path=path, filename=filename, full_path=full_path, status=status, full_stats=full_stats,
-							del_time=del_time, file_start=file_start, file_end=file_end, time_date=time_date)
+		MONITOR = Monitor(**entry_dict)
 		self.add_entry(MONITOR)
 		return None
 
-	def add_ram(self, host, total, used, free, shared, buffers, cached, bc_used, bc_free, swap_total, swap_used, swap_free, time_date):
+	def add_ram(self, entry_dict):
 		"""
 		create a new ram entry.
 		"""
-		RAM = Ram(host=host, total=total, used=used, free=free, shared=shared, buffers=buffers, cached=cached, bc_used=bc_used, bc_free=bc_free,
-					swap_total=swap_total, swap_used=swap_used, swap_free=swap_free, time_date=time_date)
+		RAM = Ram(**entry_dict)
 		self.add_entry(RAM)
 		return None
 
-	def add_iostat(self, host, device, tps, read_s, write_s, bl_reads, bl_writes, time_date):
+	def add_iostat(self, entry_dict):
 		"""
 		create a new iostat entry.
 		"""
-		IOSTAT = Iostat(host=host, device=device, tps=tps, read_s=read_s, write_s=write_s, bl_reads=bl_reads, bl_writes=bl_writes,
-						time_date=time_date)
+		IOSTAT = Iostat(**entry_dict)
 		self.add_entry(IOSTAT)
 		return None
 
-	def add_cpu(self, host, cpu, user_perc, sys_perc, iowait_perc, idle_perc, intr_s, time_date):
+	def add_cpu(self, entry_dict):
 		"""
 		create a new cpu entry.
 		"""
-		CPU = Cpu(host=host, cpu=cpu, user_perc=user_perc, sys_perc=sys_perc, iowait_perc=iowait_perc, idle_perc=idle_perc, intr_s=intr_s, time_date=time_date)
+		CPU = Cpu(**entry_dict)
 		self.add_entry(CPU)
 		return None
 
