@@ -27,7 +27,7 @@ def load_backup(backup, table=None):
 			for row in read:
 				print row.items()
 				try:
-					dbi.add_observation(**row)
+					dbi.add_observation(row)
 				except:
 					print('Failed to load in entry')
 		elif table == 'file':
@@ -36,7 +36,7 @@ def load_backup(backup, table=None):
 			for row in read:
 				print row.items()			
 				try:
-					dbi.add_file(**row)
+					dbi.add_file(row)
 				except:
 					print('Failed to load in entry')
 		#elif table == 'feed':
@@ -45,7 +45,7 @@ def load_backup(backup, table=None):
 		#	for row in read:
 		#		print row.items()
 		#		try:
-		#			dbi.add_file(**row)
+		#			dbi.add_file(row)
 		#		except:
 		#			print('Failed to load in entry')
 
