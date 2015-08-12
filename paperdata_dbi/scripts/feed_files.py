@@ -96,7 +96,7 @@ def dupe_check(input_host, input_paths):
 def add_feed_to_db(input_host, full_path):
 	dbi = pdbi.DataBaseInterface()
 	feed_data = gen_feed_data(input_host, full_path)
-	dbi.add_feed(**feed_data)
+	dbi.add_feed(feed_data)
 
 	return None
 

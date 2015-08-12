@@ -369,11 +369,11 @@ def add_files(input_host, input_paths):
 		filename = os.path.basename(input_path)
 		obs_data, file_data = calc_uv_data(input_host, path, filename)
 		try:
-			dbi.add_observation(**obs_data)
+			dbi.add_observation(obs_data)
 		except:
 			print('Failed to load in obs ', path, filename)
 		try:
-			dbi.add_file(**file_data)
+			dbi.add_file(file_data)
 		except:
 			print('Failed to load in file ', path, filename)
 

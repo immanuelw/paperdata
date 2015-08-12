@@ -328,38 +328,34 @@ class DataBaseInterface(object):
 		s.close()
 		return None
 
-	def add_observation(self, obsnum, julian_date, polarization, julian_day, era, era_type, length, time_start, time_end, delta_time,
-						prev_obs, next_obs, edge, timestamp):
+	def add_observation(self, entry_dict):
 		"""
 		create a new observation entry.
 		returns: obsnum  (see jdpol2obsnum)
 		Note: does not link up neighbors!
 		"""
-		OBS = Observation(obsnum=obsnum, julian_date=julian_date, polarization=polarization, julian_day=julian_day, era=era, era_type=era_type,
-							length=length, time_start=time_start, time_end=time_end, delta_time=delta_time,	prev_obs=prev_obs,
-							next_obs=next_obs, edge=edge, timestamp=timestamp)
+		OBS = Observation(**entry_dict)
 		self.add_entry(OBS)
 		obsnum = OBS.obsnum
 		sys.stdout.flush()
 		return obsnum
 
-	def add_file(self, host, path, filename, filetype, full_path, obsnum, filesize, md5sum, tape_index, write_to_tape, delete_file, timestamp):
+	def add_file(self, entry_dict):
 		"""
 		Add a file to the database and associate it with an observation.
 		"""
-		FILE = File(host=host, path=path, filename=filename, filetype=filetype, full_path=full_path, obsnum=obsnum, filesize=filesize,
-					md5sum=md5sum, tape_index=tape_index, write_to_tape=write_to_tape, delete_file=delete_file, timestamp=timestamp)
+		FILE = File(**entry_dict)
 		#get the observation corresponding to this file
 		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
 		FILE.observation = OBS  #associate the file with an observation
 		self.add_entry(FILE)
 		return None
 
-	def add_feed(self, host, path, filename, ready_to_move, moved_to_distill, timestamp):
+	def add_feed(self, entry_dict):
 		"""
 		Add a feed to the database
 		"""
-		FEED = Feed(host=host, path=path, filename=filename, ready_to_move=ready_to_move, moved_to_distill=moved_to_distill, timestamp=timestamp)
+		FEED = Feed(**entry_dict)
 		self.add_entry(FILE)
 		return None
 
