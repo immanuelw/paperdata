@@ -45,9 +45,19 @@ def load_backup(backup, table=None):
 		#	for row in read:
 		#		print row.items()
 		#		try:
-		#			dbi.add_file(row)
+		#			dbi.add_eed(row)
 		#		except:
 		#			print('Failed to load in entry')
+
+		elif table == 'log':
+			LOG_class = pdb.Log()
+			log_list = LOG_class.db_list
+			for row in read:
+				print row.items()
+				try:
+					dbi.add_log(row)
+				except:
+					print('Failed to load in entry')
 
 	return None
 

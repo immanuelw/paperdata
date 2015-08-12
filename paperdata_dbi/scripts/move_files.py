@@ -43,6 +43,8 @@ def rsync_copy(source, destination):
 def move_files(input_host, input_paths, output_host, output_dir):
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))
+	action = 'move'
+	table = 'file'
 	if named_host == input_host:
 		dbi = pdbi.DataBaseInterface()
 		s = dbi.Session()
@@ -54,6 +56,14 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			dbi.set_file_host(FILE.full_path, output_host)
 			dbi.set_file_path(FILE.full_path, output_dir)
 			dbi.set_file_time(FILE.full_path, timestamp)
+			log_data = {'action':action,
+						'table':table,
+						'obsnum':None,
+						'host':input_host,
+						'full_path':source,
+						'feed_path':None,
+						'timestamp':timestamp}
+			dbi.add_log(log_data)
 			shutil.rmtree(source)
 		s.close()
 	else:
@@ -70,6 +80,14 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			dbi.set_file_host(FILE.full_path, output_host)
 			dbi.set_file_path(FILE.full_path, output_dir)
 			dbi.set_file_time(FILE.full_path, timestamp)
+			log_data = {'action':action,
+						'table':table,
+						'obsnum':None,
+						'host':input_host,
+						'full_path':source,
+						'feed_path':None,
+						'timestamp':timestamp}
+			dbi.add_log(log_data)
 			ssh.exec_command(rsync_del_command)
 		ssh.close()
 		s.close()

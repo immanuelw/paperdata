@@ -145,6 +145,7 @@ class File(Base):
 						'path':self.path,
 						'filename':self.filename,
 						'filetype':self.filetype,
+						'full_path':self.full_path,
 						'obsnum':self.obsnum,
 						'filesize':self.filesize,
 						'md5sum':self.md5sum,
@@ -175,6 +176,27 @@ class Feed(Base):
 						'moved_to_distill':self.moved_to_distill,
 						'timestamp':self.timestamp}
 		return self.feed_data
+
+class Log(Base):
+	__tablename__ = 'log'
+	action = Column(String(100), nullable=False)
+	table = Column(String(100))
+	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
+	host = Column(String(100))
+	full_path = Column(String(200), ForeignKey('file.full_path'))
+	feed_path = Column(String(200), ForeignKey('feed.full_path'))
+	timestamp = Column(BigInteger)
+
+	def to_json(self):
+		self.log_data = {'action':self.action,
+						'table':self.table,
+						'obsnum':self.obsnum,
+						'host':self.host,
+						'full_path':self.full_path,
+						'feed_path':self.feed_path,
+						'timestamp':self.timestamp}
+		return log_data
+
 
 class DataBaseInterface(object):
 	def __init__(self,configfile='~/paperdata.cfg',test=False):
@@ -357,6 +379,14 @@ class DataBaseInterface(object):
 		"""
 		FEED = Feed(**entry_dict)
 		self.add_entry(FILE)
+		return None
+
+	def add_log(self, entry_dict):
+		"""
+		Add a feed to the database
+		"""
+		LOG = Log(**entry_dict)
+		self.add_entry(LOG)
 		return None
 
 	def get_file_path(self, full_path):
