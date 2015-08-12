@@ -179,6 +179,7 @@ class Feed(Base):
 
 class Log(Base):
 	__tablename__ = 'log'
+	__table_args__ = (PrimaryKeyConstraint('action', 'full_path', 'feed_path', 'timestamp', name='action_time'),)
 	action = Column(String(100), nullable=False)
 	table = Column(String(100))
 	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
