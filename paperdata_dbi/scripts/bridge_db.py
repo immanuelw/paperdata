@@ -12,6 +12,7 @@ import shutil
 import socket
 import aipy as A
 import hashlib
+import psutil
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
@@ -27,23 +28,6 @@ import move_files
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
-
-def calculate_free_space(direc):
-	#Calculates the free space left on input dir
-	folio = subprocess.check_output(['du', '-bs', direc])
-	#Amount of available bytes should be free_space
-
-	#Do not surpass this amount ~1.2TiB
-	max_space = 1319413953331
-
-	total_space = 0
-	for output in folio.split('\n'):
-		subdir = output.split('\t')[-1]
-		if subdir == dir:
-			total_space = int(output.split('\t')[0])
-	free_space = max_space - total_space
-
-	return free_space
 
 def email_space(table):
 	server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -109,14 +93,11 @@ def add_data():
 			polarization = 'all'
 		else:
 			polarization = OBS.pol
-		julian_day = int(str(julian_date)[3:7])
 		length = round(OBS.length, 5)
 	
 		host = FILE.host
 		full_path = FILE.filename
-		path = os.path.dirname(full_path)
-		filename = os.path.basename(full_path)
-		filetype = filename.split('.')[-1]
+		path, filename, filetype = add_files.file_names(full_path)
 
 		named_host = socket.gethostname()
 		if named_host == host:
@@ -125,27 +106,8 @@ def add_data():
 			except:
 				continue
 
-			time_start = 0
-			time_end = 0
-			n_times = 0
-			c_time = 0
+			time_start, time_end, delta_time, n_times = add_files.calc_times(uv)
 
-			try:
-				for (uvw, t, (i,j)),d in uv.all():
-					if time_start == 0 or t < time_start:
-						time_start = t
-					if time_end == 0 or t > time_end:
-						time_end = t
-					if c_time != t:
-						c_time = t
-						n_times += 1
-			except:
-				continue
-
-			if n_times > 1:
-				delta_time = -(time_start - time_end)/(n_times - 1)
-			else:
-				delta_time = -(time_start - time_end)/(n_times)
 		else:
 			ssh = pdbi.login_ssh(host)
 			uv_data_script = './uv_data.py'
@@ -156,36 +118,12 @@ def add_data():
 			time_start, time_end, delta_time = [float(info) for info in uv_data.read().split(',')]
 			ssh.close()
 		
-		#indicates julian day and set of data
-		if julian_date < 2456100:
-			era = 32
-		elif julian_date < 2456400:
-			era = 64
-		else:
-			era = 128
+		era, julian_day = add_files.julian_era(julian_date)
 
 		#indicates type of file in era
 		era_type = None
 
-		if obsnum == None:
-			prev_obs = None
-			next_obs = None
-		else:
-			PREV_OBS = sp.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum-1).one()
-			if PREV_OBS is not None:
-				prev_obs = PREV_OBS.obsnum
-			else:
-				prev_obs = None
-			NEXT_OBS = sp.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum+1).one()
-			if NEXT_OBS is not None:
-				next_obs = NEXT_OBS.obsnum
-			else:
-				next_obs = None
-
-		if (prev_obs, next_obs) == (None, None):
-			edge = False
-		else:
-			edge = (None in (prev_obs, next_obs))
+		prev_obs, next_obs, edge = add_files.obs_edge(obsnum, sess=sp)
 
 		filesize = add_files.calc_size(host, path, filename)
 		md5 = add_files.calc_md5sum(host, path, filename)
@@ -301,7 +239,7 @@ def paperbridge():
 
 	#Amount of space free in directory
 	direc = '/data4/paper/raw_to_tape/'
-	free_space = calculate_free_space(direc)
+	free_space = psutil.disk_usage(direc).free
 
 	if free_space >= required_space:
 		input_host = raw_input('Source directory host: ')

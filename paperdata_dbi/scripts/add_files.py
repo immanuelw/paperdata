@@ -105,12 +105,91 @@ def calc_md5sum(host, path, filename):
 
 	return md5
 
-def calc_obs_data(host, full_path):
-	#mostly file data
-	host = host
+def calc_times(uv):
+	#takes in uv file and calculates time based information
+	time_start = 0
+	time_end = 0
+	n_times = 0
+	c_time = 0
+
+	try:
+		for (uvw, t, (i,j)),d in uv.all():
+			if time_start == 0 or t < time_start:
+				time_start = t
+			if time_end == 0 or t > time_end:
+				time_end = t
+			if c_time != t:
+				c_time = t
+				n_times += 1
+	except:
+		return None
+
+	if n_times > 1:
+		delta_time = -(time_start - time_end)/(n_times - 1)
+	else:
+		delta_time = -(time_start - time_end)/(n_times)
+
+	return time_start, time_end, delta_time, n_times
+
+def julian_era(julian_date):
+	#indicates julian day and set of data
+	if julian_date < 2456100:
+		era = 32
+	elif julian_date < 2456400:
+		era = 64
+	else:
+		era = 128
+
+	julian_day = int(str(julian_date)[3:7])
+
+	return era, julian_day
+
+def obs_pn(s):
+	PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum-1).one()
+	if PREV_OBS is not None:
+		prev_obs = PREV_OBS.obsnum
+	else:
+		prev_obs = None
+	NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum+1).one()
+	if NEXT_OBS is not None:
+		next_obs = NEXT_OBS.obsnum
+	else:
+		next_obs = None
+
+	return prev_obs, next_obs
+
+def obs_edge(obsnum, sess=None):
+	#unknown prev/next observation
+	if obsnum == None:
+		prev_obs = None
+		next_obs = None
+	else:
+		if sess is None:
+			dbi = pdbi.DataBaseInterface()
+			s = dbi.Session()
+			prev_obs, next_obs = obs_pn(s)
+			s.close()
+		else:
+			prev_obs, next_obs = obs_pn(sess)
+
+	if (prev_obs, next_obs) == (None, None):
+		edge = None
+	else:
+		edge = (None in (prev_obs, next_obs))
+
+	return prev_obs, next_obs, edge
+
+def file_names(full_path)
 	path = os.path.dirname(full_path)
 	filename = os.path.basename(full_path)
 	filetype = filename.split('.')[-1]
+
+	return path, filename, filetype
+
+def calc_obs_data(host, full_path):
+	#mostly file data
+	host = host
+	path, filename, filetype = file_names(full_path)
 
 	#Dictionary of polarizations
 	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
@@ -133,28 +212,7 @@ def calc_obs_data(host, full_path):
 			elif uv['npol'] == 4:
 				polarization = 'all'
 
-			time_start = 0
-			time_end = 0
-			n_times = 0
-			c_time = 0
-
-			try:
-				for (uvw, t, (i,j)),d in uv.all():
-					if time_start == 0 or t < time_start:
-						time_start = t
-					if time_end == 0 or t > time_end:
-						time_end = t
-					if c_time != t:
-						c_time = t
-						n_times += 1
-			except:
-				return None
-
-			if n_times > 1:
-				delta_time = -(time_start - time_end)/(n_times - 1)
-			else:
-				delta_time = -(time_start - time_end)/(n_times)
-
+			time_start, time_end, delta_time, n_times = calc_times(uv)
 			length = round(n_times * delta_time, 5)
 
 			#gives each file unique id
@@ -204,42 +262,12 @@ def calc_obs_data(host, full_path):
 
 		s.close()
 
-	#indicates julian day and set of data
-	if julian_date < 2456100:
-		era = 32
-	elif julian_date < 2456400:
-		era = 64
-	else:
-		era = 128
-
-	julian_day = int(str(julian_date)[3:7])
+	era, julian_day = julian_era(julian_date)
 
 	#indicates type of file in era
 	era_type = None
 
-	#unknown prev/next observation
-	if obsnum == None:
-		prev_obs = None
-		next_obs = None
-	else:
-		dbi = pdbi.DataBaseInterface()
-		s = dbi.Session()
-		PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum-1).one()
-		if PREV_OBS is not None:
-			prev_obs = PREV_OBS.obsnum
-		else:
-			prev_obs = None
-		NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum+1).one()
-		if NEXT_OBS is not None:
-			next_obs = NEXT_OBS.obsnum
-		else:
-			next_obs = None
-		s.close()
-
-	if (prev_obs, next_obs) == (None, None):
-		edge = None
-	else:
-		edge = (None in (prev_obs, next_obs))
+	prev_obs, next_obs, edge = obs_edge(obsnum)
 
 	filesize = calc_size(host, path, filename)
 	md5 = calc_md5sum(host, path, filename)

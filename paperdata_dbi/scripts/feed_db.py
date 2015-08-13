@@ -24,23 +24,6 @@ from email import Encoders
 ### Author: Immanuel Washington
 ### Date: 11-23-14
 
-def calculate_free_space(direc):
-	#Calculates the free space left on input dir
-	folio = subprocess.check_output(['du', '-bs', direc])
-	#Amount of available bytes should be free_space
-
-	#Do not surpass this amount ~3.1TiB
-	max_space = 3408486046105
-
-	total_space = 0
-	for output in folio.split('\n'):
-		subdir = output.split('\t')[-1]
-		if subdir == direc:
-			total_space = int(output.split('\t')[0])
-	free_space = max_space - total_space
-
-	return free_space
-
 def count_days():
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
@@ -114,7 +97,7 @@ def email_space(table):
 def feed_db:
 	#Checks all filesystems
 	direc = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
-	free_space = calculate_free_space(direc)
+	free_space = psutil.disk_usage(direc).free
 
 	#Minimum amount of space to move a day ~3.1TiB
 	required_space = 1112373311360
@@ -139,7 +122,7 @@ def feed_db:
 				outfile_dirs.append(outfiles.split('z')[0])
 		for out_direc in outfile_dirs:
 			out_dir = os.path.join(out_direc,'zen.*.uv')
-			add_obs = 'add_observations.py {out_dir}'.format(out_dir)
+			add_obs = 'add_observations.py {out_dir}'.format(out_dir=out_dir)
 			subprocess.call(add_obs, shell=True)
 	else:
 		table = 'Feed'
