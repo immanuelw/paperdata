@@ -73,37 +73,13 @@ def email_paperfeed(files):
 
 	return None
 
-def email_space(table):
-	server = smtplib.SMTP('smtp.gmail.com', 587)
-	server.ehlo()
-	server.starttls()
-
-	#Next, log in to the server
-	server.login('paperfeed.paperdev@gmail.com', 'papercomesfrom1tree')
-
-	#Send the mail
-	header = 'From: PAPERFeed <paperfeed.paperdev@gmail.com>\nSubject: NOT ENOUGH SPACE ON FOLIO\n'
-    msgs = header + '\nNot enough space for ' + table + ' on folio'
-
-	server.sendmail('paperfeed.paperdev@gmail.com', 'immwa@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paperdev@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paperdev@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
-	server.sendmail('paperfeed.paperdev@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
-
-	server.quit()
-
-	return None
-
 def feed_db:
-	#Checks all filesystems
-	direc = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
-	free_space = psutil.disk_usage(direc).free
-
 	#Minimum amount of space to move a day ~3.1TiB
 	required_space = 1112373311360
+	space_path = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
 
 	#Move if there is enough free space
-	if free_space >= required_space:
+	if move_files.enough_space(required_space, space_path):
 		#FIND DATA
 		infile_paths = find_data()
 		input_host = infile_paths[0][0]
@@ -126,7 +102,7 @@ def feed_db:
 			subprocess.call(add_obs, shell=True)
 	else:
 		table = 'Feed'
-		email_space(table)
+		move_files.email_space(table)
 		time.sleep(21600)
 
 	return None

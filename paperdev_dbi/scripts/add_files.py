@@ -241,7 +241,7 @@ def calc_obs_data(host, full_path):
 
 	elif filetype in ('npz',):
 		#filename is zen.2456640.24456.xx.uvcRE.npz or zen.2456243.24456.uvcRE.npz
-		jdate = filename.split('.')[1] + '.' + filename.split('.')[2]
+		jdate = ''.join(filename.split('.')[1], '.', filename.split('.')[2])
 		julian_date = round(float(jdate, 5))
 
 		dbi = pdbi.DataBaseInterface()

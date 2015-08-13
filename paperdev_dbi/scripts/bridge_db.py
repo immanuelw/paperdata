@@ -12,10 +12,6 @@ import shutil
 import socket
 import aipy as A
 import hashlib
-import psutil
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email import Encoders
 from ddr_compress.dbi import DataBaseInterface, Observation, File
 from sqlalchemy import func
 import paperdev_dbi as pdbi
@@ -28,27 +24,6 @@ import move_files
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
-
-def email_space(table):
-	server = smtplib.SMTP('smtp.gmail.com', 587)
-	server.ehlo()
-	server.starttls()
-
-	#Next, log in to the server
-	server.login('paperfeed.paperdev@gmail.com', 'papercomesfrom1tree')
-
-	#Send the mail
-	header = 'From: PAPERBridge <paperfeed.paperdev@gmail.com>\nSubject: NOT ENOUGH SPACE ON FOLIO\n'
-	msgs = header + '\nNot enough space for ' + table + ' on folio'
-
-	server.sendmail('paperfeed.paperdev@gmail.com', 'immwa@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paperdev@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paperdev@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
-	server.sendmail('paperfeed.paperdev@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
-
-	server.quit()
-
-	return None
 
 def add_data():
 	dbi = DataBaseInterface()
@@ -176,7 +151,7 @@ def add_data():
 		movable_paths.append((host, path, filename, filetype))
 
 
-		compr_filename = filename + 'cRRE'
+		compr_filename = ''.join(filename, 'cRRE')
 		compr_filetype = 'uvcRRE'
 		compr_filesize = add_files.calc_size(host, path, compr_filename)
 		compr_md5 = add_files.calc_md5sum(host, path, compr_filename)
@@ -197,7 +172,7 @@ def add_data():
 			pdbi.add_file(compr_data)
 			movable_paths.append((host, path, compr_filename, compr_filetype))
 
-		npz_filename = filename + 'cRE.npz'
+		npz_filename = ''.join(filename, 'cRE.npz')
 		npz_filetype = 'npz'
 		npz_filesize = add_files.calc_size(host, path, npz_filename)
 		npz_md5 = add_files.calc_md5sum(host, path, npz_filename)
@@ -236,12 +211,9 @@ def bridge_move(input_host, movable_paths, raw_host, raw_dir, compr_host, compr_
 def paperbridge():
 	#Calculate amount of space needed to move a day ~1.1TB
 	required_space = 1112661213184
+	space_path = '/data4/paper/raw_to_tape/'
 
-	#Amount of space free in directory
-	direc = '/data4/paper/raw_to_tape/'
-	free_space = psutil.disk_usage(direc).free
-
-	if free_space >= required_space:
+	if move_files.enough_space(required_space, space_path):
 		input_host = raw_input('Source directory host: ')
 		#Add observations and paths from paperdistiller
 		movable_paths = add_data()
@@ -256,7 +228,7 @@ def paperbridge():
 
 	else:
 		table = 'paperdistiller'
-		email_space(table)
+		move_files.email_space(table)
 		if auto == 'y':
 			time.sleep(14400)
 
