@@ -133,72 +133,18 @@ def convert(entries):
 
 def match(input_group, tab, field, value, equality):
 	if equality is '=':
-		if tab in ('File',):
-			FILEs = input_group
-			if field is 'host':
-				return tuple(FILE for FILE in FILEs if FILE.host==value)
-			elif field is 'path':
-				return tuple(FILE for FILE in FILEs if FILE.path==value)
-			elif field is 'filename':
-				return tuple(FILE for FILE in FILEs if FILE.filename==value)
-			elif field is 'filetype':
-				return tuple(FILE for FILE in FILEs if FILE.filetype==value)
-			elif field is 'obsnum':
-				return tuple(FILE for FILE in FILEs if FILE.obsnum==value)
-			elif field is 'filesize':
-				return tuple(FILE for FILE in FILEs if FILE.filesize==value)
-			elif field is 'write_to_tape':
-				return tuple(FILE for FILE in FILEs if FILE.write_to_tape==value)
-			elif field is 'delete_file':
-				return tuple(FILE for FILE in FILEs if FILE.delete_file==value)
-		elif tab in ('Observation',):
-			OBSs = input_group
-			if field is 'obsnum':
-				return tuple(OBS for OBS in OBSs if OBS.obsnum==value)
-			elif field is 'julian_date':
-				return tuple(OBS for OBS in OBSs if OBS.julian_date==value)
-			elif field is 'polarization':
-				return tuple(OBS for OBS in OBSs if OBS.polarization==value)
-			elif field is 'julian_day':
-				return tuple(OBS for OBS in OBSs if OBS.julian_day==value)
-			elif field is 'era':
-				return tuple(OBS for OBS in OBSs if OBS.era==value)
-			elif field is 'era_type':
-				return tuple(OBS for OBS in OBSs if OBS.era_type==value)
+		OBJs = input_group
+		if (tab in ('File',) and field in ('host', 'path', 'filename', 'filetype', 'write_to_tape', 'delete_file')) or
+		(tab in ('Observation',) and field in ('obsnum', 'julian_date', 'polarization', 'julian_day', 'era', 'era_type')):
+			return tuple(OBJ for OBJ in OBJs if OBJ.to_json()[field] == value)
 	elif equality is '<':
-		if tab in ('File',):
-			FILEs = input_group
-			if field is 'obsnum':
-				return tuple(FILE for FILE in FILEs if FILE.obsnum<=value)
-			elif field is 'filesize':
-				return tuple(FILE for FILE in FILEs if FILE.filesize<=value)
-		elif tab in ('Observation',):
-			OBSs = input_group
-			if field is 'obsnum':
-				return tuple(OBS for OBS in OBSs if OBS.obsnum<=value)
-			elif field is 'julian_date':
-				return tuple(OBS for OBS in OBSs if OBS.julian_date<=value)
-			elif field is 'julian_day':
-				return tuple(OBS for OBS in OBSs if OBS.julian_day<=value)
-			elif field is 'era':
-				return tuple(OBS for OBS in OBSs if OBS.era<=value)
+		if (tab in ('File',) and field in ('obsnum', 'filesize')) or
+		(tab in ('Observation',) and field in ('obsnum', 'julian_date', 'julian_day', 'era')):
+			return tuple(OBJ for OBJ in OBJs if OBJ.to_json()[field] <= value)
 	elif equality is '>':
-		if tab in ('File',):
-			FILEs = input_group
-			if field is 'obsnum':
-				return tuple(FILE for FILE in FILEs if FILE.obsnum>=value)
-			elif field is 'filesize':
-				return tuple(FILE for FILE in FILEs if FILE.filesize>=value)
-		elif tab in ('Observation',):
-			OBSs = input_group
-			if field is 'obsnum':
-				return tuple(OBS for OBS in OBSs if OBS.obsnum>=value)
-			elif field is 'julian_date':
-				return tuple(OBS for OBS in OBSs if OBS.julian_date>=value)
-			elif field is 'julian_day':
-				return tuple(OBS for OBS in OBSs if OBS.julian_day>=value)
-			elif field is 'era':
-				return tuple(OBS for OBS in OBSs if OBS.era>=value)
+		if (tab in ('File',) and field in ('obsnum', 'filesize')) or
+		(tab in ('Observation',) and field in ('obsnum', 'julian_date', 'julian_day', 'era')):
+			return tuple(OBJ for OBJ in OBJs if OBJ.to_json()[field] >= value)
 
 def sql_query(output, info_list, tab):
 	eq_dict = {pdb.EXACT:'=', pdb.MAX:'<', pdb.MIN:'>'}
@@ -235,7 +181,7 @@ def sql_query(output, info_list, tab):
 
 def write_to_file(data, table):
 	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-	file_name = './paper_{0}_output_{1}.psv'.format(table, time_date)
+	file_name = os.path.expanduser('~/paper_{table}_output_{time_date}.psv'.format(table=table, time_date=time_date)
 	data_file = open(file_name,'wb')
 	wr = csv.writer(data_file, delimiter='|', lineterminator='\n', dialect='excel')
 	for item in data:
