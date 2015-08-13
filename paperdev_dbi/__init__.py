@@ -79,8 +79,7 @@ def login_ssh(host, username=None):
 
 class Observation(Base):
 	__tablename__ = 'observation'
-	#obsnum = Column(BigInteger, default=updateobsnum, primary_key=True)
-	obsnum = Column(BigInteger, primary_key=True)
+	obsnum = Column(BigInteger, default=updateobsnum, primary_key=True)
 	julian_date = Column(Numeric(12,5))
 	polarization = Column(String(4))
 	julian_day = Column(Integer)
