@@ -131,8 +131,7 @@ class File(Base):
 	md5sum = Column(String(32))
 	tape_index = Column(String(100))
 	### maybe unnecessary fields
-	#calibration_path = Column(String(100))
-	#history?
+	source_host = Column(String(100))
 	write_to_tape = Column(Boolean)
 	delete_file = Column(Boolean)
 	timestamp = Column(BigInteger)
@@ -150,6 +149,7 @@ class File(Base):
 						'filesize':self.filesize,
 						'md5sum':self.md5sum,
 						'tape_index':self.tape_index,
+						'source_host':source_host,
 						'write_to_tape':self.write_to_tape,
 						'delete_file':self.delete_file,
 						'timestamp':self.timestamp}

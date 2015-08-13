@@ -191,6 +191,7 @@ def add_data():
 		md5 = add_files.calc_md5sum(host, path, filename)
 		tape_index = None
 
+		source_host = host
 		write_to_tape = True
 		delete_file = False
 
@@ -219,6 +220,7 @@ def add_data():
 					'filesize':filesize,
 					'md5sum':md5,
 					'tape_index':tape_index,
+					'source_host':source_host,
 					'write_to_tape':write_to_tape,
 					'delete_file':delete_file,
 					'timestamp':timestamp}

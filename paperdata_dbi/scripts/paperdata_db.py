@@ -30,6 +30,7 @@ class File:
 						'filesize',
 						'md5sum',
 						'tape_index',
+						'source_host',
 						'write_to_tape',
 						'delete_file',
 						'timestamp')
@@ -43,6 +44,7 @@ class File:
 						'filesize':('DECIMAL(7, 2)', 'None', 'No', 'size of file in megabytes'),
 						'md5sum':('INTEGER', 'None', 'No', '32-bit integer md5 checksum of file'),
 						'tape_index':('VARCHAR(100)', 'None', 'No', 'indexed location of file on tape'),
+						'source_host':('VARCHAR(100)', 'None', 'No', 'original source(host) of file'),
 						'write_to_tape':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file needs to be written to tape'),
 						'delete_file':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file needs to be deleted from its host'),
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was last updated')}

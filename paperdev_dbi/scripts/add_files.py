@@ -245,6 +245,7 @@ def calc_obs_data(host, full_path):
 	md5 = calc_md5sum(host, path, filename)
 	tape_index = None
 
+	source_host = host
 	write_to_tape = False
 	delete_file = False
 
@@ -273,6 +274,7 @@ def calc_obs_data(host, full_path):
 				'filesize':filesize,
 				'md5sum':md5,
 				'tape_index':tape_index,
+				'source_host':source_host,
 				'write_to_tape':write_to_tape,
 				'delete_file':delete_file,
 				'timestamp':timestamp}
