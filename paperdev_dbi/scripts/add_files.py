@@ -29,43 +29,24 @@ def get_size(start_path):
 	return total_size
 
 def sizeof_fmt(num):
-	for x in ['bytes','KB','MB']:
-		if num < 1024.0:
-			return "%3.1f" % (num)
+	#converts bytes to MB
+	for byte_size in ('KB', 'MB'):
 		num /= 1024.0
-	num *= 1024.0
-	return "%3.1f" % (num)
+	return round(num, 1)
 
 ### other functions
-def md5sum(fname):
-	"""
-	calculate the md5 checksum of a file whose filename entry is fname.
-	"""
-	fname = fname.split(':')[-1]
-	BLOCKSIZE = 65536
-	hasher = hashlib.md5()
-	try:
-		afile = open(fname, 'rb')
-	except(IOError):
-		afile = open("%s/visdata"%fname, 'rb')
-	buf = afile.read(BLOCKSIZE)
-	while len(buf) >0:
-		hasher.update(buf)
-		buf = afile.read(BLOCKSIZE)
-	return hasher.hexdigest()
-
 def calc_size(host, path, filename):
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
 	#DEFAULT VALUE
 	size = 0
 	if named_host == host:
-		size = round(float(sizeof_fmt(get_size(full_path))), 1)
+		size = sizeof_fmt(get_size(full_path))
 	else:
 		ssh = pdbi.login_ssh(host)
 		sftp = ssh.open_sftp()
 		size_bytes = sftp.stat(full_path).st_size
-		size = round(float(sizeof_fmt(size_bytes)), 1)
+		size = sizeof_fmt(size_bytes)
 		sftp.close()
 		ssh.close()
 
@@ -77,18 +58,17 @@ def calc_md5sum(host, path, filename):
 	#DEFAULT VALUE
 	md5 = None
 	if named_host == host:
-		md5 = md5sum(full_path)
+		md5 = pdbi.get_md5sum(full_path)
 	else:
 		ssh = pdbi.login_ssh(host)
-		sftp = ssh.open_sftp()
 		try:
+			sftp = ssh.open_sftp()
 			remote_path = sftp.file(full_path, mode='r')
 			md5 = remote_path.check('md5', block_size=65536)
+			sftp.close()
 		except(IOError):
-			stdin, md5_out, stderr = ssh.exec_command('md5sum {full_path}/visdata'.format(full_path=full_path))
-			
-		md5 = md5_out.read().split(' ')[0]
-		sftp.close()
+			stdin, md5_out, stderr = ssh.exec_command('md5sum {full_path}/visdata'.format(full_path=full_path))		
+			md5 = md5_out.read().split(' ')[0]
 		ssh.close()
 
 	return md5
@@ -108,13 +88,18 @@ def get_uv_data(host, full_path, mode=None):
 	sftp.close()
 
 	if mode is None:
-		stdin, uv_dat, stderr = ssh.exec_command('python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path))
-		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [float(info) if key in (0,1,2) else round(float(info), 5) if key in (3,5) else int(info) if key in (6,) else info for key, info in enumerate(uv_dat.read().split(','))]
+		uv_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path))
+		_, uv_dat, _ = ssh.exec_command(uv_comm)
+		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [round(float(info), 5) if key in (0, 1, 2, 3, 5)
+																						else int(info) if key in (6,)
+																						else info
+																						for key, info in enumerate(uv_dat.read().split(','))]
 		ssh.close()
 		return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
 	elif mode =='time':
-		stdin, uv_dat, stderr = ssh.exec_command('python {moved_script} {host} {full_path} time'.format(moved_script=moved_script, host=host, full_path=full_path))
+		uv_comm = 'python {moved_script} {host} {full_path} time'.format(moved_script=moved_script, host=host, full_path=full_path)
+		_, uv_dat, _ = ssh.exec_command(uv_comm)
 		time_start, time_end, delta_time, length = [round(float(info), 5) for info in uv_dat.read().split(',')]
 		ssh.close()
 		return time_start, time_end, delta_time, length

@@ -84,9 +84,10 @@ def calc_uv_data(host, full_path, mode=None):
 		else:
 			obsnum = None
 
-	uv_info = (time_start, time_end, delta_time, julian_date, polarization, length, obsnum)
-
-	return uv_info
+		uv_info = (time_start, time_end, delta_time, julian_date, polarization, length, obsnum)
+		return uv_info
+	else:
+		return None
 
 if __name__ == '__main__':
 	input_host = sys.argv[1]

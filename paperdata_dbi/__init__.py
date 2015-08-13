@@ -42,22 +42,17 @@ def get_md5sum(fname):
 	calculate the md5 checksum of a file whose filename entry is fname.
 	"""
 	fname = fname.split(':')[-1]
-	BLOCKSIZE=65536
-	hasher=hashlib.md5()
+	BLOCKSIZE = 65536
+	hasher = hashlib.md5()
 	try:
-		afile=open(fname, 'rb')
+		afile = open(fname, 'rb')
 	except(IOError):
-		afile=open("%s/visdata"%fname, 'rb')
-	buf=afile.read(BLOCKSIZE)
+		afile = open('{fname}/visdata'.format(fname=fname), 'rb')
+	buf = afile.read(BLOCKSIZE)
 	while len(buf) >0:
 		hasher.update(buf)
-		buf=afile.read(BLOCKSIZE)
+		buf = afile.read(BLOCKSIZE)
 	return hasher.hexdigest()
-
-def gethostname():
-	from subprocess import Popen,PIPE
-	hn = Popen(['bash','-cl','hostname'], stdout=PIPE).communicate()[0].strip()
-	return hn
 
 #SSH/SFTP Function
 #Need private key so don't need username/password
