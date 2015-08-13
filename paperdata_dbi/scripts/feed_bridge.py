@@ -110,7 +110,7 @@ def email_paperfeed(files):
 
 	return None
 
-def feed_db():
+def feed_bridge():
 	#Minimum amount of space to move a day ~3.1TiB
 	required_space = 1112373311360
 	output_dir = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
@@ -140,4 +140,4 @@ def feed_db():
 	return None
 
 if __name__ == '__main__':
-	feed_db()
+	feed_bridge()
