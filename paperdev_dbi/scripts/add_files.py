@@ -11,6 +11,7 @@ import os
 import paramiko
 import paperdev_dbi as pdbi
 import time
+import uv_data
 
 ### Script to add files to paperdev database
 ### Adds files using dbi
@@ -36,19 +37,6 @@ def sizeof_fmt(num):
 	return "%3.1f" % (num)
 
 ### other functions
-
-#create function to uniquely identify files
-def jdpol2obsnum(jd,pol,djd):
-	"""
-	input: julian date float, pol string. and length of obs in fraction of julian date
-	output: a unique index
-	"""
-	dublinjd = jd - 2415020  #use Dublin Julian Date
-	obsint = int(dublinjd/djd)  #divide up by length of obs
-	polnum = A.miriad.str2pol[pol]+10
-	assert(obsint < 2**31)
-	return int(obsint + polnum*(2**32))
-
 def md5sum(fname):
 	"""
 	calculate the md5 checksum of a file whose filename entry is fname.
@@ -105,31 +93,31 @@ def calc_md5sum(host, path, filename):
 
 	return md5
 
-def calc_times(uv):
-	#takes in uv file and calculates time based information
-	time_start = 0
-	time_end = 0
-	n_times = 0
-	c_time = 0
-
+def get_uv_data(host, full_path, mode=None):
+	ssh = pdbi.login_ssh(host)
+	uv_data_script = os.path.expanduser('~/paperdev/paperdev_dbi/scripts/uv_data.py')
+	sftp = ssh.open_sftp()
+	moved_script = './uv_data.py'
 	try:
-		for (uvw, t, (i,j)),d in uv.all():
-			if time_start == 0 or t < time_start:
-				time_start = t
-			if time_end == 0 or t > time_end:
-				time_end = t
-			if c_time != t:
-				c_time = t
-				n_times += 1
-	except:
-		return None
+		filestat = sftp.stat(uv_data_script)
+	except(IOError):
+		try:
+			filestat = sftp.stat(moved_script)
+		except(IOError):
+			sftp.put(uv_data_script, moved_script)
+	sftp.close()
 
-	if n_times > 1:
-		delta_time = -(time_start - time_end)/(n_times - 1)
-	else:
-		delta_time = -(time_start - time_end)/(n_times)
+	if mode is None:
+		stdin, uv_dat, stderr = ssh.exec_command('python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path))
+		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [float(info) if key in (0,1,2) else round(float(info), 5) if key in (3,5) else int(info) if key in (6,) else info for key, info in enumerate(uv_dat.read().split(','))]
+		ssh.close()
+		return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
-	return time_start, time_end, delta_time, n_times
+	elif mode =='time':
+		stdin, uv_dat, stderr = ssh.exec_command('python {moved_script} {host} {full_path} time'.format(moved_script=moved_script, host=host, full_path=full_path))
+		time_start, time_end, delta_time, length = [round(float(info), 5) for info in uv_dat.read().split(',')]
+		ssh.close()
+		return time_start, time_end, delta_time, length
 
 def julian_era(julian_date):
 	#indicates julian day and set of data
@@ -198,46 +186,9 @@ def calc_obs_data(host, full_path):
 	named_host = socket.gethostname()
 	if filetype in ('uv', 'uvcRRE'):
 		if named_host == host:
-			try:
-				uv = A.miriad.UV(full_path)
-			except:
-				return None
-
-			#indicates julian date
-			julian_date = round(uv['time'], 5)
-
-			#assign letters to each polarization
-			if uv['npol'] == 1:
-				polarization = pol_dict[uv['pol']]
-			elif uv['npol'] == 4:
-				polarization = 'all'
-
-			time_start, time_end, delta_time, n_times = calc_times(uv)
-			length = round(n_times * delta_time, 5)
-
-			#gives each file unique id
-			if length > 0:
-				obsnum = jdpol2obsnum(julian_date, polarization, length)
-			else:
-				obsnum = None
-
+			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = uv_data.calc_uv_data(host, full_path)
 		else:
-			ssh = login_ssh(host)
-			uv_data_script = '/home/{user}/scripts/paperdev/paper/scripts/pdbi/scripts/uv_data.py'.format(user='immwa')
-			sftp = ssh.open_sftp()
-			moved_script = '/home/{user}/scripts/uv_data.py'.format(user='immwa')
-			try:
-				filestat = sftp.stat(uv_data_script)
-			except(IOError):
-				try:
-					filestat = sftp.stat(moved_script)
-				except(IOError):
-					sftp.put(uv_data_script, moved_script)
-			sftp.close()
-			stdin, uv_data, stderr = ssh.exec_command('python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path))
-			ssh.close()
-
-			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [float(info) if key in (0,1,2) else round(float(info), 5) if key in (3,5) else int(info) if key is 6 else info for key, info in enumerate(uv_data.read().split(','))]
+			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = get_uv_data(host, full_path)
 
 	elif filetype in ('npz',):
 		#filename is zen.2456640.24456.xx.uvcRE.npz or zen.2456243.24456.uvcRE.npz
@@ -319,24 +270,6 @@ def calc_obs_data(host, full_path):
 
 	return obs_data, file_data, log_data
 
-def calc_uv_data(host, path, filename):
-	named_host = socket.gethostname()
-	full_path = os.path.join(path, filename)
-
-	if named_host == host:
-		obs_data, file_data = calc_obs_data(host, full_path)
-	else:
-		ssh = pdbi.login_ssh(host)
-		sftp = ssh.open_sftp()
-		#allows uv access
-		#XXXX DO NOT KNOW IF THIS WORKS -- HOW TO UV REMOTE FILE??
-		remote_path = sftp.file(full_path, mode='r')
-		obs_data, file_data = calc_obs_data(host, remote_path)
-		sftp.close()
-		ssh.close()
-
-	return obs_data, file_data
-
 def dupe_check(input_host, input_paths):
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
@@ -400,7 +333,7 @@ def add_files(input_host, input_paths):
 	for input_path in input_paths:
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
-		obs_data, file_data, log_data = calc_uv_data(input_host, path, filename)
+		obs_data, file_data, log_data = calc_obs_data(input_host, input_path)
 		try:
 			dbi.add_observation(obs_data)
 		except:

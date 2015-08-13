@@ -24,6 +24,24 @@ import move_files
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
+def calc_time_data(host):
+	ssh = pdbi.login_ssh(host)
+	time_data_script = os.path.expanduser('~/paperdata/paperdata_dbi/scripts/time_data.py')
+	sftp = ssh.open_sftp()
+	moved_script = './time_data.py'
+	try:
+		filestat = sftp.stat(time_data_script)
+	except(IOError):
+		try:
+			filestat = sftp.stat(moved_script)
+		except(IOError):
+			sftp.put(time_data_script, moved_script)
+	sftp.close()
+	stdin, time_data, stderr = ssh.exec_command('python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path))
+	time_start, time_end, delta_time = [float(info) for info in time_data.read().split(',')]
+	ssh.close()
+
+	return time_start, time_end, delta_time
 
 def add_data():
 	dbi = DataBaseInterface()
@@ -68,7 +86,7 @@ def add_data():
 			polarization = 'all'
 		else:
 			polarization = OBS.pol
-		length = round(OBS.length, 5)
+		length = OBS.length
 	
 		host = FILE.host
 		full_path = FILE.filename
@@ -81,17 +99,10 @@ def add_data():
 			except:
 				continue
 
-			time_start, time_end, delta_time, n_times = add_files.calc_times(uv)
+			time_start, time_end, delta_time, _  = uv_data.calc_times(uv)
 
 		else:
-			ssh = pdbi.login_ssh(host)
-			uv_data_script = './uv_data.py'
-			sftp = ssh.open_sftp()
-			sftp.put(uv_data_script, './')
-			sftp.close()
-			stdin, uv_data, stderr = ssh.exec_command('python {uv_data_script} {host} {full_path}'.format(uv_data_script=moved_script, host=host, full_path=full_path))
-			time_start, time_end, delta_time = [float(info) for info in uv_data.read().split(',')]
-			ssh.close()
+			time_start, time_end, delta_time, _ = add_files.get_uv_data(host, full_path, mode='time')
 		
 		era, julian_day = add_files.julian_era(julian_date)
 
