@@ -21,41 +21,18 @@ def load_backup(backup, table=None):
 		read = json.load(backup_db)
 		if table is None:
 			return None
-		elif table == 'observation':
-			OBS_class = pdb.Observation()
-			obs_list = OBS_class.db_list
+		else:
 			for row in read:
 				print row.items()
 				try:
-					dbi.add_observation(row)
-				except:
-					print('Failed to load in entry')
-		elif table == 'file':
-			FILE_class = pdb.File()
-			file_list = FILE_class.db_list
-			for row in read:
-				print row.items()			
-				try:
-					dbi.add_file(row)
-				except:
-					print('Failed to load in entry')
-		#elif table == 'feed':
-		#	FEED_class = pdb.Feed()
-		#	feed_list = FEED_class.db_list
-		#	for row in read:
-		#		print row.items()
-		#		try:
-		#			dbi.add_eed(row)
-		#		except:
-		#			print('Failed to load in entry')
-
-		elif table == 'log':
-			LOG_class = pdb.Log()
-			log_list = LOG_class.db_list
-			for row in read:
-				print row.items()
-				try:
-					dbi.add_log(row)
+					if table == 'observation':
+						dbi.add_observation(row)
+					elif table == 'file':
+						dbi.add_file(row)
+					#elif table == 'feed':
+					#	dbi.add_feed(row)
+					elif table == 'log':
+						dbi.add_log(row)
 				except:
 					print('Failed to load in entry')
 
@@ -73,8 +50,10 @@ if __name__ == '__main__':
 		backup_obs = '/data4/paper/paperdev_backup/{time_date}/obs_{time_date}.json'.format(time_date=time_date)
 		backup_file = '/data4/paper/paperdev_backup/{time_date}/file_{time_date}.json'.format(time_date=time_date)
 		backup_feed = '/data4/paper/paperdev_backup/{time_date}/feed_{time_date}.json'.format(time_date=time_date)
+		backup_log = '/data4/paper/paperdev_backup/{time_date}/log_{time_date}.json'.format(time_date=time_date)
 		
 	
 	#load_backup(backup_obs, table='observation')
 	load_backup(backup_file, table='file')
 	#load_backup(backup_feed, table='feed')
+	#load_backup(backup_log, table='feed')
