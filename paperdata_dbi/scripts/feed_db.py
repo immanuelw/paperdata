@@ -10,7 +10,7 @@ import move_files
 import sys
 import os
 import time
-import glob
+import shutil
 import socket
 import subprocess
 import smtplib
@@ -24,14 +24,48 @@ from email import Encoders
 ### Author: Immanuel Washington
 ### Date: 11-23-14
 
+def rsync_copy(source, destination):
+	subprocess.check_output(['rsync', '-ac', source, destination])
+	return None
+
+def set_feed(source, output_host, output_dir, moved_to_distill=True):
+	dbi = pdbi.DataBaseInterface()
+	FEED = dbi.get_feed(source)
+	dbi.set_feed_host(FEED, output_host)
+	dbi.set_feed_path(FEED, output_dir)
+	dbi.set_feed_move(FEED, moved_to_distill)
+	return None
+
+def move_feed_files(input_host, input_paths, output_host, output_dir):
+	#different from move_files, adds to feed
+	named_host = socket.gethostname()
+	destination = ''.join((output_host, ':', output_dir))
+	if named_host == input_host:
+		for source in input_paths:
+			rsync_copy(source, destination)
+			set_feed(source, output_host, output_dir)
+			shutil.rmtree(source)
+	else:
+		ssh = pdbi.login_ssh(output_host)
+		for source in input_paths:
+			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
+			rsync_del_command = '''rm -r {source}'''.format(source=source)
+			ssh.exec_command(rsync_copy_command)
+			set_feed(source, output_host, output_dir)
+			ssh.exec_command(rsync_del_command)
+		ssh.close()
+
+	print 'Completed transfer'
+	return None
+
 def count_days():
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	count_FEEDs = s.query(pdbi.Feed.julian_day, label('count', func.count(pdbi.Feed.julian_day))).group_by(pdbi.Feed.julian_day).all()
 	all_FEEDs = s.query(pdbi.Feed).all()
-	s.close()
 	good_days = tuple(FEED.julian_day for FEED in count_FEEDs if FEED.count==288 or FEED.count==72)
 	to_move = tuple(FEED.full_path for FEED in all_FEEDs if FEED.julian_day in good_days)
+	s.close()
 
 	for full_path in to_move:
 		FEED = dbi.get_feed(full_path)
@@ -45,9 +79,13 @@ def find_data():
 	FEEDs = s.query(pdbi.Feed).filter(pdbi.Feed.moved_to_distill==False).filter(pdbi.Feed.ready_to_move==True).all()
 	s.close()
 
-	feed_paths = tuple((FEED.host, os.path.join(FEED.path, FEED.filename)) for FEED in FEEDs if FEED.julian_Day==FEEDS[0].julian_day)
+	#only move one day at a time
+	feed_host = FEEDs[0].host
+	feed_day = FEEDs[0].julian_day
+	feed_paths = tuple(os.path.join(FEED.path, FEED.filename) for FEED in FEEDs if FEED.julian_Day == feed_day)
+	feed_filenames = tuple(FEED.filename for FEED in FEEDs if FEED.julian_Day == feed_day)
 
-	return feed_paths
+	return feed_paths, feed_host, feed_filenames
 
 def email_paperfeed(files):
 	server = smtplib.SMTP('smtp.gmail.com', 587)
@@ -60,9 +98,8 @@ def email_paperfeed(files):
 	header = 'From: PAPERFeed <paperfeed.paperdata@gmail.com>\nSubject: FILES ARE BEING MOVED\n'
     msgs = header
 	#Send the mail
-	for file in files:
-		msg = '\n' + file + ' is being moved.\n'
-		msgs = msgs + msg
+	for filename in files:
+		msgs = ''.join(msgs, '\n', filename, ' is being moved.\n')
 
 	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
 	server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
@@ -73,33 +110,28 @@ def email_paperfeed(files):
 
 	return None
 
-def feed_db:
+def feed_db():
 	#Minimum amount of space to move a day ~3.1TiB
 	required_space = 1112373311360
-	space_path = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
+	output_dir = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
 
 	#Move if there is enough free space
-	if move_files.enough_space(required_space, space_path):
+	if move_files.enough_space(required_space, output_dir):
+		#check how many days are in each
+		count_days()
 		#FIND DATA
-		infile_paths = find_data()
-		input_host = infile_paths[0][0]
-		input_paths = tuple(path[0] for path in infile_paths)
-		#create directory to output to
+		input_paths, input_host, input_filenames = find_data()
+		#pick directory to output to
 		output_host = 'folio'
-		output_dir = '/data4/paper/feed/'
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
-		outfile_list = move_files.move_files(input_host, input_paths, output_host, output_dir)
+		move_feed_files(input_host, input_paths, output_host, output_dir)
 		#EMAIL PEOPLE THAT DATA IS BEING MOVED AND LOADED
 		email_paperfeed(input_paths)
 		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
-		outfile_dirs = []
-		for outfiles in outfile_list:
-			if outfiles.split('z')[0] not in outfile_dirs:
-				outfile_dirs.append(outfiles.split('z')[0])
-		for out_direc in outfile_dirs:
-			out_dir = os.path.join(out_direc,'zen.*.uv')
-			add_obs = 'add_observations.py {out_dir}'.format(out_dir=out_dir)
-			subprocess.call(add_obs, shell=True)
+		out_dir = os.path.join(output_dir, 'zen.*.uv')
+		add_obs = 'python /usr/global/paper/CanopyVirtualEnvs/PAPER_Distiller/bin/add_observations.py {out_dir}'.format(out_dir=out_dir)
+		#shell = True because wildcards can't be done without it
+		subprocess.call(add_obs, shell=True)
 	else:
 		table = 'Feed'
 		move_files.email_space(table)

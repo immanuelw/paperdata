@@ -12,6 +12,7 @@ import paperdev_dbi as pdbi
 
 ### Script to load data from anywhere into paperfeed database
 ### Crawls folio or elsewhere and reads through .uv files to generate all field information
+### DOES NOT MOVE ANY DATA
 
 ### Author: Immanuel Washington
 ### Date: 05-18-14
@@ -58,39 +59,8 @@ def gen_feed_data(host, full_path):
 
 	return feed_data, log_data
 
-def rsync_copy(source, destination):
-	subprocess.check_output(['rsync', '-ac', source, destination])
-	return None
-
-def move_files(input_host, input_paths, output_host, output_dir):
-	#different from move_files, adds to feed
-	named_host = socket.gethostname()
-	destination = ''.join((output_host, ':', output_dir))
-	if named_host == input_host:
-		dbi = pdbi.DataBaseInterface()
-		s = dbi.Session()
-		for source in input_paths:
-			rsync_copy(source, destination)
-			add_feed_to_db(input_host, source)
-			shutil.rmtree(source)
-		s.close()
-	else:
-		dbi = pdbi.DataBaseInterface()
-		s = dbi.Session()
-		ssh = pdbi.login_ssh(output_host)
-		for source in input_paths:
-			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
-			rsync_del_command = '''rm -r {source}'''.format(source=source)
-			ssh.exec_command(rsync_copy_command)
-			add_feed_to_db(input_host, source)
-			ssh.exec_command(rsync_del_command)
-		ssh.close()
-		s.close()
-
-	print 'Completed transfer'
-	return None
-
 def dupe_check(input_host, input_paths):
+	#checks for files already in feed table
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	FEEDs = s.query(pdbi.Feed).all()
@@ -103,11 +73,12 @@ def dupe_check(input_host, input_paths):
 		
 	return unique_paths
 
-def add_feed_to_db(input_host, full_path):
+def add_feeds_to_db(input_host, input_paths):
 	dbi = pdbi.DataBaseInterface()
-	feed_data, log_data = gen_feed_data(input_host, full_path)
-	dbi.add_feed(feed_data)
-	dbi.add_log(log_data)
+	for source in input_paths:
+		feed_data, log_data = gen_feed_data(input_host, source)
+		dbi.add_feed(feed_data)
+		dbi.add_log(log_data)
 
 	return None
 
@@ -131,13 +102,11 @@ if __name__ == '__main__':
 	else:
 		ssh = pdbi.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
-		stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
+		_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]
 		ssh.close()
 
 	output_host = 'folio'
 	feed_output = '/data4/paper/feed/'
 	input_paths = dupe_check(input_host, input_paths)
-	input_paths = move_files(input_host, input_paths, output_host, feed_output)
-	input_paths.sort()
-	add_feeds(input_host, input_paths)
+	add_feeds_to_db(input_host, input_paths)
