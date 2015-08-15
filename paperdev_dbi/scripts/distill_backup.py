@@ -38,21 +38,21 @@ def json_data(dbo, dump_objects):
 		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
 	return None
 
-def paperbackup(time_date):
+def paperbackup(timestamp):
 
-	backup_dir = os.path.join('/data4/paper/paperdistiller_backup', time_date)
+	backup_dir = os.path.join('/data4/paper/paperdistiller_backup', str(timestamp))
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 
 	#Create separate files for each directory
 
-	db1 = 'obs_{0}.json'.format(time_date)
+	db1 = 'obs_{timestamp}.json'.format(timestamp=timestamp)
 	dbo1 = os.path.join(backup_dir, db1)
 
-	db2 = 'file_{0}.json'.format(time_date)
+	db2 = 'file_{timestamp}.json'.format(timestamp=timestamp)
 	dbo2 = os.path.join(backup_dir, db2)
 
-	db3 = 'log_{0}.json'.format(time_date)
+	db3 = 'log_{timestamp}.json'.format(timestamp=timestamp)
 	dbo3 = os.path.join(backup_dir, db3)
 
 	dbi = DataBaseInterface()
@@ -68,11 +68,11 @@ def paperbackup(time_date):
 	json_data(dbo3, LOG_dump)
 
 	s.close()
-	print time_date
+	print timestamp
 	print 'Table data backup saved'
 
 	return None
 
 if __name__ == '__main__':
-	time_date = time.strftime("%d-%m-%Y_%H:%M:%S")
-	paperbackup(time_date)
+	timestamp = time.strftime("%d-%m-%Y_%H:%M:%S")
+	paperbackup(timestamp)

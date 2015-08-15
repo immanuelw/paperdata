@@ -2,7 +2,6 @@
 # -*- coding: utf-8 -*-
 # Load data into MySQL table 
 
-# import the MySQLdb and sys modules
 import paperdev_dbi as pdbi
 from sqlalchemy import func
 from sqlalchemy.sql import label

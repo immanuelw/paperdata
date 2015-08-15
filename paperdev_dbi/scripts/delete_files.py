@@ -2,17 +2,13 @@
 # -*- coding: utf-8 -*-
 # Add files to paperdev
 
-import MySQLdb
 import sys
-import getpass
 import time
 import subprocess
 import aipy as A
-import hashlib
 import glob
 import socket
 import os
-import paramiko
 import shutil
 import paperdev_dbi as pdbi
 
@@ -28,9 +24,8 @@ def delete_check(input_host):
 	FILEs = s.query(pdbi.File).filter(pdbi.File.delete_file==True).filter(pdbi.File.tape_index!=None).filter(pdbi.File.host==input_host).all()
 	s.close()
 	#all files on same host
-	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
-		
-	return filenames
+	full_paths = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
+	return full_paths
 
 def set_delete_table(input_host, source, output_host, output_dir):
 	#change in database

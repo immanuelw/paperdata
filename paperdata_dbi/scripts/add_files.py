@@ -158,7 +158,6 @@ def file_names(full_path)
 	path = os.path.dirname(full_path)
 	filename = os.path.basename(full_path)
 	filetype = filename.split('.')[-1]
-
 	return path, filename, filetype
 
 def calc_obs_data(host, full_path):
