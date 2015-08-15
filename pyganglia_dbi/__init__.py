@@ -23,11 +23,12 @@ def login_ssh(host, username=None):
 	ssh = paramiko.SSHClient()
 	ssh.load_system_host_keys()
 	ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+	key_filename = os.path.expanduser('~/.ssh/id_rsa')
 	try:
-		ssh.connect(host, username=username, key_filename='~/.ssh/id_rsa')
+		ssh.connect(host, username=username, key_filename=key_filename)
 	except:
 		try:
-			ssh.connect(host, key_filename='~/.ssh/id_rsa')
+			ssh.connect(host, key_filename=key_filename)
 		except:
 			return None
 
@@ -41,14 +42,14 @@ def login_ssh(host, username=None):
 
 class Filesystem(Base):
 	__tablename__ = 'filesystem'
-	__table_args__ = (PrimaryKeyConstraint('host', 'system', 'time_date', name='host_system_time'),)
+	__table_args__ = (PrimaryKeyConstraint('host', 'system', 'timestamp', name='host_system_time'),)
 	host = Column(String(100)) #folio
 	system = Column(String(100)) #/data4
 	total_space = Column(BigInteger)
 	used_space = Column(BigInteger)
 	free_space = Column(BigInteger)
 	percent_space = Numeric(4,1)
-	time_date = Column(BigInteger) #seconds since 1970
+	timestamp = Column(BigInteger) #seconds since 1970
 
 	def to_json(self):
 		self.data_dict = {'host':self.host,
@@ -57,7 +58,7 @@ class Filesystem(Base):
 						'used_space':self.used_space,
 						'free_space':self.free_space,
 						'percent_space':self.percent_space,
-						'time_date':self.time_date}
+						'timestamp':self.timestamp}
 		return self.data_dict
 
 class Monitor(Base):
@@ -71,7 +72,7 @@ class Monitor(Base):
 	del_time = Column(BigInteger)
 	time_start = Column(BigInteger)
 	time_end = Column(BigInteger)
-	time_date = Column(BigInteger)
+	timestamp = Column(BigInteger)
 
 	def to_json(self):
 		self.data_dict = {'host':self.host,
@@ -83,12 +84,12 @@ class Monitor(Base):
 						'del_time':self.del_time,
 						'time_start':self.time_start,
 						'time_end':self.time_end,
-						'time_date':self.time_date}
+						'timestamp':self.timestamp}
 		return self.data_dict
 
 class Ram(Base):
 	__tablename__ = 'ram'
-	__table_args__ = (PrimaryKeyConstraint('host', 'time_date', name='host_time'),)
+	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
 	total = Column(BigInteger)
 	used = Column(BigInteger)
@@ -101,7 +102,7 @@ class Ram(Base):
 	swap_total = Column(BigInteger)
 	swap_used = Column(BigInteger)
 	swap_free = Column(BigInteger)
-	time_date = Column(BigInteger)
+	timestamp = Column(BigInteger)
 
 	def to_json(self):
 		self.data_dict = {'host':self.host,
@@ -116,12 +117,12 @@ class Ram(Base):
 						'swap_total':self.swap_total,
 						'swap_used':self.swap_used,
 						'swap_free':self.swap_free,
-						'time_date':self.time_date}
+						'timestamp':self.timestamp}
 		return self.data_dict
 
 class Iostat(Base):
 	__tablename__ = 'iostat'
-	__table_args__ = (PrimaryKeyConstraint('host', 'time_date', name='host_time'),)
+	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
 	device = Column(String(100))
 	tps = Column(Numeric(7,2))
@@ -129,7 +130,7 @@ class Iostat(Base):
 	write_s = Column(Numeric(7,2))
 	bl_reads = Column(BigInteger)
 	bl_writes = Column(BigInteger)
-	time_date = Column(BigInteger)
+	timestamp = Column(BigInteger)
 
 	def to_json(self):
 		self.data_dict = {'host':self.host,
@@ -139,12 +140,12 @@ class Iostat(Base):
 						'write_s':self.write_s,
 						'bl_reads':self.bl_reads,
 						'bl_writes':self.bl_writes,
-						'time_date':self.time_date}
+						'timestamp':self.timestamp}
 		return self.data_dict
 
 class Cpu(Base):
 	__tablename__ = 'cpu'
-	__table_args__ = (PrimaryKeyConstraint('host', 'time_date', name='host_time'),)
+	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
 	cpu = Column(Integer)
 	user_perc = Column(Numeric(5,2))
@@ -152,7 +153,7 @@ class Cpu(Base):
 	iowait_perc = Column(Numeric(5,2))
 	idle_perc = Column(Numeric(5,2))
 	intr_s = Column(Integer)
-	time_date = Column(BigInteger)
+	timestamp = Column(BigInteger)
 
 	def to_json(self):
 		self.data_dict = {'host':self.host,
@@ -162,7 +163,7 @@ class Cpu(Base):
 						'iowait_perc':self.iowait_perc,
 						'idle_perc':self.idle_perc,
 						'intr_s':self.intr_s,
-						'time_date':self.time_date}
+						'timestamp':self.timestamp}
 		return self.data_dict
 
 class DataBaseInterface(object):

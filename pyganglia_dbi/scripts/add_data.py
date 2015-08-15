@@ -19,11 +19,11 @@ def two_round(num):
 	return round(float(num), 2)
 
 def filesystem(ssh, host, path):
-	time_date = int(time.time())
+	timestamp = int(time.time())
 	system_data = {}
 	system_data['host'] = host
 	system_data['system'] = path
-	system_data['time_date'] = time_date
+	system_data['timestamp'] = timestamp
 	if ssh is None:
 		fi = psutil.disk_usage(path)
 		total = fi.total
@@ -48,13 +48,13 @@ def filesystem(ssh, host, path):
 	return system_data
 
 def iostat(ssh, host):
-	time_date = int(time.time())
+	timestamp = int(time.time())
 	iostat_data = {}
 	if ssh is None:
 		io = psutil.disk_io_counters(perdisk=True)
 		for device, value in io.items():
 			iostat_data[device] = {'host': host}
-			iostat_data[device]['time_date'] = time_date
+			iostat_data[device]['timestamp'] = timestamp
 			tps = None
 			read_s = round(value.read_count / float(value.read_time), 2)
 			write_s = round(value.write_count / float(value.write_time), 2)
@@ -102,10 +102,10 @@ def iostat(ssh, host):
 
 def ram_free(ssh, host):
 	#Calculates ram usage on folio
-	time_date = int(time.time())
+	timestamp = int(time.time())
 	ram_data = {}
 	ram_data['host'] = host
-	ram_data['time_date'] = time_date
+	ram_data['timestamp'] = timestamp
 	if ssh is None:
 		ram1 = psutil.virtual_memory()
 		ram2 = psutil.swap_memory()
@@ -162,13 +162,13 @@ def ram_free(ssh, host):
 
 def cpu_perc(ssh, host):
 	#Calculates cpu usage on folio
-	time_date = int(time.time())
+	timestamp = int(time.time())
 	cpu_data = {}
 	if ssh is None:
 		cpu_all = psutil.cpu_times_percent(interval=1, percpu=True)
 		for key, value in enumerate(cpu_all):
 			cpu_data[key] = {'host': host}
-			cpu_data[key]['time_date'] = time_date
+			cpu_data[key]['timestamp'] = timestamp
 			cpu = key
 			user_perc = value.user
 			sys_perc = value.system
@@ -196,7 +196,7 @@ def cpu_perc(ssh, host):
 		for key, row in enumerate(cpu[3:]):
 			#skip first three lines
 			cpu_data[key] = {'host': host}
-			cpu_data[key]['time_date'] = time_date
+			cpu_data[key]['timestamp'] = timestamp
 			cpu = int(row[2])
 			user_perc = two_round(row[3])
 			sys_perc = two_round(row[5])

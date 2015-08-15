@@ -32,14 +32,14 @@ class filesystem:
 					'used_space',
 					'free_space',
 					'percent_space',
-					'time_date')
+					'timestamp')
 	self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that us being monitored'),
 					'system':('VARCHAR(100)', 'None', 'No', 'directory that is being searched for space'),
 					'total_space':('BIGINT', 'None', 'No', 'total space in system in bytes'),
 					'used_space':('BIGINT', 'None', 'No', 'used space in system in bytes'),
 					'free_space':('BIGINT', 'None', 'No', 'free space in system in bytes'),
 					'percent_space':('BIGINT', 'None', 'No', 'percent of used space in system'),
-					'time_date':('BIGINT', 'None', 'No', 'time and date entry was updated')}
+					'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
 
 class monitor:
 	def __init__(self):
@@ -53,7 +53,7 @@ class monitor:
 						'del_time',
 						'time_start',
 						'time_end',
-						'time_date')
+						'timestamp')
 		self.db_descr = {'host'('VARCHAR(100)', 'None', 'No', 'node that uv file is being compressed on'),
 						'path':('VARCHAR(100)', 'None', 'No', 'directory that file is located in'),
 						'filename':('VARCHAR(100)', 'None', 'No', 'name/path of uv file being compressed'),
@@ -64,7 +64,7 @@ class monitor:
 						'del_time':('BIGINT', 'None', 'No', 'time taken to finish step -- status transition'),
 						'time_start':('BIGINT', 'None', 'No', 'time process started as a integer -- process transition'),
 						'time_end':('BIGINT', 'None', 'No', 'time process ended as an integer -- process transition'),
-						'time_date':('BIGINT', 'None', 'No', 'time and date entry was updated')}
+						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
 
 class ram:
 	def __init__(self):
@@ -81,7 +81,7 @@ class ram:
 						'swap_total',
 						'swap_used',
 						'swap_free',
-						'time_date')
+						'timestamp')
 		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that is being monitored'),
 						'total':('BIGINT', 'None', 'No', 'total ram'),
 						'used':('BIGINT', 'None', 'No', 'used ram'),
@@ -94,7 +94,7 @@ class ram:
 						'swap_total':('BIGINT', 'None', 'No', ''),
 						'swap_used':('BIGINT', 'None', 'No', ''),
 						'swap_free':('BIGINT', 'None', 'No', ''),
-						'time_date':('BIGINT', 'None', 'No', 'time and date entry was updated')}
+						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
 
 class iostat:
 	def __init__(self):
@@ -106,7 +106,7 @@ class iostat:
 						'write_s',
 						'bl_reads',
 						'bl_writes',
-						'time_date')
+						'timestamp')
 		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that is being monitored'),
 						'device':('VARCHAR(100)', 'None', 'No', ''),
 						'tps':('DECIMAL(7,2)', 'None', 'No', ''),
@@ -114,7 +114,7 @@ class iostat:
 						'write_s':('DECIMAL(7,2)', 'None', 'No', 'writes per second'),
 						'bl_reads':('BIGINT', 'None', 'No', 'block reads'),
 						'bl_writes':('BIGINT', 'None', 'No', 'block writes'),
-						'time_date':('BIGINT', 'None', 'No', 'time and date entry was updated')}
+						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
 
 class cpu:
 	def __init__(self):
@@ -126,7 +126,7 @@ class cpu:
 						'iowait_perc',
 						'idle_perc',
 						'intr_s',
-						'time_date')
+						'timestamp')
 		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that is being monitored'),
 						'cpu':('INT', 'None', 'No', 'No', 'number of cpu/processor being monitored'),
 						'user_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu being used by user)',
@@ -134,7 +134,7 @@ class cpu:
 						'iowait_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu waiting'),
 						'idle_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu that is idle'),
 						'intr_s':('INT', 'None', 'No', 'instructions (per second?)'),
-						'time_date':('BIGINT', 'None', 'No', 'time and date entry was updated')}
+						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
 
 #dictionary of instantiated classes
 instant_class = {'filesystem':filesystem(), 'monitor':monitor(), 'ram':ram(), 'iostat':iostat(), 'cpu':cpu()}

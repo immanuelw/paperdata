@@ -39,7 +39,7 @@ i=0
 stat = ['\\','|','/','-','.']
 try:
 	while(1):
-		time_date = int(time.time())
+		timestamp = int(time.time())
 		log_info = []
 		#get the screen dimensions
 
@@ -100,7 +100,7 @@ try:
 							'del_time':del_time,
 							'time_start':file_start[filename],
 							'time_end':file_end[filename],
-							'time_date':time_date}
+							'timestamp':timestamp}
 				file_log.append(entry_dict)
 				file_pid.update({filename:current_pid})
 				time_start = int(time.time())
@@ -119,7 +119,7 @@ try:
 							'del_time':del_time,
 							'time_start':file_start[filename],
 							'time_end':file_end[filename],
-							'time_date':time_date}
+							'timestamp':timestamp}
 				file_log.append(entry_dict)
 				file_time.update({filename:time.time()})
 			#write output log
@@ -135,7 +135,7 @@ try:
 							'del_time':del_time,
 							'time_start':file_start[filename],
 							'time_end':file_end[filename],
-							'time_date':time_date}
+							'timestamp':timestamp}
 				file_log.append(entry_dict)
 				file_status.update({filename:status})
 				file_time.update({filename:time.time()})

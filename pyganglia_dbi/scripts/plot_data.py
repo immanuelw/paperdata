@@ -65,24 +65,24 @@ def plot_ram(host=None, time_min=None, time_max=None):
 	if host is not None:
 		RAMs = RAMs.filter(pyg.Ram.host==host)
 	if time_min is not None:
-		RAMs = RAMs.filter(pyg.Ram.time_date<=time_min)
+		RAMs = RAMs.filter(pyg.Ram.timestamp<=time_min)
 	if time_max is not None:
-		RAMs = RAMs.filter(pyg.Ram.time_date<=time_max)
+		RAMs = RAMs.filter(pyg.Ram.timestamp<=time_max)
 
 	RAMs = RAMs.all()
 	s.close()
 
-	total_data = tuple((RAM.time_date, RAM.total) for RAM in RAMs)
-	used_data = tuple((RAM.time_date, RAM.used) for RAM in RAMs)
-	free_data = tuple((RAM.time_date, RAM.free) for RAM in RAMs)
-	shared_data = tuple((RAM.time_date, RAM.shared) for RAM in RAMs)
-	buffers_data = tuple((RAM.time_date, RAM.buffers) for RAM in RAMs)
-	cached_data = tuple((RAM.time_date, RAM.cached) for RAM in RAMs)
-	bc_used_data = tuple((RAM.time_date, RAM.bc_used) for RAM in RAMs)
-	bc_free_data = tuple((RAM.time_date, RAM.bc_free) for RAM in RAMs)
-	swap_total_data = tuple((RAM.time_date, RAM.swap_total) for RAM in RAMs)
-	swap_used_data = tuple((RAM.time_date, RAM.swap_used) for RAM in RAMs)
-	swap_free_data = tuple((RAM.time_date, RAM.swap_free) for RAM in RAMs)
+	total_data = tuple((RAM.timestamp, RAM.total) for RAM in RAMs)
+	used_data = tuple((RAM.timestamp, RAM.used) for RAM in RAMs)
+	free_data = tuple((RAM.timestamp, RAM.free) for RAM in RAMs)
+	shared_data = tuple((RAM.timestamp, RAM.shared) for RAM in RAMs)
+	buffers_data = tuple((RAM.timestamp, RAM.buffers) for RAM in RAMs)
+	cached_data = tuple((RAM.timestamp, RAM.cached) for RAM in RAMs)
+	bc_used_data = tuple((RAM.timestamp, RAM.bc_used) for RAM in RAMs)
+	bc_free_data = tuple((RAM.timestamp, RAM.bc_free) for RAM in RAMs)
+	swap_total_data = tuple((RAM.timestamp, RAM.swap_total) for RAM in RAMs)
+	swap_used_data = tuple((RAM.timestamp, RAM.swap_used) for RAM in RAMs)
+	swap_free_data = tuple((RAM.timestamp, RAM.swap_free) for RAM in RAMs)
 
 	plt.figure(1)
 	plt.subplot(211)
@@ -141,18 +141,18 @@ def plot_iostat(host=None, device=None, time_min=None, time_max=None):
 	if device is not None:
 		IOSTATs = IOSTATs.filter(pyg.Iostat.device==device)
 	if time_min is not None:
-		IOSTATs = IOSTATs.filter(pyg.Iostat.time_date<=time_min)
+		IOSTATs = IOSTATs.filter(pyg.Iostat.timestamp<=time_min)
 	if time_max is not None:
-		IOSTATs = IOSTATs.filter(pyg.Iostat.time_date<=time_max)
+		IOSTATs = IOSTATs.filter(pyg.Iostat.timestamp<=time_max)
 
 	IOSTATs = IOSTATs.all()
 	s.close()
 
-	tps_data = tuple((IOSTAT.time_date, IOSTAT.tps) for IOSTAT in IOSTATs)
-	reads_data = tuple((IOSTAT.time_date, IOSTAT.read_s) for IOSTAT in IOSTATs)
-	writes_data = tuple((IOSTAT.time_date, IOSTAT.write_s) for IOSTAT in IOSTATs)
-	block_read_data = tuple((IOSTAT.time_date, IOSTAT.bl_reads) for IOSTAT in IOSTATs)
-	block_write_data = tuple((IOSTAT.time_date, IOSTAT.bl_writes) for IOSTAT in IOSTATs)
+	tps_data = tuple((IOSTAT.timestamp, IOSTAT.tps) for IOSTAT in IOSTATs)
+	reads_data = tuple((IOSTAT.timestamp, IOSTAT.read_s) for IOSTAT in IOSTATs)
+	writes_data = tuple((IOSTAT.timestamp, IOSTAT.write_s) for IOSTAT in IOSTATs)
+	block_read_data = tuple((IOSTAT.timestamp, IOSTAT.bl_reads) for IOSTAT in IOSTATs)
+	block_write_data = tuple((IOSTAT.timestamp, IOSTAT.bl_writes) for IOSTAT in IOSTATs)
 
 	plt.figure(1)
 	plt.subplot(211)
@@ -195,18 +195,18 @@ def plot_cpu(host=None, cpu=None, time_min=None, time_max=None):
 	if cpu is not None:
 		CPUs = CPUs.filter(pyg.Cpu.cpu==cpu)
 	if time_min is not None:
-		CPUs = CPUs.filter(pyg.Cpu.time_date<=time_min)
+		CPUs = CPUs.filter(pyg.Cpu.timestamp<=time_min)
 	if time_max is not None:
-		CPUs = CPUs.filter(pyg.Cpu.time_date<=time_max)
+		CPUs = CPUs.filter(pyg.Cpu.timestamp<=time_max)
 
 	CPUs = CPUs.all()
 	s.close()
 
-	user_perc_data = tuple((CPU.time_date, CPU.user_perc) for CPU in CPUs)
-	sys_perc_data = tuple((CPU.time_date, CPU.sys_perc) for CPU in CPUs)
-	iowait_perc_data = tuple((CPU.time_date, CPU.iowait_perc) for CPU in CPUs)
-	idle_perc_data = tuple((CPU.time_date, CPU.idle_perc) for CPU in CPUs)
-	intr_s_data = tuple((CPU.time_date, CPU.intr_s) for CPU in CPUs)
+	user_perc_data = tuple((CPU.timestamp, CPU.user_perc) for CPU in CPUs)
+	sys_perc_data = tuple((CPU.timestamp, CPU.sys_perc) for CPU in CPUs)
+	iowait_perc_data = tuple((CPU.timestamp, CPU.iowait_perc) for CPU in CPUs)
+	idle_perc_data = tuple((CPU.timestamp, CPU.idle_perc) for CPU in CPUs)
+	intr_s_data = tuple((CPU.timestamp, CPU.intr_s) for CPU in CPUs)
 
 	plt.figure(1)
 	plt.subplot(211)
