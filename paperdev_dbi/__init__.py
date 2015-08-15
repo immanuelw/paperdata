@@ -254,114 +254,6 @@ class DataBaseInterface(object):
 								max_overflow=40)
 		self.Session = sessionmaker(bind=self.engine)
 
-	def get_obs(self, obsnum):
-		"""
-		retrieves an observation object.
-		Errors if there are more than one of the same obsnum in the db. This is bad and should
-		never happen
-
-		todo:test
-		"""
-		s = self.Session()
-		try:
-			OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
-		except:
-			return None
-		s.close()
-		return OBS
-
-	def update_obs(self, OBS):
-		"""
-		updates file object field
-		***NEED TO TEST
-		"""
-		s = self.Session()
-		s.add(OBS)
-		s.commit()
-		s.close()
-		return True
-
-	def get_file(self, full_path):
-		"""
-		retrieves an file object.
-		Errors if there are more than one of the same file in the db. This is bad and should
-		never happen
-
-		todo:test
-		"""
-		s = self.Session()
-		try:
-			FILE = s.query(File).filter(File.full_path==full_path).one()
-		except:
-			return None
-		s.close()
-		return FILE
-
-	def update_file(self, FILE):
-		"""
-		updates file object field
-		***NEED TO TEST
-		"""
-		s = self.Session()
-		s.add(FILE)
-		s.commit()
-		s.close()
-		return True
-
-	def get_feed(self, full_path):
-		"""
-		retrieves an feed object.
-		Errors if there are more than one of the same feed in the db. This is bad and should
-		never happen
-
-		todo:test
-		"""
-		s = self.Session()
-		try:
-			FEED = s.query(Feed).filter(Feed.full_path==full_path).one()
-		except:
-			return None
-		s.close()
-		return FEED
-
-	def update_feed(self, FEED):
-		"""
-		updates feed object field
-		***NEED TO TEST
-		"""
-		s = self.Session()
-		s.add(FEED)
-		s.commit()
-		s.close()
-		return True
-
-	#def get_rtp_file(self, full_path):
-	#	"""
-	#	retrieves an rtp_file object.
-	#	Errors if there are more than one of the same rtp_file in the db. This is bad and should
-	#	never happen
-
-	#	todo:test
-	#	"""
-	#	s = self.Session()
-	#	try:
-	#		RTP_FILE = s.query(RTP_File).filter(RTP_File.full_path==full_path).one()
-	#	except:
-	#		return None
-	#	s.close()
-	#	return RTP_FILE
-
-	#def update_rtp_file(self, RTP_FILE):
-	#	"""
-	#	updates rtp_file object field
-	#	***NEED TO TEST
-	#	"""
-	#	s = self.Session()
-	#	s.add(RTP_FILE)
-	#	s.commit()
-	#	s.close()
-	#	return True
-
 	def create_db(self):
 		"""
 		creates the tables in the database.
@@ -379,6 +271,40 @@ class DataBaseInterface(object):
 		creates a table in the database.
 		"""
 		Table.__table__.create(bind=self.engine)
+
+	def get_entry(self, TABLE, unique_value):
+		"""
+		retrieves any object.
+		Errors if there are more than one of the same object in the db. This is bad and should
+		never happen
+
+		todo:test
+		"""
+		s = self.Session()
+		try:
+			if TABLE in ('observation',):
+				ENTRY = s.query(Observation).filter(Observation.obsnum == unique_value).one()
+			elif TABLE in ('file',):
+				ENTRY = s.query(File).filter(File.full_path == unique_value).one()
+			elif TABLE in ('feed',):
+				ENTRY = s.query(Feed).filter(Feed.full_path == unique_value).one()
+		#	elif TABLE in ('rtp_file',):
+		#		ENTRY = s.query(RTP_File).filter(RTP_File.full_path == unique_value).one()
+		except:
+			return None
+		s.close()
+		return ENTRY
+
+	def update_entry(self, ENTRY):
+		"""
+		updates any object field
+		***NEED TO TEST
+		"""
+		s = self.Session()
+		s.add(ENTRY)
+		s.commit()
+		s.close()
+		return True
 
 	def drop_db(self):
 		"""
@@ -418,7 +344,7 @@ class DataBaseInterface(object):
 		"""
 		FILE = File(**entry_dict)
 		#get the observation corresponding to this file
-		OBS = s.query(Observation).filter(Observation.obsnum==obsnum).one()
+		OBS = s.query(Observation).filter(Observation.obsnum == entry_dict['obsnum']).one()
 		FILE.observation = OBS  #associate the file with an observation
 		self.add_entry(FILE)
 		return None
@@ -451,14 +377,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		return FILE.path
 
 	def set_file_path(self, full_path, path):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		FILE.path = path
 		yay = self.update_file(FILE)
 		return yay
@@ -467,14 +393,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		return FILE.host
 
 	def set_file_host(self, full_path, host):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		FILE.host = host
 		yay = self.update_file(FILE)
 		return yay
@@ -483,14 +409,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		return FILE.md5sum
 
 	def set_file_md5(self, full_path, md5):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		FILE.md5sum = md5
 		yay = self.update_file(FILE)
 		return yay
@@ -499,14 +425,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		return FILE.write_to_tape
 
 	def set_file_write(self, full_path, write_to_tape):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		FILE.write_to_tape = write_to_tape
 		yay = self.update_file(FILE)
 		return yay
@@ -515,14 +441,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		return FILE.delete_file
 
 	def set_file_delete(self, full_path, delete_file):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		FILE.delete_file = delete_file
 		yay = self.update_file(FILE)
 		return yay
@@ -531,14 +457,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		return FILE.timestamp
 
 	def set_file_time(self, full_path, timestamp):
 		"""
 		todo
 		"""
-		FILE = self.get_file(full_path)
+		FILE = self.get_entry('file', full_path)
 		FILE.timestamp = timestamp
 		yay = self.update_file(FILE)
 		return yay
@@ -547,14 +473,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		OBS = self.get_obs(obsnum)
+		OBS = self.get_entry('observation', obsnum)
 		return OBS.prev_obs
 
 	def set_prev_obs(self, obsnum, prev_obs):
 		"""
 		todo
 		"""
-		OBS = self.get_obs(obsnum)
+		OBS = self.get_entry('observation', obsnum)
 		OBS.prev_obs = prev_obs
 		yay = self.update_obs(OBS)
 		return yay
@@ -563,14 +489,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		OBS = self.get_obs(obsnum)
+		OBS = self.get_entry('observation', obsnum)
 		return OBS.next_obs
 
 	def set_next_obs(self, obsnum, next_obs):
 		"""
 		todo
 		"""
-		OBS = self.get_obs(obsnum)
+		OBS = self.get_entry('observation', obsnum)
 		OBS.next_obs = next_obs
 		yay = self.update_obs(OBS)
 		return yay
@@ -579,30 +505,30 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		OBS = self.get_obs(obsnum)
+		OBS = self.get_entry('observation', obsnum)
 		return OBS.edge
 
 	def set_edge(self, obsnum, edge):
 		"""
 		todo
 		"""
-		OBS = self.get_obs(obsnum)
+		OBS = self.get_entry('observation', obsnum)
 		OBS.edge = edge
 		yay = self.update_obs(OBS)
 		return yay
 
-	def get_obs_time(self, full_path):
+	def get_obs_time(self, obsnum):
 		"""
 		todo
 		"""
-		OBS = self.get_obs(full_path)
+		OBS = self.get_entry('observation', obsnum)
 		return OBS.timestamp
 
-	def set_obs_time(self, full_path, timestamp):
+	def set_obs_time(self, obsnum, timestamp):
 		"""
 		todo
 		"""
-		OBS = self.get_obs(full_path)
+		OBS = self.get_entry('observation', obsnum)
 		OBS.timestamp = timestamp
 		yay = self.update_obs(OBS)
 		return yay
@@ -611,14 +537,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FEED = self.get_feed(full_path)
+		FEED = self.get_entry('feed', full_path)
 		return FEED.path
 
 	def set_feed_path(self, full_path, path):
 		"""
 		todo
 		"""
-		FEED = self.get_feed(full_path)
+		FEED = self.get_entry('feed', full_path)
 		FEED.path = path
 		yay = self.update_feed(FEED)
 		return yay
@@ -627,14 +553,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FEED = self.get_feed(full_path)
+		FEED = self.get_entry('feed', full_path)
 		return FEED.host
 
 	def set_feed_host(self, full_path, host):
 		"""
 		todo
 		"""
-		FEED = self.get_feed(full_path)
+		FEED = self.get_entry('feed', full_path)
 		FEED.host = host
 		yay = self.update_feed(FEED)
 		return yay
@@ -643,14 +569,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FEED = self.get_feed(full_path)
+		FEED = self.get_entry('feed', full_path)
 		return FEED.moved_to_distill
 
 	def set_feed_move(self, full_path, move):
 		"""
 		todo
 		"""
-		FEED = self.get_feed(full_path)
+		FEED = self.get_entry('feed', full_path)
 		FEED.moved_to_distill = move
 		yay = self.update_feed(FEED)
 		return yay
@@ -659,14 +585,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FEED = self.get_feed(full_path)
+		FEED = self.get_entry('feed', full_path)
 		return FEED.ready_to_move
 
 	def set_feed_ready(self, full_path, ready):
 		"""
 		todo
 		"""
-		FEED = self.get_feed(full_path)
+		FEED = self.get_entry('feed', full_path)
 		FEED.ready_to_move = ready
 		yay = self.update_feed(FEED)
 		return yay
@@ -675,14 +601,14 @@ class DataBaseInterface(object):
 		"""
 		todo
 		"""
-		FEED = self.get_feed(full_path)
+		FEED = self.get_entry('feed', full_path)
 		return FEED.timestamp
 
 	def set_feed_time(self, full_path, timestamp):
 		"""
 		todo
 		"""
-		FEED = self.get_feed(full_path)
+		FEED = self.get_entry('feed', full_path)
 		FEED.timestamp = timestamp
 		yay = self.update_feed(FEED)
 		return yay
@@ -691,14 +617,14 @@ class DataBaseInterface(object):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	return RTP_FILE.md5sum
 
 	#def set_rtp_file_md5(self, full_path, md5):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	RTP_FILE.md5sum = md5
 	#	yay = self.update_rtp_file(RTP_FILE)
 	#	return yay
@@ -707,14 +633,14 @@ class DataBaseInterface(object):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	return RTP_FILE.transferred
 
 	#def set_rtp_file_transferred(self, full_path, transferred):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	RTP_FILE.transferred = transferred
 	#	yay = self.update_rtp_file(RTP_FILE)
 	#	return yay
@@ -723,14 +649,14 @@ class DataBaseInterface(object):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	return RTP_FILE.julian_day
 
 	#def set_rtp_file_day(self, full_path, julian_day):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	RTP_FILE.julian_day = julian_day
 	#	yay = self.update_rtp_file(RTP_FILE)
 	#	return yay
@@ -739,14 +665,14 @@ class DataBaseInterface(object):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	return RTP_FILE.new_host
 
 	#def set_rtp_file_new_host(self, full_path, new_host):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	RTP_FILE.new_host = new_host
 	#	yay = self.update_rtp_file(RTP_FILE)
 	#	return yay
@@ -755,14 +681,14 @@ class DataBaseInterface(object):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	return RTP_FILE.new_path
 
 	#def set_rtp_file_new_path(self, full_path, new_path):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	RTP_FILE.new_path = new_path
 	#	yay = self.update_rtp_file(RTP_FILE)
 	#	return yay
@@ -771,14 +697,14 @@ class DataBaseInterface(object):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	return RTP_FILE.timestamp
 
 	#def set_rtp_file_time(self, full_path, timestamp):
 	#	"""
 	#	todo
 	#	"""
-	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE = self.get_entry('rtp_file', full_path)
 	#	RTP_FILE.timestamp = timestamp
 	#	yay = self.update_rtp_file(RTP_FILE)
 	#	return yay
