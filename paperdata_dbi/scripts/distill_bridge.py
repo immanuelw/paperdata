@@ -6,6 +6,7 @@ import sys
 import os
 import time
 import socket
+from collections import Counter
 import aipy as A
 from ddr_compress.dbi import DataBaseInterface, Observation, File
 from sqlalchemy import func
@@ -43,37 +44,33 @@ def add_data():
 	s = dbi.Session()
 	#do stuff
 	OBSs_all = s.query(Observation).all()
-	OBSs_complete = s.query(Observation).filter(Observation.status=='COMPLETE').all()
+	OBSs_complete = s.query(Observation).filter(Observation.status == 'COMPLETE').all()
+	s.close()
 
-	j_days = {OBS: int(str(OBS.julian_date)[3:7]) for OBS in OBSs_complete}
-	count_days = {jday:0 for jday in j_days.values()}
-	for jday in j_days.values():
-		count_days[jday] += 1
+	julian_obs = {OBS: int(str(OBS.julian_date)[3:7]) for OBS in OBSs_complete)
+	julian_days = tuple(jday for jday in julian_obs.values())
+	#dict of julian day as key, amount as value
+	count_jdays = Counter(julian_days)
 
-	a_days = {OBS: int(str(OBS.julian_date)[3:7]) for OBS in OBSs_all}
-	all_days = {jday:0 for jday in a_days.values()}
-	for jday in a_days.values():
-		all_days[jday] += 1
+	all_days = tuple(int(str(OBS.julian_date)[3:7]) for OBS in OBSs_all)
+	count_all_days = Counter(all_days)
 
 	#tuple list of all complete days
-	complete_jdays = tuple(day for day in count_days.keys() if count_day[day]==all_day[day])
-	raw_OBSs = []
-	for OBS, jday in j_days.items():
-		if jday in complete_jdays:
-			raw_OBSs.append(OBS)
-	
-	#check if day complete
-	#if so ignore if already in db
+	complete_jdays = tuple(day for day, amount in count_jdays.items() if amount == count_all_days[day])
+	raw_OBSs = tuple(OBS for OBS, jday in julian_obs.items() if jday in complete_jdays)
+
+	#check for duplicates
 	data_dbi = pdbi.DataBaseInterface()
-	sp = data_dbi.Session()
-	#If not, add obs to paperdata, attempt to add files later
-	#then create list of tuples of path, filename, other info to load into paperdata
 
 	#need to keep list of files to move of each type -- (host, path, filename, filetype)
 	movable_paths = []
 
 	for OBS in raw_OBSs:
-		FILE = s.query(File).filter(File.obsnum==OBS.obsnum).one()
+		FILE = s.query(File).filter(File.obsnum == OBS.obsnum).one()
+
+		host = FILE.host
+		full_path = FILE.filename
+		path, filename, filetype = add_files.file_names(full_path)
 
 		obsnum = OBS.obsnum
 		julian_date = OBS.julian_date
@@ -83,10 +80,6 @@ def add_data():
 			polarization = OBS.pol
 		length = OBS.length
 	
-		host = FILE.host
-		full_path = FILE.filename
-		path, filename, filetype = add_files.file_names(full_path)
-
 		named_host = socket.gethostname()
 		if named_host == host:
 			try:
@@ -107,7 +100,9 @@ def add_data():
 		prev_obs, next_obs, edge = add_files.obs_edge(obsnum, sess=sp)
 
 		filesize = add_files.calc_size(host, path, filename)
-		md5 = add_files.calc_md5sum(host, path, filename)
+		md5 = FILE.md5sum
+		if md5 is None:
+			md5 = add_files.calc_md5sum(host, path, filename)
 		tape_index = None
 
 		source_host = host
@@ -151,31 +146,24 @@ def add_data():
 					'full_path':full_path,
 					'feed_path':None,
 					'timestamp':timestamp}
-		pdbi.add_to_table('observation', obs_data)
-		pdbi.add_to_table('file', raw_data)
-		pdbi.add_to_table('log',log_data)
+		data_dbi.add_to_table('observation', obs_data)
+		data_dbi.add_to_table('file', raw_data)
+		data_dbi.add_to_table('log',log_data)
 		movable_paths.append((host, path, filename, filetype))
-
 
 		compr_filename = ''.join(filename, 'cRRE')
 		compr_filetype = 'uvcRRE'
 		compr_filesize = add_files.calc_size(host, path, compr_filename)
 		compr_md5 = add_files.calc_md5sum(host, path, compr_filename)
 		compr_write_to_tape = False
-		if os.path.isdir(compr_filename):
-			compr_data = {'host':host,
-							'path':path,
-							'filename':compr_filename,
-							'filetype':compr_filetype,
-							'full_path':full_path,
-							'obsnum':obsnum,
-							'filesize':compr_filesize,
-							'md5sum':compr_md5,
-							'tape_index':tape_index,
-							'write_to_tape':compr_write_to_tape,
-							'delete_file':delete_file,
-							'timestamp':timestamp}
-			pdbi.add_to_table('file', compr_data)
+		if os.path.isdir(os.path.join(path, compr_filename)):
+			compr_data = raw_data
+			compr_data['filename'] = compr_filename
+			compr_data['filetype'] = compr_filetype
+			compr_data['filesize'] = compr_filesize
+			compr_data['md5sum'] = compr_md5
+			compr_data['write_to_tape'] = compr_write_to_tape
+			data_dbi.add_to_table('file', compr_data)
 			movable_paths.append((host, path, compr_filename, compr_filetype))
 
 		npz_filename = ''.join(filename, 'cRE.npz')
@@ -183,23 +171,15 @@ def add_data():
 		npz_filesize = add_files.calc_size(host, path, npz_filename)
 		npz_md5 = add_files.calc_md5sum(host, path, npz_filename)
 		npz_write_to_tape = False
-		if os.path.isfile(npz_filename):
-			npz_data = {'host':host,
-						'path':path,
-						'filename':npz_filename,
-						'filetype':npz_filetype,
-						'obsnum':obsnum,
-						'filesize':npz_filesize,
-						'md5sum':npz_md5,
-						'tape_index':tape_index,
-						'write_to_tape':npz_write_to_tape,
-						'delete_file':delete_file,
-						'timestamp':timestamp}
-			pdbi.add_to_table('file', npz_data)
-			movable_paths.append((host, npz_path, npz_filename, npz_filetype))
-
-	s.close()
-	sp.close()
+		if os.path.isfile(os.path.join(path, npz_filename)):
+			npz_data = raw_data
+			npz_data['filename'] = npz_filename
+			npz_data['filetype'] = npz_filetype
+			npz_data['filesize'] = npz_filesize
+			npz_data['md5sum'] = npz_md5
+			npz_data['write_to_tape'] = npz_write_to_tape
+			data_dbi.add_to_table('file', npz_data)
+			movable_paths.append((host, path, npz_filename, npz_filetype))
 
 	return movable_paths
 
