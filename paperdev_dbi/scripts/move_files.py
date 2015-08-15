@@ -84,11 +84,11 @@ def move_files(input_host, input_paths, output_host, output_dir):
 		for source in input_paths:
 			rsync_copy(source, destination)
 			full_path = ''.join((input_host, ':', source))
-			FILE = dbi.get_file(full_path)
 			timestamp = int(time.time())
-			dbi.set_file_host(FILE.full_path, output_host)
-			dbi.set_file_path(FILE.full_path, output_dir)
-			dbi.set_file_time(FILE.full_path, timestamp)
+			FILE = dbi.get_entry('file', full_path)
+			dbi.set_entry(FILE, 'host', output_host)
+			dbi.set_entry(FILE, 'path', output_dir)
+			dbi.set_entry(FILE, 'timestamp', timestamp)
 			log_data = {'action':action,
 						'table':table,
 						'obsnum':None,
@@ -108,11 +108,11 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			rsync_del_command = '''rm -r {source}'''.format(source=source)
 			ssh.exec_command(rsync_copy_command)
 			full_path = ''.join((input_host, ':', source))
-			FILE = dbi.get_file(full_path)
 			timestamp = int(time.time())
-			dbi.set_file_host(FILE.full_path, output_host)
-			dbi.set_file_path(FILE.full_path, output_dir)
-			dbi.set_file_time(FILE.full_path, timestamp)
+			FILE = dbi.get_entry('file', full_path)
+			dbi.set_entry(FILE, 'host', output_host)
+			dbi.set_entry(FILE, 'path', output_dir)
+			dbi.set_entry(FILE, 'timestamp', timestamp)
 			log_data = {'action':action,
 						'table':table,
 						'obsnum':None,

@@ -30,10 +30,10 @@ def rsync_copy(source, destination):
 
 def set_feed(source, output_host, output_dir, moved_to_distill=True):
 	dbi = pdbi.DataBaseInterface()
-	FEED = dbi.get_feed(source)
-	dbi.set_feed_host(FEED, output_host)
-	dbi.set_feed_path(FEED, output_dir)
-	dbi.set_feed_move(FEED, moved_to_distill)
+	FEED = dbi.get_entry('feed', source)
+	dbi.set_entry(FEED, 'host', output_host)
+	dbi.set_entry(FEED, 'path', output_dir)
+	dbi.set_entry(FEED, 'moved_to_distill', moved_to_distill)
 	return None
 
 def move_feed_files(input_host, input_paths, output_host, output_dir):
@@ -68,8 +68,8 @@ def count_days():
 	s.close()
 
 	for full_path in to_move:
-		FEED = dbi.get_feed(full_path)
-		dbi.set_feed_ready(FEED.full_path, True)
+		FEED = dbi.get_entry('feed', source)
+		dbi.set_entry(FEED, 'ready_to_move', True)
 
 	return None
 

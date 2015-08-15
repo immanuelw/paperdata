@@ -287,29 +287,29 @@ def update_obsnums():
 		PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==OBS.obsnum-1).one()
 		if PREV_OBS is not None:
 			prev_obs = PREV_OBS.obsnum
-			dbi.set_prev_obs(OBS.obsnum, prev_obs)
+			dbi.set_entry(PREV_OBS, 'prev_obs', prev_obs)
 		else:
 			prev_time = OBS.time_start - OBS.delta_time
 			pol = OBS.polarization
 			PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date==prev_time).filter(pdbi.Observation.polarization==pol).one()
 			if PREV_OBS is not None:
 				prev_obs = PREV_OBS.obsnum
-				dbi.set_prev_obs(OBS.obsnum, prev_obs)
+				dbi.set_entry(PREV_OBS, 'prev_obs', prev_obs)
 
 		NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==OBS.obsnum+1).one()
 		if NEXT_OBS is not None:
 			next_obs = NEXT_OBS.obsnum
-			dbi.set_next_obs(OBS.obsnum, next_obs)
+			dbi.set_entry(NEXT_OBS, 'next_obs', next_obs)
 		else:
 			next_time = OBS.time_end + OBS.delta_time
 			pol = OBS.polarization
 			NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date==next_time).filter(pdbi.Observation.polarization==pol).one()
 			if NEXT_OBS is not None:
 				next_obs = NEXT_OBS.obsnum
-				dbi.set_next_obs(OBS.obsnum, next_obs)
+				dbi.set_entry(NEXT_OBS, 'next_obs', next_obs)
 
 		#sets edge 
-		dbi.set_edge(OBS.obsnum, edge=(None in (PREV_OBS, NEXT_OBS)))
+		dbi.set_entry(OBS, 'edge', edge=(None in (PREV_OBS, NEXT_OBS)))
 
 	return None
 

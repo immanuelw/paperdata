@@ -313,13 +313,13 @@ class DataBaseInterface(object):
 		s.close()
 		return True
 
-	def set_entry(self, TABLE, unique_value, field, new_value):
+	def set_entry(self, ENTRY, field, new_value):
 		"""
 		sets the value of any entry
+		input: ENTRY object, field to be changed, new value
 		"""
-		ENTRY = self.get_entry(TABLE, unique_value)
 		ENTRY.__setattr__(field, new_value)
-		yay = self.update_feed(ENTRY)
+		yay = self.update_entry(ENTRY)
 		return yay
 
 	def add_entry(self, ENTRY):

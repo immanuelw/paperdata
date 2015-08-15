@@ -21,8 +21,8 @@ def md5_db():
 	for FILE in FILEs:
 		md5 = add_files.calc_md5sum(FILE.host, FILE.path, FILE.filename)
 		timestamp = int(time.time())
-		data_dbi.set_file_md5(FILE.full_path, md5)
-		data_dbi.set_file_time(FILE.full_path, timestamp)
+		data_dbi.set_entry(FILE, 'md5sum', md5)
+		data_dbi.set_entry(FILE, 'timestamp', timestamp)
 		action = 'update md5sum'
 		table = 'file'
 		log_data = {'action':action,
