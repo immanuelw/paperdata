@@ -62,9 +62,10 @@ def add_data():
 	#check for duplicates
 	data_dbi = pdbi.DataBaseInterface()
 
-	#need to keep list of files to move of each type -- (host, path, filename, filetype)
-	movable_paths = []
+	#need to keep dict of list of files to move of each type -- (host, path, filename, filetype)
+	movable_paths = {'uv':[], 'uvcRRE':[], 'npz':[]}
 
+	named_host = socket.gethostname()
 	for OBS in raw_OBSs:
 		FILE = s.query(File).filter(File.obsnum == OBS.obsnum).one()
 
@@ -80,7 +81,6 @@ def add_data():
 			polarization = OBS.pol
 		length = OBS.length
 	
-		named_host = socket.gethostname()
 		if named_host == host:
 			try:
 				uv = A.miriad.UV(full_path)
@@ -148,8 +148,8 @@ def add_data():
 					'timestamp':timestamp}
 		data_dbi.add_to_table('observation', obs_data)
 		data_dbi.add_to_table('file', raw_data)
-		data_dbi.add_to_table('log',log_data)
-		movable_paths.append((host, path, filename, filetype))
+		data_dbi.add_to_table('log', log_data)
+		movable_paths[filetype].append(os.path.join(path, filename))
 
 		compr_filename = ''.join(filename, 'cRRE')
 		compr_filetype = 'uvcRRE'
@@ -164,7 +164,7 @@ def add_data():
 			compr_data['md5sum'] = compr_md5
 			compr_data['write_to_tape'] = compr_write_to_tape
 			data_dbi.add_to_table('file', compr_data)
-			movable_paths.append((host, path, compr_filename, compr_filetype))
+			movable_paths[compr_filetype].append(os.path.join(path, compr_filename))
 
 		npz_filename = ''.join(filename, 'cRE.npz')
 		npz_filetype = 'npz'
@@ -179,18 +179,18 @@ def add_data():
 			npz_data['md5sum'] = npz_md5
 			npz_data['write_to_tape'] = npz_write_to_tape
 			data_dbi.add_to_table('file', npz_data)
-			movable_paths.append((host, path, npz_filename, npz_filetype))
+			movable_paths[npz_filetype].append(os.path.join(path, npz_filename))
 
 	return movable_paths
 
 def bridge_move(input_host, movable_paths, raw_host, raw_dir, compr_host, compr_dir, npz_host, npz_dir):
-	raw_paths = [os.path.join(path[1], path[2]) for path in movable_paths if path[3] == 'uv']
-	compr_paths = [os.path.join(path[1], path[2]) for path in movable_paths if path[3] == 'uvcRRE']
-	npz_paths = [os.path.join(path[1], path[2]) for path in movable_paths if path[3] == 'npz']
+	raw_paths = movable_paths['uv']
+	compr_paths = movable_paths['uvcRRE']
+	npz_paths = movable_paths['npz']
 
-	move_files.move_files(input_host, raw_paths, output_host, raw_dir)
-	move_files.move_files(input_host, compr_paths, output_host, compr_dir)
-	move_files.move_files(input_host, npz_paths, output_host, npz_dir)
+	move_files.move_files(input_host, raw_paths, raw_host, raw_dir)
+	move_files.move_files(input_host, compr_paths, compr_host, compr_dir)
+	move_files.move_files(input_host, npz_paths, npz_host, npz_dir)
 
 	return None
 

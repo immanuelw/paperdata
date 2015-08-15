@@ -23,10 +23,6 @@ from email import Encoders
 ### Author: Immanuel Washington
 ### Date: 11-23-14
 
-def rsync_copy(source, destination):
-	subprocess.check_output(['rsync', '-ac', source, destination])
-	return None
-
 def set_feed(source, output_host, output_dir, moved_to_distill=True):
 	dbi = pdbi.DataBaseInterface()
 	FEED = dbi.get_entry('feed', source)
@@ -41,7 +37,7 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
 		for source in input_paths:
-			rsync_copy(source, destination)
+			move_files.rsync_copy(source, destination)
 			set_feed(source, output_host, output_dir)
 			shutil.rmtree(source)
 	else:
@@ -62,7 +58,7 @@ def count_days():
 	s = dbi.Session()
 	count_FEEDs = s.query(pdbi.Feed.julian_day, label('count', func.count(pdbi.Feed.julian_day))).group_by(pdbi.Feed.julian_day).all()
 	all_FEEDs = s.query(pdbi.Feed).all()
-	good_days = tuple(FEED.julian_day for FEED in count_FEEDs if FEED.count==288 or FEED.count==72)
+	good_days = tuple(FEED.julian_day for FEED in count_FEEDs if FEED.count == 288 or FEED.count == 72)
 	to_move = tuple(FEED.full_path for FEED in all_FEEDs if FEED.julian_day in good_days)
 	s.close()
 
@@ -75,7 +71,7 @@ def count_days():
 def find_data():
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FEEDs = s.query(pdbi.Feed).filter(pdbi.Feed.moved_to_distill==False).filter(pdbi.Feed.ready_to_move==True).all()
+	FEEDs = s.query(pdbi.Feed).filter(pdbi.Feed.moved_to_distill == False).filter(pdbi.Feed.ready_to_move == True).all()
 	s.close()
 
 	#only move one day at a time
