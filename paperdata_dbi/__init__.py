@@ -114,7 +114,6 @@ class Observation(Base):
 
 class File(Base):
 	__tablename__ = 'file'
-	#filenum = Column(Integer, primary_key=True)
 	host = Column(String(100))
 	path = Column(String(100)) #directory
 	filename = Column(String(100)) #zen.*.*.uv/uvcRRE/uvcRREzx...
@@ -144,7 +143,7 @@ class File(Base):
 						'filesize':self.filesize,
 						'md5sum':self.md5sum,
 						'tape_index':self.tape_index,
-						'source_host':source_host,
+						'source_host':self.source_host,
 						'write_to_tape':self.write_to_tape,
 						'delete_file':self.delete_file,
 						'timestamp':self.timestamp}
@@ -171,6 +170,34 @@ class Feed(Base):
 						'moved_to_distill':self.moved_to_distill,
 						'timestamp':self.timestamp}
 		return self.feed_data
+
+#def RTP_File(Base):
+	#__tablename__ = 'rtp_file'
+	#host = Column(String(100), nullable=False)
+	#path = Column(String(100), nullable=False) #directory
+	#filename = Column(String(100), nullable=False) #zen.*.*.uv/uvcRRE/uvcRREzx...
+	#filetype = Column(String(20), nullable=False) #uv, uvcRRE, etc.
+	#full_path = Column(String(200), primary_key=True)
+	#md5sum = Column(String(32))
+	#transferred = Column(Boolean)
+	#julian_day = Column(Integer)
+	#new_host = Column(String(100))
+	#new_path = Column(String(100))
+	#timestamp = Column(BigInteger)
+
+	#def to_json(self):
+	#	self.rtp_data = {'host':self.host,
+	#					'path':self.path,
+	#					'filename':self.filename,
+	#					'filetype':self.filetype,
+	#					'full_path':self.full_path,
+	#					'md5sum':self.md5sum,
+	#					'transferred':self.transferred,
+	#					'julian_day':self.julian_day,
+	#					'new_host':self.new_host,
+	#					'new_path':self.new_path,
+	#					'timestamp':self.timestamp}
+	#	return self.rtp_data
 
 class Log(Base):
 	__tablename__ = 'log'
@@ -308,6 +335,33 @@ class DataBaseInterface(object):
 		s.close()
 		return True
 
+	#def get_rtp_file(self, full_path):
+	#	"""
+	#	retrieves an rtp_file object.
+	#	Errors if there are more than one of the same rtp_file in the db. This is bad and should
+	#	never happen
+
+	#	todo:test
+	#	"""
+	#	s = self.Session()
+	#	try:
+	#		RTP_FILE = s.query(RTP_File).filter(RTP_File.full_path==full_path).one()
+	#	except:
+	#		return None
+	#	s.close()
+	#	return RTP_FILE
+
+	#def update_rtp_file(self, RTP_FILE):
+	#	"""
+	#	updates rtp_file object field
+	#	***NEED TO TEST
+	#	"""
+	#	s = self.Session()
+	#	s.add(RTP_FILE)
+	#	s.commit()
+	#	s.close()
+	#	return True
+
 	def create_db(self):
 		"""
 		creates the tables in the database.
@@ -384,6 +438,14 @@ class DataBaseInterface(object):
 		LOG = Log(**entry_dict)
 		self.add_entry(LOG)
 		return None
+
+	#def add_rtp_file(self, entry_dict):
+	#	"""
+	#	Add a rtp_file to the database
+	#	"""
+	#	RTP_FILE = RTP_File(**entry_dict)
+	#	self.add_entry(RTP_FILE)
+	#	return None
 
 	def get_file_path(self, full_path):
 		"""
@@ -624,3 +686,99 @@ class DataBaseInterface(object):
 		FEED.timestamp = timestamp
 		yay = self.update_feed(FEED)
 		return yay
+
+	#def get_rtp_file_md5(self, full_path):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	return RTP_FILE.md5sum
+
+	#def set_rtp_file_md5(self, full_path, md5):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE.md5sum = md5
+	#	yay = self.update_rtp_file(RTP_FILE)
+	#	return yay
+
+	#def get_rtp_file_transferred(self, full_path):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	return RTP_FILE.transferred
+
+	#def set_rtp_file_transferred(self, full_path, transferred):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE.transferred = transferred
+	#	yay = self.update_rtp_file(RTP_FILE)
+	#	return yay
+
+	#def get_rtp_file_day(self, full_path):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	return RTP_FILE.julian_day
+
+	#def set_rtp_file_day(self, full_path, julian_day):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE.julian_day = julian_day
+	#	yay = self.update_rtp_file(RTP_FILE)
+	#	return yay
+
+	#def get_rtp_file_new_host(self, full_path):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	return RTP_FILE.new_host
+
+	#def set_rtp_file_new_host(self, full_path, new_host):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE.new_host = new_host
+	#	yay = self.update_rtp_file(RTP_FILE)
+	#	return yay
+
+	#def get_rtp_file_new_path(self, full_path):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	return RTP_FILE.new_path
+
+	#def set_rtp_file_new_path(self, full_path, new_path):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE.new_path = new_path
+	#	yay = self.update_rtp_file(RTP_FILE)
+	#	return yay
+
+	#def get_rtp_file_time(self, full_path):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	return RTP_FILE.timestamp
+
+	#def set_rtp_file_time(self, full_path, timestamp):
+	#	"""
+	#	todo
+	#	"""
+	#	RTP_FILE = self.get_rtp_file(full_path)
+	#	RTP_FILE.timestamp = timestamp
+	#	yay = self.update_rtp_file(RTP_FILE)
+	#	return yay
