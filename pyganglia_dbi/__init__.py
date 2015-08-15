@@ -199,33 +199,6 @@ class DataBaseInterface(object):
 								max_overflow=40)
 		self.Session = sessionmaker(bind=self.engine)
 
-	def get_monitor(self, full_stats):
-		"""
-		retrieves an monitor object.
-		Errors if there are more than one of the same monitor in the db. This is bad and should
-		never happen
-
-		todo:test
-		"""
-		s = self.Session()
-		try:
-			MONITOR = s.query(Monitor).filter(Monitor.full_stats==full_stats).one()
-		except:
-			return None
-		s.close()
-		return MONITOR
-
-	def update_monitor(self, MONITOR):
-		"""
-		updates monitor object field
-		***NEED TO TEST
-		"""
-		s = self.Session()
-		s.add(MONITOR)
-		s.commit()
-		s.close()
-		return True
-
 	def create_db(self):
 		"""
 		creates the tables in the database.
@@ -251,6 +224,40 @@ class DataBaseInterface(object):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
+	def get_entry(self, TABLE, unique_value):
+		"""
+		retrieves any object.
+		Errors if there are more than one of the same object in the db. This is bad and should
+		never happen
+
+		todo:test
+		"""
+		s = self.Session()
+		try:
+			if TABLE in ('filesystem',):
+				ENTRY = s.query(Filesystem).filter(Filesystem.full_system_time == unique_value).one()
+			elif TABLE in ('monitor',):
+				ENTRY = s.query(Monitor).filter(Monitor.full_stats == unique_value).one()
+			elif TABLE in ('ram',):
+				ENTRY = s.query(Ram).filter(Ram.host_time == unique_value).one()
+			elif TABLE in ('iostat',):
+				ENTRY = s.query(Iostat).filter(Iostat.host_time == unique_value).one()
+			elif TABLE in ('cpu',):
+				ENTRY = s.query(Cpu).filter(Cpu.host_time == unique_value).one()
+		except:
+			return None
+		s.close()
+		return ENTRY
+
+	def set_entry(self, ENTRY, field, new_value):
+		"""
+		sets the value of any entry
+		input: ENTRY object, field to be changed, new value
+		"""
+		ENTRY.__setattr__(field, new_value)
+		yay = self.update_entry(ENTRY)
+		return yay
+
 	def add_entry(self, ENTRY):
 		s = self.Session()
 		try:
@@ -264,58 +271,19 @@ class DataBaseInterface(object):
 		s.close()
 		return None
 
-	def add_filesystem(self, entry_dict):
+	def add_to_table(self, TABLE, entry_dict):
 		"""
-		create a new filesystem entry.
+		create a new entry.
 		"""
-		FILESYSTEM = Filesystem(**entry_dict)
-		self.add_entry(FILESYSTEM)
+		if TABLE in ('filesystem',):
+			ENTRY = Filesystem(**entry_dict)
+		elif TABLE in ('monitor',):
+			ENTRY = Monitor(**entry_dict)
+		elif TABLE in ('ram',):
+			ENTRY = Ram(**entry_dict)
+		elif TABLE in ('iostat',):
+			ENTRY = Iostat(**entry_dict)
+		elif TABLE in ('cpu',):
+			ENTRY = Cpu(**entry_dict)
+		self.add_entry(ENTRY)
 		return None
-
-	def add_monitor(self, entry_dict):
-		"""
-		create a new monitor entry.
-		"""
-		MONITOR = Monitor(**entry_dict)
-		self.add_entry(MONITOR)
-		return None
-
-	def add_ram(self, entry_dict):
-		"""
-		create a new ram entry.
-		"""
-		RAM = Ram(**entry_dict)
-		self.add_entry(RAM)
-		return None
-
-	def add_iostat(self, entry_dict):
-		"""
-		create a new iostat entry.
-		"""
-		IOSTAT = Iostat(**entry_dict)
-		self.add_entry(IOSTAT)
-		return None
-
-	def add_cpu(self, entry_dict):
-		"""
-		create a new cpu entry.
-		"""
-		CPU = Cpu(**entry_dict)
-		self.add_entry(CPU)
-		return None
-
-	def get_monitor_path(self, full_stats):
-		"""
-		todo
-		"""
-		MONITOR = self.get_monitor(full_stats)
-		return MONITOR.path
-
-	def set_monitor_path(self, full_stats, path):
-		"""
-		todo
-		"""
-		MONITOR = self.get_monitor(full_stats)
-		MONITOR.path = path
-		yay = self.update_monitor(MONITOR)
-		return yay

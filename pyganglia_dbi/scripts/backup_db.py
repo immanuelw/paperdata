@@ -34,50 +34,50 @@ def json_data(dbo, dump_objects):
 		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
 	return None
 
-def paperbackup(time_date):
+def paperbackup(timestamp):
 
-	backup_dir = os.path.join('/data4/paper/pyganglia_backup', str(time_date))
+	backup_dir = os.path.join('/data4/paper/pyganglia_backup', str(timestamp))
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 
 	#Create separate files for each directory
 
-	db1 = 'filesystem_{time_date}.json'.format(time_date=time_date)
+	db1 = 'filesystem_{timestamp}.json'.format(timestamp=timestamp)
 	dbo1 = os.path.join(backup_dir, db1)
 	print(dbo1)
 
-	db2 = 'monitor_{time_date}.json'.format(time_date=time_date)
+	db2 = 'monitor_{timestamp}.json'.format(timestamp=timestamp)
 	dbo2 = os.path.join(backup_dir, db2)
 	print(dbo2)
 
-	db3 = 'iostat_{time_date}.json'.format(time_date=time_date)
+	db3 = 'iostat_{timestamp}.json'.format(timestamp=timestamp)
 	dbo3 = os.path.join(backup_dir, db3)
 	print(dbo3)
 
-	db4 = 'ram_{time_date}.json'.format(time_date=time_date)
+	db4 = 'ram_{timestamp}.json'.format(timestamp=timestamp)
 	dbo4 = os.path.join(backup_dir, db4)
 	print(dbo4)
 
-	db5 = 'cpu_{time_date}.json'.format(time_date=time_date)
+	db5 = 'cpu_{timestamp}.json'.format(timestamp=timestamp)
 	dbo5 = os.path.join(backup_dir, db5)
 	print(dbo5)
 
 	dbi = pyg.DataBaseInterface()
 	s = dbi.Session()
 
-	FILESYSTEM_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Filesystem.time_date.asc(), pyg.Filesystem.host.asc(), pyg.Filesystem.system.asc())
+	FILESYSTEM_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Filesystem.timestamp.asc(), pyg.Filesystem.host.asc(), pyg.Filesystem.system.asc())
 	json_data(dbo1, FILESYSTEM_dump)
 
-	MONITOR_dump = s.query(pyg.MONITOR).order_by(pyg.Monitor.time_date.asc(), pyg.Monitor.host.asc(), pyg.Monitor.filename.asc())
+	MONITOR_dump = s.query(pyg.MONITOR).order_by(pyg.Monitor.timestamp.asc(), pyg.Monitor.host.asc(), pyg.Monitor.filename.asc())
 	json_data(dbo2, MONITOR_dump)
 
-	IOSTAT_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Iostat.time_date.asc(), pyg.Iostat.host.asc(), pyg.Iostat.device.asc())
+	IOSTAT_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Iostat.timestamp.asc(), pyg.Iostat.host.asc(), pyg.Iostat.device.asc())
 	json_data(dbo1, IOSTAT_dump)
 
-	RAM_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Ram.time_date.asc(), pyg.Ram.host.asc(), pyg.Ram.polarization.asc())
+	RAM_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Ram.timestamp.asc(), pyg.Ram.host.asc(), pyg.Ram.polarization.asc())
 	json_data(dbo1, RAM_dump)
 
-	CPU_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Cpu.time_date.asc(), pyg.Cpu.host.asc(), pyg.Cpu.cpu.asc())
+	CPU_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Cpu.timestamp.asc(), pyg.Cpu.host.asc(), pyg.Cpu.cpu.asc())
 	json_data(dbo1, CPU_dump)
 
 	s.close()
@@ -112,8 +112,8 @@ def email_backup(backup_file):
 	return None
 
 if __name__ == '__main__':
-	time_date = int(time.time())
+	timestamp = int(time.time())
 
-	paperbackup(time_date)
-	#backup_file = '/data4/paper/pyganglia_backup/{time_date}/pyganglia_backup.json'.format(time_date=time_date)
+	paperbackup(timestamp)
+	#backup_file = '/data4/paper/pyganglia_backup/{timestamp}/pyganglia_backup.json'.format(timestamp=timestamp)
 	#email_backup(backup_file)

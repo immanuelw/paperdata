@@ -219,20 +219,20 @@ def add_data(ssh, host):
 
 	iostat_all_data = iostat(ssh, host)
 	for name, iostat_data in iostat_all_data.items():
-		dbi.add_iostat(iostat_data)
+		dbi.add_to_table('iostat', iostat_data)
 
 	ram_data = ram_free(ssh, host)
-	dbi.add_ram(ram_data)
+	dbi.add_to_table('ram', ram_data)
 
 	cpu_all_data = cpu_perc(ssh, host)
 	for key, cpu_data in cpu_all_data.items():
-		dbi.add_cpu(cpu_data)
+		dbi.add_to_table('cpu', cpu_data)
 
 	if host in ('folio',):
 		paths = ('/data3', '/data4')
 		for path in paths:
 			system_data = filesystem(ssh, path)
-			dbi.add_filesystem(system_data)
+			dbi.add_to_table('filesystem', system_data)
 
 	ssh.close()
 

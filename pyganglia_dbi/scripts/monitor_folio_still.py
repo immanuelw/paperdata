@@ -140,7 +140,7 @@ try:
 				file_status.update({filename:status})
 				file_time.update({filename:time.time()})
 		for monitor_data in file_log:
-			pyg_dbi.add_monitor(monitor_data)
+			pyg_dbi.add_to_table('monitor', monitor_data)
 		file_log = []
 		s.close()
 		statusscr.refresh()

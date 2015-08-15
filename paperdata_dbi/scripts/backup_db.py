@@ -34,27 +34,27 @@ def json_data(dbo, dump_objects):
 		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
 	return None
 
-def paperbackup(time_date):
+def paperbackup(timestamp):
 
-	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(time_date))
+	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(timestamp))
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 
 	#Create separate files for each directory
 
-	db1 = 'obs_{time_date}.json'.format(time_date=time_date)
+	db1 = 'obs_{timestamp}.json'.format(timestamp=timestamp)
 	dbo1 = os.path.join(backup_dir, db1)
 	print(dbo1)
 
-	db2 = 'file_{time_date}.json'.format(time_date=time_date)
+	db2 = 'file_{timestamp}.json'.format(timestamp=timestamp)
 	dbo2 = os.path.join(backup_dir, db2)
 	print(dbo2)
 
-	#db3 = 'feed_{0}.json'.format(time_date)
+	#db3 = 'feed_{timestamp}.json'.format(timestamp=timestamp)
 	#dbo3 = os.path.join(backup_dir, db3)
 	#print(dbo3)
 
-	db4 = 'log_{0}.json'.format(time_date)
+	db4 = 'log_{timestamp}.json'.format(timestamp=timestamp)
 	dbo4 = os.path.join(backup_dir, db4)
 	print(dbo4)
 
@@ -105,8 +105,8 @@ def email_backup(backup_file):
 	return None
 
 if __name__ == '__main__':
-	time_date = int(time.time())
+	timestamp = int(time.time())
 
-	paperbackup(time_date)
-	#backup_file = '/data4/paper/paperdata_backup/{time_date}/paperdata_backup.psv'.format(time_date=time_date)
+	paperbackup(timestamp)
+	#backup_file = '/data4/paper/paperdata_backup/{timestamp}/paperdata_backup.psv'.format(timestamp=timestamp)
 	#email_backup(backup_file)
