@@ -32,6 +32,27 @@ def delete_check(input_host):
 		
 	return filenames
 
+def set_delete_table(input_host, source, output_host, output_dir):
+	#change in database
+	dbi = pdbi.DataBaseInterface()
+	action = 'delete'
+	table = 'file'
+	full_path = ''.join((input_host, ':', source))
+	timestamp = int(time.time())
+	FILE = dbi.get_entry('file', full_path)
+	dbi.set_entry(FILE, 'host', output_host)
+	dbi.set_entry(FILE, 'path', output_dir)
+	dbi.set_entry(FILE, 'delete_file', False)
+	dbi.set_entry(FILE, 'timestamp', timestamp)
+	log_data = {'action':action,
+				'table':table,
+				'obsnum':None,
+				'host':input_host,
+				'full_path':source,
+				'feed_path':None,
+				'timestamp':timestamp}
+	dbi.add_to_table('log', log_data)
+	return None
 
 def rsync_copy(source, destination):
 	subprocess.check_output(['rsync', '-ac', source, destination])
@@ -40,49 +61,20 @@ def rsync_copy(source, destination):
 def delete_files(input_host, input_paths, output_host, output_dir):
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))
-	action = 'delete'
-	table = 'file'
 	if named_host == input_host:
-		dbi = pdbi.DataBaseInterface()
-		s = dbi.Session()
 		for source in input_paths:
 			rsync_copy(source, destination)
-			#change in database
-			full_path = ''.join((input_host, ':', source))
-			timestamp = int(time.time())
-			FILE = dbi.get_entry('file', full_path)
-			dbi.set_entry(FILE, 'host', output_host)
-			dbi.set_entry(FILE, 'path', output_dir)
-			dbi.set_entry(FILE, 'delete_file', False)
-			dbi.set_entry(FILE, 'timestamp', timestamp)
-			log_data = {'action':action,
-						'table':table,
-						'obsnum':None,
-						'host':input_host,
-						'full_path':source,
-						'feed_path':None,
-						'timestamp':timestamp}
-			dbi.add_log(log_data)
+			set_delete_table(input_host, source, output_host, output_dir)
 			shutil.rmtree(source)
-		s.close()
 	else:
-		dbi = pdbi.DataBaseInterface()
-		s = dbi.Session()
 		ssh = pdbi.login_ssh(host)
 		for source in input_paths:
 			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 			rsync_del_command = '''rm -r {source}'''.format(source=source)
 			ssh.exec_command(rsync_copy_command)
-			full_path = ''.join((input_host, ':', source))
-			timestamp = int(time.time())
-			FILE = dbi.get_entry('file', full_path)
-			dbi.set_entry(FILE, 'host', output_host)
-			dbi.set_entry(FILE, 'path', output_dir)
-			dbi.set_entry(FILE, 'delete_file', False)
-			dbi.set_entry(FILE, 'timestamp', timestamp)
+			set_delete_table(input_host, source, output_host, output_dir)
 			ssh.exec_command(rsync_del_command)
 		ssh.close()
-		s.close()
 
 	print 'Completed transfer'
 	return None
