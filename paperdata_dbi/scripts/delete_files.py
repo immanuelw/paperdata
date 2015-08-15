@@ -2,17 +2,13 @@
 # -*- coding: utf-8 -*-
 # Add files to paperdata
 
-import MySQLdb
 import sys
-import getpass
 import time
 import subprocess
 import aipy as A
-import hashlib
 import glob
 import socket
 import os
-import paramiko
 import shutil
 import paperdata_dbi as pdbi
 

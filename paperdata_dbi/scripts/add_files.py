@@ -4,11 +4,9 @@
 
 import sys
 import aipy as A
-import hashlib
 import glob
 import socket
 import os
-import paramiko
 import paperdata_dbi as pdbi
 import time
 import uv_data
@@ -97,7 +95,7 @@ def get_uv_data(host, full_path, mode=None):
 		ssh.close()
 		return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
-	elif mode =='time':
+	elif mode == 'time':
 		uv_comm = 'python {moved_script} {host} {full_path} time'.format(moved_script=moved_script, host=host, full_path=full_path)
 		_, uv_dat, _ = ssh.exec_command(uv_comm)
 		time_start, time_end, delta_time, length = [round(float(info), 5) for info in uv_dat.read().split(',')]
@@ -117,13 +115,20 @@ def julian_era(julian_date):
 
 	return era, julian_day
 
-def obs_pn(s):
-	PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum-1).one()
+def is_edge(prev_obs, next_obs):
+	if (prev_obs, next_obs) == (None, None):
+		edge = None
+	else:
+		edge = (None in (prev_obs, next_obs))
+	return edge
+
+def obs_pn(s, obsnum):
+	PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum == obsnum - 1).one()
 	if PREV_OBS is not None:
 		prev_obs = PREV_OBS.obsnum
 	else:
 		prev_obs = None
-	NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==obsnum+1).one()
+	NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum == obsnum + 1).one()
 	if NEXT_OBS is not None:
 		next_obs = NEXT_OBS.obsnum
 	else:
@@ -140,15 +145,12 @@ def obs_edge(obsnum, sess=None):
 		if sess is None:
 			dbi = pdbi.DataBaseInterface()
 			s = dbi.Session()
-			prev_obs, next_obs = obs_pn(s)
+			prev_obs, next_obs = obs_pn(s, obsnum)
 			s.close()
 		else:
-			prev_obs, next_obs = obs_pn(sess)
+			prev_obs, next_obs = obs_pn(sess, obsnum)
 
-	if (prev_obs, next_obs) == (None, None):
-		edge = None
-	else:
-		edge = (None in (prev_obs, next_obs))
+	edge = is_edge(prev_obs, next_obs)
 
 	return prev_obs, next_obs, edge
 
@@ -188,7 +190,7 @@ def calc_obs_data(host, full_path):
 		elif len(filename.split('.')) == 6:
 			polarization = filename.split('.')[3]
 			pol = polarization
-		OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date==julian_date).filter(pdbi.Observation.polarization==pol).one()
+		OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date == julian_date).filter(pdbi.Observation.polarization == pol).one()
 
 		time_start = OBS.time_start		
 		time_end = OBS.time_end
@@ -258,59 +260,50 @@ def calc_obs_data(host, full_path):
 def dupe_check(input_host, input_paths):
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FILEs = s.query(pdbi.File).all()
 	#all files on same host
-	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs if FILE.host == input_host)
-
-	#for each input file, check if in filenames
-	unique_paths = tuple(input_path for input_path in input_paths if input_path not in filenames)
+	FILEs = s.query(pdbi.File).filter(pdbi.File.host == input_host).all()
+	full_paths = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
 	s.close()
+
+	#for each input file, check if in full_paths
+	unique_paths = tuple(input_path for input_path in input_paths if input_path not in full_paths)
 		
 	return unique_paths
 
-def obsnum_list(obsnum):
-	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	OBSs = s.query(pdbi.Observation).all()
-	s.close()
-	#all files on same host
-	obsnums = tuple(OBS.obsnum for OBS in OBSs)
+def set_obs(s, OBS, field):
+	if field == 'prev_obs':
+		edge_num = OBS.obsnum - 1
+		edge_time = OBS.time_start - OBS.delta_time
+	elif field == 'next_obs':
+		edge_num = OBS.obsnum + 1
+		edge_time = OBS.time_start + OBS.delta_time
 
-	return obsnums
+	EDGE_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum == edge_time).one()
+	if EDGE_OBS is not None:
+		edge_obs = EDGE_OBS.obsnum
+		dbi.set_entry(OBS, field, edge_obs)
+	else:
+		pol = OBS.polarization
+		EDGE_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date == edge_time).filter(pdbi.Observation.polarization == pol).one()
+		if EDGE_OBS is not None:
+			edge_obs = EDGE_OBS.obsnum
+			dbi.set_entry(OBS, field, edge_obs)
+
+	return EDGE_OBS
 
 def update_obsnums():
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	OBSs = s.query(pdbi.Observation).all()
-	s.close()
+
 	for OBS in OBSs:
-		PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==OBS.obsnum-1).one()
-		if PREV_OBS is not None:
-			prev_obs = PREV_OBS.obsnum
-			dbi.set_entry(OBS, 'prev_obs', prev_obs)
-		else:
-			prev_time = OBS.time_start - OBS.delta_time
-			pol = OBS.polarization
-			PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date==prev_time).filter(pdbi.Observation.polarization==pol).one()
-			if PREV_OBS is not None:
-				prev_obs = PREV_OBS.obsnum
-				dbi.set_entry(OBS, 'prev_obs', prev_obs)
-
-		NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum==OBS.obsnum+1).one()
-		if NEXT_OBS is not None:
-			next_obs = NEXT_OBS.obsnum
-			dbi.set_entry(OBS, 'next_obs', next_obs)
-		else:
-			next_time = OBS.time_end + OBS.delta_time
-			pol = OBS.polarization
-			NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date==next_time).filter(pdbi.Observation.polarization==pol).one()
-			if NEXT_OBS is not None:
-				next_obs = NEXT_OBS.obsnum
-				dbi.set_entry(OBS, 'next_obs', next_obs)
-
+		PREV_OBS = set_obs(s, OBS, 'prev_obs')
+		NEXT_OBS = set_obs(s, OBS, 'next_obs')
 		#sets edge 
-		dbi.set_entry(OBS, 'edge', edge=(None in (PREV_OBS, NEXT_OBS)))
+		edge = is_edge(PREV_OBS, NEXT_OBS)
+		dbi.set_entry(OBS, 'edge', edge)
 
+	s.close()
 	return None
 
 def add_files(input_host, input_paths):

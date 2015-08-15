@@ -6,11 +6,9 @@ import sys
 import time
 import subprocess
 import aipy as A
-import hashlib
 import glob
 import socket
 import os
-import paramiko
 import shutil
 import psutil
 from email.MIMEMultipart import MIMEMultipart

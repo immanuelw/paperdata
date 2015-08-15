@@ -2,16 +2,11 @@
 # -*- coding: utf-8 -*-
 # Load data into MySQL table 
 
-# import the MySQLdb and sys modules
 import sys
 import os
 import time
-import subprocess
-import smtplib
-import shutil
 import socket
 import aipy as A
-import hashlib
 from ddr_compress.dbi import DataBaseInterface, Observation, File
 from sqlalchemy import func
 import paperdata_dbi as pdbi
