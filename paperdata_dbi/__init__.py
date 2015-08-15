@@ -178,26 +178,53 @@ class Feed(Base):
 	#filename = Column(String(100), nullable=False) #zen.*.*.uv/uvcRRE/uvcRREzx...
 	#filetype = Column(String(20), nullable=False) #uv, uvcRRE, etc.
 	#full_path = Column(String(200), primary_key=True)
+	#obsnum = Column(BigInteger, ForeignKey('rtp_observation.obsnum'))
 	#md5sum = Column(String(32))
 	#transferred = Column(Boolean)
 	#julian_day = Column(Integer)
 	#new_host = Column(String(100))
 	#new_path = Column(String(100))
 	#timestamp = Column(BigInteger)
+	#observation = relationship(RTP_Observation, backref=backref('files', uselist=True))
 
 	#def to_json(self):
-	#	self.rtp_data = {'host':self.host,
-	#					'path':self.path,
-	#					'filename':self.filename,
-	#					'filetype':self.filetype,
-	#					'full_path':self.full_path,
-	#					'md5sum':self.md5sum,
-	#					'transferred':self.transferred,
-	#					'julian_day':self.julian_day,
-	#					'new_host':self.new_host,
-	#					'new_path':self.new_path,
-	#					'timestamp':self.timestamp}
+	#	self.rtp_file_data = {'host':self.host,
+	#						'path':self.path,
+	#						'filename':self.filename,
+	#						'filetype':self.filetype,
+	#						'full_path':self.full_path,
+	#						'obsnum':self.obsnum,
+	#						'md5sum':self.md5sum,
+	#						'transferred':self.transferred,
+	#						'julian_day':self.julian_day,
+	#						'new_host':self.new_host,
+	#						'new_path':self.new_path,
+	#						'timestamp':self.timestamp}
 	#	return self.rtp_data
+
+#class RTP_Observation(Base):
+	#__tablename__ = 'rtp_observation'
+	#obsnum = Column(BigInteger, primary_key=True)
+	#julian_date = Column(Numeric(12,5))
+	#polarization = Column(String(4))
+	#julian_day = Column(Integer)
+	#era = Column(Integer)
+	#length = Column(Numeric(6,5)) #length of rtp_observation in fraction of a day
+	#prev_obs = Column(BigInteger, unique=True)
+	#next_obs = Column(BigInteger, unique=True)
+	#timestamp = Column(BigInteger)
+
+	#def to_json(self):
+	#	self.rtp_obs_data = {'obsnum':self.obsnum,
+	#						'julian_date':self.julian_date,
+	#						'polarization':self.polarization,
+	#						'julian_day':self.julian_day,
+	#						'era':self.era,
+	#						'length':self.length,
+	#						'prev_obs':self.prev_obs, 
+	#						'next_obs':self.next_obs,
+	#						'timestamp':self.timestamp}
+	#	return self.rtp_obs_data
 
 class Log(Base):
 	__tablename__ = 'log'
@@ -297,6 +324,8 @@ class DataBaseInterface(object):
 				ENTRY = s.query(Feed).filter(Feed.full_path == unique_value).one()
 		#	elif TABLE in ('rtp_file',):
 		#		ENTRY = s.query(RTP_File).filter(RTP_File.full_path == unique_value).one()
+		#	elif TABLE in ('rtp_observation',):
+		#		ENTRY = s.query(RTP_Observation).filter(RTP_Observation.obsnum == unique_value).one()
 		except:
 			return None
 		s.close()
