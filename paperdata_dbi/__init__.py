@@ -254,6 +254,40 @@ class DataBaseInterface(object):
 								max_overflow=40)
 		self.Session = sessionmaker(bind=self.engine)
 
+	def get_entry(self, TABLE, unique_value):
+		"""
+		retrieves any object.
+		Errors if there are more than one of the same object in the db. This is bad and should
+		never happen
+
+		todo:test
+		"""
+		s = self.Session()
+		try:
+			if TABLE in ('observation',):
+				ENTRY = s.query(Observation).filter(Observation.obsnum == unique_value).one()
+			elif TABLE in ('file',):
+				ENTRY = s.query(File).filter(File.full_path == unique_value).one()
+			elif TABLE in ('feed',):
+				ENTRY = s.query(Feed).filter(Feed.full_path == unique_value).one()
+		#	elif TABLE in ('rtp_file',):
+		#		ENTRY = s.query(RTP_File).filter(RTP_File.full_path == unique_value).one()
+		except:
+			return None
+		s.close()
+		return ENTRY
+
+	def update_entry(self, ENTRY):
+		"""
+		updates any object field
+		***NEED TO TEST
+		"""
+		s = self.Session()
+		s.add(ENTRY)
+		s.commit()
+		s.close()
+		return True
+
 	def get_obs(self, obsnum):
 		"""
 		retrieves an observation object.
