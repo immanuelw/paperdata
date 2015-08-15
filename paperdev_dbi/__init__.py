@@ -335,50 +335,23 @@ class DataBaseInterface(object):
 		s.close()
 		return None
 
-	def add_observation(self, entry_dict):
+	def add_to_table(self, TABLE, entry_dict):
 		"""
-		create a new observation entry.
-		returns: obsnum  (see jdpol2obsnum)
-		Note: does not link up neighbors!
+		create a new entry.
 		"""
-		OBS = Observation(**entry_dict)
-		self.add_entry(OBS)
-		obsnum = OBS.obsnum
-		sys.stdout.flush()
-		return obsnum
-
-	def add_file(self, entry_dict):
-		"""
-		Add a file to the database and associate it with an observation.
-		"""
-		FILE = File(**entry_dict)
-		#get the observation corresponding to this file
-		OBS = s.query(Observation).filter(Observation.obsnum == entry_dict['obsnum']).one()
-		FILE.observation = OBS  #associate the file with an observation
-		self.add_entry(FILE)
+		if TABLE in ('observation',):
+			ENTRY = Observation(**entry_dict)
+		elif TABLE in ('file',):
+			#files linked to observations
+			ENTRY = File(**entry_dict)
+			#get the observation corresponding to this file
+			OBS = s.query(Observation).filter(Observation.obsnum == entry_dict['obsnum']).one()
+			ENTRY.observation = OBS  #associate the file with an observation
+		elif TABLE in ('feed',):
+			ENTRY = Feed(**entry_dict)
+		elif TABLE in ('log',):
+			ENTRY = Log(**entry_dict)
+		#elif TABLE in ('rtp_file',):
+		#	ENTRY = RTP_File(**entry_dict)
+		self.add_entry(ENTRY)
 		return None
-
-	def add_feed(self, entry_dict):
-		"""
-		Add a feed to the database
-		"""
-		FEED = Feed(**entry_dict)
-		self.add_entry(FILE)
-		return None
-
-	def add_log(self, entry_dict):
-		"""
-		Add a feed to the database
-		"""
-		LOG = Log(**entry_dict)
-		self.add_entry(LOG)
-		return None
-
-	#def add_rtp_file(self, entry_dict):
-	#	"""
-	#	Add a rtp_file to the database
-	#	"""
-	#	RTP_FILE = RTP_File(**entry_dict)
-	#	self.add_entry(RTP_FILE)
-	#	return None
-

@@ -26,15 +26,15 @@ def load_backup(backup, table=None):
 				print row.items()
 				try:
 					if table == 'observation':
-						dbi.add_observation(row)
+						dbi.add_to_table('observation', row)
 					elif table == 'file':
-						dbi.add_file(row)
+						dbi.add_to_table('file', row)
 					#elif table == 'feed':
-					#	dbi.add_feed(row)
+					#	dbi.add_to_table('feed', row)
 					elif table == 'log':
-						dbi.add_log(row)
+						dbi.add_to_table('log', row)
 					#elif table == 'rtp_file':
-					#	dbi.add_rtp_file(row)
+					#	dbi.add_to_table('rtp_file', row)
 				except:
 					print('Failed to load in entry')
 

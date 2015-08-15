@@ -96,7 +96,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 						'full_path':source,
 						'feed_path':None,
 						'timestamp':timestamp}
-			dbi.add_log(log_data)
+			dbi.add_to_table('log', log_data)
 			shutil.rmtree(source)
 		s.close()
 	else:
@@ -120,7 +120,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 						'full_path':source,
 						'feed_path':None,
 						'timestamp':timestamp}
-			dbi.add_log(log_data)
+			dbi.add_to_table('log', log_data)
 			ssh.exec_command(rsync_del_command)
 		ssh.close()
 		s.close()

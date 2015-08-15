@@ -156,9 +156,9 @@ def add_data():
 					'full_path':full_path,
 					'feed_path':None,
 					'timestamp':timestamp}
-		pdbi.add_observation(obs_data)
-		pdbi.add_file(raw_data)
-		pdbi.add_log(log_data)
+		pdbi.add_to_table('observation', obs_data)
+		pdbi.add_to_table('file', raw_data)
+		pdbi.add_to_table('log',log_data)
 		movable_paths.append((host, path, filename, filetype))
 
 
@@ -180,7 +180,7 @@ def add_data():
 							'write_to_tape':compr_write_to_tape,
 							'delete_file':delete_file,
 							'timestamp':timestamp}
-			pdbi.add_file(compr_data)
+			pdbi.add_to_table('file', compr_data)
 			movable_paths.append((host, path, compr_filename, compr_filetype))
 
 		npz_filename = ''.join(filename, 'cRE.npz')
@@ -200,7 +200,7 @@ def add_data():
 						'write_to_tape':npz_write_to_tape,
 						'delete_file':delete_file,
 						'timestamp':timestamp}
-			pdbi.add_file(npz_data)
+			pdbi.add_to_table('file', npz_data)
 			movable_paths.append((host, npz_path, npz_filename, npz_filetype))
 
 	s.close()

@@ -77,8 +77,8 @@ def add_feeds_to_db(input_host, input_paths):
 	dbi = pdbi.DataBaseInterface()
 	for source in input_paths:
 		feed_data, log_data = gen_feed_data(input_host, source)
-		dbi.add_feed(feed_data)
-		dbi.add_log(log_data)
+		dbi.add_to_table('feed', feed_data)
+		dbi.add_to_table('log', log_data)
 
 	return None
 
