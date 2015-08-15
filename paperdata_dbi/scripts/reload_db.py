@@ -30,7 +30,7 @@ def find_paths(input_host):
 	else:
 		ssh = pdbi.login_ssh(input_host)
 		find = '''find / -name '*.uv' -o -name '*.uvcRRE' -o -name '*.npz' 2>/dev/null'''
-		stdin, all_paths, stderr = ssh.exec_command(find)
+		_, all_paths, _ = ssh.exec_command(find)
 		for path in all_paths.split('\n'):
 			if direc.endswith('uv'):
 				 input_paths.append(path)
