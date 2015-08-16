@@ -1,5 +1,6 @@
 from app import db_utils, models
 from flask import g, render_template
+#import paperdata_dbi as pdbi
 
 def get_error_counts(start_gps, end_gps):
 	error_counts = []
@@ -10,11 +11,20 @@ def get_error_counts(start_gps, end_gps):
 							WHERE reference_time >= {} AND reference_time <= {}
 							ORDER BY reference_time ASC'''.format(start_gps, end_gps)).fetchall()
 
+	#dbi = pdbi.DataBaseInterface()
+	#s = dbi.Session()
+	#need to add more filters and like
+	#need to change func to fit paperdata
+	#TIME_ALL = s.query(pdbi.XXX).filter(pdbi.XXX.time_start >= time_start).filter(pdbi.XXX.time_end <= time_end).order_by(XXX).all()
+	#response = tuple(TIME.time_start for TIME in TIME_ALL)
 	recvstatuspolice_response = db_utils.send_query(g.eor_db, '''SELECT FLOOR(reference_time) AS reference_time
 							FROM recvstatuspolice_log
 							WHERE reference_time >= {} AND reference_time <= {}
 							ORDER BY reference_time ASC'''.format(start_gps, end_gps)).fetchall()
 
+	#TIME_ALL = s.query(pdbi.XXX).filter(pdbi.XXX.time_start >= time_start).filter(pdbi.XXX.time_end <= time_end).order_by(XXX).all()
+	#response = tuple(TIME.time_start for TIME in TIME_ALL)
+	#s.close()
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
 	prev_time = 0
@@ -53,6 +63,14 @@ def get_observation_counts(start_gps, end_gps, low_or_high, eor):
 				{}
 				{}
 				ORDER BY starttime ASC'''.format(start_gps, end_gps, low_high_clause, eor_clause)).fetchall()
+
+	#dbi = pdbi.DataBaseInterface()
+	#s = dbi.Session()
+	#need to add more filters and like
+	#need to change func to fit paperdata
+	#TIME_ALL = s.query(pdbi.XXX).filter(pdbi.XXX.time_start >= time_start).filter(pdbi.XXX.time_end <= time_end).order_by(XXX).all()
+	#response = tuple(TIME.time_start for TIME in TIME_ALL)
+	#s.close()
 
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 

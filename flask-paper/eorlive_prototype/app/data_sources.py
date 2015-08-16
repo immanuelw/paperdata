@@ -4,6 +4,8 @@ import os
 import re
 from app.flask_app import app, db
 from app import db_utils, models
+#import paperdata_dbi as pdbi
+#from sqlalchemy.engine import reflection
 
 @app.route('/get_tables', methods = ['POST'])
 def get_tables():
@@ -24,8 +26,6 @@ def get_tables():
 
 		db_conn.close()
 
-		#import paperdata_dbi as pdbi
-		#from sqlalchemy.engine import reflection
 		#insp = reflection.Inspector.from_engine(pdbi.engine)
 		#table_tuples = insp.get_table_names()
 
@@ -53,8 +53,6 @@ def get_columns():
 
 		db_conn.close()
 
-		#import paperdata_dbi as pdbi
-		#from sqlalchemy.engine import reflection
 		#insp = reflection.Inspector.from_engine(pdbi.engine)
 		#it's a list of dicts
 		#column_list = insp.get_column_names(table)
@@ -204,6 +202,8 @@ def create_data_source():
 											WHERE table_name = '{}'
 											AND table_schema='public'""".format(table)).fetchall()
 
+		#table_response = (table,)
+
 		if len(table_response) == 0: #No results, so the table doesn't exist.
 			db_conn.close()
 			return jsonify(error=True, message="The table {} doesn't exist.".format(table))
@@ -212,6 +212,11 @@ def create_data_source():
 											FROM information_schema.columns
 											WHERE table_name = '{}'
 											AND numeric_precision IS NOT NULL""".format(table)).fetchall()
+
+		#insp = reflection.Inspector.from_engine(pdbi.engine)
+		#it's a list of dicts
+		#column_list = insp.get_column_names(table)
+		#column_response = tuple(column['name'] for column in column_list)
 
 		db_conn.close()
 
@@ -339,6 +344,14 @@ def separate_data_into_sets(data, data_source_results, columns, data_source, sta
 									ORDER BY starttime ASC""".format(start_gps,
 									end_gps, projectid_clause)).fetchall()
 
+	#dbi = pdbi.DataBaseInterface()
+	#s = dbi.Session()
+	#need to add more filters and like
+	#need to change func to fit paperdata
+	#OBSID_ALL = s.query(pdbi.XXX).filter(pdbi.XXX.time_start >= time_start).filter(pdbi.XXX.time_end <= time_end).order_by(XXX).all()
+	#obsid_results = tuple((OBSID.time_start, OBSID.obsname, OBSID.XXX) for OBSID in OBSID_ALL)
+	#s.close()
+
 	data['l0'] = {}
 	data['l1'] = {}
 	data['h0'] = {}
@@ -410,6 +423,14 @@ def join_with_obsids_from_set(data_source_results, the_set, data_source):
 				{}
 				ORDER BY starttime ASC'''.format(the_set.start, the_set.end,
 					projectid_clause, low_high_clause, eor_clause)).fetchall()
+
+	#dbi = pdbi.DataBaseInterface()
+	#s = dbi.Session()
+	#need to add more filters and like
+	#need to change func to fit paperdata
+	#TIME_ALL = s.query(pdbi.XXX).filter(pdbi.XXX.time_start >= time_start).filter(pdbi.XXX.time_end <= time_end).order_by(XXX).all()
+	#response = tuple(TIME.time_start for TIME in TIME_ALL)
+	#s.close()
 
 	obs_id_list = [obs_tuple[0] for obs_tuple in response]
 
