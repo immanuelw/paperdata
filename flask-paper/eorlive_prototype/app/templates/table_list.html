@@ -1,0 +1,8 @@
+{% block content %}
+Table:
+<select id="table_select" onchange="getColumns(this)">
+{% for table in table_tuples %}
+    <option value="{{table[0]}}">{{table[0]}}</option>
+{% endfor %}
+</select>
+{% endblock %}

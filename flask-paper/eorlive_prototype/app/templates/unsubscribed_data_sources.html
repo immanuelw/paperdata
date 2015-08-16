@@ -1,0 +1,20 @@
+{% block content %}
+    <table class="table-striped table-bordered scrolledList">
+        {% for data_source in unsubscribed_data_sources %}
+            <tr>
+                <td>
+                    Data source: {{ data_source.name }}<br>
+                    Graph type: {{ data_source.graph_type }}
+                </td>
+                <td>
+                    <button type="button" value="{{data_source.name}}" onclick="subscribeToDataSource(this)">
+                        Add to yours
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        {% if unsubscribed_data_sources | length == 0 %}
+            No data sources
+        {% endif %}
+    </table>
+{% endblock %}

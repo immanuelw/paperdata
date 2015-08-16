@@ -1,0 +1,14 @@
+{% block content %}
+Columns (what columns do you want data from?):
+<div id="column_checkbox_list" style="max-height:100px;overflow:auto;">
+{% for column in column_tuples %}
+    <input type="checkbox" name="{{column[0]}}">  {{column[0]}}<br>
+{% endfor %}
+</div>
+Column containing the obs ids to index by:
+<input id="obs_column_name_box" type="text" placeholder="Enter column name..." maxlength="100"><br>
+Name for your data source:
+<input id="data_source_name_box" type="text" placeholder="Must be unique..." maxlength="100"><br>
+<button id="create_data_source_button" type="button" onclick="createDataSource()">Create data source</button>
+<span id="error_message" class="errorMessage" style="display:hidden;"></span>
+{% endblock %}

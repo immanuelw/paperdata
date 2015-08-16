@@ -1,0 +1,39 @@
+{% block content %}
+    <table class="table-striped table-bordered scrolledList">
+        {% for data_source in active_data_sources %}
+            <tr>
+                <td>
+                    Data source: {{ data_source.name }}<br>
+                    Graph type: {{ data_source.graph_type }}
+                </td>
+                <td>
+                    <input type="checkbox" value="{{data_source.name}}" checked>Activate
+                </td>
+                <td>
+                    <button type="button" value="{{data_source.name}}" onclick="unsubscribeFromDataSource(this)">
+                        Remove from yours
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        {% for data_source in subscribed_but_inactive_data_sources %}
+            <tr>
+                <td>
+                    Data source: {{ data_source.name }}<br>
+                    Graph type: {{ data_source.graph_type }}
+                </td>
+                <td>
+                    <input type="checkbox" value="{{data_source.name}}">Activate
+                </td>
+                <td>
+                    <button type="button" value="{{data_source.name}}" onclick="unsubscribeFromDataSource(this)">
+                        Remove from yours
+                    </button>
+                </td>
+            </tr>
+        {% endfor %}
+        {% if active_data_sources | length == 0 and subscribed_but_inactive_data_sources | length == 0 %}
+            No data sources
+        {% endif %}
+    </table>
+{% endblock %}

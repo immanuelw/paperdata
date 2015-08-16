@@ -1,0 +1,22 @@
+<table id="set_details" class="tableClass setDetails">
+    <tr class="rowClass">
+        <th class="cellClass">{{ the_set.name }}</th>
+        <td class="cellClass">Creator: {{ the_set.username }}</td>
+        <td class="cellClass">High/Low: {{ the_set.low_or_high }}</td>
+        <td class="cellClass">EOR0/EOR1: {{ the_set.eor }}</td>
+        <td class="cellClass">
+            Data hours: {{ the_set.total_data_hrs | round(2) }} ({{ the_set.flagged_data_hrs | round(2) }} flagged)
+        </td>
+        <td class="cellClass"><button type="button" onclick="downloadSet()">Download set</button></td>
+        <td class="cellClass"><button type="button" onclick="goToNGAS()">NGAS Observations</button></td>
+    </tr>
+</table>
+<script>
+function goToNGAS() {
+    window.open("http://ngas01.ivec.org/admin/observation/observationsetting?projectid=G0009&startTime={{start_time_str_full}}&endTime={{end_time_str_full}}", '_blank');
+};
+
+function downloadSet() {
+    window.open("/download_set?set_id={{the_set.id}}", '_blank');
+};
+</script>

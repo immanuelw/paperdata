@@ -1,0 +1,53 @@
+<table style="width:100%">
+    <tr>
+        <td style="text-align:left">
+            <input id="construction_mode_checkbox_{{data_source_str_nospace}}" type="checkbox" onclick="{{data_source_str_nospace}}.clickConstructionModeCheckbox(this)">Enable set construction mode
+        </td>
+        {% if width_slider %}
+            {% include 'width_slider.html' %}
+        {% endif %}
+        <td style="text-align:right">
+            {% if not is_set %}
+            <span id="data_set_span_{{data_source_str_nospace}}">Data set:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <select id="low_high_dropdown_{{data_source_str_nospace}}" onchange=       "{{data_source_str_nospace}}.setLowOrHighData(this)">
+                <option value="high">High</option>
+                <option value="low">Low</option>
+            </select>
+            <select id="eor_dropdown_{{data_source_str_nospace}}" onchange="{{data_source_str_nospace}}.setEorData(this)">
+                <option value="EOR0">EOR0</option>
+                <option value="EOR1">EOR1</option>
+            </select>
+            <br>
+            {% endif %}
+            <input id="remove_flagged_data_checkbox_{{data_source_str_nospace}}" type="checkbox"
+            onclick="{{data_source_str_nospace}}.clickRemoveFlaggedDataCheckbox(this)">Hide flagged data
+        </td>
+</table>
+<div id='construction_controls_{{data_source_str_nospace}}'>
+    Start:&nbsp;<span id="start_time_label_{{data_source_str_nospace}}">{{start_time_str_short}}</span>&nbsp;&nbsp;&nbsp;&nbsp;End:&nbsp;<span id="end_time_label_{{data_source_str_nospace}}">{{end_time_str_short}}</span>
+    &nbsp;&nbsp;&nbsp;&nbsp;Click + drag:&nbsp;&nbsp;
+    <select id="click_drag_dropdown_{{data_source_str_nospace}}" onchange="{{data_source_str_nospace}}.setClickDragMode(this)">
+        <option value="zoom">Zooms</option>
+        <option value="flag">Flags</option>
+    </select>
+    &nbsp;&nbsp;&nbsp;&nbsp;
+    <input type="text" id="set_name_textbox_{{data_source_str_nospace}}" placeholder="Enter set name...">
+    <button type="button" onclick="{{data_source_str_nospace}}.saveSet()" id="save_set_button_{{data_source_str_nospace}}">Save set</button>
+    <div id='set_construction_div_{{data_source_str_nospace}}'>
+        <table id='set_construction_table_{{data_source_str_nospace}}' class='table table-striped table-bordered table-responsive'>
+            <thead>
+                <tr>
+                    <th colspan="5">Flagged sub-ranges</th>
+                </tr>
+                <tr>
+                    <th>Number</th>
+                    <th>Start</th>
+                    <th>End</th>
+                    <th>Observations</th>
+                    <th>Unflag</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+</div>

@@ -1,0 +1,61 @@
+{% block body %}
+<table>
+    <tr>
+        <td>
+            Created by:
+        </td>
+        <td>
+            <select id="user_setlist_dropdown">
+                <option value="" selected>All</option>
+                {% for user in users %}
+                    <option value="{{user.username}}">{{user.username}}</option>
+                {% endfor %}
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            EOR0/EOR1:
+        </td>
+        <td>
+            <select id="eor_setlist_dropdown">
+                <option value="" selected>All</option>
+                <option value="EOR0">EOR0</option>
+                <option value="EOR1">EOR1</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            High/Low:
+        </td>
+        <td>
+            <select id="high_low_setlist_dropdown">
+                <option value="" selected>All</option>
+                <option value="high">High</option>
+                <option value="low">Low</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            Sort:
+        </td>
+        <td>
+            <select id="sort_setlist_dropdown">
+                <option value="" selected>None</option>
+                <option value="hours">Data hrs (desc)</option>
+                <option value="time">Most recent</option>
+            </select>
+        </td>
+    </tr>
+    <tr>
+        <td>
+            <button type="button" onclick="applyFiltersAndSort()">Go</button>
+        </td>
+        <td>
+            <input type="checkbox" id="range_filter">In current range</input>
+        </td>
+    </tr>
+</table>
+{% endblock %}
