@@ -66,14 +66,14 @@ class Set(db.Model):
 
 class FlaggedSubset(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
-	set_id = db.Column(db.Integer, db.ForeignKey('set.id', ondelete="CASCADE"))
+	set_id = db.Column(db.Integer, db.ForeignKey('set.id', ondelete='CASCADE'))
 	start = db.Column(db.Integer)
 	end = db.Column(db.Integer)
 
 class FlaggedObsIds(db.Model):
 	id = db.Column(db.Integer, primary_key=True)
 	obs_id = db.Column(db.Integer)
-	flagged_subset_id = db.Column(db.Integer, db.ForeignKey('flagged_subset.id', ondelete="CASCADE"))
+	flagged_subset_id = db.Column(db.Integer, db.ForeignKey('flagged_subset.id', ondelete='CASCADE'))
 
 class DataAmount(db.Model):
 	# AUTO_INCREMENT is automatically set on the first Integer primary key column that is not marked as a foreign key.
@@ -97,6 +97,16 @@ class DataAmount(db.Model):
 			'hours_with_uvfits': round(self.hours_with_uvfits or 0., 4),
 			'data_transfer_rate': round(self.data_transfer_rate or 0., 4)
 		}
+
+	def to_json(self):
+		data_dict = {'id': self.id,
+					'created_on': self.created_on,
+					'hours_scheduled': round(self.hours_scheduled or 0., 4),
+					'hours_observed': round(self.hours_observed or 0., 4),
+					'hours_with_data': round(self.hours_with_data or 0., 4),
+					'hours_with_uvfits': round(self.hours_with_uvfits or 0., 4),
+					'data_transfer_rate': round(self.data_transfer_rate or 0., 4)}
+		return data_dict
 
 class Thread(db.Model):
 	id = db.Column(db.Integer, primary_key=True)

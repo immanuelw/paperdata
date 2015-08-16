@@ -24,6 +24,11 @@ def get_tables():
 
 		db_conn.close()
 
+		#import paperdata_dbi as pdbi
+		#from sqlalchemy.engine import reflection
+		#insp = reflection.Inspector.from_engine(pdbi.engine)
+		#table_tuples = insp.get_table_names()
+
 		return render_template("table_list.html", table_tuples=table_tuples)
 	else:
 		return make_response("You must be logged in to use this feature.", 401)
@@ -47,6 +52,13 @@ def get_columns():
 													AND numeric_precision IS NOT NULL""".format(table)).fetchall()
 
 		db_conn.close()
+
+		#import paperdata_dbi as pdbi
+		#from sqlalchemy.engine import reflection
+		#insp = reflection.Inspector.from_engine(pdbi.engine)
+		#it's a list of dicts
+		#column_list = insp.get_column_names(table)
+		#column_tuples = tuple(column['name'] for column in column_list)
 
 		return render_template("column_list.html", column_tuples=column_tuples)
 	else:
