@@ -1,37 +1,37 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>EoRLiv3</title>
-    <link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css"/>
-    <link rel="stylesheet" href="../static/css/jquery.datetimepicker.css"/>
-    <link rel="stylesheet" href="../static/css/style.css"/>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"/>
+	<title>EoRLiv3</title>
+	<link rel="stylesheet" href="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/themes/smoothness/jquery-ui.css"/>
+	<link rel="stylesheet" href="../static/css/jquery.datetimepicker.css"/>
+	<link rel="stylesheet" href="../static/css/style.css"/>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css"/>
 </head>
 <body>
-    <div class='page'>
-        <div class='metanav'>
-            <span class='nav_left'>
-                <a href="{{ url_for('index') }}">EoRLiv3</a>
-            </span>
-            <span class='nav_right'>
-                <a href="{{ url_for('index') }}">home</a> |
-                {% if not g.user.is_authenticated() %}
-                <a href="{{ url_for('login') }}">log in</a> |
-                <a href="{{ url_for('signup') }}">sign up</a>
-                {% else %}
-                <span>logged in as {{ g.user.username }} | </span>
-                <span><a href="{{ url_for('profile') }}">profile</a> | </span>
-                <a href="{{ url_for('user_page') }}">users</a> |
-                <a href="{{ url_for('logout') }}">log out</a>
-                {% endif %}
-            </span>
-        </div>
-        {% with messages = get_flashed_messages(with_categories=true) %}
-            {% for category, message in messages %}
-                <div class="{{ category }}">{{ message }}</div>
-            {% endfor %}
-        {% endwith %}
-        {% block body %}{% endblock %}
-    </div>
+	<div class='page'>
+		<div class='metanav'>
+			<span class='nav_left'>
+				<a href="{{ url_for('index') }}">EoRLiv3</a>
+			</span>
+			<span class='nav_right'>
+				<a href="{{ url_for('index') }}">home</a> |
+				{% if not g.user.is_authenticated() %}
+				<a href="{{ url_for('login') }}">log in</a> |
+				<a href="{{ url_for('signup') }}">sign up</a>
+				{% else %}
+				<span>logged in as {{ g.user.username }} | </span>
+				<span><a href="{{ url_for('profile') }}">profile</a> | </span>
+				<a href="{{ url_for('user_page') }}">users</a> |
+				<a href="{{ url_for('logout') }}">log out</a>
+				{% endif %}
+			</span>
+		</div>
+		{% with messages = get_flashed_messages(with_categories=true) %}
+			{% for category, message in messages %}
+				<div class="{{ category }}">{{ message }}</div>
+			{% endfor %}
+		{% endwith %}
+		{% block body %}{% endblock %}
+	</div>
 </body>
 </html>

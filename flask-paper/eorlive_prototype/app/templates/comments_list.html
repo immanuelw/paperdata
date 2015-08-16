@@ -1,46 +1,46 @@
 <div id="comments_list" class="collapse-container">
-    {% if g.user and g.user.is_authenticated() %}
-        {% if threads | length > 0 %}
-            {% for thread in threads %}
-                <p>
-                    <span class="arrow-r"></span>
-                    {{ thread.title }} ({{ thread.comments | length }} replies,
-                    last updated {{ thread.last_updated.strftime('%Y-%m-%d %H:%M') }})
-                    {% if g.user and g.user.is_authenticated() %}
-                    <button type="button" class="replyButton" onclick="reply(event, '{{thread.id}}', '{{thread.title}}')">
-                        Reply
-                    </button>
-                    {% endif %}
-                </p>
-                <div>
-                    {% for comment in thread.comments %}
-                        <p>
-                            {{ comment.username }} @ {{ comment.created_on.strftime('%Y-%m-%d %H:%M') }}:
-                            {{ comment.text | set_hyperlinks | safe }}
-                        </p>
-                    {% endfor %}
-                </div>
-            {% endfor %}
-        {% else %}
-            No comments
-        {% endif %}
-    {% else %}
-        Log in to view comments.
-    {% endif %}
+	{% if g.user and g.user.is_authenticated() %}
+		{% if threads | length > 0 %}
+			{% for thread in threads %}
+				<p>
+					<span class="arrow-r"></span>
+					{{ thread.title }} ({{ thread.comments | length }} replies,
+					last updated {{ thread.last_updated.strftime('%Y-%m-%d %H:%M') }})
+					{% if g.user and g.user.is_authenticated() %}
+					<button type="button" class="replyButton" onclick="reply(event, '{{thread.id}}', '{{thread.title}}')">
+						Reply
+					</button>
+					{% endif %}
+				</p>
+				<div>
+					{% for comment in thread.comments %}
+						<p>
+							{{ comment.username }} @ {{ comment.created_on.strftime('%Y-%m-%d %H:%M') }}:
+							{{ comment.text | set_hyperlinks | safe }}
+						</p>
+					{% endfor %}
+				</div>
+			{% endfor %}
+		{% else %}
+			No comments
+		{% endif %}
+	{% else %}
+		Log in to view comments.
+	{% endif %}
 </div>
 <script>
-    var reply = function(event, thread_id, thread_name) {
-        // Stop the collapsible list from handling the click.
-        event.stopPropagation();
+	var reply = function(event, thread_id, thread_name) {
+		// Stop the collapsible list from handling the click.
+		event.stopPropagation();
 
-        $("#replying_thread_id").val(thread_id);
-        $("#replying_thread_name").text(thread_name);
-        $("#new_thread").hide();
-        $("#comment_reply").show();
-    };
+		$("#replying_thread_id").val(thread_id);
+		$("#replying_thread_name").text(thread_name);
+		$("#new_thread").hide();
+		$("#comment_reply").show();
+	};
 
-    var newThread = function(event) {
-        $("#comment_reply").hide();
-        $("#new_thread").show();
-    };
+	var newThread = function(event) {
+		$("#comment_reply").hide();
+		$("#new_thread").show();
+	};
 </script>

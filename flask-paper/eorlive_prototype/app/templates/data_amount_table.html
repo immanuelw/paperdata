@@ -1,23 +1,23 @@
 {% block content %}
 <table class='table table-striped table-bordered'>
-    <thead>
-        <tr>
-            <th colspan="4">As of {{ data_time }}</th>
-        </tr>
-        <tr>
-            <th>Hours scheduled</th>
-            <th>Hours observed</th>
-            <th>Hours with data</th>
-            <th>Hours with uvfits</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td>{{ hours_scheduled }}</td>
-            <td>{{ hours_observed }}</td>
-            <td>{{ hours_with_data }}</td>
-            <td>{{ hours_with_uvfits }}</td>
-        </tr>
-    </tbody>
+	<thead>
+		<tr>
+			<th colspan="4">As of {{ data_time }}</th>
+		</tr>
+		<tr>
+			<th>Hours scheduled</th>
+			<th>Hours observed</th>
+			<th>Hours with data</th>
+			<th>Hours with uvfits</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>{{ hours_scheduled }}</td>
+			<td>{{ hours_observed }}</td>
+			<td>{{ hours_with_data }}</td>
+			<td>{{ hours_with_uvfits }}</td>
+		</tr>
+	</tbody>
 </table>
 {% endblock %}

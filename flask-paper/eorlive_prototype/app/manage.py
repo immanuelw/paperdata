@@ -12,4 +12,4 @@ from app.user_command import UserCommand
 manager.add_command('user', UserCommand)
 
 if __name__ == '__main__':
-    manager.run()
+	manager.run()

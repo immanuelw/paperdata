@@ -1,197 +1,197 @@
 {% block body %}
 <div id="main_content_div">
-    <button id='backbutton' onclick="obs_err.backToHistogram()">Back to histogram</button>
-    <div id='error_table'></div>
-    <div id="obs_err"></div>
-    <div id='set_construction_panel'>
-        {% include 'set_construction_panel.html' %}
-    </div>
+	<button id='backbutton' onclick="obs_err.backToHistogram()">Back to histogram</button>
+	<div id='error_table'></div>
+	<div id="obs_err"></div>
+	<div id='set_construction_panel'>
+		{% include 'set_construction_panel.html' %}
+	</div>
 </div>
 <script type="text/javascript">
 var obs_err = (function($) {
-    var dataSourceObj = {};
-    var observation_counts = {{ observation_counts | tojson }};
-    var observation_counts_copy = {{ observation_counts | tojson }};
-    var error_counts = {{ error_counts | tojson }};
-    var error_counts_copy = {{ error_counts | tojson }};
-    var plot_bands = {{ plot_bands | tojson }};
-    var utc_obsid_map_{{which_data_set}} = {{ utc_obsid_map | tojson }};
+	var dataSourceObj = {};
+	var observation_counts = {{ observation_counts | tojson }};
+	var observation_counts_copy = {{ observation_counts | tojson }};
+	var error_counts = {{ error_counts | tojson }};
+	var error_counts_copy = {{ error_counts | tojson }};
+	var plot_bands = {{ plot_bands | tojson }};
+	var utc_obsid_map_{{which_data_set}} = {{ utc_obsid_map | tojson }};
 
-    {% include "js/obs_err_set_construction.js" %}
+	{% include "js/obs_err_set_construction.js" %}
 
-    var backToHistogram = function() {
-        $('#backbutton').hide();
-        $('#error_table').hide();
-        $('#obs_err').show();
-        $('#set_construction_panel').show();
-    };
-    dataSourceObj.backToHistogram = backToHistogram;
+	var backToHistogram = function() {
+		$('#backbutton').hide();
+		$('#error_table').hide();
+		$('#obs_err').show();
+		$('#set_construction_panel').show();
+	};
+	dataSourceObj.backToHistogram = backToHistogram;
 
-    $(function() {
-        $('#backbutton').hide();
-        $('#error_table').hide();
+	$(function() {
+		$('#backbutton').hide();
+		$('#error_table').hide();
 
-        $("#obs_err").highcharts('StockChart', {
-            colors: [
-                '#7cb5ec',
-                '#FF0000',
-                '#90ed7d',
-                '#f7a35c',
-                '#8085e9',
-                '#f15c80',
-                '#e4d354',
-                '#8085e8',
-                '#8d4653',
-                '#91e8e1'
-            ],
-            credits: {
-                enabled: false,
-            },
-            chart: {
-                zoomType: "x",
-                events: {
-                    selection: function(event) {
-                        if (clickDragMode === 'flag') {
-                            event.preventDefault();
-                            flagClickAndDraggedRange(event);
-                        }
-                    }
-                }
-            },
-            legend: {
-                enabled: true
-            },
-            plotOptions: {
-                column: {
-                    dataGrouping: {
-                        groupPixelWidth: 80,
-                        forced: true
-                    },
-                    pointPlacement: "between",
-                    groupPadding: 0.1,
-                    pointPadding: 0,
-                    events: {
-                        click: function(event) {
-                            if (this.name === 'errors') {
-                                var columnLimits = getColumnRangeLimits(event, this.xAxis.series[1]);
-                                var startTime = columnLimits.startTime, endTime = columnLimits.endTime;
+		$("#obs_err").highcharts('StockChart', {
+			colors: [
+				'#7cb5ec',
+				'#FF0000',
+				'#90ed7d',
+				'#f7a35c',
+				'#8085e9',
+				'#f15c80',
+				'#e4d354',
+				'#8085e8',
+				'#8d4653',
+				'#91e8e1'
+			],
+			credits: {
+				enabled: false,
+			},
+			chart: {
+				zoomType: "x",
+				events: {
+					selection: function(event) {
+						if (clickDragMode === 'flag') {
+							event.preventDefault();
+							flagClickAndDraggedRange(event);
+						}
+					}
+				}
+			},
+			legend: {
+				enabled: true
+			},
+			plotOptions: {
+				column: {
+					dataGrouping: {
+						groupPixelWidth: 80,
+						forced: true
+					},
+					pointPlacement: "between",
+					groupPadding: 0.1,
+					pointPadding: 0,
+					events: {
+						click: function(event) {
+							if (this.name === 'errors') {
+								var columnLimits = getColumnRangeLimits(event, this.xAxis.series[1]);
+								var startTime = columnLimits.startTime, endTime = columnLimits.endTime;
 
-                                $('#obs_err').hide();
-                                $('#set_construction_panel').hide();
-                                $('#error_table').html("<img src='/static/images/ajax-loader.gif' class='loading'/>");
-                                $('#error_table').show();
+								$('#obs_err').hide();
+								$('#set_construction_panel').hide();
+								$('#error_table').html("<img src='/static/images/ajax-loader.gif' class='loading'/>");
+								$('#error_table').show();
 
-                                $.ajax({
-                                    type: "POST",
-                                    url: "/error_table",
-                                    data: {
-                                        'starttime': startTime,
-                                        'endtime': endTime
-                                    },
-                                    success: function(data) {
-                                        $('#error_table').html(data);
-                                        $('#backbutton').show();
-                                    },
-                                    error: function(xhr, ajaxOptions, thrownError) {
-                                        backToHistogram();
-                                    },
-                                    dataType: "html"
-                                });
-                            }
-                        }
-                    }
-                }
-            },
-            rangeSelector: {
-                buttons: [{
-                    type: 'second',
-                    count: 1,
-                    text: '1s'
-                }, {
-                    type: 'minute',
-                    count: 1,
-                    text: '1min'
-                }, {
-                    type: 'minute',
-                    count: 60,
-                    text: '1hr'
-                }, {
-                    type: 'day',
-                    count: 1,
-                    text: '1d'
-                }, {
-                    type: 'week',
-                    count: 1,
-                    text: '1w'
-                }, {
-                    type: 'month',
-                    count: 1,
-                    text: '1mo'
-                }, {
-                    type: 'month',
-                    count: 3,
-                    text: '3mo'
-                }, {
-                    type: 'month',
-                    count: 6,
-                    text: '6mo'
-                }, {
-                    type: 'ytd',
-                    count: 1,
-                    text: 'YTD'
-                }, {
-                    type: 'year',
-                    count: 1,
-                    text: '1y'
-                }, {
-                    type: 'all',
-                    count: 1,
-                    text: 'all'
-                }],
-                selected: 10
-            },
-            title: {
-                text: 'Observation & Error Count'
-            },
-            xAxis: {
-                ordinal: false
-            },
-            yAxis: {
-                title: {
-                    text: 'Number of Observations/Errors'
-                },
-                min: 0,
-                allowDecimals: false
-            },
-            series: [{
-                type: 'column',
-                name: 'observations',
-                data: observation_counts
-            },
-            {
-                type: 'column',
-                name: 'errors',
-                data: error_counts
-            }]
-        }, function(chart) {
-            _chart = chart;
-            setup();
-        });
-    });
+								$.ajax({
+									type: "POST",
+									url: "/error_table",
+									data: {
+										'starttime': startTime,
+										'endtime': endTime
+									},
+									success: function(data) {
+										$('#error_table').html(data);
+										$('#backbutton').show();
+									},
+									error: function(xhr, ajaxOptions, thrownError) {
+										backToHistogram();
+									},
+									dataType: "html"
+								});
+							}
+						}
+					}
+				}
+			},
+			rangeSelector: {
+				buttons: [{
+					type: 'second',
+					count: 1,
+					text: '1s'
+				}, {
+					type: 'minute',
+					count: 1,
+					text: '1min'
+				}, {
+					type: 'minute',
+					count: 60,
+					text: '1hr'
+				}, {
+					type: 'day',
+					count: 1,
+					text: '1d'
+				}, {
+					type: 'week',
+					count: 1,
+					text: '1w'
+				}, {
+					type: 'month',
+					count: 1,
+					text: '1mo'
+				}, {
+					type: 'month',
+					count: 3,
+					text: '3mo'
+				}, {
+					type: 'month',
+					count: 6,
+					text: '6mo'
+				}, {
+					type: 'ytd',
+					count: 1,
+					text: 'YTD'
+				}, {
+					type: 'year',
+					count: 1,
+					text: '1y'
+				}, {
+					type: 'all',
+					count: 1,
+					text: 'all'
+				}],
+				selected: 10
+			},
+			title: {
+				text: 'Observation & Error Count'
+			},
+			xAxis: {
+				ordinal: false
+			},
+			yAxis: {
+				title: {
+					text: 'Number of Observations/Errors'
+				},
+				min: 0,
+				allowDecimals: false
+			},
+			series: [{
+				type: 'column',
+				name: 'observations',
+				data: observation_counts
+			},
+			{
+				type: 'column',
+				name: 'errors',
+				data: error_counts
+			}]
+		}, function(chart) {
+			_chart = chart;
+			setup();
+		});
+	});
 
-    var sliderChanged = function(slider) {
-        var newOptions = {
-            dataGrouping: {
-                groupPixelWidth: slider.value
-            }
-        };
+	var sliderChanged = function(slider) {
+		var newOptions = {
+			dataGrouping: {
+				groupPixelWidth: slider.value
+			}
+		};
 
-        _chart.series[0].update(newOptions, false); // Don't redraw chart.
-        _chart.series[1].update(newOptions);
-    };
-    dataSourceObj.sliderChanged = sliderChanged;
+		_chart.series[0].update(newOptions, false); // Don't redraw chart.
+		_chart.series[1].update(newOptions);
+	};
+	dataSourceObj.sliderChanged = sliderChanged;
 
-    return dataSourceObj;
+	return dataSourceObj;
 }(jQuery));
 </script>
 {% endblock %}

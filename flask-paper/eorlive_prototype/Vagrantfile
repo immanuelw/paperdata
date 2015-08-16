@@ -21,8 +21,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provision :shell, path: "provision.sh", privileged: false
 
   config.vm.provider "virtualbox" do |v|
-    v.memory = 4096
-    v.cpus = 4
+	v.memory = 4096
+	v.cpus = 4
   end
 
   #https://stefanwrobel.com/how-to-make-vagrant-performance-not-suck
