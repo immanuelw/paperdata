@@ -34,13 +34,17 @@ from requests_futures.sessions import FuturesSession
 ##	field = getattr(table, field_name)
 ##	if equivalency is None:
 ##		return None
-##	if equivalency == '<='
+##	if equivalency == '<=':
 ##		clause = field <= value
-##	elif equivalency == '=='
+##	elif equivalency == '==':
 ##		clause = field == value
-##	elif equivalency == '>='
+##	elif equivalency == '>=':
 ##		clause = field >= value
-##	elif equivalency == 'like'
+##	elif equivalency == '<':
+##		clause = field < value
+##	elif equivalency == '>':
+##		clause = field > value
+##	elif equivalency == 'like':
 ##		clause = field.like(value)
 ##	elif equivalency == 'or' and value is None:
 ##		clause_tuple = tuple(make_clause(table, new_field_name, new_equivalency, new_value)
@@ -53,12 +57,18 @@ from requests_futures.sessions import FuturesSession
 ##	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in field_sort_tuple]
 ##	return clause_list
 
-##def get_query_results(data_source, field_tuples, field_sort_tuple=None, output_vars=None):
+##def get_query_results(data_source=None, database=None, table=None, field_tuples, field_sort_tuple=None, output_vars=None):
 ##	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
 ##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
-##	dbi, module = get_dbi(data_source.database)
+##	if data_souce is None:
+##		dbi, module = get_dbi(database)
+##	else:
+##		dbi, module = get_dbi(data_source.database)
+##	if table is None:
+##		table = getattr(module, data_source.table.capitalize())
+##	else:
+##		table = getattr(module, table.capitalize())
 ##	s = dbi.Session()
-##	table = getattr(module, data_source.table.capitalize())
 ##	results = s.query(table)
 ##	clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
 ##	for clause in clause_gen:
