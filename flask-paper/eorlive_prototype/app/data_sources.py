@@ -5,7 +5,21 @@ import re
 from app.flask_app import app, db
 from app import db_utils, models
 #import paperdata_dbi as pdbi
+#import pyganglia_dbi as pyg
 #from sqlalchemy.engine import reflection
+#from sqlalchemy import or_
+
+#def get_dbi(database):
+#	if database == 'paperdata':
+#		dbi = pdbi.DataBaseInterface()
+#	elif database == 'ganglia':
+#		dbi = pyg.DataBaseInterface()
+#	return dbi, module
+
+#def inspector(database):
+#	dbi, _ = get_dbi(database)
+#	insp = reflection.Inspector.from_engine(dbi.engine)
+#	return insp
 
 @app.route('/get_tables', methods = ['POST'])
 def get_tables():
@@ -17,21 +31,21 @@ def get_tables():
 			db_conn = psycopg2.connect(database=database, host=hostname,
 				user=os.environ['MWA_DB_USERNAME'], password=os.environ['MWA_DB_PW'])
 		except Exception as e:
-			return "Can't connect to database"
+			return 'Cannot connect to database'
 
-		table_tuples = db_utils.send_query(db_conn, """SELECT table_name
+		table_tuples = db_utils.send_query(db_conn, '''SELECT table_name
 													FROM information_schema.tables
 													WHERE table_schema='public'
-													ORDER BY table_name""").fetchall()
+													ORDER BY table_name''').fetchall()
 
 		db_conn.close()
 
-		#insp = reflection.Inspector.from_engine(pdbi.engine)
+		#insp = inspector(database)
 		#table_tuples = insp.get_table_names()
 
-		return render_template("table_list.html", table_tuples=table_tuples)
+		return render_template('table_list.html', table_tuples=table_tuples)
 	else:
-		return make_response("You must be logged in to use this feature.", 401)
+		return make_response('You must be logged in to use this feature.', 401)
 
 @app.route('/get_columns', methods = ['POST'])
 def get_columns():
@@ -44,23 +58,23 @@ def get_columns():
 			db_conn = psycopg2.connect(database=database, host=hostname,
 				user=os.environ['MWA_DB_USERNAME'], password=os.environ['MWA_DB_PW'])
 		except Exception as e:
-			return "Can't connect to database"
+			return 'Cannot connect to database'
 
-		column_tuples = db_utils.send_query(db_conn, """SELECT column_name
+		column_tuples = db_utils.send_query(db_conn, '''SELECT column_name
 													FROM information_schema.columns
-													WHERE table_name = '{}'
-													AND numeric_precision IS NOT NULL""".format(table)).fetchall()
+													WHERE table_name = '{table}'
+													AND numeric_precision IS NOT NULL'''.format(table=table)).fetchall()
 
 		db_conn.close()
 
-		#insp = reflection.Inspector.from_engine(pdbi.engine)
+		#insp = inspector(database)
 		#it's a list of dicts
 		#column_list = insp.get_column_names(table)
 		#column_tuples = tuple(column['name'] for column in column_list)
 
-		return render_template("column_list.html", column_tuples=column_tuples)
+		return render_template('column_list.html', column_tuples=column_tuples)
 	else:
-		return make_response("You must be logged in to use this feature.", 401)
+		return make_response('You must be logged in to use this feature.', 401)
 
 @app.route('/get_users_data_sources')
 def get_users_data_sources():
@@ -69,11 +83,11 @@ def get_users_data_sources():
 		subscribed_but_inactive_data_sources =\
 			list(set(g.user.subscribed_data_sources) - set(active_data_sources))
 
-		return render_template("data_sources.html",
+		return render_template('data_sources.html',
 			subscribed_but_inactive_data_sources=subscribed_but_inactive_data_sources,
 			active_data_sources=g.user.active_data_sources)
 	else:
-		return make_response("You must be logged in to use this feature.", 401)
+		return make_response('You must be logged in to use this feature.', 401)
 
 @app.route('/get_unsubscribed_data_sources')
 def get_unsubscribed_data_sources():
@@ -84,10 +98,10 @@ def get_unsubscribed_data_sources():
 		unsubscribed_data_sources = list(set(all_data_sources) -\
 			set(subscribed_data_sources))
 
-		return render_template("unsubscribed_data_sources.html",
+		return render_template('unsubscribed_data_sources.html',
 			unsubscribed_data_sources=unsubscribed_data_sources)
 	else:
-		return make_response("You must be logged in to use this feature.", 401)
+		return make_response('You must be logged in to use this feature.', 401)
 
 @app.route('/update_active_data_sources', methods = ['POST'])
 def update_active_data_sources():
@@ -111,9 +125,9 @@ def update_active_data_sources():
 
 		db.session.add(g.user)
 		db.session.commit()
-		return "Success"
+		return 'Success'
 	else:
-		return make_response("You must be logged in to use this feature.", 401)
+		return make_response('You must be logged in to use this feature.', 401)
 
 @app.route('/subscribe_to_data_source', methods = ['POST'])
 def subscribe_to_data_source():
@@ -126,9 +140,9 @@ def subscribe_to_data_source():
 		g.user.subscribed_data_sources.append(data_source)
 		db.session.add(g.user)
 		db.session.commit()
-		return "Success"
+		return 'Success'
 	else:
-		return make_response("You must be logged in to use this feature.", 401)
+		return make_response('You must be logged in to use this feature.', 401)
 
 @app.route('/unsubscribe_from_data_source', methods = ['POST'])
 def unsubscribe_from_data_source():
@@ -143,12 +157,12 @@ def unsubscribe_from_data_source():
 			g.user.active_data_sources.remove(data_source)
 		except ValueError as e:
 			#The user didn't have this as an active data source.
-			print("Tried to remove an inactive data source")
+			print('Tried to remove an inactive data source')
 		db.session.add(g.user)
 		db.session.commit()
-		return "Success"
+		return 'Success'
 	else:
-		return make_response("You must be logged in to use this feature.", 401)
+		return make_response('You must be logged in to use this feature.', 401)
 
 @app.route('/get_graph_types')
 def get_graph_types():
@@ -171,11 +185,11 @@ def create_data_source():
 
 		if not graph_type or not host or not database or not table or not columns\
 			or not obs_column or not data_source_name:
-			return jsonify(error=True, message="You need to fill out all the fields.")
+			return jsonify(error=True, message='You need to fill out all the fields.')
 
 		data_source_name = data_source_name.strip()
 		if len(data_source_name) == 0:
-			return jsonify(error=True, message="Name cannot be empty.")
+			return jsonify(error=True, message='Name cannot be empty.')
 
 		# The data source name (with spaces replaced by ಠ_ಠ) is used as
 		# a JavaScript variable name and as an ID in HTML, so it needs
@@ -183,45 +197,47 @@ def create_data_source():
 		# options such as $ since they would need to be escaped in
 		# the HTML IDs.
 		if not re.match(r'^[a-zA-Z_][0-9a-zA-Z_ ]*$', data_source_name):
-			return jsonify(error=True, message="""Your data source name must
+			return jsonify(error=True, message='''Your data source name must
 				start with a letter or _ that is followed by digits,
-				letters, _, or spaces.""")
+				letters, _, or spaces.''')
 
 		#Is the data source name unique?
 		if models.GraphDataSource.query.filter(models.GraphDataSource.name == data_source_name).first() is not None:
-			return jsonify(error=True, message="The data source name must be unique.")
+			return jsonify(error=True, message='The data source name must be unique.')
 
 		try:
 			db_conn = psycopg2.connect(database=database, host=host,
 				user=os.environ['MWA_DB_USERNAME'], password=os.environ['MWA_DB_PW'])
 		except Exception as e:
-			return jsonify(error=True, message="Could not connect to that database.")
+			return jsonify(error=True, message='Could not connect to that database.')
 
-		table_response = db_utils.send_query(db_conn, """SELECT table_name
+		table_response = db_utils.send_query(db_conn, '''SELECT table_name
 											FROM information_schema.tables
-											WHERE table_name = '{}'
-											AND table_schema='public'""".format(table)).fetchall()
+											WHERE table_name = '{table}'
+											AND table_schema='public''''.format(table=table)).fetchall()
 
-		#table_response = (table,)
-
-		if len(table_response) == 0: #No results, so the table doesn't exist.
+		if len(table_response) == 0: #No results, so the table does not exist.
 			db_conn.close()
-			return jsonify(error=True, message="The table {} doesn't exist.".format(table))
+			return jsonify(error=True, message='The table {table} does not exist.'.format(table=table))
 
-		column_response = db_utils.send_query(db_conn, """SELECT column_name
+		#insp = inspector(database)
+		#table_tuples = insp.get_table_names()
+		#if table not in table_tuples:
+		#	return jsonify(error=True, message='The table {table} does not exist.'.format(table=table))
+
+		column_response = db_utils.send_query(db_conn, '''SELECT column_name
 											FROM information_schema.columns
-											WHERE table_name = '{}'
-											AND numeric_precision IS NOT NULL""".format(table)).fetchall()
-
-		#insp = reflection.Inspector.from_engine(pdbi.engine)
-		#it's a list of dicts
-		#column_list = insp.get_column_names(table)
-		#column_response = tuple(column['name'] for column in column_list)
+											WHERE table_name = '{table}'
+											AND numeric_precision IS NOT NULL'''.format(table=table)).fetchall()
 
 		db_conn.close()
 
 		columns_with_obs_column = list(columns)
 		columns_with_obs_column.append(obs_column)
+
+		#it's a list of dicts
+		#column_list = insp.get_column_names(table)
+		#column_response = tuple(column['name'] for column in column_list)
 
 		for column in columns_with_obs_column: # So we can check for the existence of the obs column along with the
 			column_exists = False			  # others in the same loop.
@@ -231,13 +247,20 @@ def create_data_source():
 					break
 			if not column_exists:
 				return jsonify(error=True,
-					message="The column {} does not exist in that table or is not a numeric column.".format(column))
+					message='The column {column} does not exist in that table or is not a numeric column.'.format(column=column))
 
+		#missing_columns = tuple(column if column not in column_reponse for columns_with_obs_column)
+		#if missing_columns:
+		#	return jsonify(error=True,
+		#		message='The column {column} does not exist in that table or is not a numeric column.'.format(column=missing_columns[0]))
+		
 		projectid = False
 		for returned_column in column_response:
 			if returned_column[0] == 'projectid':
 				projectid = True
 				break
+
+		#projectid = 'projectid' in column_response
 
 		graph_data_source = models.GraphDataSource()
 		graph_data_source.name = data_source_name
@@ -264,30 +287,102 @@ def create_data_source():
 
 		return jsonify(error=False)
 	else:
-		return make_response("You must be logged in to use this feature.", 401)
+		return make_response('You must be logged in to use this feature.', 401)
 
 def build_query(data_source):
-	query = "SELECT "
-
-	query += data_source.obs_column
-
+	query = ''.join(('SELECT ', data_source.obs_column))
 	columns = models.GraphDataSourceColumn.query.filter(
 		models.GraphDataSourceColumn.graph_data_source == data_source.name).all()
 
 	for column in columns:
-		query += ", " + column.name
+		query = ', '.join((query, column.name))
 
-	query += " FROM " + data_source.table
-	query += " WHERE "
-
-	query += data_source.obs_column + " >= {} AND "
-	query += data_source.obs_column + " <= {} "
-
-	query += " AND projectid='G0009' " if data_source.projectid else ""
-
-	query += " ORDER BY " + data_source.obs_column + " ASC"
+	query = ''.join((query, ' FROM ', data_source.table, ' WHERE ', data_source.obs_column, ' >= {} AND ', data_source.obs_column, ' <= {} ',
+						''' AND projectid='G0009' ''' if data_source.projectid else '', ' ORDER BY ', data_source.obs_column, ' ASC'))
 
 	return (query, columns)
+
+##def make_clause(table, field_name, equivalency, value):
+##	field = getattr(table, field_name)
+##	if equivalency == '<='
+##		clause = field <= value
+##	elif equivalency == '=='
+##		clause = field == value
+##	elif equivalency == '>='
+##		clause = field >= value
+##	elif equivalency == 'like'
+##		clause = field.like(value)
+##	elif equivalency == 'or':
+##		clause_tuple = tuple(make_clause(table, new_field_name, new_equivalency, new_value)
+##										for new_field_name, new_equivalency, new_value in field_name)
+##		clause = or_(*clause_tuple)
+##	return clause
+
+##def gen_results(table, results, field_name, equivalency, value):
+##	field = getattr(table, field_name)
+##	if equivalency == '<='
+##		results = results.filter(field <= value)
+##	elif equivalency == '=='
+##		results = results.filter(field == value)
+##	elif equivalency == '>='
+##		results = results.filter(field >= value)
+##	elif equivalency == 'like'
+##		results = results.filter(field.like(value))
+##	return results
+
+##def get_query_results(data_source, field_tuples, field_sort_name, output_vars=None):
+##	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
+##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
+##	dbi, module = get_dbi(data_source.database)
+##	s = dbi.Session()
+##	table = getattr(module, data_source.table.capitalize())
+##	results = s.query(table)
+##	for field_name, equivalency, value in field_tuples:
+##		if equivalency == 'or' and value is None:
+##			for new_field_name, new_equivalency, new value in field_name:
+##				results = gen_results(table, results, new_field_name, new_equivalency, new_value)
+##		else:
+##			results = gen_results(table, results, field_name, equivalency, value)
+##	field_sort = getattr(table, field_sort_name)
+##	results = results.order_by(field_sort.asc()).all()
+##	if output_vars is not None:
+##		results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results))
+##	s.close()
+##	return results
+
+##def get_query_results(data_source, field_tuples, field_sort_name, output_vars=None):
+##	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
+##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
+##	dbi, module = get_dbi(data_source.database)
+##	s = dbi.Session()
+##	table = getattr(module, data_source.table.capitalize())
+##	results = s.query(table)
+##	#tuple of all results
+##	results_tuples = (results,)
+##	for field_name, equivalency, value in field_tuples:
+##	
+##		#list purged on every loop
+##		results_list = []
+##		if equivalency == 'or' and value is None:
+##			#run through each set
+##			for new_results in results_tuples:
+##				for new_field_name, new_equivalency, new value in field_name:
+##					results_list.append(gen_results(table, new_results, new_field_name, new_equivalency, new_value))
+##		else:
+##			for new_results in results_tuples:
+##				results_list.append(gen_results(table, new_results, field_name, equivalency, value))
+##		results_tuples = tuple(results_list)
+##	#now should have couple of sets
+##	field_sort = getattr(table, field_sort_name)
+##	flatten and make a set to be unique
+##	results_list = tuple(results.order_by(field_sort.asc()).all() for results in results_tuples)
+##	#grab relevant variables
+##	if output_vars is None:
+##		results = tuple({tuple(getattr(entry, output_var) for output_var in output_vars) for result in results_list for entry in result})
+##	else:
+##		results = tuple({entry for result in results_list for entry in result})
+##	s.close()
+##	return results
 
 def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 	data_source = models.GraphDataSource.query.filter(models.GraphDataSource.name == data_source_str).first()
@@ -300,6 +395,9 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 	results = db_utils.send_query(db_conn, query.format(start_gps, end_gps)).fetchall()
 
 	db_conn.close()
+
+	##results = get_query_results(data_source, (('obs_column, '>=', start_gps), ('obs_column', '<=', end_gps),
+	##			('projectid', '==', 'G0009' if data_source.projectid else '')), field_sort_name='obs_column')
 
 	data = {}
 
@@ -334,23 +432,22 @@ def which_data_set(the_set):
 	return 'any' if is_any else the_set.low_or_high[0] + the_set.eor[3]
 
 def separate_data_into_sets(data, data_source_results, columns, data_source, start_gps, end_gps):
-	projectid_clause = "AND projectid='G0009'" if data_source.projectid else ""
-	obsid_results = db_utils.send_query(g.eor_db, """SELECT starttime, obsname, ra_phase_center
+	projectid_clause = '''AND projectid='G0009'''' if data_source.projectid else ''
+	obsid_results = db_utils.send_query(g.eor_db, '''SELECT starttime, obsname, ra_phase_center
 									FROM mwa_setting
-									WHERE starttime >= {} AND starttime <= {}
-									{}
+									WHERE starttime >= {start} AND starttime <= {end}
+									{projectid}
 									AND (obsname LIKE 'low%' OR obsname LIKE 'high%')
 									AND (ra_phase_center = 0 OR ra_phase_center = 60)
-									ORDER BY starttime ASC""".format(start_gps,
-									end_gps, projectid_clause)).fetchall()
+									ORDER BY starttime ASC'''.format(start=start_gps,
+									end=end_gps, projectid=projectid_clause)).fetchall()
 
-	#dbi = pdbi.DataBaseInterface()
-	#s = dbi.Session()
-	#need to add more filters and like
-	#need to change func to fit paperdata
-	#OBSID_ALL = s.query(pdbi.XXX).filter(pdbi.XXX.time_start >= time_start).filter(pdbi.XXX.time_end <= time_end).order_by(XXX).all()
-	#obsid_results = tuple((OBSID.time_start, OBSID.obsname, OBSID.XXX) for OBSID in OBSID_ALL)
-	#s.close()
+	#sqlalchemy overloads the |, &, and ~ operators, can use as or, and, not
+	##obsid_results = get_query_results(data_source, (('starttime, '>=', start_gps), ('starttime', '<=', end_gps),
+	##									('projectid', '==', 'G0009' if data_source.projectid else ''),
+	##									((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None)),
+	##									((('ra_phase_center', '==', 0), ('ra_phase_center', '==', 60)), 'or', None),
+	##									field_sort_name='starttime', output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	data['l0'] = {}
 	data['l1'] = {}
@@ -413,24 +510,22 @@ def separate_data_into_sets(data, data_source_results, columns, data_source, sta
 def join_with_obsids_from_set(data_source_results, the_set, data_source):
 	low_high_clause, eor_clause = db_utils.get_lowhigh_and_eor_clauses(the_set.low_or_high, the_set.eor)
 
-	projectid_clause = "AND projectid='G0009'" if data_source.projectid else ""
+	projectid_clause = '''AND projectid='G0009'''' if data_source.projectid else ''
 
 	response = db_utils.send_query(g.eor_db, '''SELECT starttime
 				FROM mwa_setting
-				WHERE starttime >= {} AND starttime <= {}
-				{}
-				{}
-				{}
-				ORDER BY starttime ASC'''.format(the_set.start, the_set.end,
-					projectid_clause, low_high_clause, eor_clause)).fetchall()
+				WHERE starttime >= {start} AND starttime <= {end}
+				{projectid}
+				{low_high}
+				{eor}
+				ORDER BY starttime ASC'''.format(start=the_set.start, end=the_set.end,
+					projectid=projectid_clause, low_high=low_high_clause, eor=eor_clause)).fetchall()
 
-	#dbi = pdbi.DataBaseInterface()
-	#s = dbi.Session()
-	#need to add more filters and like
-	#need to change func to fit paperdata
-	#TIME_ALL = s.query(pdbi.XXX).filter(pdbi.XXX.time_start >= time_start).filter(pdbi.XXX.time_end <= time_end).order_by(XXX).all()
-	#response = tuple(TIME.time_start for TIME in TIME_ALL)
-	#s.close()
+	##response = get_query_results(data_source, (('starttime, '>=', the_set.start), ('starttime', '<=', the_set.end),
+	##									('projectid', '==', 'G0009' if data_source.projectid else ''),
+	##									((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None)),
+	##									((('ra_phase_center', '==', 0), ('ra_phase_center', '==', 60)), 'or', None),
+	##									field_sort_name='starttime', output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	obs_id_list = [obs_tuple[0] for obs_tuple in response]
 
