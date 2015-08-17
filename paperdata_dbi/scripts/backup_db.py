@@ -61,17 +61,21 @@ def paperbackup(timestamp):
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 
-	OBS_dump = s.query(pdbi.Observation).order_by(pdbi.Observation.julian_date.asc(), pdbi.Observation.polarization.asc())
+	OBS_table = getattr(pdbi, 'Observation')
+	OBS_dump = s.query(OBS_table).order_by(getattr(OBS_table, 'julian_date').asc(), getattr(OBS_table, 'polarization').asc())
 	json_data(dbo1, OBS_dump)
 
-	FILE_dump = s.query(pdbi.File).order_by(pdbi.File.obsnum.asc(), pdbi.File.filename.asc())
+	FILE_table = getattr(pdbi, 'File')
+	FILE_dump = s.query(FILE_table).order_by(getattr(FILE_table, 'obsnum').asc(), getattr(FILE_table, 'filename').asc())
 	json_data(dbo2, FILE_dump)
 
-	#FEED_dump = s.query(pdbi.Feed).order_by(pdbi.Feed.julian_day.asc(), pdbi.Feed.filename.asc())
+	#FEED_table = getattr(pdbi, 'File')
+	#FEED_dump = s.query(FEED_table).order_by(getattr(FEED_table, 'julian_day').asc(), getattr(FEED_table, 'filename').asc())
 	#json_data(dbo3, FEED_dump)
 
-	LOG_dump = s.query(pdbi.Log).order_by(pdbi.Log.timestamp.asc(), pdbi.Log.action.asc())
-	json_data(dbo3, LOG_dump)
+	LOG_table = getattr(pdbi, 'Log')
+	LOG_dump = s.query(LOG_table).order_by(getattr(LOG_table, 'timestamp').asc(), getattr(LOG_table, 'action').asc())
+	json_data(dbo4, LOG_dump)
 
 	s.close()
 	print 'Table data backup saved'

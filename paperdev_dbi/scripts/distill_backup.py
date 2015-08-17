@@ -7,7 +7,7 @@ import sys
 import time
 import os
 import subprocess
-from ddr_compress.dbi import DataBaseInterface, Observation, File, Neighbors, Log
+import ddr_compress.dbi as ddbi
 import json
 
 ### Script to Backup paperdev database
@@ -55,16 +55,19 @@ def paperbackup(timestamp):
 	db3 = 'log_{timestamp}.json'.format(timestamp=timestamp)
 	dbo3 = os.path.join(backup_dir, db3)
 
-	dbi = DataBaseInterface()
+	dbi = ddbi.DataBaseInterface()
 	s = dbi.Session()
 
-	OBS_dump = s.query(Observation).order_by(Observation.julian_date.asc(), Observation.pol.asc())
+	OBS_table = getattr(ddbi, 'Observation')
+	OBS_dump = s.query(OBS_table).order_by(getattr(OBS_table, 'julian_date').asc(), getattr(OBS_table, 'pol').asc())
 	json_data(dbo1, OBS_dump)
 
-	FILE_dump = s.query(File).order_by(File.obsnum.asc(), File.filename.asc())
+	FILE_table = getattr(ddbi, 'File')
+	FILE_dump = s.query(FILE_table).order_by(getattr(FILE_table, 'obsnum').asc(), getattr(FILE_table, 'filename').asc())
 	json_data(dbo2, FILE_dump)
 
-	LOG_dump = s.query(Log).order_by(Log.obsnum.asc(), Log.timestamp.asc())
+	LOG_table = getattr(ddbi, 'Log')
+	LOG_dump = s.query(LOG_table).order_by(getattr(LOG_table, 'obsnum').asc(), getattr(LOG_table, 'timestamp').asc())
 	json_data(dbo3, LOG_dump)
 
 	s.close()

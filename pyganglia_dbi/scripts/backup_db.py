@@ -65,19 +65,24 @@ def paperbackup(timestamp):
 	dbi = pyg.DataBaseInterface()
 	s = dbi.Session()
 
-	FILESYSTEM_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Filesystem.timestamp.asc(), pyg.Filesystem.host.asc(), pyg.Filesystem.system.asc())
+	table = getattr(pyg, 'Filesystem')
+	FILESYSTEM_dump = s.query(table).orderby(getattr(table, 'timestamp').asc(), getattr(table, 'host').asc(), getattr(table, 'system').asc())
 	json_data(dbo1, FILESYSTEM_dump)
 
-	MONITOR_dump = s.query(pyg.MONITOR).order_by(pyg.Monitor.timestamp.asc(), pyg.Monitor.host.asc(), pyg.Monitor.filename.asc())
+	table = getattr(pyg, 'Monitor')
+	MONITOR_dump = s.query(table).orderby(getattr(table, 'timestamp').asc(), getattr(table, 'host').asc(), getattr(table, 'filename').asc())
 	json_data(dbo2, MONITOR_dump)
 
-	IOSTAT_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Iostat.timestamp.asc(), pyg.Iostat.host.asc(), pyg.Iostat.device.asc())
+	table = getattr(pyg, 'Iostat')
+	IOSTAT_dump = s.query(table).orderby(getattr(table, 'timestamp').asc(), getattr(table, 'host').asc(), getattr(table, 'device').asc())
 	json_data(dbo1, IOSTAT_dump)
 
-	RAM_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Ram.timestamp.asc(), pyg.Ram.host.asc(), pyg.Ram.polarization.asc())
+	table = getattr(pyg, 'Ram')
+	RAM_dump = s.query(table).orderby(getattr(table, 'timestamp').asc(), getattr(table, 'host').asc())
 	json_data(dbo1, RAM_dump)
 
-	CPU_dump = s.query(pyg.FILESYSTEM).order_by(pyg.Cpu.timestamp.asc(), pyg.Cpu.host.asc(), pyg.Cpu.cpu.asc())
+	table = getattr(pyg, 'Cpu')
+	CPU_dump = s.query(table).orderby(getattr(table, 'timestamp').asc(), getattr(table, 'host').asc(), getattr(table, 'cpu').asc())
 	json_data(dbo1, CPU_dump)
 
 	s.close()
