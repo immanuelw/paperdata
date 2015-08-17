@@ -66,7 +66,7 @@ def dupe_check(input_host, input_paths):
 	FEEDs = s.query(pdbi.Feed).all()
 	s.close()
 	#all files on same host
-	filenames = tuple(os.path.join(FEED.path, FEED.filename) for FEED in FEEDs if FEED.host==input_host)
+	filenames = tuple(os.path.join(getattr(FEED, 'path'), getattr(FEED, 'filename')) for FEED in FEEDs if getattr(FEED, 'host') == input_host)
 
 	#for each input file, check if in filenames
 	unique_paths = tuple(input_path for input_path in input_paths if input_path not in filenames)

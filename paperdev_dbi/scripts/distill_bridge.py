@@ -47,12 +47,12 @@ def add_data():
 	OBSs_complete = s.query(Observation).filter(Observation.status == 'COMPLETE').all()
 	s.close()
 
-	julian_obs = {OBS: int(str(OBS.julian_date)[3:7]) for OBS in OBSs_complete)
+	julian_obs = {OBS: int(str(getattr(OBS, 'julian_date'))[3:7]) for OBS in OBSs_complete)
 	julian_days = tuple(jday for jday in julian_obs.values())
 	#dict of julian day as key, amount as value
 	count_jdays = Counter(julian_days)
 
-	all_days = tuple(int(str(OBS.julian_date)[3:7]) for OBS in OBSs_all)
+	all_days = tuple(int(str(getattr(OBS, 'julian_date'))[3:7]) for OBS in OBSs_all)
 	count_all_days = Counter(all_days)
 
 	#tuple list of all complete days
@@ -69,17 +69,17 @@ def add_data():
 	for OBS in raw_OBSs:
 		FILE = s.query(File).filter(File.obsnum == OBS.obsnum).one()
 
-		host = FILE.host
-		full_path = FILE.filename
+		host = getattr(FILE, 'host')
+		full_path = getattr(FILE, 'filename')
 		path, filename, filetype = add_files.file_names(full_path)
 
-		obsnum = OBS.obsnum
-		julian_date = OBS.julian_date
+		obsnum = getattr(OBS, 'obsnum')
+		julian_date = getattr(OBS, 'julian_date')
 		if julian_date < 2456400:
 			polarization = 'all'
 		else:
-			polarization = OBS.pol
-		length = OBS.length
+			polarization = getattr(OBS, 'pol')
+		length = getattr(OBS, 'length')
 	
 		if named_host == host:
 			try:
@@ -100,7 +100,7 @@ def add_data():
 		prev_obs, next_obs, edge = add_files.obs_edge(obsnum, sess=sp)
 
 		filesize = add_files.calc_size(host, path, filename)
-		md5 = FILE.md5sum
+		md5 = getattr(FILE, 'md5sum')
 		if md5 is None:
 			md5 = add_files.calc_md5sum(host, path, filename)
 		tape_index = None
@@ -151,7 +151,7 @@ def add_data():
 		data_dbi.add_to_table('log', log_data)
 		movable_paths[filetype].append(os.path.join(path, filename))
 
-		compr_filename = ''.join(filename, 'cRRE')
+		compr_filename = ''.join((filename, 'cRRE'))
 		compr_filetype = 'uvcRRE'
 		compr_filesize = add_files.calc_size(host, path, compr_filename)
 		compr_md5 = add_files.calc_md5sum(host, path, compr_filename)
@@ -166,7 +166,7 @@ def add_data():
 			data_dbi.add_to_table('file', compr_data)
 			movable_paths[compr_filetype].append(os.path.join(path, compr_filename))
 
-		npz_filename = ''.join(filename, 'cRE.npz')
+		npz_filename = ''.join((filename, 'cRE.npz'))
 		npz_filetype = 'npz'
 		npz_filesize = add_files.calc_size(host, path, npz_filename)
 		npz_md5 = add_files.calc_md5sum(host, path, npz_filename)

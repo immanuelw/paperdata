@@ -125,12 +125,12 @@ def is_edge(prev_obs, next_obs):
 def obs_pn(s, obsnum):
 	PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum == obsnum - 1).one()
 	if PREV_OBS is not None:
-		prev_obs = PREV_OBS.obsnum
+		prev_obs = getattr(PREV_OBS, 'obsnum')
 	else:
 		prev_obs = None
 	NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum == obsnum + 1).one()
 	if NEXT_OBS is not None:
-		next_obs = NEXT_OBS.obsnum
+		next_obs = getattr(NEXT_OBS, 'obsnum')
 	else:
 		next_obs = None
 
@@ -191,11 +191,11 @@ def calc_obs_data(host, full_path):
 			pol = polarization
 		OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date == julian_date).filter(pdbi.Observation.polarization == pol).one()
 
-		time_start = OBS.time_start		
-		time_end = OBS.time_end
-		delta_time_start = OBS.delta_time		
-		length = OBS.length
-		obsnum = OBS.obsnum		
+		time_start = getattr(OBS, 'time_start')
+		time_end = getattr(OBS, 'time_end')
+		delta_time = getattr(OBS, 'delta_time')
+		length = getattr(OBS, 'length')
+		obsnum = getattr(OBS, 'obsnum')
 
 		s.close()
 
@@ -261,7 +261,7 @@ def dupe_check(input_host, input_paths):
 	s = dbi.Session()
 	#all files on same host
 	FILEs = s.query(pdbi.File).filter(pdbi.File.host == input_host).all()
-	full_paths = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
+	full_paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
 	s.close()
 
 	#for each input file, check if in full_paths
@@ -271,15 +271,15 @@ def dupe_check(input_host, input_paths):
 
 def set_obs(s, OBS, field):
 	if field == 'prev_obs':
-		edge_num = OBS.obsnum - 1
-		edge_time = OBS.time_start - OBS.delta_time
+		edge_num = getattr(OBS, 'obsnum') - 1
+		edge_time = getattr(OBS, 'time_start') - getattr(OBS, 'delta_time')
 	elif field == 'next_obs':
-		edge_num = OBS.obsnum + 1
-		edge_time = OBS.time_start + OBS.delta_time
+		edge_num = getattr(OBS, 'obsnum') + 1
+		edge_time = getattr(OBS, 'time_start') + getattr(OBS, 'delta_time')
 
 	EDGE_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum == edge_time).one()
 	if EDGE_OBS is not None:
-		edge_obs = EDGE_OBS.obsnum
+		edge_obs = getattr(EDGE_OBS, 'obsnum')
 		dbi.set_entry(OBS, field, edge_obs)
 	else:
 		pol = OBS.polarization

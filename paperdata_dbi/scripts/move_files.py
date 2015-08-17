@@ -57,7 +57,7 @@ def null_check(input_host, input_paths):
 	FILEs = s.query(pdbi.File).filter(pdbi.File.host==input_host).all()
 	s.close()
 	#all files on same host
-	filenames = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
+	filenames = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
 
 	#for each input file, check if in filenames
 	nulls = tuple(input_path for input_path in input_paths if input_path not in filenames)

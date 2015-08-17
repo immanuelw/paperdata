@@ -19,7 +19,7 @@ def md5_db():
 	FILEs = s.query(data_dbi.File).filter(data_dbi.File.md5sum==None).all()
 	s.close()
 	for FILE in FILEs:
-		md5 = add_files.calc_md5sum(FILE.host, FILE.path, FILE.filename)
+		md5 = add_files.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
 		timestamp = int(time.time())
 		data_dbi.set_entry(FILE, 'md5sum', md5)
 		data_dbi.set_entry(FILE, 'timestamp', timestamp)
@@ -27,9 +27,9 @@ def md5_db():
 		table = 'file'
 		log_data = {'action':action,
 					'table':table,
-					'obsnum':FILE.obsnum,
-					'host':FILE.host,
-					'full_path':FILE.full_path,
+					'obsnum':getattr(FILE, 'obsnum'),
+					'host':getattr(FILE, 'host'),
+					'full_path':getattr(FILE, 'full_path'),
 					'feed_path':None,
 					'timestamp':timestamp}
 
@@ -43,11 +43,11 @@ def md5_distiller():
 	FILEs = s.query(pdbi.File).filter(pdbi.File.md5sum==None).all()
 	s.close()
 	for FILE in FILEs:
-		full_path = FILE.path
+		full_path = getattr(FILE, 'path')
 		path = os.path.dirname(full_path)
 		filename = os.path.basename(full_path)
-		md5 = add_files.calc_md5sum(FILE.host, path, filename)
-		FILE.md5sum = md5
+		md5 = add_files.calc_md5sum(getattr(FILE, 'host'), path, filename)
+		setattr(FILE, 'md5sum', md5)
 		s = dbi.Session()
 		s.add(FILE)
 		s.commit()

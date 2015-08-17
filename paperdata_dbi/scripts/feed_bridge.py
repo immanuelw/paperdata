@@ -58,8 +58,8 @@ def count_days():
 	s = dbi.Session()
 	count_FEEDs = s.query(pdbi.Feed.julian_day, label('count', func.count(pdbi.Feed.julian_day))).group_by(pdbi.Feed.julian_day).all()
 	all_FEEDs = s.query(pdbi.Feed).all()
-	good_days = tuple(FEED.julian_day for FEED in count_FEEDs if FEED.count == 288 or FEED.count == 72)
-	to_move = tuple(FEED.full_path for FEED in all_FEEDs if FEED.julian_day in good_days)
+	good_days = tuple(getattr(FEED, 'julian_day') for FEED in count_FEEDs if getattr(FEED, 'count') == 288 or getattr(FEED, 'count') == 72)
+	to_move = tuple(getattr(FEED, 'full_path') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
 	s.close()
 
 	for full_path in to_move:
@@ -77,8 +77,9 @@ def find_data():
 	#only move one day at a time
 	feed_host = FEEDs[0].host
 	feed_day = FEEDs[0].julian_day
-	feed_paths = tuple(os.path.join(FEED.path, FEED.filename) for FEED in FEEDs if FEED.julian_Day == feed_day)
-	feed_filenames = tuple(FEED.filename for FEED in FEEDs if FEED.julian_Day == feed_day)
+	feed_paths = tuple(os.path.join(getattr(FEED, 'path'), getattr(FEED, 'filename'))
+						for FEED in FEEDs if getattr(FEED, 'julian_day') == feed_day)
+	feed_filenames = tuple(getattr(FEED, 'filename') for FEED in FEEDs if getattr(FEED, 'julian_day') == feed_day)
 
 	return feed_paths, feed_host, feed_filenames
 
