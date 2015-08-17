@@ -3,8 +3,8 @@ from flask.ext.login import current_user
 from app.flask_app import app
 from app import models, db_utils, histogram_utils, data_sources
 from datetime import datetime
-import psycopg2
 import os
+import paperdata_dbi as pdbi
 
 @app.route('/')
 @app.route('/index')
@@ -52,7 +52,7 @@ def get_graph():
 
 	set_str = request.args.get('set')
 
-	template_name = "js/" + graph_type_str.lower() + ".js"
+	template_name = ''.join(('js/', graph_type_str.lower(), '.js'))
 
 	if set_str is None: # There should be a date range instead.
 		start_time_str = request.args.get('start')
@@ -160,17 +160,22 @@ def error_table():
 @app.before_request
 def before_request():
 	g.user = current_user
+	paper_dbi = pdbi.DataBaseInterface()
+	pyg_dbi = pyg.DataBaseInterface()
 	try :
-		g.eor_db = psycopg2.connect(database='mwa', host='eor-db.mit.edu',
-			user=os.environ['MWA_DB_USERNAME'], password=os.environ['MWA_DB_PW'])
+		g.paper_session = paper_dbi.Session()
+		g.pyg_session = pyg_dbi.Session()
 	except Exception as e:
-		print("Can't connect to database - %s" % e)
+		print('Cannot connect to database - {e}'.format(e))
 
 @app.teardown_request
 def teardown_request(exception):
-	eor_db = getattr(g, 'eor_db', None)
-	if eor_db is not None:
-		eor_db.close()
+	paper_db = getattr(g, 'paper_session', None)
+	pyg_db = getattr(g, 'pyg_session', None)
+	if paper_db is not None:
+		paper_db.close()
+	if pyg_db is not None:
+		pyg_db.close()
 
 @app.route('/profile')
 def profile():
@@ -193,6 +198,7 @@ def user_page():
 
 @app.route('/data_summary_table', methods=['POST'])
 def data_summary_table():
+	#table that shows on side of website under login
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
@@ -239,7 +245,7 @@ def data_summary_table():
 
 	error_counts, error_count = histogram_utils.get_error_counts(start_gps, end_gps)
 
-	return render_template("summary_table.html", error_count=error_count,
+	return render_template('summary_table.html', error_count=error_count,
 		low_eor0_count=low_eor0_count, high_eor0_count=high_eor0_count,
 		low_eor1_count=low_eor1_count, high_eor1_count=high_eor1_count,
 		low_eor0_hours=low_eor0_hours, high_eor0_hours=high_eor0_hours,

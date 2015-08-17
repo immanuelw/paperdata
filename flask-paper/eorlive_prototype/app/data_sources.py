@@ -4,20 +4,10 @@ import os
 import re
 from app.flask_app import app, db
 from app import db_utils, models
-#import paperdata_dbi as pdbi
-#import pyganglia_dbi as pyg
 #from sqlalchemy.engine import reflection
-#from sqlalchemy import or_
-
-#def get_dbi(database):
-#	if database == 'paperdata':
-#		dbi = pdbi.DataBaseInterface()
-#	elif database == 'ganglia':
-#		dbi = pyg.DataBaseInterface()
-#	return dbi, module
 
 #def inspector(database):
-#	dbi, _ = get_dbi(database)
+#	dbi, _ = db_utils.get_dbi(database)
 #	insp = reflection.Inspector.from_engine(dbi.engine)
 #	return insp
 
@@ -40,8 +30,7 @@ def get_tables():
 
 		db_conn.close()
 
-		#insp = inspector(database)
-		#table_tuples = insp.get_table_names()
+		#table_tuples = db_utils.get_table_names(database)
 
 		return render_template('table_list.html', table_tuples=table_tuples)
 	else:
@@ -67,10 +56,7 @@ def get_columns():
 
 		db_conn.close()
 
-		#insp = inspector(database)
-		#it's a list of dicts
-		#column_list = insp.get_column_names(table)
-		#column_tuples = tuple(column['name'] for column in column_list)
+		#column_tuples = db_utils.get_column_names(database, table)
 
 		return render_template('column_list.html', column_tuples=column_tuples)
 	else:
@@ -220,8 +206,7 @@ def create_data_source():
 			db_conn.close()
 			return jsonify(error=True, message='The table {table} does not exist.'.format(table=table))
 
-		#insp = inspector(database)
-		#table_tuples = insp.get_table_names()
+		#table_tuples = db_utils.get_table_names(database)
 		#if table not in table_tuples:
 		#	return jsonify(error=True, message='The table {table} does not exist.'.format(table=table))
 
@@ -235,9 +220,7 @@ def create_data_source():
 		columns_with_obs_column = list(columns)
 		columns_with_obs_column.append(obs_column)
 
-		#it's a list of dicts
-		#column_list = insp.get_column_names(table)
-		#column_response = tuple(column['name'] for column in column_list)
+		#column_response = db_utils.get_column_names(database, table)
 
 		for column in columns_with_obs_column: # So we can check for the existence of the obs column along with the
 			column_exists = False			  # others in the same loop.
@@ -302,88 +285,6 @@ def build_query(data_source):
 
 	return (query, columns)
 
-##def make_clause(table, field_name, equivalency, value):
-##	field = getattr(table, field_name)
-##	if equivalency == '<='
-##		clause = field <= value
-##	elif equivalency == '=='
-##		clause = field == value
-##	elif equivalency == '>='
-##		clause = field >= value
-##	elif equivalency == 'like'
-##		clause = field.like(value)
-##	elif equivalency == 'or':
-##		clause_tuple = tuple(make_clause(table, new_field_name, new_equivalency, new_value)
-##										for new_field_name, new_equivalency, new_value in field_name)
-##		clause = or_(*clause_tuple)
-##	return clause
-
-##def gen_results(table, results, field_name, equivalency, value):
-##	field = getattr(table, field_name)
-##	if equivalency == '<='
-##		results = results.filter(field <= value)
-##	elif equivalency == '=='
-##		results = results.filter(field == value)
-##	elif equivalency == '>='
-##		results = results.filter(field >= value)
-##	elif equivalency == 'like'
-##		results = results.filter(field.like(value))
-##	return results
-
-##def get_query_results(data_source, field_tuples, field_sort_name, output_vars=None):
-##	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
-##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
-##	dbi, module = get_dbi(data_source.database)
-##	s = dbi.Session()
-##	table = getattr(module, data_source.table.capitalize())
-##	results = s.query(table)
-##	for field_name, equivalency, value in field_tuples:
-##		if equivalency == 'or' and value is None:
-##			for new_field_name, new_equivalency, new value in field_name:
-##				results = gen_results(table, results, new_field_name, new_equivalency, new_value)
-##		else:
-##			results = gen_results(table, results, field_name, equivalency, value)
-##	field_sort = getattr(table, field_sort_name)
-##	results = results.order_by(field_sort.asc()).all()
-##	if output_vars is not None:
-##		results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results))
-##	s.close()
-##	return results
-
-##def get_query_results(data_source, field_tuples, field_sort_name, output_vars=None):
-##	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
-##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
-##	dbi, module = get_dbi(data_source.database)
-##	s = dbi.Session()
-##	table = getattr(module, data_source.table.capitalize())
-##	results = s.query(table)
-##	#tuple of all results
-##	results_tuples = (results,)
-##	for field_name, equivalency, value in field_tuples:
-##	
-##		#list purged on every loop
-##		results_list = []
-##		if equivalency == 'or' and value is None:
-##			#run through each set
-##			for new_results in results_tuples:
-##				for new_field_name, new_equivalency, new value in field_name:
-##					results_list.append(gen_results(table, new_results, new_field_name, new_equivalency, new_value))
-##		else:
-##			for new_results in results_tuples:
-##				results_list.append(gen_results(table, new_results, field_name, equivalency, value))
-##		results_tuples = tuple(results_list)
-##	#now should have couple of sets
-##	field_sort = getattr(table, field_sort_name)
-##	flatten and make a set to be unique
-##	results_list = tuple(results.order_by(field_sort.asc()).all() for results in results_tuples)
-##	#grab relevant variables
-##	if output_vars is None:
-##		results = tuple({tuple(getattr(entry, output_var) for output_var in output_vars) for result in results_list for entry in result})
-##	else:
-##		results = tuple({entry for result in results_list for entry in result})
-##	s.close()
-##	return results
-
 def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 	data_source = models.GraphDataSource.query.filter(models.GraphDataSource.name == data_source_str).first()
 
@@ -396,8 +297,8 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 
 	db_conn.close()
 
-	##results = get_query_results(data_source, (('obs_column, '>=', start_gps), ('obs_column', '<=', end_gps),
-	##			('projectid', '==', 'G0009' if data_source.projectid else '')), field_sort_name='obs_column')
+	##results = db_utils.get_query_results(data_source, (('obs_column, '>=', start_gps), ('obs_column', '<=', end_gps),
+	##				('projectid', '==' if data_source.projectid else None, 'G0009')), field_sort_tuple=('obs_column', 'asc'))
 
 	data = {}
 
@@ -442,12 +343,11 @@ def separate_data_into_sets(data, data_source_results, columns, data_source, sta
 									ORDER BY starttime ASC'''.format(start=start_gps,
 									end=end_gps, projectid=projectid_clause)).fetchall()
 
-	#sqlalchemy overloads the |, &, and ~ operators, can use as or, and, not
-	##obsid_results = get_query_results(data_source, (('starttime, '>=', start_gps), ('starttime', '<=', end_gps),
-	##									('projectid', '==', 'G0009' if data_source.projectid else ''),
-	##									((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None)),
-	##									((('ra_phase_center', '==', 0), ('ra_phase_center', '==', 60)), 'or', None),
-	##									field_sort_name='starttime', output_vars=('starttime', 'obsname', 'ra_phase_center'))
+	##obsid_results = db_utils.get_query_results(data_source, (('starttime, '>=', start_gps), ('starttime', '<=', end_gps),
+	##									('projectid', '==' if data_source.projectid else None, 'G0009'),
+	##									((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None),
+	##									((('ra_phase_center', '==', 0), ('ra_phase_center', '==', 60)), 'or', None)),
+	##									field_sort_tuple=('starttime', 'asc'), output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	data['l0'] = {}
 	data['l1'] = {}
@@ -521,11 +421,11 @@ def join_with_obsids_from_set(data_source_results, the_set, data_source):
 				ORDER BY starttime ASC'''.format(start=the_set.start, end=the_set.end,
 					projectid=projectid_clause, low_high=low_high_clause, eor=eor_clause)).fetchall()
 
-	##response = get_query_results(data_source, (('starttime, '>=', the_set.start), ('starttime', '<=', the_set.end),
-	##									('projectid', '==', 'G0009' if data_source.projectid else ''),
-	##									((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None)),
-	##									((('ra_phase_center', '==', 0), ('ra_phase_center', '==', 60)), 'or', None),
-	##									field_sort_name='starttime', output_vars=('starttime', 'obsname', 'ra_phase_center'))
+	##response = db_utils.get_query_results(data_source, (('starttime, '>=', the_set.start), ('starttime', '<=', the_set.end),
+	##									('projectid', '==' if data_source.projectid else None, 'G0009'),
+	##									('obsname', None if the_set.low_or_high == 'any' else 'like', ''.join(the_set.low_or_high, '%')),
+	##									('ra_phase_center', None if the_set.eor == 'any' else '==', 0 if the_set.eor == 'EOR0' else 60))
+	##									field_sort_tuple=('starttime', 'asc'), output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	obs_id_list = [obs_tuple[0] for obs_tuple in response]
 

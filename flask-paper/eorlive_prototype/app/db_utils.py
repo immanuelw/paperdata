@@ -1,6 +1,74 @@
 from flask import g
 from datetime import datetime
 from requests_futures.sessions import FuturesSession
+#import paperdata_dbi as pdbi
+#import pyganglia_dbi as pyg
+#from sqlalchemy import or_
+#from sqlalchemy.engine import reflection
+
+#def get_dbi(database):
+#	if database == 'paperdata':
+#		dbi = pdbi.DataBaseInterface()
+#	elif database == 'ganglia':
+#		dbi = pyg.DataBaseInterface()
+#	return dbi, module
+
+#def inspector(database):
+#	dbi, _ = get_dbi(database)
+#	insp = reflection.Inspector.from_engine(dbi.engine)
+#	return insp
+
+#def get_table_names(database):
+#	insp = inspector(database)
+#	table_names = insp.get_table_names()
+#	return table_names
+
+#def get_column_names(database, table)
+#	insp = inspector(database)
+#	#it's a list of dicts
+#	column_list = insp.get_column_names(table)
+#	column_names = tuple(column['name'] for column in column_list)
+#	return column_names
+
+##def make_clause(table, field_name, equivalency, value):
+##	field = getattr(table, field_name)
+##	if equivalency is None:
+##		return None
+##	if equivalency == '<='
+##		clause = field <= value
+##	elif equivalency == '=='
+##		clause = field == value
+##	elif equivalency == '>='
+##		clause = field >= value
+##	elif equivalency == 'like'
+##		clause = field.like(value)
+##	elif equivalency == 'or' and value is None:
+##		clause_tuple = tuple(make_clause(table, new_field_name, new_equivalency, new_value)
+##										for new_field_name, new_equivalency, new_value in field_name)
+##		clause = or_(*clause_tuple)
+##	return clause
+
+##def sort_clause(table, field_sort_tuple):
+##	#grab the sort clause of the query
+##	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in field_sort_tuple]
+##	return clause_list
+
+##def get_query_results(data_source, field_tuples, field_sort_tuple=None, output_vars=None):
+##	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
+##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
+##	dbi, module = get_dbi(data_source.database)
+##	s = dbi.Session()
+##	table = getattr(module, data_source.table.capitalize())
+##	results = s.query(table)
+##	clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
+##	for clause in clause_gen:
+##		results = results.filter(clause)
+##	if field_sort_tuple is not None:
+##		results = results.order_by(*sort_clause(field_sort_tuple)).all()
+##	if output_vars is not None:
+##		results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results))
+##	s.close()
+##	return results
 
 def send_query(db, query):
 	cur = db.cursor()
@@ -9,7 +77,7 @@ def send_query(db, query):
 
 def get_gps_utc_constants():
 	leap_seconds_result = send_query(g.eor_db,
-		"SELECT leap_seconds FROM leap_seconds ORDER BY leap_seconds DESC LIMIT 1").fetchone()
+		'SELECT leap_seconds FROM leap_seconds ORDER BY leap_seconds DESC LIMIT 1').fetchone()
 
 	leap_seconds = leap_seconds_result[0]
 
@@ -70,14 +138,14 @@ def get_datetime_from_gps(start_gps, end_gps):
 	return (start_datetime, end_datetime)
 
 def get_lowhigh_and_eor_clauses(low_or_high, eor):
-	low_high_clause = "" if low_or_high == 'any' else "AND obsname LIKE '" + low_or_high + "%'"
+	low_high_clause = '' if low_or_high == 'any' else ''.join('AND obsname LIKE "', low_or_high, '%"')
 
 	eor_clause = ''
 
 	if eor != 'any':
 		if eor == 'EOR0':
-			eor_clause = "AND ra_phase_center = 0"
+			eor_clause = 'AND ra_phase_center = 0'
 		else:
-			eor_clause = "AND ra_phase_center = 60"
+			eor_clause = 'AND ra_phase_center = 60'
 
 	return (low_high_clause, eor_clause)
