@@ -60,13 +60,11 @@ from requests_futures.sessions import FuturesSession
 ##def get_query_results(data_source=None, database=None, table=None, field_tuples, field_sort_tuple=None, output_vars=None):
 ##	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
 ##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
-##	if data_souce is None:
-##		dbi, module = get_dbi(database)
-##	else:
+##	if data_source is not None:
 ##		dbi, module = get_dbi(data_source.database)
-##	if table is None:
 ##		table = getattr(module, data_source.table.capitalize())
 ##	else:
+##		dbi, module = get_dbi(database)
 ##		table = getattr(module, table.capitalize())
 ##	s = dbi.Session()
 ##	results = s.query(table)

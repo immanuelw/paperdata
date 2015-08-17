@@ -8,23 +8,14 @@ def get_error_counts(start_gps, end_gps):
 
 	obscontroller_response = db_utils.send_query(g.eor_db, '''SELECT FLOOR(reference_time) AS reference_time
 							FROM obscontroller_log
-							WHERE reference_time >= {} AND reference_time <= {}
-							ORDER BY reference_time ASC'''.format(start_gps, end_gps)).fetchall()
+							WHERE reference_time >= {start} AND reference_time <= {end}
+							ORDER BY reference_time ASC'''.format(start=start_gps, end=end_gps)).fetchall()
 
-	#dbi = pdbi.DataBaseInterface()
-	#s = dbi.Session()
-	#need to add more filters and like
-	#need to change func to fit paperdata
-	#TIME_ALL = s.query(pdbi.XXX).filter(pdbi.XXX.time_start >= time_start).filter(pdbi.XXX.time_end <= time_end).order_by(XXX).all()
-	#response = tuple(TIME.time_start for TIME in TIME_ALL)
 	recvstatuspolice_response = db_utils.send_query(g.eor_db, '''SELECT FLOOR(reference_time) AS reference_time
 							FROM recvstatuspolice_log
-							WHERE reference_time >= {} AND reference_time <= {}
-							ORDER BY reference_time ASC'''.format(start_gps, end_gps)).fetchall()
+							WHERE reference_time >= {start} AND reference_time <= {end}
+							ORDER BY reference_time ASC'''.format(start=start_gps, end=end_gps)).fetchall()
 
-	#TIME_ALL = s.query(pdbi.XXX).filter(pdbi.XXX.time_start >= time_start).filter(pdbi.XXX.time_end <= time_end).order_by(XXX).all()
-	#response = tuple(TIME.time_start for TIME in TIME_ALL)
-	#s.close()
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
 	prev_time = 0
@@ -58,19 +49,18 @@ def get_observation_counts(start_gps, end_gps, low_or_high, eor):
 
 	response = db_utils.send_query(g.eor_db, '''SELECT starttime
 				FROM mwa_setting
-				WHERE starttime >= {} AND starttime <= {}
+				WHERE starttime >= {start} AND starttime <= {end}
 				AND projectid='G0009'
-				{}
-				{}
-				ORDER BY starttime ASC'''.format(start_gps, end_gps, low_high_clause, eor_clause)).fetchall()
+				{low_high}
+				{eor}
+				ORDER BY starttime ASC'''.format(start=start_gps, end=end_gps, low_high=low_high_clause, eor=eor_clause)).fetchall()
 
-	#dbi = pdbi.DataBaseInterface()
-	#s = dbi.Session()
-	#need to add more filters and like
-	#need to change func to fit paperdata
-	#TIME_ALL = s.query(pdbi.XXX).filter(pdbi.XXX.time_start >= time_start).filter(pdbi.XXX.time_end <= time_end).order_by(XXX).all()
-	#response = tuple(TIME.time_start for TIME in TIME_ALL)
-	#s.close()
+	##response = db_utils.get_query_results(data_source=None, database=None, table=None,
+	##									(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
+	##									('projectid', '==', 'G0009'),
+	##									('obsname', None if the_set.low_or_high == 'any' else 'like', ''.join(the_set.low_or_high, '%')),
+	##									('ra_phase_center', None if the_set.eor == 'any' else '==', 0 if the_set.eor == 'EOR0' else 60))
+	##									field_sort_tuple=('starttime', 'asc'), output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
@@ -99,9 +89,13 @@ def get_plot_bands(the_set):
 def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 	response = db_utils.send_query(g.eor_db, '''SELECT starttime, stoptime, obsname, ra_phase_center
 					FROM mwa_setting
-					WHERE starttime >= {} AND starttime <= {}
+					WHERE starttime >= {start} AND starttime <= {end}
 					AND projectid='G0009'
-					ORDER BY starttime ASC'''.format(start_gps, end_gps)).fetchall()
+					ORDER BY starttime ASC'''.format(start=start_gps, end=end_gps)).fetchall()
+
+	##results = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+	##				(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
+	##				('projectid', '==', 'G0009')), field_sort_tuple=('starttime', 'asc'))
 
 	low_eor0_counts = []
 

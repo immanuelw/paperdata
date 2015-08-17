@@ -297,8 +297,8 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 
 	db_conn.close()
 
-	##results = db_utils.get_query_results(data_source=None, database=None, table=None,
-	##				(('obs_column, '>=', start_gps), ('obs_column', '<=', end_gps),
+	##results = db_utils.get_query_results(data_source, database=None, table=None,
+	##				(('obs_column', '>=', start_gps), ('obs_column', '<=', end_gps),
 	##				('projectid', '==' if data_source.projectid else None, 'G0009')), field_sort_tuple=('obs_column', 'asc'))
 
 	data = {}
@@ -344,7 +344,7 @@ def separate_data_into_sets(data, data_source_results, columns, data_source, sta
 									ORDER BY starttime ASC'''.format(start=start_gps,
 									end=end_gps, projectid=projectid_clause)).fetchall()
 
-	##obsid_results = db_utils.get_query_results(data_source=None, database=None, table=None,
+	##obsid_results = db_utils.get_query_results(data_source, database=None, table=None,
 	##									(('starttime, '>=', start_gps), ('starttime', '<=', end_gps),
 	##									('projectid', '==' if data_source.projectid else None, 'G0009'),
 	##									((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None),
@@ -423,7 +423,7 @@ def join_with_obsids_from_set(data_source_results, the_set, data_source):
 				ORDER BY starttime ASC'''.format(start=the_set.start, end=the_set.end,
 					projectid=projectid_clause, low_high=low_high_clause, eor=eor_clause)).fetchall()
 
-	##response = db_utils.get_query_results(data_source=None, database=None, table=None,
+	##response = db_utils.get_query_results(data_source, database=None, table=None,
 	##									(('starttime, '>=', the_set.start), ('starttime', '<=', the_set.end),
 	##									('projectid', '==' if data_source.projectid else None, 'G0009'),
 	##									('obsname', None if the_set.low_or_high == 'any' else 'like', ''.join(the_set.low_or_high, '%')),
