@@ -1,6 +1,7 @@
 from app import db_utils, models
 from flask import g, render_template
 #import paperdata_dbi as pdbi
+#import math
 
 def get_error_counts(start_gps, end_gps):
 	error_counts = []
@@ -11,10 +12,22 @@ def get_error_counts(start_gps, end_gps):
 							WHERE reference_time >= {start} AND reference_time <= {end}
 							ORDER BY reference_time ASC'''.format(start=start_gps, end=end_gps)).fetchall()
 
+	##obscontroller_response = db_utils.get_query_results(data_source=None, database='eor', table='obscontroller_log',
+	##													(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
+	##													field_sort_tuple=(('reference_time', 'asc'),),
+	##													output_vars=('reference_time', 'observation_number', 'comment'))
+	##obscontroller_response = tuple(math.floor(ref_time) for ref_time in obscontroller_response)
+
 	recvstatuspolice_response = db_utils.send_query(g.eor_db, '''SELECT FLOOR(reference_time) AS reference_time
 							FROM recvstatuspolice_log
 							WHERE reference_time >= {start} AND reference_time <= {end}
 							ORDER BY reference_time ASC'''.format(start=start_gps, end=end_gps)).fetchall()
+
+	##recvstatuspolice_response = db_utils.get_query_results(data_source=None, database='eor', table='recvstatuspolice_log',
+	##													(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
+	##													field_sort_tuple=(('reference_time', 'asc'),),
+	##													output_vars=('reference_time',))
+	##recvstatuspolice_response = tuple(math.floor(ref_time) for ref_time in recvstatuspolice_response)
 
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
@@ -95,9 +108,9 @@ def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 
 	##response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
 	##									(('starttime, '>=', start_gps), ('starttime', '<=', end_gps),
-	##									('projectid', '==', 'G0009'),
+	##									('projectid', '==', 'G0009')),
 	##									field_sort_tuple=(('starttime', 'asc'),),
-	##									output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center')))
+	##									output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center'))
 
 	low_eor0_counts = []
 
