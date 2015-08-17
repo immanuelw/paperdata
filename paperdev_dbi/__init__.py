@@ -315,17 +315,12 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
+		table = getattr(sys.modules[__name__], TABLE.capitalize())
 		try:
-			if TABLE in ('observation',):
-				ENTRY = s.query(Observation).filter(Observation.obsnum == unique_value).one()
-			elif TABLE in ('file',):
-				ENTRY = s.query(File).filter(File.full_path == unique_value).one()
-			elif TABLE in ('feed',):
-				ENTRY = s.query(Feed).filter(Feed.full_path == unique_value).one()
-		#	elif TABLE in ('rtp_file',):
-		#		ENTRY = s.query(RTP_File).filter(RTP_File.full_path == unique_value).one()
-		#	elif TABLE in ('rtp_observation',):
-		#		ENTRY = s.query(RTP_Observation).filter(RTP_Observation.obsnum == unique_value).one()
+			if TABLE in ('observation', 'rtp_observation'):
+				ENTRY = s.query(table).filter(getattr(table, 'obsnum') == unique_value).one()
+			elif TABLE in ('file', 'feed', 'rtp_file'):
+				ENTRY = s.query(table).filter(getattr(table, 'full_path') == unique_value).one()
 		except:
 			return None
 		s.close()
@@ -368,19 +363,15 @@ class DataBaseInterface(object):
 		"""
 		create a new entry.
 		"""
-		if TABLE in ('observation',):
-			ENTRY = Observation(**entry_dict)
+		table = getattr(sys.modules[__name__], TABLE.capitalize())
+		if TABLE in ('observation', 'feed', 'log', 'rtp_file', 'rtp_observation'):
+			ENTRY = table(**entry_dict)
 		elif TABLE in ('file',):
 			#files linked to observations
-			ENTRY = File(**entry_dict)
+			obs_table = getattr(sys.modules[__name__], 'Observation')
+			ENTRY = table(**entry_dict)
 			#get the observation corresponding to this file
-			OBS = s.query(Observation).filter(Observation.obsnum == entry_dict['obsnum']).one()
-			ENTRY.observation = OBS  #associate the file with an observation
-		elif TABLE in ('feed',):
-			ENTRY = Feed(**entry_dict)
-		elif TABLE in ('log',):
-			ENTRY = Log(**entry_dict)
-		#elif TABLE in ('rtp_file',):
-		#	ENTRY = RTP_File(**entry_dict)
+			OBS = s.query(obs_table).filter(getattr(obs_table, 'obsnum') == entry_dict['obsnum']).one()
+			setattr(ENTRY, 'observation', OBS)  #associate the file with an observation
 		self.add_entry(ENTRY)
 		return None
