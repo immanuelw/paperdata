@@ -56,8 +56,10 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 def count_days():
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	count_FEEDs = s.query(pdbi.Feed.julian_day, label('count', func.count(pdbi.Feed.julian_day))).group_by(pdbi.Feed.julian_day).all()
-	all_FEEDs = s.query(pdbi.Feed).all()
+	table = getattr(pdbi, 'Feed')
+	count_FEEDs = s.query(getattr(table, 'julian_day'), label('count', func.count(getattr(table, 'julian_day'))))\
+							.group_by(getattr(table, 'julian_day')).all()
+	all_FEEDs = s.query(table).all()
 	good_days = tuple(getattr(FEED, 'julian_day') for FEED in count_FEEDs if getattr(FEED, 'count') == 288 or getattr(FEED, 'count') == 72)
 	to_move = tuple(getattr(FEED, 'full_path') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
 	s.close()
@@ -71,7 +73,8 @@ def count_days():
 def find_data():
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FEEDs = s.query(pdbi.Feed).filter(pdbi.Feed.moved_to_distill == False).filter(pdbi.Feed.ready_to_move == True).all()
+	table = getattr(pdbi, 'Feed')
+	FEEDs = s.query(table).filter(getattr(table, 'moved_to_distill') == False).filter(getattr(table, 'ready_to_move') == True).all()
 	s.close()
 
 	#only move one day at a time

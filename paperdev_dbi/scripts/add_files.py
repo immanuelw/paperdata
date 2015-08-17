@@ -123,12 +123,13 @@ def is_edge(prev_obs, next_obs):
 	return edge
 
 def obs_pn(s, obsnum):
-	PREV_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum == obsnum - 1).one()
+	table = getattr(pdbi, 'Observation')
+	PREV_OBS = s.query(table).filter(getattr(table, 'obsnum') == obsnum - 1).one()
 	if PREV_OBS is not None:
 		prev_obs = getattr(PREV_OBS, 'obsnum')
 	else:
 		prev_obs = None
-	NEXT_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum == obsnum + 1).one()
+	NEXT_OBS = s.query(table).filter(getattr(table, 'obsnum') == obsnum + 1).one()
 	if NEXT_OBS is not None:
 		next_obs = getattr(NEXT_OBS, 'obsnum')
 	else:
@@ -189,7 +190,8 @@ def calc_obs_data(host, full_path):
 		elif len(filename.split('.')) == 6:
 			polarization = filename.split('.')[3]
 			pol = polarization
-		OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date == julian_date).filter(pdbi.Observation.polarization == pol).one()
+		table = getattr(pdbi, 'Observation')
+		OBS = s.query(table).filter(getattr(table, 'julian_date') == julian_date).filter(getattr(table, 'polarization') == pol).one()
 
 		time_start = getattr(OBS, 'time_start')
 		time_end = getattr(OBS, 'time_end')
@@ -260,7 +262,8 @@ def dupe_check(input_host, input_paths):
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	#all files on same host
-	FILEs = s.query(pdbi.File).filter(pdbi.File.host == input_host).all()
+	table = getattr(pdbi, 'File')
+	FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
 	full_paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
 	s.close()
 
@@ -277,13 +280,14 @@ def set_obs(s, OBS, field):
 		edge_num = getattr(OBS, 'obsnum') + 1
 		edge_time = getattr(OBS, 'time_start') + getattr(OBS, 'delta_time')
 
-	EDGE_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.obsnum == edge_time).one()
+	table = getattr(pdbi, 'Observation')
+	EDGE_OBS = s.query(table).filter(getattr(table, 'julian_date') == edge_time).one()
 	if EDGE_OBS is not None:
 		edge_obs = getattr(EDGE_OBS, 'obsnum')
 		dbi.set_entry(OBS, field, edge_obs)
 	else:
 		pol = OBS.polarization
-		EDGE_OBS = s.query(pdbi.Observation).filter(pdbi.Observation.julian_date == edge_time).filter(pdbi.Observation.polarization == pol).one()
+		EDGE_OBS = s.query(table).filter(getattr(table, 'julian_date') == edge_time).filter(getattr(table, 'polarization') == pol).one()
 		if EDGE_OBS is not None:
 			edge_obs = EDGE_OBS.obsnum
 			dbi.set_entry(OBS, field, edge_obs)
@@ -293,7 +297,8 @@ def set_obs(s, OBS, field):
 def update_obsnums():
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	OBSs = s.query(pdbi.Observation).all()
+	table = getattr(pdbi, 'Observation')
+	OBSs = s.query(table).all()
 
 	for OBS in OBSs:
 		PREV_OBS = set_obs(s, OBS, 'prev_obs')

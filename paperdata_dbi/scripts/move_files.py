@@ -54,7 +54,8 @@ def email_space(table):
 def null_check(input_host, input_paths):
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FILEs = s.query(pdbi.File).filter(pdbi.File.host==input_host).all()
+	table = getattr(pdbi, 'File')
+	FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
 	s.close()
 	#all files on same host
 	filenames = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)

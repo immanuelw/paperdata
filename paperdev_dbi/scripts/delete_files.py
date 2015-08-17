@@ -21,7 +21,9 @@ import paperdev_dbi as pdbi
 def delete_check(input_host):
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FILEs = s.query(pdbi.File).filter(pdbi.File.delete_file==True).filter(pdbi.File.tape_index!=None).filter(pdbi.File.host==input_host).all()
+	table = getattr(pdbi, 'File')
+	FILEs = s.query(table).filter(getattr(table, 'delete_file') == True).filter(getattr(table, 'tape_index') != None)\
+							.filter(getattr(table, 'host') == input_host).all()
 	s.close()
 	#all files on same host
 	full_paths = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)

@@ -63,7 +63,8 @@ def dupe_check(input_host, input_paths):
 	#checks for files already in feed table
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
-	FEEDs = s.query(pdbi.Feed).all()
+	table = getattr(pdbi, 'Feed')
+	FEEDs = s.query(table).all()
 	s.close()
 	#all files on same host
 	filenames = tuple(os.path.join(getattr(FEED, 'path'), getattr(FEED, 'filename')) for FEED in FEEDs if getattr(FEED, 'host') == input_host)

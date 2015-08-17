@@ -67,7 +67,7 @@ def add_data():
 
 	named_host = socket.gethostname()
 	for OBS in raw_OBSs:
-		FILE = s.query(File).filter(File.obsnum == OBS.obsnum).one()
+		FILE = s.query(File).filter(getattr(File, 'obsnum') == getattr(OBS, 'obsnum')).one()
 
 		host = getattr(FILE, 'host')
 		full_path = getattr(FILE, 'filename')

@@ -16,7 +16,8 @@ import add_files
 def md5_db():
 	data_dbi = pdbi.DataBaseInterface()
 	s = data_dbi.Session()
-	FILEs = s.query(data_dbi.File).filter(data_dbi.File.md5sum==None).all()
+	table = getattr(pdbi, 'File')
+	FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
 	s.close()
 	for FILE in FILEs:
 		md5 = add_files.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
@@ -40,7 +41,8 @@ def md5_db():
 def md5_distiller():
 	dbi = DataBaseInterface()
 	s = dbi.Session()
-	FILEs = s.query(pdbi.File).filter(pdbi.File.md5sum==None).all()
+	table = getattr(pdbi, 'File')
+	FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
 	s.close()
 	for FILE in FILEs:
 		full_path = getattr(FILE, 'path')
