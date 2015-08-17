@@ -3,7 +3,7 @@
 # Create paperdev tables
 
 import time
-from ddr_compress.dbi import DataBaseInterface, File, Observation
+import ddr_compress.dbi as ddbi
 import paperdev_dbi as pdbi
 import add_files
 
@@ -39,9 +39,9 @@ def md5_db():
 	return None
 
 def md5_distiller():
-	dbi = DataBaseInterface()
+	dbi = ddbi.DataBaseInterface()
 	s = dbi.Session()
-	table = getattr(pdbi, 'File')
+	table = getattr(ddbi, 'File')
 	FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
 	s.close()
 	for FILE in FILEs:

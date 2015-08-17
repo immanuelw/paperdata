@@ -8,7 +8,7 @@ import time
 import socket
 from collections import Counter
 import aipy as A
-from ddr_compress.dbi import DataBaseInterface, Observation, File
+import ddr_compress.dbi as ddbi
 from sqlalchemy import func
 import paperdata_dbi as pdbi
 import add_files
@@ -40,11 +40,12 @@ def calc_time_data(host):
 	return time_start, time_end, delta_time
 
 def add_data():
-	dbi = DataBaseInterface()
+	dbi = ddbi.DataBaseInterface()
 	s = dbi.Session()
 	#do stuff
-	OBSs_all = s.query(Observation).all()
-	OBSs_complete = s.query(Observation).filter(Observation.status == 'COMPLETE').all()
+	table = getattr(ddbi, 'Observation')
+	OBSs_all = s.query(table).all()
+	OBSs_complete = s.query(table).filter(getattr(table, 'status') == 'COMPLETE').all()
 	s.close()
 
 	julian_obs = {OBS: int(str(getattr(OBS, 'julian_date'))[3:7]) for OBS in OBSs_complete)
@@ -67,7 +68,8 @@ def add_data():
 
 	named_host = socket.gethostname()
 	for OBS in raw_OBSs:
-		FILE = s.query(File).filter(getattr(File, 'obsnum') == getattr(OBS, 'obsnum')).one()
+		table = getattr(ddbi, 'File')
+		FILE = s.query(table).filter(getattr(table, 'obsnum') == getattr(OBS, 'obsnum')).one()
 
 		host = getattr(FILE, 'host')
 		full_path = getattr(FILE, 'filename')
