@@ -204,7 +204,8 @@ class DataBaseInterface(object):
 		creates the tables in the database.
 		"""
 		Base.metadata.bind = self.engine
-		table = Monitor.__table__
+		table_name = getattr(sys.modules[__name__], 'Monitor')
+		table = getattr(table_name, '__table__')
 		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
 										after INSERT or UPDATE on Monitor \
 										FOR EACH ROW \
@@ -233,17 +234,14 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
+		table = getattr(sys.modules[__name__], TABLE.capitalize())
 		try:
 			if TABLE in ('filesystem',):
-				ENTRY = s.query(Filesystem).filter(Filesystem.full_system_time == unique_value).one()
+				ENTRY = s.query(table).filter(getattr(table, 'full_system_time') == unique_value).one()
 			elif TABLE in ('monitor',):
-				ENTRY = s.query(Monitor).filter(Monitor.full_stats == unique_value).one()
-			elif TABLE in ('ram',):
-				ENTRY = s.query(Ram).filter(Ram.host_time == unique_value).one()
-			elif TABLE in ('iostat',):
-				ENTRY = s.query(Iostat).filter(Iostat.host_time == unique_value).one()
-			elif TABLE in ('cpu',):
-				ENTRY = s.query(Cpu).filter(Cpu.host_time == unique_value).one()
+				ENTRY = s.query(table).filter(getattr(table, 'full_stats' == unique_value).one()
+			elif TABLE in ('ram', 'iostat', 'cpu'):
+				ENTRY = s.query(table).filter(getattr(table, 'host_time') == unique_value).one()
 		except:
 			return None
 		s.close()
@@ -254,7 +252,7 @@ class DataBaseInterface(object):
 		sets the value of any entry
 		input: ENTRY object, field to be changed, new value
 		"""
-		ENTRY.__setattr__(field, new_value)
+		setattr(ENTRY, field, new_value)
 		yay = self.update_entry(ENTRY)
 		return yay
 
@@ -275,15 +273,8 @@ class DataBaseInterface(object):
 		"""
 		create a new entry.
 		"""
-		if TABLE in ('filesystem',):
-			ENTRY = Filesystem(**entry_dict)
-		elif TABLE in ('monitor',):
-			ENTRY = Monitor(**entry_dict)
-		elif TABLE in ('ram',):
-			ENTRY = Ram(**entry_dict)
-		elif TABLE in ('iostat',):
-			ENTRY = Iostat(**entry_dict)
-		elif TABLE in ('cpu',):
-			ENTRY = Cpu(**entry_dict)
+		table = getattr(sys.modules[__name__], TABLE.capitalize())
+		if TABLE in ('filesystem', 'monitor', 'ram', 'iostat', 'cpu'):
+			ENTRY = table(**entry_dict)
 		self.add_entry(ENTRY)
 		return None

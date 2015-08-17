@@ -342,7 +342,7 @@ class DataBaseInterface(object):
 		sets the value of any entry
 		input: ENTRY object, field to be changed, new value
 		"""
-		ENTRY.__setattr__(field, new_value)
+		setattr(ENTRY, field, new_value)
 		yay = self.update_entry(ENTRY)
 		return yay
 
