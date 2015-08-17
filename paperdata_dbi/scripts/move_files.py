@@ -40,7 +40,7 @@ def email_space(table):
 
 	#Send the mail
 	header = 'From: PAPERBridge <paperfeed.paperdata@gmail.com>\nSubject: NOT ENOUGH SPACE ON FOLIO\n'
-	msgs = ''.join(header, '\nNot enough space for ', table, ' on folio')
+	msgs = ''.join((header, '\nNot enough space for ', table, ' on folio'))
 
 	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
 	server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)

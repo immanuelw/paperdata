@@ -151,7 +151,7 @@ def add_data():
 		data_dbi.add_to_table('log', log_data)
 		movable_paths[filetype].append(os.path.join(path, filename))
 
-		compr_filename = ''.join(filename, 'cRRE')
+		compr_filename = ''.join((filename, 'cRRE'))
 		compr_filetype = 'uvcRRE'
 		compr_filesize = add_files.calc_size(host, path, compr_filename)
 		compr_md5 = add_files.calc_md5sum(host, path, compr_filename)
@@ -166,7 +166,7 @@ def add_data():
 			data_dbi.add_to_table('file', compr_data)
 			movable_paths[compr_filetype].append(os.path.join(path, compr_filename))
 
-		npz_filename = ''.join(filename, 'cRE.npz')
+		npz_filename = ''.join((filename, 'cRE.npz'))
 		npz_filetype = 'npz'
 		npz_filesize = add_files.calc_size(host, path, npz_filename)
 		npz_md5 = add_files.calc_md5sum(host, path, npz_filename)

@@ -90,7 +90,7 @@ try:
 				time_end = int(time.time())
 				file_end.update({filename:time_end})
 				del_time = -1
-				full_stats = ''.join(full_path, status)
+				full_stats = ''.join((full_path, status))
 				entry_dict = {'host':still_host,
 							'path':path,
 							'filename':file_name,
@@ -109,7 +109,7 @@ try:
 			if filename not in file_status.keys():
 				file_status.update({filename:status})
 				del_time = 0
-				full_stats = ''.join(full_path, status)
+				full_stats = ''.join((full_path, status))
 				entry_dict = {'host':still_host,
 							'path':path,
 							'filename':file_name,
@@ -125,7 +125,7 @@ try:
 			#write output log
 			if file_status[filename] not in [status]:
 				del_time = time.time() - file_time[filename]
-				full_stats = ''.join(full_path, status)
+				full_stats = ''.join((full_path, status))
 				entry_dict = {'host':still_host,
 							'path':path,
 							'filename':file_name,
