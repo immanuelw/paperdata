@@ -106,9 +106,9 @@ def get_gps_from_datetime(start_datetime, end_datetime):
 
 	baseUTCToGPSURL = 'http://ngas01.ivec.org/metadata/tconv/?utciso='
 
-	requestURLStart = baseUTCToGPSURL + start_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+	requestURLStart = ''.join(baseUTCToGPSURL, start_datetime.strftime('%Y-%m-%dT%H:%M:%S'))
 
-	requestURLEnd = baseUTCToGPSURL + end_datetime.strftime('%Y-%m-%dT%H:%M:%S')
+	requestURLEnd = ''.join(baseUTCToGPSURL, end_datetime.strftime('%Y-%m-%dT%H:%M:%S'))
 
 	#Start the first Web service request in the background.
 	future_start = session.get(requestURLStart)
@@ -129,9 +129,9 @@ def get_datetime_from_gps(start_gps, end_gps):
 
 	baseUTCToGPSURL = 'http://ngas01.ivec.org/metadata/tconv/?gpssec='
 
-	requestURLStart = baseUTCToGPSURL + str(start_gps)
+	requestURLStart = ''.join(baseUTCToGPSURL, str(start_gps))
 
-	requestURLEnd = baseUTCToGPSURL + str(end_gps)
+	requestURLEnd = ''.join(baseUTCToGPSURL, str(end_gps))
 
 	#Start the first Web service request in the background.
 	future_start = session.get(requestURLStart)
