@@ -29,9 +29,9 @@ def thread_reply():
 		db.session.add(thread)
 
 		db.session.commit()
-		return make_response("Success", 200)
+		return make_response('Success', 200)
 	else:
-		return make_response("You need to be logged in to post a comment.", 401)
+		return make_response('You need to be logged in to post a comment.', 401)
 
 @app.route('/new_thread', methods = ['POST'])
 def new_thread():
@@ -52,6 +52,6 @@ def new_thread():
 		first_comment.thread_id = new_thread.id
 		db.session.add(first_comment)
 		db.session.commit()
-		return make_response("Success", 200)
+		return make_response('Success', 200)
 	else:
-		return make_response("You need to be logged in to create a thread.", 401)
+		return make_response('You need to be logged in to create a thread.', 401)
