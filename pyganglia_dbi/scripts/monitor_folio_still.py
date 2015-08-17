@@ -1,12 +1,11 @@
 #!/usr/global/paper/bin/python
-from ddr_compress.dbi import DataBaseInterface,Observation,File
+import ddr_compress.dbi as ddbi
 from sqlalchemy import func
 import curses,time,os
 import jdcal
 import pyganglia_dbi as pyg
 
 #setup my output file
-#node_data = '/data4/paper/paperoutput/monitor_folio_log.psv'
 file_log = []
 file_status = {}
 file_time = {}
@@ -23,21 +22,22 @@ stdscr.keypad(1)
 stdscr.nodelay(1)
 
 #setup my db connection
-dbi = DataBaseInterface()
+dbi = ddbi.DataBaseInterface()
 pyg_dbi = pyg.DataBaseInterface()
 
-stdscr.addstr("PAPER Distiller Status Board")
-stdscr.addstr(1,0,"Press 'q' to exit")
+stdscr.addstr('PAPER Distiller Status Board')
+stdscr.addstr(1,0,'Press 'q' to exit')
 statheight = 50
 statusscr = curses.newwin(statheight,200,5,0)
 statusscr.keypad(1)
 statusscr.nodelay(1)
-curline = 2
+curline = `2
 colwidth = 50
 obslines = 20
 i=0
 stat = ['\\','|','/','-','.']
 try:
+	table = getattr(ddbi, 'Observation')
 	while(1):
 		timestamp = int(time.time())
 		log_info = []
@@ -48,39 +48,41 @@ try:
 		curline = 2
 		stdscr.addstr(0,30,stat[i%len(stat)])
 		s = dbi.Session()
-		totalobs = s.query(Observation).count()
-		stdscr.addstr(curline,0,"Number of observations currently in the database: {totalobs}".format(totalobs=totalobs))
+		totalobs = s.query(table).count()
+		stdscr.addstr(curline, 0, 'Number of observations currently in the database: {totalobs}'.format(totalobs=totalobs))
 		curline += 1
-		OBSs = s.query(Observation).filter(Observation.status!='NEW').filter(Observation.status!='COMPLETE').all()
-		#OBSs = s.query(Observation).all()
+		OBSs = s.query(table).filter(getattr(table, 'status') != 'NEW').filter(getattr(table, 'status') != 'COMPLETE').all()
+		#OBSs = s.query(table).all()
 		obsnums = [OBS.obsnum for OBS in OBSs]
-		stdscr.addstr(curline,0,"Number of observations currently being processed {num}".format(num=len(obsnums)))
+		stdscr.addstr(curline, 0, 'Number of observations currently being processed {num}'.format(num=len(obsnums)))
 		curline += 1
 		statusscr.erase()
-		statusscr.addstr(0,0,"  ----  Still Idle  ----   ")
-		for j,obsnum in enumerate(obsnums):
+		statusscr.addstr(0, 0 ,'  ----  Still Idle  ----   ')
+		for j, obsnum in enumerate(obsnums):
 			try:
-				host,path,filename= dbi.get_input_file(obsnum)
+				host, path, filename= dbi.get_input_file(obsnum)
 				status = dbi.get_obs_status(obsnum)
 				still_host = dbi.get_obs_still_host(obsnum)
 				current_pid = dbi.get_obs_pid(obsnum)
 			except:
-				host,path,filename = 'host','/path/to/','zen.2345672.23245.uv'
+				host, path, filename = 'host', '/path/to/', 'zen.2345672.23245.uv'
 				status = 'WTF'
 			col = int(j/statusscr.getmaxyx()[0])
 			#print col*colwidth
-			if j==0 or col==0:
+			if j == 0 or col == 0:
 				row = j
 			else:
-				row = j%statheight
+				row = j % statheight
 			try:
-				statusscr.addstr(row,col*colwidth,"{filename} {status} {still_host}".format(col=col,filename=os.path.basename(filename),status=status,still_host=still_host))
+				statusscr.addstr(row, col * colwidth,
+					'{filename} {status} {still_host}'.format(col=col, filename=os.path.basename(filename),
+																status=status, still_host=still_host))
 			except:
 				continue
 			#check for new filenames
 			path = os.path.dirname(filename)
 			file_name = os.path.basename(filename)
-			full_path = still_host + ':' + filename
+			full_path = ':'.join(still_host, filename)
 			if filename not in file_pid.keys():
 				file_pid.update({filename:current_pid})
 				time_start = int(time.time())
@@ -145,7 +147,7 @@ try:
 		s.close()
 		statusscr.refresh()
 		c = stdscr.getch()
-		if c==ord('q'):
+		if c == ord('q'):
 			break
 		time.sleep(1)
 except(KeyboardInterrupt):
