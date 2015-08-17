@@ -349,7 +349,7 @@ def separate_data_into_sets(data, data_source_results, columns, data_source, sta
 	##									('projectid', '==' if data_source.projectid else None, 'G0009'),
 	##									((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None),
 	##									((('ra_phase_center', '==', 0), ('ra_phase_center', '==', 60)), 'or', None)),
-	##									field_sort_tuple=('starttime', 'asc'), output_vars=('starttime', 'obsname', 'ra_phase_center'))
+	##									field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	data['l0'] = {}
 	data['l1'] = {}
@@ -428,7 +428,7 @@ def join_with_obsids_from_set(data_source_results, the_set, data_source):
 	##									('projectid', '==' if data_source.projectid else None, 'G0009'),
 	##									('obsname', None if the_set.low_or_high == 'any' else 'like', ''.join(the_set.low_or_high, '%')),
 	##									('ra_phase_center', None if the_set.eor == 'any' else '==', 0 if the_set.eor == 'EOR0' else 60))
-	##									field_sort_tuple=('starttime', 'asc'), output_vars=('starttime', 'obsname', 'ra_phase_center'))
+	##									field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	obs_id_list = [obs_tuple[0] for obs_tuple in response]
 

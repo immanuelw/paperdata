@@ -48,11 +48,18 @@ def get_data_hours_in_set(start, end, low_or_high, eor, flagged_range_dicts):
 
 	all_obs_ids_tuples = db_utils.send_query(g.eor_db, '''SELECT starttime, stoptime
 							FROM mwa_setting
-							WHERE starttime >= {} AND starttime <= {}
+							WHERE starttime >= {start} AND starttime <= {end}
 							AND projectid='G0009'
-							{}
-							{}
-							ORDER BY starttime ASC'''.format(start, end, low_high_clause, eor_clause)).fetchall()
+							{low_high}
+							{eor}
+							ORDER BY starttime ASC'''.format(start=start, end=end, low_high=low_high_clause, eor=eor_clause)).fetchall()
+
+	##all_obs_ids_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+	##									(('starttime', '>=', start), ('starttime', '<=', end),
+	##									('projectid', '==', 'G0009'),
+	##									('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
+	##									('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
+	##									field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'stoptime'))
 
 	for obs in all_obs_ids_tuples:
 		obs_id = obs[0]
@@ -71,15 +78,15 @@ def save_new_set():
 		name = request_content['name']
 
 		if name is None:
-			return jsonify(error=True, message="Name cannot be empty.")
+			return jsonify(error=True, message='Name cannot be empty.')
 
 		name = name.strip()
 
 		if len(name) == 0:
-			return jsonify(error=True, message="Name cannot be empty.")
+			return jsonify(error=True, message='Name cannot be empty.')
 
 		if models.Set.query.filter(models.Set.name == name).count() > 0:
-			return jsonify(error=True, message="Name must be unique.")
+			return jsonify(error=True, message='Name must be unique.')
 
 		flagged_range_dicts = []
 
@@ -107,7 +114,7 @@ def save_new_set():
 
 		return jsonify()
 	else:
-		return make_response("You need to be logged in to save a set.", 401)
+		return make_response('You need to be logged in to save a set.', 401)
 
 @app.route('/upload_set', methods=['POST'])
 def upload_set():
@@ -115,29 +122,29 @@ def upload_set():
 		set_name = request.form['set_name']
 
 		if set_name is None:
-			return jsonify(error=True, message="Name cannot be empty.")
+			return jsonify(error=True, message='Name cannot be empty.')
 
 		set_name = set_name.strip()
 
 		if len(set_name) == 0:
-			return jsonify(error=True, message="Name cannot be empty.")
+			return jsonify(error=True, message='Name cannot be empty.')
 
 		if models.Set.query.filter(models.Set.name == set_name).count() > 0:
-			return jsonify(error=True, message="Name must be unique.")
+			return jsonify(error=True, message='Name must be unique.')
 
 		f = request.files['file']
 
 		good_obs_ids = []
 
 		for line in f.stream:
-			line = str(line.decode("utf-8").strip())
+			line = str(line.decode('utf-8').strip())
 			if line == '':
 				continue
 			try:
 				obs_id = int(line)
 				good_obs_ids.append(obs_id)
 			except ValueError as ve:
-				return jsonify(error=True, message="Invalid content in file: " + line)
+				return jsonify(error=True, message=''.join('Invalid content in file: ', line))
 
 		good_obs_ids.sort()
 
@@ -152,12 +159,18 @@ def upload_set():
 
 		all_obs_ids_tuples = db_utils.send_query(g.eor_db, '''SELECT starttime
 							FROM mwa_setting
-							WHERE starttime >= {} AND starttime <= {}
-							{}
-							{}
-							ORDER BY starttime ASC'''
-							.format(start_gps, end_gps, low_high_clause, eor_clause))\
-							.fetchall()
+							WHERE starttime >= {start} AND starttime <= {end}
+							AND projectid='G0009'
+							{low_high}
+							{eor}
+							ORDER BY starttime ASC'''.format(start=start_gps, end=end_gps, low_high=low_high_clause, eor=eor_clause)).fetchall()
+
+		##all_obs_ids_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+		##									(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
+		##									('projectid', '==', 'G0009'),
+		##									('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
+		##									('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
+		##									field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime',))
 
 		all_obs_ids = [tup[0] for tup in all_obs_ids_tuples]
 
@@ -169,9 +182,9 @@ def upload_set():
 			try:
 				next_index = all_obs_ids.index(good_obs_id)
 			except ValueError as e:
-				return jsonify(error=True, message="Obs ID " + str(good_obs_id) +
-					""" not found in the set of observations corresponding
-						to Low/High: {} and EOR: {}""".format(low_or_high, eor))
+				return jsonify(error=True, message=''.join('Obs ID ', str(good_obs_id),
+					''' not found in the set of observations corresponding
+						to Low/High: {low_high} and EOR: {eor}'''.format(low_high=low_or_high, eor=eor)))
 			if next_index > last_index:
 				bad_range_dict = {}
 				bad_range_dict['start_gps'] = all_obs_ids[last_index]
@@ -187,9 +200,9 @@ def upload_set():
 		insert_set_into_db(set_name, start_gps, end_gps, bad_ranges,
 			low_or_high, eor, total_data_hrs, flagged_data_hrs)
 
-		return "OK"
+		return 'OK'
 	else:
-		return make_response("You need to be logged in to upload a set.", 401)
+		return make_response('You need to be logged in to upload a set.', 401)
 
 @app.route('/download_set')
 def download_set():
@@ -207,15 +220,23 @@ def download_set():
 
 		all_obs_ids_tuples = db_utils.send_query(g.eor_db, '''SELECT starttime
 							FROM mwa_setting
-							WHERE starttime >= {} AND starttime <= {}
-							{}
-							{}
-							ORDER BY starttime ASC'''.format(the_set.start,
-							the_set.end, low_high_clause, eor_clause)).fetchall()
+							WHERE starttime >= {start} AND starttime <= {end}
+							AND projectid='G0009'
+							{low_high}
+							{eor}
+							ORDER BY starttime ASC'''.format(start=the_set.start, end=the_set.end,
+															low_high=low_high_clause, eor=eor_clause)).fetchall()
+
+		##all_obs_id_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+		##									(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
+		##									('projectid', '==', 'G0009'),
+		##									('obsname', None if the_set.low_or_high == 'any' else 'like', ''.join(the_set.low_or_high, '%')),
+		##									('ra_phase_center', None if the_set.eor == 'any' else '==', 0 if the_set.eor == 'EOR0' else 60))
+		##									field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime',))
 
 		all_obs_ids = [tup[0] for tup in all_obs_ids_tuples]
 
-		good_obs_ids_text_file = ""
+		good_obs_ids_text_file = ''
 
 		for obs_id in all_obs_ids:
 			good = True # assume obs_id is good
@@ -224,19 +245,19 @@ def download_set():
 					good = False
 					break
 			if good:
-				good_obs_ids_text_file += str(obs_id) + '\n'
+				good_obs_ids_text_file = ''.join(good_obs_ids_text_file, str(obs_id), '\n')
 
 		response = make_response(good_obs_ids_text_file)
-		filename = the_set.name.replace(' ', '_') + ".txt"
-		response.headers["Content-Disposition"] = "attachment; filename=" + filename
+		filename = ''.join(the_set.name.replace(' ', '_'), '.txt')
+		response.headers['Content-Disposition'] = ''.join('attachment; filename=', filename)
 		return response
 	else:
-		return make_response("That set wasn't found.", 500)
+		return make_response('That set was not found.', 500)
 
 @app.route('/get_filters')
 def get_filters():
 	users = models.User.query.all()
-	return render_template("filters.html", users=users)
+	return render_template('filters.html', users=users)
 
 @app.route('/get_sets', methods = ['POST'])
 def get_sets():
@@ -294,6 +315,6 @@ def delete_set():
 
 		db.session.delete(theSet)
 		db.session.commit()
-		return "Success"
+		return 'Success'
 	else:
 		return redirect(url_for('login'))

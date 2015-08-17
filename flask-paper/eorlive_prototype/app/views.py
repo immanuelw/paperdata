@@ -144,13 +144,23 @@ def error_table():
 
 	obscontroller_response = db_utils.send_query(g.eor_db, '''SELECT reference_time, observation_number, comment
 							FROM obscontroller_log
-							WHERE reference_time >= {} AND reference_time < {}
-							ORDER BY reference_time ASC'''.format(start_gps, end_gps)).fetchall()
+							WHERE reference_time >= {start} AND reference_time <= {end}
+							ORDER BY reference_time ASC'''.format(start=start_gps, end=end_gps)).fetchall()
+
+	##obscontroller_response = db_utils.get_query_results(data_source=None, database='eor', table='obscontroller_log',
+	##													(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps),
+	##													field_sort_tuple=(('reference_time', 'asc'),),
+	##													output_vars=('reference_time', 'observation_number', 'comment')))
 
 	recvstatuspolice_response = db_utils.send_query(g.eor_db, '''SELECT reference_time, observation_number, comment
 							FROM recvstatuspolice_log
-							WHERE reference_time >= {} AND reference_time < {}
-							ORDER BY reference_time ASC'''.format(start_gps, end_gps)).fetchall()
+							WHERE reference_time >= {start} AND reference_time <= {end}
+							ORDER BY reference_time ASC'''.format(start=start_gps, end=end_gps)).fetchall()
+
+	##recvstatuspolice_response = db_utils.get_query_results(data_source=None, database='eor', table='recvstatuspolice_log',
+	##													(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps),
+	##													field_sort_tuple=(('reference_time', 'asc'),),
+	##													output_vars=('reference_time', 'observation_number', 'comment')))
 
 	return render_template('error_table.html', obscontroller_error_list=obscontroller_response,
 							recvstatuspolice_error_list=recvstatuspolice_response,
@@ -209,9 +219,15 @@ def data_summary_table():
 
 	response = db_utils.send_query(g.eor_db, '''SELECT starttime, stoptime, obsname, ra_phase_center
 					FROM mwa_setting
-					WHERE starttime >= {} AND starttime <= {}
+					WHERE starttime >= {start} AND starttime <= {end}
 					AND projectid='G0009'
-					ORDER BY starttime ASC'''.format(start_gps, end_gps)).fetchall()
+					ORDER BY starttime ASC'''.format(start=start_gps, end=end_gps)).fetchall()
+
+	##response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+	##									(('starttime, '>=', start_gps), ('starttime', '<=', end_gps),
+	##									('projectid', '==', 'G0009'),
+	##									field_sort_tuple=(('starttime', 'asc'),),
+	##									output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center')))
 
 	low_eor0_count = low_eor1_count = high_eor0_count = high_eor1_count = 0
 	low_eor0_hours = low_eor1_hours = high_eor0_hours = high_eor1_hours = 0

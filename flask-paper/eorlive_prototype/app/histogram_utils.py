@@ -55,12 +55,12 @@ def get_observation_counts(start_gps, end_gps, low_or_high, eor):
 				{eor}
 				ORDER BY starttime ASC'''.format(start=start_gps, end=end_gps, low_high=low_high_clause, eor=eor_clause)).fetchall()
 
-	##response = db_utils.get_query_results(data_source=None, database=None, table=None,
+	##response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
 	##									(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
 	##									('projectid', '==', 'G0009'),
 	##									('obsname', None if the_set.low_or_high == 'any' else 'like', ''.join(the_set.low_or_high, '%')),
 	##									('ra_phase_center', None if the_set.eor == 'any' else '==', 0 if the_set.eor == 'EOR0' else 60))
-	##									field_sort_tuple=('starttime', 'asc'), output_vars=('starttime', 'obsname', 'ra_phase_center'))
+	##									field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
@@ -93,9 +93,11 @@ def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 					AND projectid='G0009'
 					ORDER BY starttime ASC'''.format(start=start_gps, end=end_gps)).fetchall()
 
-	##results = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
-	##				(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-	##				('projectid', '==', 'G0009')), field_sort_tuple=('starttime', 'asc'))
+	##response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+	##									(('starttime, '>=', start_gps), ('starttime', '<=', end_gps),
+	##									('projectid', '==', 'G0009'),
+	##									field_sort_tuple=(('starttime', 'asc'),),
+	##									output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center')))
 
 	low_eor0_counts = []
 
