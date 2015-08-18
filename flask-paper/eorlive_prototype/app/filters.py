@@ -30,9 +30,9 @@ def set_hyperlink_filter(comment):
 
 		set_name_escaped_for_url = urllib.parse.quote(set_name_stripped)
 
-		link = "<a href='/set/" + set_name_escaped_for_url + "' target='_blank'>" + set_name + "</a>"
+		link = ''.join('<a href="/set/', set_name_escaped_for_url, '" target="_blank">', set_name, '</a>')
 
-		comment_copy = comment_copy.replace(EXPR_START_TEXT + set_name + ')', link, 1)
+		comment_copy = comment_copy.replace(''.join(EXPR_START_TEXT, set_name, ')'), link, 1)
 
 	return comment_copy
 

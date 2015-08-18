@@ -232,6 +232,10 @@ def download_set():
 
 	the_set = models.Set.query.filter(models.Set.id == set_id).first()
 
+	##the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+	##												field_tuples=(('id', '==', set_id),),
+	##												field_sort_tuple=None, output_vars=None)[0]
+
 	if the_set is not None:
 		flagged_subsets = models.Flagged_Subset.query.filter(models.Flagged_Subset.set_id == the_set.id).all()
 

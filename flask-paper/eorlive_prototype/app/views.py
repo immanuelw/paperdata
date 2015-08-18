@@ -19,6 +19,10 @@ def index(setName = None):
 	if setName is not None:
 		the_set = models.Set.query.filter(models.Set.name == setName).first()
 
+		##the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		##												field_tuples=(('name', '==', setName),),
+		##												field_sort_tuple=None, output_vars=None)[0]
+
 		if the_set is not None:
 			start_datetime, end_datetime = db_utils.get_datetime_from_gps(
 				the_set.start, the_set.end)
@@ -48,7 +52,11 @@ def get_graph():
 	if data_source_str is None:
 		return make_response('No data source', 500)
 
-	data_source = models.GraphDataSource.query.filter(models.GraphDataSource.name == data_source_str).first()
+	data_source = models.Graph_Data_Source.query.filter(models.Graph_Data_Source.name == data_source_str).first()
+
+	##data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+	##												field_tuples=(('name', '==', data_source_str),),
+	##												field_sort_tuple=None, output_vars=None)[0]
 
 	set_str = request.args.get('set')
 
@@ -81,6 +89,11 @@ def get_graph():
 				width_slider=data_source.width_slider)
 	else:
 		the_set = models.Set.query.filter(models.Set.name == set_str).first()
+
+		##the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		##												field_tuples=(('name', '==', set_str),),
+		##												field_sort_tuple=None, output_vars=None)[0]
+
 		if the_set is None:
 			return make_response('Set not found', 500)
 
@@ -117,9 +130,14 @@ def get_graph():
 
 @app.route('/data_amount', methods = ['GET'])
 def data_amount():
-	query = models.DataAmount.query
+	query = models.Data_Amount.query
 
-	data = query.order_by(models.DataAmount.created_on.desc()).first()
+	data = query.order_by(models.Data_Amount.created_on.desc()).first()
+
+	##data = db_utils.get_query_results(data_source=None, database='eorlive', table='data_amount',
+	##												field_tuples=None,
+	##												field_sort_tuple=(('created_on', 'desc'),), output_vars=None)[0]
+
 
 	data_time = hours_scheduled = hours_observed = hours_with_data = hours_with_uvfits = 'N/A'
 
@@ -191,7 +209,16 @@ def teardown_request(exception):
 def profile():
 	if (g.user is not None and g.user.is_authenticated()):
 		user = models.User.query.get(g.user.username)
+
+		##user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+		##									field_tuples=(('username', '==', g.user.username),), field_sort_tuple=None, output_vars=None)[0]
+
 		setList = models.Set.query.filter(models.Set.username == g.user.username)
+
+		##setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		##												field_tuples=(('username', '==', g.user.username),),
+		##												field_sort_tuple=None, output_vars=None)[0]
+
 		return render_template('profile.html', user=user, sets=setList)
 	else:
 		return redirect(url_for('login'))
@@ -200,8 +227,20 @@ def profile():
 def user_page():
 	if (g.user is not None and g.user.is_authenticated()):
 		user = models.User.query.get(g.user.username)
+
+		##user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+		##									field_tuples=(('username', '==', g.user.username),), field_sort_tuple=None, output_vars=None)[0]
+
 		userList = models.User.query.all()
+
+		##userList = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+		##									field_tuples=None, field_sort_tuple=None, output_vars=None)[0]
+
 		setList = models.Set.query.all()
+
+		##setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		##												field_tuples=None, field_sort_tuple=None, output_vars=None)[0]
+
 		return render_template('user_page.html', theUser=user, userList=userList, setList=setList)
 	else:
 		return redirect(url_for('login'))
