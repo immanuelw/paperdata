@@ -234,7 +234,7 @@ class DataBaseInterface(object):
 		todo:test
 		"""
 		s = self.Session()
-		table = getattr(sys.modules[__name__], TABLE.capitalize())
+		table = getattr(sys.modules[__name__], TABLE.title())
 		try:
 			ENTRY = s.query(table).get(unique_value)
 		except:
@@ -268,7 +268,7 @@ class DataBaseInterface(object):
 		"""
 		create a new entry.
 		"""
-		table = getattr(sys.modules[__name__], TABLE.capitalize())
+		table = getattr(sys.modules[__name__], TABLE.title())
 		if TABLE in ('filesystem', 'monitor', 'ram', 'iostat', 'cpu'):
 			ENTRY = table(**entry_dict)
 		self.add_entry(ENTRY)

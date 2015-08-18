@@ -73,10 +73,10 @@ from requests_futures.sessions import FuturesSession
 ##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
 ##	if data_source is not None:
 ##		dbi, module = get_dbi(data_source.database)
-##		table = getattr(module, data_source.table.capitalize())
+##		table = getattr(module, data_source.table.title())
 ##	else:
 ##		dbi, module = get_dbi(database)
-##		table = getattr(module, table.capitalize())
+##		table = getattr(module, table.title())
 ##	s = dbi.Session()
 ##	results = s.query(table)
 ##	if field_tuples is not None:
