@@ -1,6 +1,5 @@
 from app import db_utils, models
 from flask import g, render_template
-#import paperdata_dbi as pdbi
 #import math
 
 def get_error_counts(start_gps, end_gps):
@@ -89,6 +88,10 @@ def get_observation_counts(start_gps, end_gps, low_or_high, eor):
 
 def get_plot_bands(the_set):
 	flagged_subsets = models.FlaggedSubset.query.filter(models.FlaggedSubset.set_id == the_set.id).all()
+
+	##flagged_subets = db_utils.get_query_results(data_source=None, database='eorlive', table='flagged_subset',
+	##												field_tuples=(('set_id', '==', getattr(the_set, 'id')),),
+	##												field_sort_tuple=None, output_vars=None)
 
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 

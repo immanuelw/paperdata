@@ -1,7 +1,7 @@
 from flask.ext.script import Command, Manager, Option
 import hashlib
 from sqlalchemy.exc import IntegrityError
-from app.models import User
+from app import models
 from app.flask_app import db
 
 UserCommand = Manager(usage = 'Perform user creation')
@@ -16,7 +16,9 @@ def create_user(first_name, last_name, email, username, password):
 		print('Please pass all required parameters.\n Usage: flask/bin/python3.4 -m app.manage user create_user -fn <first name> -ln <last name> -e <email> -u <username> -p <password>')
 	else:
 		password = password.encode('UTF-8')
-		user = User(username, hashlib.sha512(password).hexdigest(), email, first_name, last_name)
+		User = getattr(models, 'User')
+		user = User(username=username, password=hashlib.sha512(password).hexdigest(), email=email,
+							firstname=first_name, lastname=last_name)
 		db.session.add(user)
 
 		try:

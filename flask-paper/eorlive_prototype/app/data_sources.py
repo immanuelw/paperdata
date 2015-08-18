@@ -4,12 +4,6 @@ import os
 import re
 from app.flask_app import app, db
 from app import db_utils, models
-#from sqlalchemy.engine import reflection
-
-#def inspector(database):
-#	dbi, _ = db_utils.get_dbi(database)
-#	insp = reflection.Inspector.from_engine(dbi.engine)
-#	return insp
 
 @app.route('/get_tables', methods = ['POST'])
 def get_tables():
@@ -78,7 +72,11 @@ def get_users_data_sources():
 @app.route('/get_unsubscribed_data_sources')
 def get_unsubscribed_data_sources():
 	if g.user is not None and g.user.is_authenticated():
-		all_data_sources = models.GraphDataSource.query.all()
+		all_data_sources = models.Graph_Data_Source.query.all()
+
+		##all_data_sources = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+		##												field_tuples=None, field_sort_tuple=None, output_vars=None)
+
 		subscribed_data_sources = g.user.subscribed_data_sources
 
 		unsubscribed_data_sources = list(set(all_data_sources) -\
@@ -95,8 +93,13 @@ def update_active_data_sources():
 		request_content = request.get_json()
 		new_active_data_sources_names = request_content['activeDataSources']
 
-		new_active_data_sources = models.GraphDataSource.query.filter(
-			models.GraphDataSource.name.in_(new_active_data_sources_names)).all()
+		new_active_data_sources = models.Graph_Data_Source.query.filter(
+			models.Graph_Data_Source.name.in_(new_active_data_sources_names)).all()
+
+		##all_data_sources = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+		##												field_tuples=(('name', 'in', new_active_data_sources_names),),
+		##												field_sort_tuple=None, output_vars=None)
+
 		current_active_data_sources = g.user.active_data_sources
 		active_to_remove = list(set(current_active_data_sources) -\
 			set(new_active_data_sources))
@@ -120,8 +123,12 @@ def subscribe_to_data_source():
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
-		data_source = models.GraphDataSource.query.filter(
-			models.GraphDataSource.name == data_source_name).first()
+		data_source = models.Graph_Data_Source.query.filter(
+			models.Graph_Data_Source.name == data_source_name).first()
+
+		##all_data_sources = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+		##												field_tuples=(('name', '==', data_source_name),),
+		##												field_sort_tuple=None, output_vars=None)
 
 		g.user.subscribed_data_sources.append(data_source)
 		db.session.add(g.user)
@@ -135,8 +142,12 @@ def unsubscribe_from_data_source():
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
-		data_source = models.GraphDataSource.query.filter(
-			models.GraphDataSource.name == data_source_name).first()
+		data_source = models.Graph_Data_Source.query.filter(
+			models.Graph_Data_Source.name == data_source_name).first()
+
+		##data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+		##												field_tuples=(('name', '==', data_source_name),),
+		##												field_sort_tuple=None, output_vars=None)[0]
 
 		g.user.subscribed_data_sources.remove(data_source)
 		try:
@@ -152,7 +163,12 @@ def unsubscribe_from_data_source():
 
 @app.route('/get_graph_types')
 def get_graph_types():
-	graph_types = models.GraphType.query.filter(models.GraphType.name != 'Obs_Err').all()
+	graph_types = models.Graph_Type.query.filter(models.Graph_Type.name != 'Obs_Err').all()
+
+	##graph_types = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_type',
+	##												field_tuples=(('name', '!=', 'Obs_Err),),
+	##												field_sort_tuple=None, output_vars=None)
+
 	return render_template('graph_type_list.html', graph_types=graph_types)
 
 @app.route('/create_data_source', methods = ['POST'])
@@ -188,8 +204,14 @@ def create_data_source():
 				letters, _, or spaces.''')
 
 		#Is the data source name unique?
-		if models.GraphDataSource.query.filter(models.GraphDataSource.name == data_source_name).first() is not None:
+		if models.Graph_Data_Source.query.filter(models.Graph_Data_Source.name == data_source_name).first() is not None:
 			return jsonify(error=True, message='The data source name must be unique.')
+
+		##data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+		##												field_tuples=(('name', '==', data_source_name),),
+		##												field_sort_tuple=None, output_vars=None)[0]
+		##if data_source is not None:
+		##	return jsonify(error=True, message='The data source name must be unique.')
 
 		try:
 			db_conn = psycopg2.connect(database=database, host=host,
@@ -245,7 +267,7 @@ def create_data_source():
 
 		#projectid = 'projectid' in column_response
 
-		graph_data_source = models.GraphDataSource()
+		graph_data_source = models.Graph_Data_Source()
 		graph_data_source.name = data_source_name
 		graph_data_source.graph_type = graph_type
 		graph_data_source.host = host
@@ -254,13 +276,29 @@ def create_data_source():
 		graph_data_source.obs_column = obs_column
 		graph_data_source.projectid = projectid
 		graph_data_source.width_slider = include_width_slider
+
+		##graph_data_source = getattr(models, 'Graph_Data_Source')()
+		##setattr(graph_data_source, 'name', data_source_name)
+		##setattr(graph_data_source, 'graph_type', graph_type)
+		##setattr(graph_data_source, 'host', host)
+		##setattr(graph_data_source, 'database', database)
+		##setattr(graph_data_source, 'table', table)
+		##setattr(graph_data_source, 'obs_column', obs_column)
+		##setattr(graph_data_source, 'projectid', projectid)
+		##setattr(graph_data_source, 'width_slider', include_width_slider)
+
 		db.session.add(graph_data_source)
 		db.session.flush()
 
 		for column in columns:
-			graph_data_source_column = models.GraphDataSourceColumn()
+			graph_data_source_column = models.Graph_Data_Source_Column()
 			graph_data_source_column.name = column
 			graph_data_source_column.graph_data_source = data_source_name
+
+			##graph_data_source_column = getattr(models, 'Graph_Data_Source_Column')()
+			##setattr(graph_data_source_column, 'name', column)
+			##setattr(graph_data_source_column, 'graph_data_source', data_source_name)
+
 			db.session.add(graph_data_source_column)
 
 		g.user.subscribed_data_sources.append(graph_data_source)
@@ -274,8 +312,12 @@ def create_data_source():
 
 def build_query(data_source):
 	query = ''.join(('SELECT ', data_source.obs_column))
-	columns = models.GraphDataSourceColumn.query.filter(
-		models.GraphDataSourceColumn.graph_data_source == data_source.name).all()
+	columns = models.Graph_Data_Source_Column.query.filter(
+		models.Graph_Data_Source_Column.graph_data_source == data_source.name).all()
+
+	##columns = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source_column',
+	##												field_tuples=(('graph_data_source', '==', getattr(data_source, 'name')),),
+	##												field_sort_tuple=None, output_vars=None)
 
 	for column in columns:
 		query = ', '.join((query, column.name))
@@ -286,7 +328,11 @@ def build_query(data_source):
 	return (query, columns)
 
 def get_graph_data(data_source_str, start_gps, end_gps, the_set):
-	data_source = models.GraphDataSource.query.filter(models.GraphDataSource.name == data_source_str).first()
+	data_source = models.Graph_Data_Source.query.filter(models.Graph_Data_Source.name == data_source_str).first()
+
+	##data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+	##												field_tuples=(('name', '==', data_source_str),),
+	##												field_sort_tuple=None, output_vars=None)[0]
 
 	query, columns = build_query(data_source)
 

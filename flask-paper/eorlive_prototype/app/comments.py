@@ -2,7 +2,7 @@ from flask import render_template, g, make_response, request
 from app.flask_app import app, db
 from app import models
 from datetime import datetime
-import db_utils
+#from app import db_utils
 
 @app.route('/get_all_comments')
 def get_all_comments():
@@ -31,24 +31,23 @@ def thread_reply():
 		new_comment.thread_id = thread_id
 		new_comment.text = text
 		new_comment.username = g.user.username
-		db.session.add(new_comment)
 
 		##new_comment = getattr(models, 'Comment')()
 		##setattr(new_comment, 'thread_id', thread_id)
 		##setattr(new_comment, 'text', text)
 		##setattr(new_comment, 'username', g.user.username)
-		##db.session.add(new_comment)
+
+		db.session.add(new_comment)
 
 		thread = models.Thread.query.filter(models.Thread.id == thread_id).first()
 		thread.last_updated = datetime.utcnow()
-		db.session.add(thread)
 
 		##thread = db_utils.get_query_result(data_source=None, database='eorlive', table='thread',
 		##									field_tuples=(('id', '==', thread_id),),
 		##									field_sort_tuple=None, output_vars=None)
 		##setattr(thread, 'last_updated', datetime.utcnow())
-		##db.session.add(thread)
 
+		db.session.add(thread)
 		db.session.commit()
 		return make_response('Success', 200)
 	else:

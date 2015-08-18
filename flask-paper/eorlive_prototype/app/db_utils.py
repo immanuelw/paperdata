@@ -5,7 +5,7 @@ from requests_futures.sessions import FuturesSession
 #from app import models as edbi
 #import paperdata_dbi as pdbi
 #import pyganglia_dbi as pyg
-#from sqlalchemy import or_
+#from sqlalchemy import or_, in_
 #from sqlalchemy.engine import reflection
 
 #def get_dbi(database):
@@ -47,12 +47,16 @@ from requests_futures.sessions import FuturesSession
 ##		clause = field == value
 ##	elif equivalency == '>=':
 ##		clause = field >= value
+##	elif equivalency == '!=':
+##		clause = field != value
 ##	elif equivalency == '<':
 ##		clause = field < value
 ##	elif equivalency == '>':
 ##		clause = field > value
 ##	elif equivalency == 'like':
 ##		clause = field.like(value)
+##	elif equivalency == 'in':
+##		clause = field.in_(value)
 ##	elif equivalency == 'or' and value is None:
 ##		clause_tuple = tuple(make_clause(table, new_field_name, new_equivalency, new_value)
 ##										for new_field_name, new_equivalency, new_value in field_name)
