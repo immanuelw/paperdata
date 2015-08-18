@@ -1,5 +1,5 @@
-web: gunicorn --pythonpath eorlive_prototype run_app:app --log-file=- & sh background.sh
-init: cd eorlive_prototype;python -m app.manage db init
-migrate: cd eorlive_prototype;python -m app.manage db migrate
-upgrade: cd eorlive_prototype;python -m app.manage db upgrade
-default_values: cd eorlive_prototype;python -m scripts.insert_default_db_values
+web: gunicorn --pythonpath papersite run_app:app --log-file=- & sh background.sh
+init: cd papersite;python -m app.manage db init
+migrate: cd papersite;python -m app.manage db migrate
+upgrade: cd papersite;python -m app.manage db upgrade
+default_values: cd papersite;python -m scripts.insert_default_db_values

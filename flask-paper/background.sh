@@ -1,2 +1,2 @@
-cd eorlive_prototype
+cd papersite
 python run_background.py
