@@ -1,6 +1,8 @@
 from flask import g
 from datetime import datetime
 from requests_futures.sessions import FuturesSession
+#from app.flask_app import db
+#from app import models as edbi
 #import paperdata_dbi as pdbi
 #import pyganglia_dbi as pyg
 #from sqlalchemy import or_
@@ -8,9 +10,14 @@ from requests_futures.sessions import FuturesSession
 
 #def get_dbi(database):
 #	if database == 'paperdata':
-#		dbi = pdbi.DataBaseInterface()
+#		module = pdbi
 #	elif database == 'ganglia':
-#		dbi = pyg.DataBaseInterface()
+#		module = pyg
+#	elif database == 'eorlive':
+#		module = db
+#		dbi = edbi
+#		return dbi, module
+#	dbi = getattr(module, 'DataBaseInterface')()
 #	return dbi, module
 
 #def inspector(database):
@@ -57,7 +64,7 @@ from requests_futures.sessions import FuturesSession
 ##	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in field_sort_tuple]
 ##	return clause_list
 
-##def get_query_results(data_source=None, database=None, table=None, field_tuples, field_sort_tuple=None, output_vars=None):
+##def get_query_results(data_source=None, database=None, table=None, field_tuples=None, field_sort_tuple=None, output_vars=None):
 ##	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
 ##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
 ##	if data_source is not None:
@@ -68,9 +75,10 @@ from requests_futures.sessions import FuturesSession
 ##		table = getattr(module, table.capitalize())
 ##	s = dbi.Session()
 ##	results = s.query(table)
-##	clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
-##	for clause in clause_gen:
-##		results = results.filter(clause)
+##	if field_tuples is not None:
+##		clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
+##		for clause in clause_gen:
+##			results = results.filter(clause)
 ##	if field_sort_tuple is not None:
 ##		results = results.order_by(*sort_clause(field_sort_tuple)).all()
 ##	if output_vars is not None:

@@ -124,7 +124,7 @@ def data_amount():
 	data_time = hours_scheduled = hours_observed = hours_with_data = hours_with_uvfits = 'N/A'
 
 	if data is not None:
-		data = data.asDict()
+		data = data.to_json()
 		data_time = data['created_on']
 		hours_scheduled = data['hours_scheduled']
 		hours_observed = data['hours_observed']
