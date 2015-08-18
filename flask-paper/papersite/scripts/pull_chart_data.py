@@ -7,37 +7,22 @@ import requests
 from datetime import datetime
 from app import models
 from app.flask_app import db
+from app import db_utils
 
-eor_conn = None  # Lazy load globals
-ngas_conn = None
-mwa_conn = None
 profiling_mark = None
 
 def write_to_log(msg):
 	print(msg)
-
-def send_query(db, query):
-	cur = db.cursor()
-	cur.execute(query)
-	return cur
-
-
-def send_eor_query(query):
-	return send_query(eor_conn, query)
-
-
-def send_ngas_query(query):
-	return send_query(ngas_conn, query)
-
-
-def send_mwa_query(query):
-	return send_query(mwa_conn, query)
 
 def profile():
 	global profiling_mark
 	result = datetime.now() - profiling_mark
 	profiling_mark = datetime.now()
 	return result.total_seconds()
+
+def log_query_time(var_name):
+	write_to_log('{var_name} query ran in {profile_time} seconds'.format(var_name=var_name, profile_time=profile())
+	return None
 
 def update():
 	utc_now = datetime.utcnow().isoformat()
@@ -48,172 +33,116 @@ def update():
 
 	profiling_mark = datetime.now()
 
-	# Total Scheduled
-	total_sch_hours = float (send_eor_query('''
-						SELECT SUM(stoptime - starttime) FROM mwa_setting
-						WHERE projectid=\'G0009\'
-						''').fetchone()[0]) / 3600.
+	#total hours in SADB
+	total_sadb_hours = sum(db_utils.get_query_results(data_source=None, database='sadb', table='observation',
+									field_tuples=(('length', '!=', None),), field_sort_tuple=None, output_vars=('length',))) / 3600.0
 
-	write_to_log("total_sch_hours query ran in %f seconds" % profile())
+	log_query_time('total_sadb_hours')
 
-	# Total Observed
-	total_obs_hours = float (send_eor_query('''
-							SELECT SUM(stoptime - starttime) FROM mwa_setting
-						WHERE projectid = \'G0009\' AND stoptime < %d
-						''' % gps_now).fetchone()[0] ) / 3600.
+	#total hours in paperdata
+	total_paperdata_hours = sum(db_utils.get_query_results(data_source=None, database='paperdata', table='observation',
+									field_tuples=(('length', '!=', None),), field_sort_tuple=None, output_vars=('length',))) / 3600.0
 
-	write_to_log("total_obs_hours query ran in %f seconds" % profile())
 
-	# Total that has data
-	mwa_setting_rows = send_eor_query('''
-					SELECT subq.starttime, subq.stoptime, subq.files
-					FROM
-						(SELECT starttime, stoptime, COUNT(data_files.id) as files
-						FROM mwa_setting
-						LEFT OUTER JOIN data_files ON mwa_setting.starttime = data_files.observation_num
-						WHERE projectid=\'G0009\'
-						GROUP BY starttime, stoptime) as subq
-					WHERE subq.files > 0
-					ORDER BY subq.starttime ASC
-					''')
+	log_query_time('total_paperdata_hours')
 
-	write_to_log("mwa_setting_rows query ran in %f seconds" % profile())
+	#total that has data in observations
+	sadb_obs_rows = db_utils.get_query_results(data_source=None, database='sadb', table='observation',
+												field_tuples=(('files', '!=', None),), field_sort_tuple=(('obsnum', 'asc'),),
+												output_vars=('length', 'obsnum', 'files'))
 
-	ngas_files_rows = send_ngas_query('''
-					SELECT DISTINCT file_id FROM ngas_files
-					ORDER BY file_id ASC
-					''')
+	#make tuple of length and file_count for sadb_obs_rows
+	sadb_obs_rows = tuple((length, obsnum, len(files)) for length, obsnum, files in sadb_obs_rows)
 
-	write_to_log("ngas_files_rows query ran in %f seconds" % profile())
+	log_query_time('sadb_obs_rows')
 
-	write_to_log("preparing for the giant interation where mwa_setting_rows = %d and ngas_files_rows = %d"
-				 % (mwa_setting_rows.rowcount, ngas_files_rows.rowcount))
+	paperdata_files_rows = db_utils.get_query_results(data_source=None, database='paperdata', table='file',
+												field_tuples=None, field_sort_tuple=(('obsnum', 'asc'),),
+												output_vars=('obsnum',))
+
+	log_query_time('paperdata_files_rows')
+
+	write_to_log('preparing for the giant iteration where sadb_obs_rows = {sadb_count} and paperdata_files_rows = {paper_count}'\
+					.format(len(sadb_obs_rows), paper_count=len(paperdata_files_rows)))
 
 	total_data_hours = 0
-	no_more_ngas_files = False
+	no_more_paperdata_files = False
 	match = 0
 	no_match = 0
-	weirdness = 0
+	weird = 0
 	not_weird = 0
-	for row in mwa_setting_rows:
-		obsid = int(row[0])
-		obsid_str = str(obsid)
-		num_ngas_files = 0
 
-		while(True):
-			ngas_file = ngas_files_rows.fetchone()
-			if not ngas_file:
-				no_more_ngas_files = True
-				break
+	#get all the unique observations
+	sadb_unique_obs = {sadb_obsnum for _, sadb_obsnum, _ in sadb_obs_rows if sadb_obsnum}
+	paperdata_unique_obs = {paper_obsnum for paper_obsnum in paperdata_files_rows if paper_obsnum}
+	shared_obs = sadb_unique_obs & paperdata_unique_obs
 
-			ngas_file_id = ngas_file[0]
+	#count every file that has a 'shared_obsnum'
+	num_paperdata_files = sum(1 for paper_obsnum in paperdata_files_rows if paper_obsnum in shared_obs and paper_obsnum is not None)
+	match = num_paperdata_files
+	no_match = sum(1 for paper_obsnum in paperdata_files_rows if paper_obsnum is None)
 
-			try:
-				ngas_file_obsid = int(ngas_file_id.split("_")[0])
-			except ValueError as e:
-				ngas_file_obsid = 0  # so it can be just fast forwarded
+	for length, sadb_obsnum, sadb_files in sadb_obs_rows:
+		num_sadb_files = len(sadb_files)
 
-			if ngas_file_id.startswith(obsid_str):
-				num_ngas_files += 1
-				match += 1
-			else:
-				# fast forward if ngas_file_obsid is smaller - for any normal
-				# situation it should be equal or greater
-				if ngas_file_obsid < obsid:
-					continue
-
-				# if not move the cursor one step back and break so it fetches
-				# the same row on the next loop
-				ngas_files_rows.scroll(-1)
-				no_match += 1
-				break
-
-		num_mit_files = row[2]
-
-		if num_ngas_files > num_mit_files:
-			print("what the hell! More files in ngas! obsid = %d num_mit_files = %s num_ngas_files = %d" % (obsid, num_mit_files, num_ngas_files))
-			weirdness += 1
+		if num_paperdata_files > num_sadb_files:
+			print('what the hell! More files in paperdata! obsid = {obsnum} num_sadb_files = {sadb_num} num_paperdata_files = {paper_num}'\
+							.format(obsnum=sadb_obsnum, sadb_num=num_sadb_files, paper_num=num_paperdata_files))
+			weird += 1
 		else:
 			not_weird += 1
 
-		total_data_hours += (float(num_ngas_files) /
-							 float(num_mit_files)) * (row[1] - row[0]) / 3600.
+		total_data_hours += (float(num_paperdata_files) /
+							 float(num_obsnum_files)) * length / 3600.
 
-		if no_more_ngas_files:
-			break
+	print('match = {match} no_match = {no_match}'.format(match=match, no_match=no_match))
+	print('weird = {weird} not_weird = {not_weird}'.format(weird=weird, not_weird=not_weird))
 
-	print("match = %d no_match = %d" % (match, no_match))
-	print("weirdness = %d not_weird = %d" % (weirdness, not_weird))
-
-	write_to_log("The giant iteration ran in %f seconds" % profile())
+	write_to_log('The giant iteration ran in {profile_time} seconds'.format(profile_time=profile()))
 
 	# UVFITS hours
 	total_uvfits_hours = float (send_mwa_query('''
 						SELECT COUNT(*) FROM uvfits_location WHERE version = 4 AND subversion = 1
 						''').fetchone()[0]) * 112. / 3600.
 
-	write_to_log("total_uvfits_hours query ran in %f seconds" % profile())
+	
+	log_query_time('total_uvfits_hours')
 
 	# Data transfer rate
-	data_transfer_rate = send_ngas_query("""
-					select sum(uncompressed_file_size) / date_part('epoch', to_timestamp('%(now)s','YYYY-MM-DD"T"HH24:MI:SS.MS') -
-						to_timestamp(min(ingestion_date), 'YYYY-MM-DD"T"HH24:MI:SS.MS')) / (1024^2) as "data_transfer_rate"
+	data_transfer_rate = send_ngas_query('''
+					select sum(uncompressed_file_size) / date_part('epoch', to_timestamp('%(now)s','YYYY-MM-DD'T'HH24:MI:SS.MS') -
+						to_timestamp(min(ingestion_date), 'YYYY-MM-DD'T'HH24:MI:SS.MS')) / (1024^2) as 'data_transfer_rate'
 					from ngas_files
-					where ingestion_date between to_char(to_timestamp('%(now)s','YYYY-MM-DD"T"HH24:MI:SS.MS') -
-						interval '24 hours','YYYY-MM-DD"T"HH24:MI:SS.MS') and '%(now)s';
-					""" % {"now": datetime.now().strftime('%Y-%m-%dT%H:%M:%S.000')}).fetchone()[0] or 0
+					where ingestion_date between to_char(to_timestamp('%(now)s','YYYY-MM-DD'T'HH24:MI:SS.MS') -
+						interval '24 hours','YYYY-MM-DD'T'HH24:MI:SS.MS') and '%(now)s';
+					''' % {'now': datetime.now().strftime('%Y-%m-%dT%H:%M:%S.000')}).fetchone()[0] or 0
 	data_transfer_rate = float(data_transfer_rate)
 
-	write_to_log("data_transfer_rate query ran in %f seconds" % profile())
+	log_query_time('data_transfer_rate')
 
-	write_to_log("\nTotal Scheduled Hours = %.6f" % total_sch_hours)
-	write_to_log("Total Observed Hours = %.6f" % total_obs_hours)
-	write_to_log("Total Hours that have data = %.6f" % total_data_hours)
-	write_to_log("Total Hours that have uvfits data = %.6f" %
-				 total_uvfits_hours)
-	write_to_log("Data transfer rate = %.6f" % data_transfer_rate)
+	write_to_log('\nTotal Scheduled Hours = {time}'.format(time=round(total_sadb_hours), 6))
+	write_to_log('Total Observed Hours = {time}'.format(time=round(total_paperdata_hours), 6))
+	write_to_log('Total Hours that have data = {time}'.format(time=round(total_data_hours), 6))
+	write_to_log('Total Hours that have uvfits data = {time}'.format(time=round(total_uvfits_hours), 6))
+	write_to_log('Data transfer rate = {time}'.format(time=round(data_transfer_rate), 6))
 
-	graph_datum = models.DataAmount(hours_scheduled = total_sch_hours, hours_observed = total_obs_hours, hours_with_data = total_data_hours,
-	hours_with_uvfits = total_uvfits_hours, data_transfer_rate = data_transfer_rate)
+	graph_datum = getattr(models, 'Data_Amount')(hours_scheduled=total_sadb_hours, hours_observed=total_paperdata_hours,
+												hours_with_data=total_data_hours, hours_with_uvfits=total_uvfits_hours,
+												data_transfer_rate=data_transfer_rate)
 
 	db.session.add(graph_datum)
 	db.session.commit()
 
 if __name__ == '__main__':
 
-	write_to_log("\n-- %s -- \n" %
-				 datetime.now().strftime("%Y-%m-%dT%H:%M:%S.%f%z"))
+	write_to_log('\n-- {timestamp} -- \n' .format(timestamp=datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f%z')))
 
 	# Establish the database connection
-	try:
-		eor_conn = psycopg2.connect(
-			database='mwa', host='eor-db.mit.edu', user=os.environ['MWA_DB_USERNAME'], password=os.environ['MWA_DB_PW'])
-	except Exception as e:
-		write_to_log(
-			"Can't connect to the eor database at eor-db.mit.edu - %s" % e)
-		exit(1)
-
-	try:
-		ngas_conn = psycopg2.connect(
-			database='ngas', user=os.environ['NGAS_DB_USERNAME'], host='ngas.mit.edu', password=os.environ['NGAS_DB_PW'])
-	except Exception as e:
-		write_to_log(
-			"Can't connect to the ngas database at ngas.mit.edu - %s" % e)
-		exit(1)
-
-	try:
-		mwa_conn = psycopg2.connect(
-			database='mwa', user=os.environ['MWA_DB_USERNAME'], password=os.environ['MWA_DB_PW'], host='mwa.mit.edu')
-	except Exception as e:
-		write_to_log(
-			"Can't connect to the mwa database at mwa.mit.edu - %s" % e)
-		exit(1)
-
 	profiling_mark = datetime.now()
 
 	try:
 		update()
-	finally:
-		eor_conn.close()
-		ngas_conn.close()
-		mwa_conn.close()
+	except:
+		except Exception as e:	
+			write_to_log('Cannot connect to some database - {e}'.format(e=e))
+			exit(1)
