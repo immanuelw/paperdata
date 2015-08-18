@@ -99,6 +99,10 @@ def get_gps_utc_constants():
 	leap_seconds_result = send_query(g.eor_db,
 		'SELECT leap_seconds FROM leap_seconds ORDER BY leap_seconds DESC LIMIT 1').fetchone()
 
+	##leap_seconds_result = get_query_results(data_source=None, database='eor', table='leap_seconds',
+	##											field_tuples=None, field_sort_tuple=(('leap_seconds', 'desc'),),
+	##											output_vars=('leap_seconds',))[0]
+
 	leap_seconds = leap_seconds_result[0]
 
 	GPS_LEAP_SECONDS_OFFSET = leap_seconds - 19
