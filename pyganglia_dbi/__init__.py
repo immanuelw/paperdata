@@ -236,12 +236,7 @@ class DataBaseInterface(object):
 		s = self.Session()
 		table = getattr(sys.modules[__name__], TABLE.capitalize())
 		try:
-			if TABLE in ('filesystem',):
-				ENTRY = s.query(table).filter(getattr(table, 'full_system_time') == unique_value).one()
-			elif TABLE in ('monitor',):
-				ENTRY = s.query(table).filter(getattr(table, 'full_stats' == unique_value).one()
-			elif TABLE in ('ram', 'iostat', 'cpu'):
-				ENTRY = s.query(table).filter(getattr(table, 'host_time') == unique_value).one()
+			ENTRY = s.query(table).get(unique_value)
 		except:
 			return None
 		s.close()

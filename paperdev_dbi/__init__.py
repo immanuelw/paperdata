@@ -317,10 +317,7 @@ class DataBaseInterface(object):
 		s = self.Session()
 		table = getattr(sys.modules[__name__], TABLE.capitalize())
 		try:
-			if TABLE in ('observation', 'rtp_observation'):
-				ENTRY = s.query(table).filter(getattr(table, 'obsnum') == unique_value).one()
-			elif TABLE in ('file', 'feed', 'rtp_file'):
-				ENTRY = s.query(table).filter(getattr(table, 'full_path') == unique_value).one()
+			ENTRY = s.query(table).get(unique_value)
 		except:
 			return None
 		s.close()
@@ -371,7 +368,7 @@ class DataBaseInterface(object):
 			obs_table = getattr(sys.modules[__name__], 'Observation')
 			ENTRY = table(**entry_dict)
 			#get the observation corresponding to this file
-			OBS = s.query(obs_table).filter(getattr(obs_table, 'obsnum') == entry_dict['obsnum']).one()
+			OBS = s.query(obs_table).get(entry_dict['obsnum'])
 			setattr(ENTRY, 'observation', OBS)  #associate the file with an observation
 		self.add_entry(ENTRY)
 		return None
