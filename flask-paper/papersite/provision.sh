@@ -11,11 +11,12 @@ export DATABASE_URL=postgres:///postgres
 sudo apt-get update
 sudo apt-get install -y python-virtualenv python3-dev libpq-dev postgresql
 
-cd /mnt/eorlive_prototype
+cd /mnt/papersite
 
 sudo virtualenv --python=/usr/bin/python3.4 flask
 source flask/bin/activate
-pip install flask requests Flask-SQLAlchemy Flask-Migrate Flask-Login requests-futures psycopg2
+pip3 install flask requests Flask-SQLAlchemy Flask-Migrate Flask-Login requests-futures psycopg2
+#pip3 install -r ../requirements.txt
 
 sudo -u postgres createuser vagrant
 
