@@ -14,23 +14,45 @@ def insert_set_into_db(name, start, end, flagged_range_dicts, low_or_high,
 	new_set.eor = eor
 	new_set.total_data_hrs = total_data_hrs
 	new_set.flagged_data_hrs = flagged_data_hrs
+
+	##new_set = getattr(models, 'Set')()
+	##setattr(new_set, 'username', g.user.username)
+	##setattr(new_set, 'name', name)
+	##setattr(new_set, 'start', start)
+	##setattr(new_set, 'end', end)
+	##setattr(new_set, 'low_or_high', low_or_high)
+	##setattr(new_set, 'eor', eor)
+	##setattr(new_set, 'total_data_hrs', total_data_hrs)
+	##setattr(new_set, 'flagged_data_hrs', flagged_data_hrs)
+
 	db.session.add(new_set)
 	db.session.flush()
 	db.session.refresh(new_set) # So we can get the set's id
 
 	for flagged_range_dict in flagged_range_dicts:
-		flagged_subset = models.FlaggedSubset()
+		flagged_subset = models.Flagged_Subset()
 		flagged_subset.set_id = new_set.id
 		flagged_subset.start = flagged_range_dict['start_gps']
 		flagged_subset.end = flagged_range_dict['end_gps']
+
+		##flagged_subset = getattr(models, 'Flagged_Subset')()
+		##setattr(flagged_subset, 'set_id', getattr(new_set, 'id'))
+		##setattr(flagged_subset, 'start', flagged_range_dict['start_gps'])
+		##setattr(flagged_subset, 'end', flagged_range_dict['end_gps'])
+
 		db.session.add(flagged_subset)
 		db.session.flush()
 		db.session.refresh(flagged_subset) # So we can get the id
 
 		for obs_id in flagged_range_dict['flaggedRange']:
-			flagged_obs_id = models.FlaggedObsIds()
+			flagged_obs_id = models.Flagged_Obs_Ids()
 			flagged_obs_id.obs_id = obs_id
 			flagged_obs_id.flagged_subset_id = flagged_subset.id
+
+			##flagged_obs_id = getattr(models, 'Flagged_Obs_Ids')()
+			##setattr(flagged_obs_id, 'obs_id', obs_id)
+			##setattr(flagged_obs_id, 'flagged_subset_id', getattr(flagged_subset, 'id'))
+
 			db.session.add(flagged_obs_id)
 
 	db.session.commit()
@@ -211,7 +233,11 @@ def download_set():
 	the_set = models.Set.query.filter(models.Set.id == set_id).first()
 
 	if the_set is not None:
-		flagged_subsets = models.FlaggedSubset.query.filter(models.FlaggedSubset.set_id == the_set.id).all()
+		flagged_subsets = models.Flagged_Subset.query.filter(models.Flagged_Subset.set_id == the_set.id).all()
+
+		##flagged_subsets = db_utils.get_query_results(data_source=None, database='eorlive', table='flagged_subset',
+		##												field_tuples=(('set_id', '==', getattr(the_set, 'id')),),
+		##												field_sort_tuple=None, output_vars=None)
 
 		low_or_high = the_set.low_or_high
 		eor = the_set.eor
@@ -257,6 +283,10 @@ def download_set():
 @app.route('/get_filters')
 def get_filters():
 	users = models.User.query.all()
+
+	##users = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+	##												field_tuples=None field_sort_tuple=None, output_vars=None)
+
 	return render_template('filters.html', users=users)
 
 @app.route('/get_sets', methods = ['POST'])
@@ -299,6 +329,28 @@ def get_sets():
 
 		setList = query.all()
 
+		##if ranged:
+		##	start_utc = request_content['starttime']
+		##	end_utc = request_content['endtime']
+		##	start_datetime = datetime.strptime(start_utc, '%Y-%m-%dT%H:%M:%SZ')
+		##	end_datetime = datetime.strptime(end_utc, '%Y-%m-%dT%H:%M:%SZ')
+		##	start_gps, end_gps = db_utils.get_gps_from_datetime(start_datetime, end_datetime)
+
+		##field_tuples = (('username', '==' if username else None, username), ('eor', '==' if eor else None, eor),
+		##					('low_or_high', '==' if high_low else None, high_low),
+		##					('start', '>=' if ranged else None, start_gps),
+		##					('end', '>=' if ranged else None, end_gps))
+	
+		##field_sort_tuple = None
+		##if sort:
+		##	if sort == 'hours'
+		##		field_sort_tuple = (('total_data_hrs', 'desc'),)
+		##	elif sort == 'time':
+		##		field_sort_tuple = (('created_on', 'desc'),)
+
+		##setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		##												field_tuples=field_tuples, field_sort_tuple=field_sort_tuple, output_vars=None)
+
 		include_delete_buttons = request_content['includeDeleteButtons']
 
 		return render_template('setList.html', sets=setList,
@@ -312,6 +364,10 @@ def delete_set():
 		set_id = request.form['set_id']
 
 		theSet = models.Set.query.filter(models.Set.id == set_id).first()
+
+		##theSet = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		##												field_tuples=(('id', '==', set_id),),
+		##												field_sort_tuple=None, output_vars=None)[0]
 
 		db.session.delete(theSet)
 		db.session.commit()
