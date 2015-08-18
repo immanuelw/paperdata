@@ -68,16 +68,7 @@ from requests_futures.sessions import FuturesSession
 ##	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in field_sort_tuple]
 ##	return clause_list
 
-##def get_query_results(data_source=None, database=None, table=None, field_tuples=None, field_sort_tuple=None, output_vars=None):
-##	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
-##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
-##	if data_source is not None:
-##		dbi, module = get_dbi(data_source.database)
-##		table = getattr(module, data_source.table.title())
-##	else:
-##		dbi, module = get_dbi(database)
-##		table = getattr(module, table.title())
-##	s = dbi.Session()
+##def get_results(s, table, field_tuples, field_sort_tuple, output_vars):
 ##	results = s.query(table)
 ##	if field_tuples is not None:
 ##		clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
@@ -87,6 +78,25 @@ from requests_futures.sessions import FuturesSession
 ##		results = results.order_by(*sort_clause(field_sort_tuple)).all()
 ##	if output_vars is not None:
 ##		results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results))
+##	return results
+
+##def get_query_results(data_source=None, database=None, table=None, field_tuples=None, field_sort_tuple=None, output_vars=None):
+##	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
+##	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
+##	if data_source is not None:
+##		dbi, module = get_dbi(data_source.database)
+##		table = getattr(module, data_source.table.title())
+##	elif database is not None:
+##		dbi, module = get_dbi(database)
+##		table = getattr(module, table.title())
+##	else:
+##		return None
+##
+##	if table == 'eorlive'.title():
+##		s = db.session
+##	else:
+##		s = dbi.Session()
+##	results = get_results(s=s, table=table, field_tuples=field_tuples, field_sort_tuple=field_sort_tuple, output_vars=output_vars)
 ##	s.close()
 ##	return results
 

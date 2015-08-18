@@ -15,9 +15,9 @@ def get_all_comments():
 		thread.comments = models.Comment.query.filter(models.Comment.thread_id == thread.id).all()
 
 	##for thread in threads:
-	##	setattr(thread, 'comments') = db_utils.get_query_result(data_source=None, database='eorlive', table='comment',
-	##									field_tuples=(('thread_id', '==', getattr(thread, 'id')),),
-	##									field_sort_tuple=None, output_vars=None)
+	##	setattr(thread, 'comments', db_utils.get_query_result(data_source=None, database='eorlive', table='comment',
+	##															field_tuples=(('thread_id', '==', getattr(thread, 'id')),),
+	##															field_sort_tuple=None, output_vars=None))
 
 	return render_template('comments_list.html', threads=threads)
 
@@ -62,29 +62,27 @@ def new_thread():
 		new_thread = models.Thread()
 		new_thread.title = title
 		new_thread.username = g.user.username
-		db.session.add(new_thread)
-		db.session.flush()
-		db.session.refresh(new_thread) # So we can get the new thread's id
 
 		##new_thread = getattr(models, 'Thread')()
 		##setattr(new_thread, 'title', title)
 		##setattr(new_thread, 'username', g.user.username)
-		##db.session.add(new_thread)
-		##db.session.flush()
-		##db.session.refresh(new_thread) # So we can get the new thread's id
+
+		db.session.add(new_thread)
+		db.session.flush()
+		db.session.refresh(new_thread) # So we can get the new thread's id
 
 		first_comment = models.Comment()
 		first_comment.text = text
 		first_comment.username = g.user.username
 		first_comment.thread_id = new_thread.id
-		db.session.add(first_comment)
-		db.session.commit()
 
 		##first_comment = getattr(models, 'Comment')()
 		##setattr(first_comment, 'text', text)
 		##setattr(first_comment, 'username', g.user.username)
-		##db.session.add(first_comment)
-		##db.session.commit()
+		##setattr(first_comment, 'thread_id', getattr(new_thread, 'id'))
+
+		db.session.add(first_comment)
+		db.session.commit()
 
 		return make_response('Success', 200)
 	else:
