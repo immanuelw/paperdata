@@ -1,0 +1,76 @@
+{% block content %}
+<div id="{{data_source_str_nospace}}"></div>
+{% if is_set %}
+<div id="set_construction_panel_{{data_source_str_nospace}}">
+	{% include 'generic_set_construction_panel.html' %}
+</div>
+<script>
+var {{data_source_str_nospace}} = (function($) {
+	{% include 'js/generic_set_construction.js' %}
+
+	var copies = {};
+
+	{% for series in graph_data['series_dict'] %}
+		var {{ series }} = {{ graph_data['series_dict'][series] | tojson }};
+		copies.{{ series }} = {{ graph_data['series_dict'][series] | tojson }};
+	{% endfor %}
+
+	var utc_obsid_map_{{which_data_set}} = {{ graph_data[which_data_set] | tojson }};
+
+	$("#{{data_source_str_nospace}}").highcharts('StockChart',
+		{% include template_name %}
+	, function (chart) {
+		_chart = chart;
+		setup();
+	});
+
+	return dataSourceObj;
+}(jQuery));
+</script>
+{% else %}
+<div id="set_construction_panel_{{data_source_str_nospace}}">
+	{% include 'generic_set_construction_panel.html' %}
+</div>
+<script>
+var {{data_source_str_nospace}} = (function($) {
+	{% include 'js/generic_set_construction.js' %}
+
+	var graph_data = {};
+
+	{% for series in graph_data.h0 %}
+		graph_data.{{ series }}_h0 = {{ graph_data.h0[series] | tojson }};
+		graph_data.{{ series }}_h0_copy = {{ graph_data.h0[series] | tojson }};
+	{% endfor %}
+
+	{% for series in graph_data.h1 %}
+		graph_data.{{ series }}_h1 = {{ graph_data.h1[series] | tojson }};
+		graph_data.{{ series }}_h1_copy = {{ graph_data.h1[series] | tojson }};
+	{% endfor %}
+
+	{% for series in graph_data.l0 %}
+		graph_data.{{ series }}_l0 = {{ graph_data.l0[series] | tojson }};
+		graph_data.{{ series }}_l0_copy = {{ graph_data.l0[series] | tojson }};
+	{% endfor %}
+
+	{% for series in graph_data.l1 %}
+		graph_data.{{ series }}_l1 = {{ graph_data.l1[series] | tojson }};
+		graph_data.{{ series }}_l1_copy = {{ graph_data.l1[series] | tojson }};
+	{% endfor %}
+
+	var utc_obsid_map_l0 = {{ graph_data.utc_obsid_map_l0 | tojson }};
+	var utc_obsid_map_l1 = {{ graph_data.utc_obsid_map_l1 | tojson }};
+	var utc_obsid_map_h0 = {{ graph_data.utc_obsid_map_h0 | tojson }};
+	var utc_obsid_map_h1 = {{ graph_data.utc_obsid_map_h1 | tojson }};
+
+	$("#{{data_source_str_nospace}}").highcharts('StockChart',
+		{% include template_name %}
+	, function (chart) {
+		_chart = chart;
+		$('#construction_controls_{{data_source_str_nospace}}').hide();
+	});
+
+	return dataSourceObj;
+}(jQuery));
+</script>
+{% endif %}
+{% endblock %}

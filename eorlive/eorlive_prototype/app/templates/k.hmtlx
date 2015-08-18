@@ -1,0 +1,59 @@
+{% if g.user and g.user.is_authenticated() %}
+<table style="width:100%">
+	<tr>
+		<td style="text-align:left">
+			<input id="construction_mode_checkbox" type="checkbox" onclick="obs_err.clickConstructionModeCheckbox(this)">
+			Enable set construction mode
+		</td>
+		<td style="text-align:center">
+			Column width
+			<input type="range" min="5" max="155" value="80" step="25" onchange="obs_err.sliderChanged(this)"/>
+		</td>
+		<td style="text-align:right">
+			{% if not is_set %}
+			<span id="data_set_span">Data set:&nbsp;&nbsp;&nbsp;&nbsp;</span>
+			<select id="low_high_dropdown" onchange="obs_err.setLowOrHighData(this)">
+				<option value="high">High</option>
+				<option value="low">Low</option>
+			</select>
+			<select id="eor_dropdown" onchange="obs_err.setEorData(this)">
+				<option value="EOR0">EOR0</option>
+				<option value="EOR1">EOR1</option>
+			</select>
+			<br>
+			{% endif %}
+			<input id="remove_flagged_data_checkbox" type="checkbox"
+			onclick="obs_err.clickRemoveFlaggedDataCheckbox(this)">Hide flagged data
+		</td>
+	</tr>
+</table>
+<div id='construction_controls'>
+	Start:&nbsp;<span id="start_time_label">{{start_time_str_short}}</span>&nbsp;&nbsp;&nbsp;&nbsp;End:&nbsp;<span id="end_time_label">{{end_time_str_short}}</span>
+	&nbsp;&nbsp;&nbsp;&nbsp;Click + drag:&nbsp;&nbsp;
+	<select id="click_drag_dropdown" onchange="obs_err.setClickDragMode(this)">
+		<option value="zoom">Zooms</option>
+		<option value="flag">Flags</option>
+	</select>
+	&nbsp;&nbsp;&nbsp;&nbsp;
+	<input type="text" id="set_name_textbox" placeholder="Enter set name...">
+	<button type="button" onclick="obs_err.saveSet()" id="save_set_button">Save set</button>
+	<div id='set_construction_div'>
+		<table id='set_construction_table' class='table table-striped table-bordered table-responsive'>
+			<thead>
+				<tr>
+					<th colspan="6">Flagged sub-ranges</th>
+				</tr>
+				<tr>
+					<th>Number</th>
+					<th>Start</th>
+					<th>End</th>
+					<th>Observations</th>
+					<th>Errors</th>
+					<th>Unflag</th>
+				</tr>
+			</thead>
+			<tbody></tbody>
+		</table>
+	</div>
+</div>
+{% endif %}
