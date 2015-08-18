@@ -16,8 +16,7 @@ def create_user(first_name, last_name, email, username, password):
 		print('Please pass all required parameters.\n Usage: flask/bin/python3.4 -m app.manage user create_user -fn <first name> -ln <last name> -e <email> -u <username> -p <password>')
 	else:
 		password = password.encode('UTF-8')
-		User = getattr(models, 'User')
-		user = User(username=username, password=hashlib.sha512(password).hexdigest(), email=email,
+		user = getattr(models, 'User')(username=username, password=hashlib.sha512(password).hexdigest(), email=email,
 							firstname=first_name, lastname=last_name)
 		db.session.add(user)
 
