@@ -63,24 +63,32 @@ def make_clause(table, field_name, equivalency, value):
 		clause = or_(*clause_tuple)
 	return clause
 
-def sort_clause(table, field_sort_tuple):
+def sort_clause(table, sort_tuple):
 	#grab the sort clause of the query
-	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in field_sort_tuple]
+	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in sort_tuple]
 	return clause_list
 
-def get_results(s, table, field_tuples, field_sort_tuple, output_vars):
+def group_clause(table, group_tuple):
+	#grab the group clause of the query
+	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in field_group_tuple]
+	return clause_list
+
+def get_results(s, table, field_tuples, sort_tuple, output_vars):
 	results = s.query(table)
 	if field_tuples is not None:
 		clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
 		for clause in clause_gen:
 			results = results.filter(clause)
-	if field_sort_tuple is not None:
-		results = results.order_by(*sort_clause(field_sort_tuple)).all()
+	if sort_tuple is not None:
+		results = results.order_by(*sort_clause(sort_tuple))
+	if group_tuple is not None:
+		results = results.group_by(
+.all()
 	if output_vars is not None:
 		results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results))
 	return results
 
-def get_query_results(data_source=None, database=None, table=None, field_tuples=None, field_sort_tuple=None, output_vars=None):
+def get_query_results(data_source=None, database=None, table=None, field_tuples=None, sort_tuple=None, group_tuple=None, output_vars=None):
 	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
 	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
 	if data_source is not None:
@@ -96,13 +104,13 @@ def get_query_results(data_source=None, database=None, table=None, field_tuples=
 		s = db.session
 	else:
 		s = dbi.Session()
-	results = get_results(s=s, table=table, field_tuples=field_tuples, field_sort_tuple=field_sort_tuple, output_vars=output_vars)
+	results = get_results(s=s, table=table, field_tuples=field_tuples, sort_tuple=sort_tuple, output_vars=output_vars)
 	s.close()
 	return results
 
 def get_gps_utc_constants():
 	leap_seconds_result = get_query_results(data_source=None, database='eor', table='leap_seconds',
-												field_tuples=None, field_sort_tuple=(('leap_seconds', 'desc'),),
+												field_tuples=None, sort_tuple=(('leap_seconds', 'desc'),),
 												output_vars=('leap_seconds',))[0]
 
 	leap_seconds = leap_seconds_result[0]

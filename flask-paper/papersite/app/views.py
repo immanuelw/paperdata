@@ -126,8 +126,27 @@ def get_graph():
 @app.route('/data_amount', methods = ['GET'])
 def data_amount():
 	data = db_utils.get_query_results(data_source=None, database='eorlive', table='data_amount',
-													field_tuples=None,
-													field_sort_tuple=(('created_on', 'desc'),), output_vars=None)[0]
+										field_tuples=None,
+										field_sort_tuple=(('created_on', 'desc'),), output_vars=None)[0]
+
+
+	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
+
+	if data is not None:
+		data = data.to_json()
+		data_time = data['created_on']
+		hours_sadb = data['hours_sadb']
+		hours_paperdata = data['hours_paperdata']
+		hours_with_data = data['hours_with_data']
+
+	return render_template('data_amount_table.html', hours_sadb=hours_sadb, hours_paperdata=hours_paperdata,
+							hours_with_data=hours_with_data, data_time=data_time)
+
+@app.route('/source_table', methods = ['GET'])
+def source_table():
+	data = db_utils.get_query_results(data_source=None, database='paperdata', table='rtp_file',
+										field_tuples=None,
+										field_sort_tuple=(('timestamp', 'desc'),), output_vars=None)[0]
 
 
 	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
