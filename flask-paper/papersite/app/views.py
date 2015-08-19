@@ -174,6 +174,7 @@ def source_table():
 
 			source_dict[time_str] = int(time.time() - getattr(source_source[0], 'timestamp'))
 
+			#limiting if seconds or minutes or hours shows up on last report
 			source_time_val = 1 if source_dict[time_str] < 500 else 60 if source_dict[time_str] < 3600\
 								else 3600 if source_dict[time_str] < 86400 else 86400
 
@@ -186,6 +187,46 @@ def source_table():
 			source_dict[day_str] = getattr(source[0], 'julian_day')
 
 	return render_template('source_table.html', **source_dict)
+
+@app.route('/filesystem', methods = ['GET'])
+def filesystem():
+	systems = db_utils.get_query_results(database='ganglia', table='filesystem',
+										sort_tuples=(('timestamp', 'desc'),),
+										group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space'))
+
+	pot1_host = pot1_time = pot1_time_segment = pot2_host = pot2_time = pot2_time_segment =	pot3_host = pot3_time = pot3_time_segment = \
+	folio_host = folio_time = folio_time_segment = pot8_host = pot8_time = pot8_time_segment = nas1_host = nas1_time = nas1_time_segment = 'N/A'
+	pot1_space = pot2_space = pot3_space = folio_space = pot8_space = nas1_space = 0
+
+	system_dict = {'pot1_time':pot1_time, 'pot1_time_segment':pot1_time_segment, 'pot1_space':pot1_space,
+					'pot2_time':pot2_time, 'pot2_time_segment':pot2_time_segment, 'pot2_space':pot2_space,
+					'pot3_time':pot3_time, 'pot3_time_segment':pot3_time_segment, 'pot3_space':pot3_space,
+					'folio_time':folio_time, 'folio_time_segment':folio_time_segment, 'folio_space':folio_space,
+					'pot8_time':pot8_time, 'pot8_time_segment':pot8_time_segment, 'pot8_space':pot8_space,
+					'nas1_time':nas1_time, 'nas1_time_segment':nas1_time_segment, 'nas1_space':nas1_space}
+
+	for system in systems:
+		host = getattr(system, 'host')
+		timestamp = getattr(system, 'timestamp')
+		percent_usage = getattr(system, 'percent_space')
+
+		time_str = '{host}_time'.format(host=host)
+		segment_str = '{host}_time_segment'.format(host=host)
+		space_str = '{host}_space'.format(host=host)
+
+		system_dict[time_str] = int(time.time() - timestamp)
+		system_time_val = 1 if system_dict[time_str] < 500 else 60 if system_dict[time_str] < 3600\
+								else 3600 if system_dict[time_str] < 86400 else 86400
+
+		system_dict[segment_str] = 'seconds' if system_dict[time_str] < 500 else 'minutes' if system_dict[time_str] < 3600\
+											else 'hours' if system_dict[time_str] < 86400 else 'days'
+		system_dict[segment_str] = ' 'join(system_dict[segment_str], 'ago')
+
+		system_dict[time_str] /= system_time_val
+
+		system_dict[space_str] = percent_usage
+
+	return render_template('filesystem_table.html', **system_dict)
 
 @app.route('/error_table', methods = ['POST'])
 def error_table():

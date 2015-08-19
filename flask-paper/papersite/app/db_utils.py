@@ -70,7 +70,7 @@ def sort_clause(table, sort_tuples):
 
 def group_clause(table, group_tuples):
 	#grab the group clause of the query
-	clause_list = [getattr(table, field_name) for field_name, field_order in field_group_tuples]
+	clause_list = [getattr(table, field_name) for field_name in field_group_tuples]
 	return clause_list
 
 def get_results(s, table, field_tuples, sort_tuples, output_vars):
