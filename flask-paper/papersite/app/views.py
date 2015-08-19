@@ -20,7 +20,7 @@ def index(setName = None):
 	if setName is not None:
 		the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
 														field_tuples=(('name', '==', setName),),
-														field_sort_tuple=None, output_vars=None)[0]
+														sort_tuples=None, output_vars=None)[0]
 
 		if the_set is not None:
 			start_datetime, end_datetime = db_utils.get_datetime_from_gps(
@@ -53,7 +53,7 @@ def get_graph():
 
 	data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
 													field_tuples=(('name', '==', data_source_str),),
-													field_sort_tuple=None, output_vars=None)[0]
+													sort_tuples=None, output_vars=None)[0]
 
 	set_str = request.args.get('set')
 
@@ -87,7 +87,7 @@ def get_graph():
 	else:
 		the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
 														field_tuples=(('name', '==', set_str),),
-														field_sort_tuple=None, output_vars=None)[0]
+														sort_tuples=None, output_vars=None)[0]
 
 		if the_set is None:
 			return make_response('Set not found', 500)
@@ -127,7 +127,7 @@ def get_graph():
 def data_amount():
 	data = db_utils.get_query_results(data_source=None, database='eorlive', table='data_amount',
 										field_tuples=None,
-										field_sort_tuple=(('created_on', 'desc'),), output_vars=None)[0]
+										sort_tuples=(('created_on', 'desc'),), output_vars=None)[0]
 
 
 	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
@@ -146,7 +146,7 @@ def data_amount():
 def source_table():
 	data = db_utils.get_query_results(data_source=None, database='paperdata', table='rtp_file',
 										field_tuples=None,
-										field_sort_tuple=(('timestamp', 'desc'),), output_vars=None)[0]
+										sort_tuples=(('timestamp', 'desc'),), output_vars=None)[0]
 
 
 	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
@@ -171,12 +171,12 @@ def error_table():
 
 	obscontroller_response = db_utils.get_query_results(data_source=None, database='eor', table='obscontroller_log',
 														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
-														field_sort_tuple=(('reference_time', 'asc'),),
+														sort_tuples=(('reference_time', 'asc'),),
 														output_vars=('reference_time', 'observation_number', 'comment'))
 
 	recvstatuspolice_response = db_utils.get_query_results(data_source=None, database='eor', table='recvstatuspolice_log',
 														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
-														field_sort_tuple=(('reference_time', 'asc'),),
+														sort_tuples=(('reference_time', 'asc'),),
 														output_vars=('reference_time', 'observation_number', 'comment'))
 
 	return render_template('error_table.html', obscontroller_error_list=obscontroller_response,
@@ -210,11 +210,11 @@ def teardown_request(exception):
 def profile():
 	if (g.user is not None and g.user.is_authenticated()):
 		user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
-											field_tuples=(('username', '==', g.user.username),), field_sort_tuple=None, output_vars=None)[0]
+											field_tuples=(('username', '==', g.user.username),), sort_tuples=None, output_vars=None)[0]
 
 		setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
 														field_tuples=(('username', '==', g.user.username),),
-														field_sort_tuple=None, output_vars=None)[0]
+														sort_tuples=None, output_vars=None)[0]
 
 		return render_template('profile.html', user=user, sets=setList)
 	else:
@@ -224,13 +224,13 @@ def profile():
 def user_page():
 	if (g.user is not None and g.user.is_authenticated()):
 		user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
-											field_tuples=(('username', '==', g.user.username),), field_sort_tuple=None, output_vars=None)[0]
+											field_tuples=(('username', '==', g.user.username),), sort_tuples=None, output_vars=None)[0]
 
 		userList = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
-											field_tuples=None, field_sort_tuple=None, output_vars=None)[0]
+											field_tuples=None, sort_tuples=None, output_vars=None)[0]
 
 		setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
-														field_tuples=None, field_sort_tuple=None, output_vars=None)[0]
+														field_tuples=None, sort_tuples=None, output_vars=None)[0]
 
 		return render_template('user_page.html', theUser=user, userList=userList, setList=setList)
 	else:
@@ -249,7 +249,7 @@ def data_summary_table():
 
 	response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
 										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-										field_sort_tuple=(('starttime', 'asc'),),
+										sort_tuples=(('starttime', 'asc'),),
 										output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center'))
 
 	low_eor0_count = low_eor1_count = high_eor0_count = high_eor1_count = 0

@@ -50,7 +50,7 @@ def get_data_hours_in_set(start, end, low_or_high, eor, flagged_range_dicts):
 										(('starttime', '>=', start), ('starttime', '<=', end),
 										('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 										('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
-										field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'stoptime'))
+										sort_tuples=(('starttime', 'asc'),), output_vars=('starttime', 'stoptime'))
 
 	for obs in all_obs_ids_tuples:
 		obs_id = obs[0]
@@ -149,7 +149,7 @@ def upload_set():
 											(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
 											('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 											('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
-											field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime',))
+											sort_tuples=(('starttime', 'asc'),), output_vars=('starttime',))
 
 		all_obs_ids = [tup[0] for tup in all_obs_ids_tuples]
 
@@ -189,12 +189,12 @@ def download_set():
 
 	the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
 													field_tuples=(('id', '==', set_id),),
-													field_sort_tuple=None, output_vars=None)[0]
+													sort_tuples=None, output_vars=None)[0]
 
 	if the_set is not None:
 		flagged_subsets = db_utils.get_query_results(data_source=None, database='eorlive', table='flagged_subset',
 														field_tuples=(('set_id', '==', getattr(the_set, 'id')),),
-														field_sort_tuple=None, output_vars=None)
+														sort_tuples=None, output_vars=None)
 
 		low_or_high = the_set.low_or_high
 		eor = the_set.eor
@@ -203,7 +203,7 @@ def download_set():
 											(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
 											('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 											('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
-											field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime',))
+											sort_tuples=(('starttime', 'asc'),), output_vars=('starttime',))
 
 		all_obs_ids = [tup[0] for tup in all_obs_ids_tuples]
 
@@ -228,7 +228,7 @@ def download_set():
 @app.route('/get_filters')
 def get_filters():
 	users = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
-													field_tuples=None field_sort_tuple=None, output_vars=None)
+													field_tuples=None sort_tuples=None, output_vars=None)
 
 	return render_template('filters.html', users=users)
 
@@ -255,15 +255,15 @@ def get_sets():
 							('start', '>=' if ranged else None, start_gps),
 							('end', '>=' if ranged else None, end_gps))
 	
-		field_sort_tuple = None
+		sort_tuples = None
 		if sort:
 			if sort == 'hours'
-				field_sort_tuple = (('total_data_hrs', 'desc'),)
+				sort_tuples = (('total_data_hrs', 'desc'),)
 			elif sort == 'time':
-				field_sort_tuple = (('created_on', 'desc'),)
+				sort_tuples = (('created_on', 'desc'),)
 
 		setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
-														field_tuples=field_tuples, field_sort_tuple=field_sort_tuple, output_vars=None)
+														field_tuples=field_tuples, sort_tuples=sort_tuples, output_vars=None)
 
 		include_delete_buttons = request_content['includeDeleteButtons']
 
@@ -279,7 +279,7 @@ def delete_set():
 
 		theSet = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
 														field_tuples=(('id', '==', set_id),),
-														field_sort_tuple=None, output_vars=None)[0]
+														sort_tuples=None, output_vars=None)[0]
 
 		db.session.delete(theSet)
 		db.session.commit()

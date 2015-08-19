@@ -8,13 +8,13 @@ def get_error_counts(start_gps, end_gps):
 
 	obscontroller_response = db_utils.get_query_results(data_source=None, database='eor', table='obscontroller_log',
 														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
-														field_sort_tuple=(('reference_time', 'asc'),),
+														sort_tuples=(('reference_time', 'asc'),),
 														output_vars=('reference_time', 'observation_number', 'comment'))
 	obscontroller_response = tuple(math.floor(ref_time) for ref_time in obscontroller_response)
 
 	recvstatuspolice_response = db_utils.get_query_results(data_source=None, database='eor', table='recvstatuspolice_log',
 														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
-														field_sort_tuple=(('reference_time', 'asc'),),
+														sort_tuples=(('reference_time', 'asc'),),
 														output_vars=('reference_time',))
 	recvstatuspolice_response = tuple(math.floor(ref_time) for ref_time in recvstatuspolice_response)
 
@@ -51,7 +51,7 @@ def get_observation_counts(start_gps, end_gps, low_or_high, eor):
 										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
 										('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 										('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
-										field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
+										sort_tuples=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
@@ -68,7 +68,7 @@ def get_observation_counts(start_gps, end_gps, low_or_high, eor):
 def get_plot_bands(the_set):
 	flagged_subsets = db_utils.get_query_results(data_source=None, database='eorlive', table='flagged_subset',
 													field_tuples=(('set_id', '==', getattr(the_set, 'id')),),
-													field_sort_tuple=None, output_vars=None)
+													sort_tuples=None, output_vars=None)
 
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
@@ -82,7 +82,7 @@ def get_plot_bands(the_set):
 def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 	response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
 										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-										field_sort_tuple=(('starttime', 'asc'),),
+										sort_tuples=(('starttime', 'asc'),),
 										output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center'))
 
 	low_eor0_counts = []

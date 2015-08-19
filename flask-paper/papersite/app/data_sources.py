@@ -46,7 +46,7 @@ def get_users_data_sources():
 def get_unsubscribed_data_sources():
 	if g.user is not None and g.user.is_authenticated():
 		all_data_sources = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
-														field_tuples=None, field_sort_tuple=None, output_vars=None)
+														field_tuples=None, sort_tuples=None, output_vars=None)
 
 		subscribed_data_sources = g.user.subscribed_data_sources
 
@@ -66,7 +66,7 @@ def update_active_data_sources():
 
 		new_active_data_sources = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
 														field_tuples=(('name', 'in', new_active_data_sources_names),),
-														field_sort_tuple=None, output_vars=None)
+														sort_tuples=None, output_vars=None)
 
 		current_active_data_sources = g.user.active_data_sources
 		active_to_remove = list(set(current_active_data_sources) -\
@@ -93,7 +93,7 @@ def subscribe_to_data_source():
 
 		data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
 														field_tuples=(('name', '==', data_source_name),),
-														field_sort_tuple=None, output_vars=None)[0]
+														sort_tuples=None, output_vars=None)[0]
 
 		g.user.subscribed_data_sources.append(data_source)
 		db.session.add(g.user)
@@ -109,7 +109,7 @@ def unsubscribe_from_data_source():
 
 		data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
 														field_tuples=(('name', '==', data_source_name),),
-														field_sort_tuple=None, output_vars=None)[0]
+														sort_tuples=None, output_vars=None)[0]
 
 		g.user.subscribed_data_sources.remove(data_source)
 		try:
@@ -127,7 +127,7 @@ def unsubscribe_from_data_source():
 def get_graph_types():
 	graph_types = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_type',
 													field_tuples=(('name', '!=', 'Obs_Err'),),
-													field_sort_tuple=None, output_vars=None)
+													sort_tuples=None, output_vars=None)
 
 	return render_template('graph_type_list.html', graph_types=graph_types)
 
@@ -166,7 +166,7 @@ def create_data_source():
 		#Is the data source name unique?
 		data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
 														field_tuples=(('name', '==', data_source_name),),
-														field_sort_tuple=None, output_vars=None)[0]
+														sort_tuples=None, output_vars=None)[0]
 		if data_source is not None:
 			return jsonify(error=True, message='The data source name must be unique.')
 
@@ -215,11 +215,11 @@ def create_data_source():
 def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 	data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
 													field_tuples=(('name', '==', data_source_str),),
-													field_sort_tuple=None, output_vars=None)[0]
+													sort_tuples=None, output_vars=None)[0]
 
 	results = db_utils.get_query_results(data_source, database=None, table=None,
 					(('obs_column', '>=', start_gps), ('obs_column', '<=', end_gps)),
-					field_sort_tuple=('obs_column', 'asc'), output_vars=None)
+					sort_tuples=('obs_column', 'asc'), output_vars=None)
 
 	data = {}
 
@@ -258,7 +258,7 @@ def separate_data_into_sets(data, data_source_results, columns, data_source, sta
 										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
 										((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None),
 										((('ra_phase_center', '==', 0), ('ra_phase_center', '==', 60)), 'or', None)),
-										field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
+										sort_tuples=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	data['l0'] = {}
 	data['l1'] = {}
@@ -323,7 +323,7 @@ def join_with_obsids_from_set(data_source_results, the_set, data_source):
 										(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
 										('obsname', None if the_set.low_or_high == 'any' else 'like', ''.join(the_set.low_or_high, '%')),
 										('ra_phase_center', None if the_set.eor == 'any' else '==', 0 if the_set.eor == 'EOR0' else 60))
-										field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
+										sort_tuples=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
 
 	obs_id_list = [obs_tuple[0] for obs_tuple in response]
 
