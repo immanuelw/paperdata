@@ -66,16 +66,16 @@ def get_observation_counts(start_gps, end_gps, low_or_high, eor):
 	return (observation_counts, utc_obsid_map)
 
 def get_plot_bands(the_set):
-	flagged_subets = db_utils.get_query_results(data_source=None, database='eorlive', table='flagged_subset',
+	flagged_subsets = db_utils.get_query_results(data_source=None, database='eorlive', table='flagged_subset',
 													field_tuples=(('set_id', '==', getattr(the_set, 'id')),),
 													field_sort_tuple=None, output_vars=None)
 
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
-	plot_bands = [{'from': int((flagged_subset.start - GPS_LEAP_SECONDS_OFFSET + GPS_UTC_DELTA) * 1000),
-		'to': int((flagged_subset.end - GPS_LEAP_SECONDS_OFFSET + GPS_UTC_DELTA) * 1000),
-		'color': 'yellow'}
-		for flagged_subset in flagged_subsets]
+	plot_bands = [{'from': int((getattr(flagged_subset, 'start') - GPS_LEAP_SECONDS_OFFSET + GPS_UTC_DELTA) * 1000),
+					'to': int((getattr(flagged_subset, 'end') - GPS_LEAP_SECONDS_OFFSET + GPS_UTC_DELTA) * 1000),
+					'color': 'yellow'}
+					for flagged_subset in flagged_subsets]
 
 	return plot_bands
 
