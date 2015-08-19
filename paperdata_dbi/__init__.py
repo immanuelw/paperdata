@@ -171,7 +171,7 @@ class Feed(Base):
 						'timestamp':self.timestamp}
 		return self.feed_data
 
-#def RTP_File(Base):
+#def Rtp_File(Base):
 	#__tablename__ = 'rtp_file'
 	#host = Column(String(100), nullable=False)
 	#path = Column(String(100), nullable=False) #directory
@@ -179,6 +179,7 @@ class Feed(Base):
 	#filetype = Column(String(20), nullable=False) #uv, uvcRRE, etc.
 	#full_path = Column(String(200), primary_key=True)
 	#obsnum = Column(BigInteger, ForeignKey('rtp_observation.obsnum'))
+	#filesize = Column(Numeric(7,2))
 	#md5sum = Column(String(32))
 	#transferred = Column(Boolean)
 	#julian_day = Column(Integer)
@@ -194,6 +195,7 @@ class Feed(Base):
 	#						'filetype':self.filetype,
 	#						'full_path':self.full_path,
 	#						'obsnum':self.obsnum,
+	#						'filesize':self.filesize,
 	#						'md5sum':self.md5sum,
 	#						'transferred':self.transferred,
 	#						'julian_day':self.julian_day,
@@ -202,7 +204,7 @@ class Feed(Base):
 	#						'timestamp':self.timestamp}
 	#	return self.rtp_data
 
-#class RTP_Observation(Base):
+#class Rtp_Observation(Base):
 	#__tablename__ = 'rtp_observation'
 	#obsnum = Column(BigInteger, primary_key=True)
 	#julian_date = Column(Numeric(12,5))

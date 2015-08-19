@@ -88,6 +88,7 @@ class Data_Amount(db.Model):
 	created_on = db.Column(db.DateTime, default=datetime.utcnow)
 	hours_sadb = db.Column(db.Float)
 	hours_paperdata = db.Column(db.Float)
+	hours_with_data = db.Column(db.Float)
 	data_transfer_rate = db.Column(db.Float)
 
 	def to_json(self):
@@ -95,6 +96,7 @@ class Data_Amount(db.Model):
 					'created_on': self.created_on,
 					'hours_sadb': round(self.hours_sadb or 0., 4),
 					'hours_paperdata': round(self.hours_paperdata or 0., 4),
+					'hours_with_data': round(self.hours_with_data or 0., 4),
 					'data_transfer_rate': round(self.data_transfer_rate or 0., 4)}
 		return data_dict
 
