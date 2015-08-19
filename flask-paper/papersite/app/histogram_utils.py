@@ -46,12 +46,13 @@ def get_error_counts(start_gps, end_gps):
 
 	return (error_counts, error_count)
 
-def get_observation_counts(start_gps, end_gps, low_or_high, eor):
-	response = db_utils.get_query_results(database='eor', table='mwa_setting',
-										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-										('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
-										('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
-										sort_tuples=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
+def get_observation_counts(start_gps, end_gps, polarization, era, era_type):
+	response = db_utils.get_query_results(database='paperdata', table='observation',
+										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										('polarization', None if polarization == 'any' else '==', polarization),
+										('era', None if era == 0 else '==', era),
+										('era_type', None if era_type == 'any' else '==', era_type)),
+										sort_tuples=(('time_start', 'asc'),), output_vars=('time_start', 'time_end'))
 
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
@@ -67,8 +68,7 @@ def get_observation_counts(start_gps, end_gps, low_or_high, eor):
 
 def get_plot_bands(the_set):
 	flagged_subsets = db_utils.get_query_results(database='eorlive', table='flagged_subset',
-													field_tuples=(('set_id', '==', getattr(the_set, 'id')),),
-													sort_tuples=None, output_vars=None)
+													field_tuples=(('set_id', '==', getattr(the_set, 'id')),))
 
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
@@ -80,10 +80,9 @@ def get_plot_bands(the_set):
 	return plot_bands
 
 def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
-	response = db_utils.get_query_results(database='eor', table='mwa_setting',
-										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-										sort_tuples=(('starttime', 'asc'),),
-										output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center'))
+	response = db_utils.get_query_results(database='paperdata', table='observation',
+										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										sort_tuples=(('time_start', 'asc'),), output_vars=('time_start', 'time_end'))
 
 	low_eor0_counts = []
 
