@@ -186,7 +186,7 @@ class Feed(Base):
 	#new_host = Column(String(100))
 	#new_path = Column(String(100))
 	#timestamp = Column(BigInteger)
-	#observation = relationship(RTP_Observation, backref=backref('files', uselist=True))
+	#observation = relationship(Rtp_Observation, backref=backref('files', uselist=True))
 
 	#def to_json(self):
 	#	self.rtp_file_data = {'host':self.host,
