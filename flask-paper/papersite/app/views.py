@@ -146,7 +146,7 @@ def data_amount():
 def source_table():
 	data = db_utils.get_query_results(data_source=None, database='paperdata', table='rtp_file',
 										field_tuples=None,
-										sort_tuples=(('timestamp', 'desc'),), output_vars=None)[0]
+										sort_tuples=(('timestamp', 'desc'),), output_vars=None)
 
 
 	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
