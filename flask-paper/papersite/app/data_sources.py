@@ -184,8 +184,6 @@ def create_data_source():
 			return jsonify(error=True,
 				message='The column {column} does not exist in that table or is not a numeric column.'.format(column=missing_columns[0]))
 		
-		projectid = 'projectid' in column_response
-
 		graph_data_source = getattr(models, 'Graph_Data_Source')()
 		setattr(graph_data_source, 'name', data_source_name)
 		setattr(graph_data_source, 'graph_type', graph_type)
@@ -193,7 +191,6 @@ def create_data_source():
 		setattr(graph_data_source, 'database', database)
 		setattr(graph_data_source, 'table', table)
 		setattr(graph_data_source, 'obs_column', obs_column)
-		setattr(graph_data_source, 'projectid', projectid)
 		setattr(graph_data_source, 'width_slider', include_width_slider)
 
 		db.session.add(graph_data_source)
@@ -221,8 +218,8 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 													field_sort_tuple=None, output_vars=None)[0]
 
 	results = db_utils.get_query_results(data_source, database=None, table=None,
-					(('obs_column', '>=', start_gps), ('obs_column', '<=', end_gps),
-					('projectid', '==' if data_source.projectid else None, 'G0009')), field_sort_tuple=('obs_column', 'asc'))
+					(('obs_column', '>=', start_gps), ('obs_column', '<=', end_gps)),
+					field_sort_tuple=('obs_column', 'asc'), output_vars=None)
 
 	data = {}
 
@@ -259,7 +256,6 @@ def which_data_set(the_set):
 def separate_data_into_sets(data, data_source_results, columns, data_source, start_gps, end_gps):
 	obsid_results = db_utils.get_query_results(data_source, database=None, table=None,
 										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-										('projectid', '==' if data_source.projectid else None, 'G0009'),
 										((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None),
 										((('ra_phase_center', '==', 0), ('ra_phase_center', '==', 60)), 'or', None)),
 										field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
@@ -325,7 +321,6 @@ def separate_data_into_sets(data, data_source_results, columns, data_source, sta
 def join_with_obsids_from_set(data_source_results, the_set, data_source):
 	response = db_utils.get_query_results(data_source, database=None, table=None,
 										(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
-										('projectid', '==' if data_source.projectid else None, 'G0009'),
 										('obsname', None if the_set.low_or_high == 'any' else 'like', ''.join(the_set.low_or_high, '%')),
 										('ra_phase_center', None if the_set.eor == 'any' else '==', 0 if the_set.eor == 'EOR0' else 60))
 										field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))

@@ -128,7 +128,6 @@ class Graph_Data_Source(db.Model):
 	database = db.Column(db.String(100))
 	table = db.Column(db.String(100))
 	obs_column = db.Column(db.String(100)) # Which column has the observation ids.
-	projectid = db.Column(db.Boolean) # Whether the table has a projectid field.
 	width_slider = db.Column(db.Boolean) # Whether the graph should come with a column width slider.
 
 class Graph_Data_Source_Column(db.Model):

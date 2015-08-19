@@ -49,7 +49,6 @@ def get_error_counts(start_gps, end_gps):
 def get_observation_counts(start_gps, end_gps, low_or_high, eor):
 	response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
 										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-										('projectid', '==', 'G0009')),
 										('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 										('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
 										field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
@@ -83,7 +82,6 @@ def get_plot_bands(the_set):
 def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 	response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
 										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-										('projectid', '==', 'G0009')),
 										field_sort_tuple=(('starttime', 'asc'),),
 										output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center'))
 

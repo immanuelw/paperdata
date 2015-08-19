@@ -48,7 +48,6 @@ def get_data_hours_in_set(start, end, low_or_high, eor, flagged_range_dicts):
 
 	all_obs_ids_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
 										(('starttime', '>=', start), ('starttime', '<=', end),
-										('projectid', '==', 'G0009'),
 										('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 										('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
 										field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'stoptime'))
@@ -148,7 +147,6 @@ def upload_set():
 
 		all_obs_ids_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
 											(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-											('projectid', '==', 'G0009'),
 											('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 											('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
 											field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime',))
@@ -203,7 +201,6 @@ def download_set():
 
 		all_obs_id_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
 											(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
-											('projectid', '==', 'G0009'),
 											('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 											('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
 											field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime',))

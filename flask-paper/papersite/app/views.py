@@ -230,7 +230,6 @@ def data_summary_table():
 
 	response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
 										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-										('projectid', '==', 'G0009')),
 										field_sort_tuple=(('starttime', 'asc'),),
 										output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center'))
 
