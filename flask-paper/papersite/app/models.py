@@ -79,26 +79,22 @@ class Flagged_Obs_Ids(db.Model):
 	obs_id = db.Column(db.Integer)
 	flagged_subset_id = db.Column(db.Integer, db.ForeignKey('flagged_subset.id', ondelete='CASCADE'))
 
-class DataAmount(db.Model):
+class Data_Amount(db.Model):
 	__tablename__ = 'data_amount'
 	# AUTO_INCREMENT is automatically set on the first Integer primary key column that is not marked as a foreign key.
 	id = db.Column(db.Integer, primary_key=True)
 	# Store a 'created_on' string field for the current time that is automatically inserted with a new entry into the database.
 	# We're using UTC time, so that's why there is a Z at the end of the string.
 	created_on = db.Column(db.DateTime, default=datetime.utcnow)
-	hours_scheduled = db.Column(db.Float)
-	hours_observed = db.Column(db.Float)
-	hours_with_data = db.Column(db.Float)
-	hours_with_uvfits = db.Column(db.Float)
+	hours_sadb = db.Column(db.Float)
+	hours_paperdata = db.Column(db.Float)
 	data_transfer_rate = db.Column(db.Float)
 
 	def to_json(self):
 		data_dict = {'id': self.id,
 					'created_on': self.created_on,
-					'hours_scheduled': round(self.hours_scheduled or 0., 4),
-					'hours_observed': round(self.hours_observed or 0., 4),
-					'hours_with_data': round(self.hours_with_data or 0., 4),
-					'hours_with_uvfits': round(self.hours_with_uvfits or 0., 4),
+					'hours_sadb': round(self.hours_sadb or 0., 4),
+					'hours_paperdata': round(self.hours_paperdata or 0., 4),
 					'data_transfer_rate': round(self.data_transfer_rate or 0., 4)}
 		return data_dict
 
