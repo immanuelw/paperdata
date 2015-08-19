@@ -79,10 +79,15 @@ def get_results(s, table, field_tuples, sort_tuples, output_vars):
 		clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
 		for clause in clause_gen:
 			results = results.filter(clause)
-	if sort_tuples is not None:
-		results = results.order_by(*sort_clause(sort_tuples))
 	if group_tuples is not None:
-		results = results.group_by(*group_clause(group_tuples))
+		if sort_tuples is not None:
+			order_first = results.order_by(*sort_clause(sort_tuples)).subquery()
+			results = s.query().add_entity(table, alias=order_first).group_by(*group_clause(group_tuples))
+		else:
+			results = results.group_by(*group_clause(group_tuples))
+	else:
+		if sort_tuples is not None:
+			results = results.order_by(*sort_clause(sort_tuples))
 
 	results = results.all()
 
