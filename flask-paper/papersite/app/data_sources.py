@@ -37,16 +37,15 @@ def get_users_data_sources():
 			list(set(g.user.subscribed_data_sources) - set(active_data_sources))
 
 		return render_template('data_sources.html',
-			subscribed_but_inactive_data_sources=subscribed_but_inactive_data_sources,
-			active_data_sources=g.user.active_data_sources)
+								subscribed_but_inactive_data_sources=subscribed_but_inactive_data_sources,
+								active_data_sources=g.user.active_data_sources)
 	else:
 		return make_response('You must be logged in to use this feature.', 401)
 
 @app.route('/get_unsubscribed_data_sources')
 def get_unsubscribed_data_sources():
 	if g.user is not None and g.user.is_authenticated():
-		all_data_sources = db_utils.get_query_results(database='eorlive', table='graph_data_source',
-														field_tuples=None, sort_tuples=None, output_vars=None)
+		all_data_sources = db_utils.get_query_results(database='eorlive', table='graph_data_source')
 
 		subscribed_data_sources = g.user.subscribed_data_sources
 
@@ -65,8 +64,7 @@ def update_active_data_sources():
 		new_active_data_sources_names = request_content['activeDataSources']
 
 		new_active_data_sources = db_utils.get_query_results(database='eorlive', table='graph_data_source',
-														field_tuples=(('name', 'in', new_active_data_sources_names),),
-														sort_tuples=None, output_vars=None)
+																field_tuples=(('name', 'in', new_active_data_sources_names),))
 
 		current_active_data_sources = g.user.active_data_sources
 		active_to_remove = list(set(current_active_data_sources) -\
@@ -92,8 +90,7 @@ def subscribe_to_data_source():
 		data_source_name = request.form['dataSource']
 
 		data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
-														field_tuples=(('name', '==', data_source_name),),
-														sort_tuples=None, output_vars=None)[0]
+													field_tuples=(('name', '==', data_source_name),))[0]
 
 		g.user.subscribed_data_sources.append(data_source)
 		db.session.add(g.user)
@@ -108,8 +105,7 @@ def unsubscribe_from_data_source():
 		data_source_name = request.form['dataSource']
 
 		data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
-														field_tuples=(('name', '==', data_source_name),),
-														sort_tuples=None, output_vars=None)[0]
+													field_tuples=(('name', '==', data_source_name),))[0]
 
 		g.user.subscribed_data_sources.remove(data_source)
 		try:
@@ -126,8 +122,7 @@ def unsubscribe_from_data_source():
 @app.route('/get_graph_types')
 def get_graph_types():
 	graph_types = db_utils.get_query_results(database='eorlive', table='graph_type',
-													field_tuples=(('name', '!=', 'Obs_Err'),),
-													sort_tuples=None, output_vars=None)
+													field_tuples=(('name', '!=', 'Obs_Err'),))
 
 	return render_template('graph_type_list.html', graph_types=graph_types)
 
@@ -165,8 +160,7 @@ def create_data_source():
 
 		#Is the data source name unique?
 		data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
-														field_tuples=(('name', '==', data_source_name),),
-														sort_tuples=None, output_vars=None)[0]
+														field_tuples=(('name', '==', data_source_name),))[0]
 		if data_source is not None:
 			return jsonify(error=True, message='The data source name must be unique.')
 
@@ -214,12 +208,10 @@ def create_data_source():
 
 def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 	data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
-													field_tuples=(('name', '==', data_source_str),),
-													sort_tuples=None, output_vars=None)[0]
+													field_tuples=(('name', '==', data_source_str),))[0]
 
-	results = db_utils.get_query_results(data_source, database=None, table=None,
-					(('obs_column', '>=', start_gps), ('obs_column', '<=', end_gps)),
-					sort_tuples=('obs_column', 'asc'), output_vars=None)
+	results = db_utils.get_query_results(data_source, field_tuples=(('obs_column', '>=', start_gps), ('obs_column', '<=', end_gps)),
+											sort_tuples=('obs_column', 'asc'))
 
 	data = {}
 
@@ -258,7 +250,16 @@ def which_data_set(the_set):
 	return which_data
 
 def separate_data_into_sets(data, data_source_results, columns, data_source, start_gps, end_gps):
-	obsid_results = db_utils.get_query_results(data_source, database=None, table=None,
+	obsid_results = db_utils.get_query_results(database='paperdata', table='observation',
+										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										('polarization', None if polarization == 'any' else '==', polarization),
+										('era', None if era == 0 else '==', era),
+										('era_type', None if era_type == 'any' else '==', era_type)),
+										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
+
+	all_obs_ids = [getattr(obs, 'obsnum') for obs in all_obs_ids_tuples]
+
+	obsid_results = db_utils.get_query_results(data_source,
 										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
 										((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None),
 										((('ra_phase_center', '==', 0), ('ra_phase_center', '==', 60)), 'or', None)),
@@ -323,13 +324,17 @@ def separate_data_into_sets(data, data_source_results, columns, data_source, sta
 	return data
 
 def join_with_obsids_from_set(data_source_results, the_set, data_source):
-	response = db_utils.get_query_results(data_source, database=None, table=None,
-										(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
-										('obsname', None if the_set.low_or_high == 'any' else 'like', ''.join(the_set.low_or_high, '%')),
-										('ra_phase_center', None if the_set.eor == 'any' else '==', 0 if the_set.eor == 'EOR0' else 60))
-										sort_tuples=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
+	polarization = getattr(the_set, 'polarization')
+	era = getattr(the_set, 'era')
+	era_type = getattr(the_set, 'era_type')
+	response = db_utils.get_query_results(data_source=data_source,
+										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										('polarization', None if polarization == 'any' else '==', polarization),
+										('era', None if era == 0 else '==', era),
+										('era_type', None if era_type == 'any' else '==', era_type)),
+										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
 
-	obs_id_list = [obs_tuple[0] for obs_tuple in response]
+	all_obs_ids = [getattr(obs, 'obsnum') for obs in all_obs_ids_tuples]
 
 	filtered_results = [obs_tuple for obs_tuple in data_source_results if obs_tuple[0] in obs_id_list]
 
