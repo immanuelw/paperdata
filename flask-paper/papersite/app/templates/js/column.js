@@ -1,10 +1,10 @@
 {
 	title: {
-		text: "{{data_source_str}}"
+		text: '{{data_source_str}}'
 	},
 	chart: {
-		type: "column",
-		zoomType: "x",
+		type: 'column',
+		zoomType: 'x',
 		events: {
 			selection: function(event) {
 				if (clickDragMode === 'flag') {
@@ -26,11 +26,11 @@
 	plotOptions: {
 		column: {
 			dataGrouping: {
-				approximation: "average",
+				approximation: 'average',
 				groupPixelWidth: 80,
 				forced: true
 			},
-			pointPlacement: "between",
+			pointPlacement: 'between',
 			groupPadding: 0.1,
 			pointPadding: 0
 		}
@@ -39,14 +39,14 @@
 	{% if is_set %}
 		{% for series in graph_data['series_dict'] %}
 		{
-			name: "{{series}}",
+			name: '{{series}}',
 			data: {{series}}
 		},
 		{% endfor %}
 	{% else %}
 		{% for series in graph_data.h0 %}
 		{
-			name: "{{series}}",
+			name: '{{series}}',
 			data: graph_data.{{series}}_h0
 		},
 		{% endfor %}

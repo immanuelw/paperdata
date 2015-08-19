@@ -1,5 +1,5 @@
 {% block content %}
-<button id='backbutton' onclick="obs_err.backToHistogram()">Back to histogram</button>
+<button id='backbutton' onclick='obs_err.backToHistogram()'>Back to histogram</button>
 <div id='error_table'></div>
 <div id='observations_histogram'></div>
 <div id='set_construction_panel'>
@@ -33,7 +33,7 @@ var obs_err = (function($) {
 	var utc_obsid_map_h0 = {{ utc_obsid_map_h0 | tojson }};
 	var utc_obsid_map_h1 = {{ utc_obsid_map_h1 | tojson }};
 
-	{% include "js/obs_err_set_construction.js" %}
+	{% include 'js/obs_err_set_construction.js' %}
 
 	$(function() {
 		$('#backbutton').hide();
@@ -56,7 +56,7 @@ var obs_err = (function($) {
 				enabled: false,
 			},
 			chart: {
-				zoomType: "x",
+				zoomType: 'x',
 				events: {
 					selection: function(event) {
 						if (clickDragMode === 'flag') {
@@ -75,7 +75,7 @@ var obs_err = (function($) {
 						groupPixelWidth: 80,
 						forced: true
 					},
-					pointPlacement: "between",
+					pointPlacement: 'between',
 					// No padding between columns so the graph looks like a histogram.
 					groupPadding: 0.1,
 					pointPadding: 0,
@@ -87,12 +87,12 @@ var obs_err = (function($) {
 
 								$('#observations_histogram').hide();
 								$('#set_construction_panel').hide();
-								$('#error_table').html("<img src='/static/images/ajax-loader.gif' class='loading'/>");
+								$('#error_table').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
 								$('#error_table').show();
 
 								$.ajax({
-									type: "POST",
-									url: "/error_table",
+									type: 'POST',
+									url: '/error_table',
 									data: {
 										'starttime': startTime,
 										'endtime': endTime
@@ -104,7 +104,7 @@ var obs_err = (function($) {
 									error: function(xhr, ajaxOptions, thrownError) {
 										backToHistogram();
 									},
-									dataType: "html"
+									dataType: 'html'
 								});
 							}
 						}

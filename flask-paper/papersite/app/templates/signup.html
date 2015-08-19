@@ -1,8 +1,8 @@
-{% extends "layout.html" %}
+{% extends 'layout.html' %}
 {% block body %}
   <h2>Signup</h2>
   {% if error %}<p class='error'><strong>Error:</strong> {{ error }}{% endif %}
-  <form name="signupForm" action="{{ url_for('signup') }}" onsubmit="return validateForm()" method='post'>
+  <form name='signupForm' action='{{ url_for('signup') }}' onsubmit='return validateForm()' method='post'>
 	<dl>
 	  <dt>First Name:
 	  <dd><input type='text' name='fname' required>

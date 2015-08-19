@@ -1,6 +1,6 @@
 {% block content %}
 	{% if sets | length > 0 %}
-		<table class="table-striped">
+		<table class='table-striped'>
 			<thead>
 				<tr>
 					<th>Name</th>
@@ -14,7 +14,7 @@
 			{% for set in sets %}
 				<tr>
 					<td>
-						<a href="/set/{{ set.name }}">{{ set.name }}</a>
+						<a href='/set/{{ set.name }}'>{{ set.name }}</a>
 					</td>
 					<td>
 						{{ set.username }}
@@ -38,7 +38,7 @@
 					</td>
 					{% if include_delete_buttons %}
 					<td>
-						<button type="button" onclick="deleteSet({{set.id}}, '{{set.name | escape_single_quote}}')" id="delete_set_button_{{set.id}}">
+						<button type='button' onclick='deleteSet({{set.id}}, '{{set.name | escape_single_quote}}')' id='delete_set_button_{{set.id}}'>
 							Delete
 						</button>
 					</td>

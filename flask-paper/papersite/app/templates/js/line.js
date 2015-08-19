@@ -1,9 +1,9 @@
 {
 	title: {
-		text: "{{data_source_str}}"
+		text: '{{data_source_str}}'
 	},
 	chart: {
-		zoomType: "x",
+		zoomType: 'x',
 		events: {
 			selection: function(event) {
 				if (clickDragMode === 'flag') {
@@ -26,14 +26,14 @@
 	{% if is_set %}
 		{% for series in graph_data['series_dict'] %}
 		{
-			name: "{{series}}",
+			name: '{{series}}',
 			data: {{series}}
 		},
 		{% endfor %}
 	{% else %}
 		{% for series in graph_data.h0 %}
 		{
-			name: "{{series}}",
+			name: '{{series}}',
 			data: graph_data.{{series}}_h0
 		},
 		{% endfor %}

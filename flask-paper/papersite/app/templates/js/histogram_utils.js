@@ -17,7 +17,7 @@ var getColumnRangeLimits = function(event, series) {
 	} else if (series.xData.length > absoluteIndex + 1) {
 		endTime = series.xData[absoluteIndex + 1];
 	} else {
-		endTime = Date.parse("{{ range_end }}");
+		endTime = Date.parse('{{ range_end }}');
 	}
 
 	return { startTime: startTime, endTime: endTime };

@@ -1,4 +1,4 @@
-{% include "js/histogram_utils.js" %}
+{% include 'js/histogram_utils.js' %}
 
 var _chart;
 var inConstructionMode = false;
@@ -45,14 +45,14 @@ var saveSet = function() {
 	var currentObsIdMap = getCurrentObsIdMap();
 
 	if (currentObsIdMap.length === 0) {
-		alert("There aren't any obs ids in this set!");
+		alert('There aren't any obs ids in this set!');
 		return;
 	} else if ($('#set_name_textbox').val().length === 0) {
-		alert("The set must have a name!");
+		alert('The set must have a name!');
 		return;
 	}
 
-	setSaveButton("Working...", true);
+	setSaveButton('Working...', true);
 
 	var getFlaggedObsIdsMapIndices = function(start_millis, end_millis) {
 		var utc_obsid_map = getCurrentObsIdMap();
@@ -97,8 +97,8 @@ var saveSet = function() {
 	}
 
 	$.ajax({
-		type: "POST",
-		url: "/save_new_set",
+		type: 'POST',
+		url: '/save_new_set',
 		data: JSON.stringify({
 			name: $('#set_name_textbox').val(),
 			startObsId: currentObsIdMap[0][1],
@@ -111,16 +111,16 @@ var saveSet = function() {
 			if (data.error) {
 				alert(data.message);
 			} else {
-				alert("Set saved successfully!");
+				alert('Set saved successfully!');
 				//refresh the set view
 				applyFiltersAndSort();
 			}
 
-			setSaveButton("Save set", false);
+			setSaveButton('Save set', false);
 		},
 		error: function(xhr, status, error) {
-			alert("An error occured: " + status);
-			setSaveButton("Save set", false);
+			alert('An error occured: ' + status);
+			setSaveButton('Save set', false);
 		},
 		contentType: 'application/json',
 		dataType: 'json'
@@ -181,7 +181,7 @@ var getVariableSuffix = function() {
 
 var hideDataOnDataSetChange = function() {
 	var suffix = getVariableSuffix();
-	var remove = $("#remove_flagged_data_checkbox").is(":checked");
+	var remove = $('#remove_flagged_data_checkbox').is(':checked');
 	var obsSeries = _chart.series[0];
 	var errSeries = _chart.series[1];
 
@@ -412,7 +412,7 @@ var flagRangeInSet = function(startTime, endTime) {
 	var counts = getObsAndErrorCountInRange(startTime, endTime);
 
 	var plotBand = {
-		id: "",		 // The id will be determined later.
+		id: '',		 // The id will be determined later.
 		color: 'yellow',
 		from: startTime,
 		to: endTime,
@@ -430,7 +430,7 @@ var flagRangeInSet = function(startTime, endTime) {
 };
 
 var updateSetConstructionTable = function() {
-	var tableHtml = "";
+	var tableHtml = '';
 
 	for (var i = 0; i < flaggedRanges.length; ++i) {
 		var flaggedRange = flaggedRanges[i];
@@ -439,8 +439,8 @@ var updateSetConstructionTable = function() {
 		'<td>' + new Date(flaggedRange.to).toISOString() + '</td>' +
 		'<td>' + flaggedRange.obs_count + '</td>' +
 		'<td>' + flaggedRange.err_count + '</td>' +
-		'<td><button onclick=\'obs_err.unflagRange("' + flaggedRange.id +
-		'")\'>Unflag range</button></td></tr>';
+		'<td><button onclick=\'obs_err.unflagRange('' + flaggedRange.id +
+		'')\'>Unflag range</button></td></tr>';
 	}
 
 	$('#set_construction_table > tbody').html(tableHtml);
@@ -467,7 +467,7 @@ var unflagRange = function(flaggedRangeId) {
 dataSourceObj.unflagRange = unflagRange;
 
 var reinsertDataForRange = function(index) {
-	if ($("#remove_flagged_data_checkbox").is(":checked")) {
+	if ($('#remove_flagged_data_checkbox').is(':checked')) {
 		var thisRange = flaggedRanges[index];
 		var obsSeries = _chart.series[0];
 		var errSeries = _chart.series[1];
@@ -498,7 +498,7 @@ var clickConstructionModeCheckbox = function(checkbox) {
 	inConstructionMode = checkbox.checked;
 	if (inConstructionMode) { // Entering construction mode.
 		$('#construction_controls').show(); // Show set construction controls.
-		clickDragMode = $("#click_drag_dropdown").val();
+		clickDragMode = $('#click_drag_dropdown').val();
 		{% if not is_set %} // If we're looking at a set, the plot bands will always be on the graph.
 			addAllPlotBands(); // Also, because the user can't change the data set, the table doesn't need to be updated.
 
@@ -507,7 +507,7 @@ var clickConstructionModeCheckbox = function(checkbox) {
 		{% endif %}
 	} else { // Exiting construction mode.
 		$('#construction_controls').hide(); // Hide set construction controls.
-		clickDragMode = "zoom"; // Only allow zooming when not in construction mode.
+		clickDragMode = 'zoom'; // Only allow zooming when not in construction mode.
 		{% if not is_set %}
 			removeAllPlotBands();
 		{% endif %}
@@ -524,7 +524,7 @@ var getSeriesDataCopyFromGraph = function(series) {
 };
 
 var removeDataForNewFlaggedRangeIfNecessary = function(flaggedRange) {
-	if ($("#remove_flagged_data_checkbox").is(":checked")) {
+	if ($('#remove_flagged_data_checkbox').is(':checked')) {
 		var obsSeries = _chart.series[0];
 		var errSeries = _chart.series[1];
 		var obsSeriesGraphData = getSeriesDataCopyFromGraph(obsSeries);
