@@ -1,10 +1,11 @@
 from flask import render_template, flash, redirect, url_for, request, g, make_response
 from flask.ext.login import current_user
-from app.flask_app import app
+from app.flask_app import app, db
 from app import models, db_utils, histogram_utils, data_sources
 from datetime import datetime
 import os
 import paperdata_dbi as pdbi
+import pyganglia as pyg
 
 @app.route('/')
 @app.route('/index')
@@ -17,11 +18,9 @@ def index(setName = None):
 		active_data_sources = g.user.active_data_sources
 
 	if setName is not None:
-		the_set = models.Set.query.filter(models.Set.name == setName).first()
-
-		##the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
-		##												field_tuples=(('name', '==', setName),),
-		##												field_sort_tuple=None, output_vars=None)[0]
+		the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+														field_tuples=(('name', '==', setName),),
+														field_sort_tuple=None, output_vars=None)[0]
 
 		if the_set is not None:
 			start_datetime, end_datetime = db_utils.get_datetime_from_gps(
@@ -52,11 +51,9 @@ def get_graph():
 	if data_source_str is None:
 		return make_response('No data source', 500)
 
-	data_source = models.Graph_Data_Source.query.filter(models.Graph_Data_Source.name == data_source_str).first()
-
-	##data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
-	##												field_tuples=(('name', '==', data_source_str),),
-	##												field_sort_tuple=None, output_vars=None)[0]
+	data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+													field_tuples=(('name', '==', data_source_str),),
+													field_sort_tuple=None, output_vars=None)[0]
 
 	set_str = request.args.get('set')
 
@@ -88,11 +85,9 @@ def get_graph():
 				end_time_str_short=end_datetime.strftime('%Y-%m-%d %H:%M'),
 				width_slider=data_source.width_slider)
 	else:
-		the_set = models.Set.query.filter(models.Set.name == set_str).first()
-
-		##the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
-		##												field_tuples=(('name', '==', set_str),),
-		##												field_sort_tuple=None, output_vars=None)[0]
+		the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+														field_tuples=(('name', '==', set_str),),
+														field_sort_tuple=None, output_vars=None)[0]
 
 		if the_set is None:
 			return make_response('Set not found', 500)
@@ -130,27 +125,22 @@ def get_graph():
 
 @app.route('/data_amount', methods = ['GET'])
 def data_amount():
-	query = models.Data_Amount.query
-
-	data = query.order_by(models.Data_Amount.created_on.desc()).first()
-
-	##data = db_utils.get_query_results(data_source=None, database='eorlive', table='data_amount',
-	##												field_tuples=None,
-	##												field_sort_tuple=(('created_on', 'desc'),), output_vars=None)[0]
+	data = db_utils.get_query_results(data_source=None, database='eorlive', table='data_amount',
+													field_tuples=None,
+													field_sort_tuple=(('created_on', 'desc'),), output_vars=None)[0]
 
 
-	data_time = hours_scheduled = hours_observed = hours_with_data = hours_with_uvfits = 'N/A'
+	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
 
 	if data is not None:
 		data = data.to_json()
 		data_time = data['created_on']
-		hours_scheduled = data['hours_scheduled']
-		hours_observed = data['hours_observed']
+		hours_sadb = data['hours_sadb']
+		hours_paperdata = data['hours_paperdata']
 		hours_with_data = data['hours_with_data']
-		hours_with_uvfits = data['hours_with_uvfits']
 
-	return render_template('data_amount_table.html', hours_scheduled=hours_scheduled, hours_observed=hours_observed,
-		hours_with_data=hours_with_data, hours_with_uvfits=hours_with_uvfits, data_time=data_time)
+	return render_template('data_amount_table.html', hours_sadb=hours_sadb, hours_paperdata=hours_paperdata,
+							hours_with_data=hours_with_data, data_time=data_time)
 
 @app.route('/error_table', methods = ['POST'])
 def error_table():
@@ -160,25 +150,15 @@ def error_table():
 
 	start_gps, end_gps = db_utils.get_gps_from_datetime(starttime, endtime)
 
-	obscontroller_response = db_utils.send_query(g.eor_db, '''SELECT reference_time, observation_number, comment
-							FROM obscontroller_log
-							WHERE reference_time >= {start} AND reference_time <= {end}
-							ORDER BY reference_time ASC'''.format(start=start_gps, end=end_gps)).fetchall()
+	obscontroller_response = db_utils.get_query_results(data_source=None, database='eor', table='obscontroller_log',
+														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
+														field_sort_tuple=(('reference_time', 'asc'),),
+														output_vars=('reference_time', 'observation_number', 'comment'))
 
-	##obscontroller_response = db_utils.get_query_results(data_source=None, database='eor', table='obscontroller_log',
-	##													(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
-	##													field_sort_tuple=(('reference_time', 'asc'),),
-	##													output_vars=('reference_time', 'observation_number', 'comment'))
-
-	recvstatuspolice_response = db_utils.send_query(g.eor_db, '''SELECT reference_time, observation_number, comment
-							FROM recvstatuspolice_log
-							WHERE reference_time >= {start} AND reference_time <= {end}
-							ORDER BY reference_time ASC'''.format(start=start_gps, end=end_gps)).fetchall()
-
-	##recvstatuspolice_response = db_utils.get_query_results(data_source=None, database='eor', table='recvstatuspolice_log',
-	##													(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
-	##													field_sort_tuple=(('reference_time', 'asc'),),
-	##													output_vars=('reference_time', 'observation_number', 'comment'))
+	recvstatuspolice_response = db_utils.get_query_results(data_source=None, database='eor', table='recvstatuspolice_log',
+														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
+														field_sort_tuple=(('reference_time', 'asc'),),
+														output_vars=('reference_time', 'observation_number', 'comment'))
 
 	return render_template('error_table.html', obscontroller_error_list=obscontroller_response,
 							recvstatuspolice_error_list=recvstatuspolice_response,
@@ -193,6 +173,7 @@ def before_request():
 	try :
 		g.paper_session = paper_dbi.Session()
 		g.pyg_session = pyg_dbi.Session()
+		g.eorlive_session = db.session
 	except Exception as e:
 		print('Cannot connect to database - {e}'.format(e))
 
@@ -200,24 +181,21 @@ def before_request():
 def teardown_request(exception):
 	paper_db = getattr(g, 'paper_session', None)
 	pyg_db = getattr(g, 'pyg_session', None)
-	if paper_db is not None:
-		paper_db.close()
-	if pyg_db is not None:
-		pyg_db.close()
+	eorlive_db = getattr(g, 'eorlive_session', None)
+	db_list = (paper_db, pyg_db, eorlive_db)
+	for open_db in db_list:
+		if open_db is not None:
+			open_db.close()
 
 @app.route('/profile')
 def profile():
 	if (g.user is not None and g.user.is_authenticated()):
-		user = models.User.query.get(g.user.username)
+		user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+											field_tuples=(('username', '==', g.user.username),), field_sort_tuple=None, output_vars=None)[0]
 
-		##user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
-		##									field_tuples=(('username', '==', g.user.username),), field_sort_tuple=None, output_vars=None)[0]
-
-		setList = models.Set.query.filter(models.Set.username == g.user.username)
-
-		##setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
-		##												field_tuples=(('username', '==', g.user.username),),
-		##												field_sort_tuple=None, output_vars=None)[0]
+		setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+														field_tuples=(('username', '==', g.user.username),),
+														field_sort_tuple=None, output_vars=None)[0]
 
 		return render_template('profile.html', user=user, sets=setList)
 	else:
@@ -226,20 +204,14 @@ def profile():
 @app.route('/user_page')
 def user_page():
 	if (g.user is not None and g.user.is_authenticated()):
-		user = models.User.query.get(g.user.username)
+		user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+											field_tuples=(('username', '==', g.user.username),), field_sort_tuple=None, output_vars=None)[0]
 
-		##user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
-		##									field_tuples=(('username', '==', g.user.username),), field_sort_tuple=None, output_vars=None)[0]
+		userList = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+											field_tuples=None, field_sort_tuple=None, output_vars=None)[0]
 
-		userList = models.User.query.all()
-
-		##userList = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
-		##									field_tuples=None, field_sort_tuple=None, output_vars=None)[0]
-
-		setList = models.Set.query.all()
-
-		##setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
-		##												field_tuples=None, field_sort_tuple=None, output_vars=None)[0]
+		setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+														field_tuples=None, field_sort_tuple=None, output_vars=None)[0]
 
 		return render_template('user_page.html', theUser=user, userList=userList, setList=setList)
 	else:
@@ -256,17 +228,11 @@ def data_summary_table():
 
 	start_gps, end_gps = db_utils.get_gps_from_datetime(startdatetime, enddatetime)
 
-	response = db_utils.send_query(g.eor_db, '''SELECT starttime, stoptime, obsname, ra_phase_center
-					FROM mwa_setting
-					WHERE starttime >= {start} AND starttime <= {end}
-					AND projectid='G0009'
-					ORDER BY starttime ASC'''.format(start=start_gps, end=end_gps)).fetchall()
-
-	##response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
-	##									(('starttime, '>=', start_gps), ('starttime', '<=', end_gps),
-	##									('projectid', '==', 'G0009')),
-	##									field_sort_tuple=(('starttime', 'asc'),),
-	##									output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center'))
+	response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
+										('projectid', '==', 'G0009')),
+										field_sort_tuple=(('starttime', 'asc'),),
+										output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center'))
 
 	low_eor0_count = low_eor1_count = high_eor0_count = high_eor1_count = 0
 	low_eor0_hours = low_eor1_hours = high_eor0_hours = high_eor1_hours = 0

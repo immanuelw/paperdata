@@ -3,55 +3,35 @@ from app.flask_app import app, db
 from flask import request, g, make_response, jsonify, render_template
 from datetime import datetime
 
-def insert_set_into_db(name, start, end, flagged_range_dicts, low_or_high,
-		eor, total_data_hrs, flagged_data_hrs):
-	new_set = models.Set()
-	new_set.username = g.user.username
-	new_set.name = name
-	new_set.start = start
-	new_set.end = end
-	new_set.low_or_high = low_or_high
-	new_set.eor = eor
-	new_set.total_data_hrs = total_data_hrs
-	new_set.flagged_data_hrs = flagged_data_hrs
-
-	##new_set = getattr(models, 'Set')()
-	##setattr(new_set, 'username', g.user.username)
-	##setattr(new_set, 'name', name)
-	##setattr(new_set, 'start', start)
-	##setattr(new_set, 'end', end)
-	##setattr(new_set, 'low_or_high', low_or_high)
-	##setattr(new_set, 'eor', eor)
-	##setattr(new_set, 'total_data_hrs', total_data_hrs)
-	##setattr(new_set, 'flagged_data_hrs', flagged_data_hrs)
+def insert_set_into_db(name, start, end, flagged_range_dicts, low_or_high, eor, total_data_hrs, flagged_data_hrs):
+	new_set = getattr(models, 'Set')()
+	setattr(new_set, 'username', g.user.username)
+	setattr(new_set, 'name', name)
+	setattr(new_set, 'start', start)
+	setattr(new_set, 'end', end)
+	setattr(new_set, 'low_or_high', low_or_high)
+	setattr(new_set, 'eor', eor)
+	setattr(new_set, 'total_data_hrs', total_data_hrs)
+	setattr(new_set, 'flagged_data_hrs', flagged_data_hrs)
 
 	db.session.add(new_set)
 	db.session.flush()
 	db.session.refresh(new_set) # So we can get the set's id
 
 	for flagged_range_dict in flagged_range_dicts:
-		flagged_subset = models.Flagged_Subset()
-		flagged_subset.set_id = new_set.id
-		flagged_subset.start = flagged_range_dict['start_gps']
-		flagged_subset.end = flagged_range_dict['end_gps']
-
-		##flagged_subset = getattr(models, 'Flagged_Subset')()
-		##setattr(flagged_subset, 'set_id', getattr(new_set, 'id'))
-		##setattr(flagged_subset, 'start', flagged_range_dict['start_gps'])
-		##setattr(flagged_subset, 'end', flagged_range_dict['end_gps'])
+		flagged_subset = getattr(models, 'Flagged_Subset')()
+		setattr(flagged_subset, 'set_id', getattr(new_set, 'id'))
+		setattr(flagged_subset, 'start', flagged_range_dict['start_gps'])
+		setattr(flagged_subset, 'end', flagged_range_dict['end_gps'])
 
 		db.session.add(flagged_subset)
 		db.session.flush()
 		db.session.refresh(flagged_subset) # So we can get the id
 
 		for obs_id in flagged_range_dict['flaggedRange']:
-			flagged_obs_id = models.Flagged_Obs_Ids()
-			flagged_obs_id.obs_id = obs_id
-			flagged_obs_id.flagged_subset_id = flagged_subset.id
-
-			##flagged_obs_id = getattr(models, 'Flagged_Obs_Ids')()
-			##setattr(flagged_obs_id, 'obs_id', obs_id)
-			##setattr(flagged_obs_id, 'flagged_subset_id', getattr(flagged_subset, 'id'))
+			flagged_obs_id = getattr(models, 'Flagged_Obs_Ids')()
+			setattr(flagged_obs_id, 'obs_id', obs_id)
+			setattr(flagged_obs_id, 'flagged_subset_id', getattr(flagged_subset, 'id'))
 
 			db.session.add(flagged_obs_id)
 
@@ -66,22 +46,12 @@ def is_obs_flagged(obs_id, flagged_range_dicts):
 def get_data_hours_in_set(start, end, low_or_high, eor, flagged_range_dicts):
 	total_data_hrs = flagged_data_hrs = 0
 
-	low_high_clause, eor_clause = db_utils.get_lowhigh_and_eor_clauses(low_or_high, eor)
-
-	all_obs_ids_tuples = db_utils.send_query(g.eor_db, '''SELECT starttime, stoptime
-							FROM mwa_setting
-							WHERE starttime >= {start} AND starttime <= {end}
-							AND projectid='G0009'
-							{low_high}
-							{eor}
-							ORDER BY starttime ASC'''.format(start=start, end=end, low_high=low_high_clause, eor=eor_clause)).fetchall()
-
-	##all_obs_ids_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
-	##									(('starttime', '>=', start), ('starttime', '<=', end),
-	##									('projectid', '==', 'G0009'),
-	##									('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
-	##									('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
-	##									field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'stoptime'))
+	all_obs_ids_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+										(('starttime', '>=', start), ('starttime', '<=', end),
+										('projectid', '==', 'G0009'),
+										('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
+										('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
+										field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime', 'stoptime'))
 
 	for obs in all_obs_ids_tuples:
 		obs_id = obs[0]
@@ -176,23 +146,12 @@ def upload_set():
 		low_or_high = request.form['low_or_high']
 		eor = request.form['eor']
 
-		low_high_clause, eor_clause = db_utils\
-			.get_lowhigh_and_eor_clauses(low_or_high, eor)
-
-		all_obs_ids_tuples = db_utils.send_query(g.eor_db, '''SELECT starttime
-							FROM mwa_setting
-							WHERE starttime >= {start} AND starttime <= {end}
-							AND projectid='G0009'
-							{low_high}
-							{eor}
-							ORDER BY starttime ASC'''.format(start=start_gps, end=end_gps, low_high=low_high_clause, eor=eor_clause)).fetchall()
-
-		##all_obs_ids_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
-		##									(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-		##									('projectid', '==', 'G0009'),
-		##									('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
-		##									('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
-		##									field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime',))
+		all_obs_ids_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+											(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
+											('projectid', '==', 'G0009'),
+											('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
+											('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
+											field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime',))
 
 		all_obs_ids = [tup[0] for tup in all_obs_ids_tuples]
 
@@ -230,39 +189,24 @@ def upload_set():
 def download_set():
 	set_id = request.args['set_id']
 
-	the_set = models.Set.query.filter(models.Set.id == set_id).first()
-
-	##the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
-	##												field_tuples=(('id', '==', set_id),),
-	##												field_sort_tuple=None, output_vars=None)[0]
+	the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+													field_tuples=(('id', '==', set_id),),
+													field_sort_tuple=None, output_vars=None)[0]
 
 	if the_set is not None:
-		flagged_subsets = models.Flagged_Subset.query.filter(models.Flagged_Subset.set_id == the_set.id).all()
-
-		##flagged_subsets = db_utils.get_query_results(data_source=None, database='eorlive', table='flagged_subset',
-		##												field_tuples=(('set_id', '==', getattr(the_set, 'id')),),
-		##												field_sort_tuple=None, output_vars=None)
+		flagged_subsets = db_utils.get_query_results(data_source=None, database='eorlive', table='flagged_subset',
+														field_tuples=(('set_id', '==', getattr(the_set, 'id')),),
+														field_sort_tuple=None, output_vars=None)
 
 		low_or_high = the_set.low_or_high
 		eor = the_set.eor
 
-		low_high_clause, eor_clause = db_utils.get_lowhigh_and_eor_clauses(low_or_high, eor)
-
-		all_obs_ids_tuples = db_utils.send_query(g.eor_db, '''SELECT starttime
-							FROM mwa_setting
-							WHERE starttime >= {start} AND starttime <= {end}
-							AND projectid='G0009'
-							{low_high}
-							{eor}
-							ORDER BY starttime ASC'''.format(start=the_set.start, end=the_set.end,
-															low_high=low_high_clause, eor=eor_clause)).fetchall()
-
-		##all_obs_id_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
-		##									(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
-		##									('projectid', '==', 'G0009'),
-		##									('obsname', None if the_set.low_or_high == 'any' else 'like', ''.join(the_set.low_or_high, '%')),
-		##									('ra_phase_center', None if the_set.eor == 'any' else '==', 0 if the_set.eor == 'EOR0' else 60))
-		##									field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime',))
+		all_obs_id_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+											(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
+											('projectid', '==', 'G0009'),
+											('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
+											('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
+											field_sort_tuple=(('starttime', 'asc'),), output_vars=('starttime',))
 
 		all_obs_ids = [tup[0] for tup in all_obs_ids_tuples]
 
@@ -286,10 +230,8 @@ def download_set():
 
 @app.route('/get_filters')
 def get_filters():
-	users = models.User.query.all()
-
-	##users = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
-	##												field_tuples=None field_sort_tuple=None, output_vars=None)
+	users = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+													field_tuples=None field_sort_tuple=None, output_vars=None)
 
 	return render_template('filters.html', users=users)
 
@@ -304,56 +246,27 @@ def get_sets():
 		sort = set_controls['sort']
 		ranged = set_controls['ranged']
 
-		query = models.Set.query
-
-		if username:
-			query = query.filter(models.Set.username == username)
-
-		if eor:
-			query = query.filter(models.Set.eor == eor) # eor is 'EOR0' or 'EOR1', which are the values used in the DB
-
-		if high_low:
-			query = query.filter(models.Set.low_or_high == high_low) # high_low is 'high' or 'low', which are the
-																	 # values used in the DB
-
 		if ranged:
 			start_utc = request_content['starttime']
 			end_utc = request_content['endtime']
 			start_datetime = datetime.strptime(start_utc, '%Y-%m-%dT%H:%M:%SZ')
 			end_datetime = datetime.strptime(end_utc, '%Y-%m-%dT%H:%M:%SZ')
 			start_gps, end_gps = db_utils.get_gps_from_datetime(start_datetime, end_datetime)
-			query = query.filter(and_(models.Set.start >= start_gps,
-									models.Set.end <= end_gps))
 
-		if sort:
-			if sort == 'hours':
-				query = query.order_by(models.Set.total_data_hrs.desc())
-			elif sort == 'time':
-				query = query.order_by(models.Set.created_on.desc())
-
-		setList = query.all()
-
-		##if ranged:
-		##	start_utc = request_content['starttime']
-		##	end_utc = request_content['endtime']
-		##	start_datetime = datetime.strptime(start_utc, '%Y-%m-%dT%H:%M:%SZ')
-		##	end_datetime = datetime.strptime(end_utc, '%Y-%m-%dT%H:%M:%SZ')
-		##	start_gps, end_gps = db_utils.get_gps_from_datetime(start_datetime, end_datetime)
-
-		##field_tuples = (('username', '==' if username else None, username), ('eor', '==' if eor else None, eor),
-		##					('low_or_high', '==' if high_low else None, high_low),
-		##					('start', '>=' if ranged else None, start_gps),
-		##					('end', '>=' if ranged else None, end_gps))
+		field_tuples = (('username', '==' if username else None, username), ('eor', '==' if eor else None, eor),
+							('low_or_high', '==' if high_low else None, high_low),
+							('start', '>=' if ranged else None, start_gps),
+							('end', '>=' if ranged else None, end_gps))
 	
-		##field_sort_tuple = None
-		##if sort:
-		##	if sort == 'hours'
-		##		field_sort_tuple = (('total_data_hrs', 'desc'),)
-		##	elif sort == 'time':
-		##		field_sort_tuple = (('created_on', 'desc'),)
+		field_sort_tuple = None
+		if sort:
+			if sort == 'hours'
+				field_sort_tuple = (('total_data_hrs', 'desc'),)
+			elif sort == 'time':
+				field_sort_tuple = (('created_on', 'desc'),)
 
-		##setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
-		##												field_tuples=field_tuples, field_sort_tuple=field_sort_tuple, output_vars=None)
+		setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+														field_tuples=field_tuples, field_sort_tuple=field_sort_tuple, output_vars=None)
 
 		include_delete_buttons = request_content['includeDeleteButtons']
 
@@ -367,11 +280,9 @@ def delete_set():
 	if (g.user is not None and g.user.is_authenticated()):
 		set_id = request.form['set_id']
 
-		theSet = models.Set.query.filter(models.Set.id == set_id).first()
-
-		##theSet = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
-		##												field_tuples=(('id', '==', set_id),),
-		##												field_sort_tuple=None, output_vars=None)[0]
+		theSet = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+														field_tuples=(('id', '==', set_id),),
+														field_sort_tuple=None, output_vars=None)[0]
 
 		db.session.delete(theSet)
 		db.session.commit()
