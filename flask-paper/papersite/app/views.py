@@ -30,9 +30,7 @@ def index(setName = None):
 		active_data_sources = g.user.active_data_sources
 
 	if setName is not None:
-		the_set = db_utils.get_query_results(database='eorlive', table='set',
-														field_tuples=(('name', '==', setName),),
-														sort_tuples=None, output_vars=None)[0]
+		the_set = db_utils.get_query_results(database='eorlive', table='set', field_tuples=(('name', '==', setName),))[0]
 
 		if the_set is not None:
 			start_datetime, end_datetime = db_utils.get_datetime_from_gps(
@@ -63,9 +61,7 @@ def get_graph():
 	if data_source_str is None:
 		return make_response('No data source', 500)
 
-	data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
-													field_tuples=(('name', '==', data_source_str),),
-													sort_tuples=None, output_vars=None)[0]
+	data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source', field_tuples=(('name', '==', data_source_str),))[0]
 
 	set_str = request.args.get('set')
 
@@ -97,25 +93,24 @@ def get_graph():
 				end_time_str_short=end_datetime.strftime('%Y-%m-%d %H:%M'),
 				width_slider=data_source.width_slider)
 	else:
-		the_set = db_utils.get_query_results(database='eorlive', table='set',
-														field_tuples=(('name', '==', set_str),),
-														sort_tuples=None, output_vars=None)[0]
+		the_set = db_utils.get_query_results(database='eorlive', table='set', field_tuples=(('name', '==', set_str),))[0]
 
 		if the_set is None:
 			return make_response('Set not found', 500)
 
 		plot_bands = histogram_utils.get_plot_bands(the_set)
 
-		start_datetime, end_datetime = db_utils.get_datetime_from_gps(
-				the_set.start, the_set.end)
+		set_start, set_end = getattr(the_set, 'start'), getattr(the_set, 'end')
+		set_polarization, set_era, set_era_type = getattr(the_set, 'polarization'), getattr(the_set, 'era'), getattr(the_set, 'era_type')
+		start_datetime, end_datetime = db_utils.get_datetime_from_gps(set_start, set_end)
 
 		start_time_str_short = start_datetime.strftime('%Y-%m-%d %H:%M')
 		end_time_str_short = end_datetime.strftime('%Y-%m-%d %H:%M')
 
 		if graph_type_str == 'Obs_Err':
 			observation_counts, utc_obsid_map = histogram_utils.get_observation_counts(
-				the_set.start, the_set.end, the_set.low_or_high, the_set.eor)
-			error_counts = histogram_utils.get_error_counts(the_set.start, the_set.end)[0]
+												set_start, set_end, set_polarization, set_era, set_era_type)
+			error_counts = histogram_utils.get_error_counts(set_start, set_end)[0]
 			range_end = end_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') # For the function in histogram_utils.js
 			which_data_set = data_sources.which_data_set(the_set)
 			return render_template('setView.html', the_set=the_set,
@@ -125,7 +120,7 @@ def get_graph():
 				which_data_set=which_data_set, is_set=True,
 				utc_obsid_map=utc_obsid_map)
 		else:
-			graph_data = data_sources.get_graph_data(data_source_str, the_set.start, the_set.end, the_set)
+			graph_data = data_sources.get_graph_data(data_source_str, set_start, set_end, the_set)
 			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
 			which_data_set = data_sources.which_data_set(the_set)
 			return render_template('graph.html',
@@ -137,10 +132,7 @@ def get_graph():
 
 @app.route('/data_amount', methods = ['GET'])
 def data_amount():
-	data = db_utils.get_query_results(database='eorlive', table='data_amount',
-										field_tuples=None,
-										sort_tuples=(('created_on', 'desc'),), output_vars=None)[0]
-
+	data = db_utils.get_query_results(database='eorlive', table='data_amount', sort_tuples=(('created_on', 'desc'),))[0]
 
 	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
 
@@ -278,12 +270,9 @@ def teardown_request(exception):
 @app.route('/profile')
 def profile():
 	if (g.user is not None and g.user.is_authenticated()):
-		user = db_utils.get_query_results(database='eorlive', table='user',
-											field_tuples=(('username', '==', g.user.username),), sort_tuples=None, output_vars=None)[0]
+		user = db_utils.get_query_results(database='eorlive', table='user',	field_tuples=(('username', '==', g.user.username),),)[0]
 
-		setList = db_utils.get_query_results(database='eorlive', table='set',
-														field_tuples=(('username', '==', g.user.username),),
-														sort_tuples=None, output_vars=None)[0]
+		setList = db_utils.get_query_results(database='eorlive', table='set', field_tuples=(('username', '==', g.user.username),))[0]
 
 		return render_template('profile.html', user=user, sets=setList)
 	else:
@@ -292,14 +281,11 @@ def profile():
 @app.route('/user_page')
 def user_page():
 	if (g.user is not None and g.user.is_authenticated()):
-		user = db_utils.get_query_results(database='eorlive', table='user',
-											field_tuples=(('username', '==', g.user.username),), sort_tuples=None, output_vars=None)[0]
+		user = db_utils.get_query_results(database='eorlive', table='user',	field_tuples=(('username', '==', g.user.username),))[0]
 
-		userList = db_utils.get_query_results(database='eorlive', table='user',
-											field_tuples=None, sort_tuples=None, output_vars=None)[0]
+		userList = db_utils.get_query_results(database='eorlive', table='user')[0]
 
-		setList = db_utils.get_query_results(database='eorlive', table='set',
-														field_tuples=None, sort_tuples=None, output_vars=None)[0]
+		setList = db_utils.get_query_results(database='eorlive', table='set')[0]
 
 		return render_template('user_page.html', theUser=user, userList=userList, setList=setList)
 	else:
