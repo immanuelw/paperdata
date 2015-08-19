@@ -13,18 +13,18 @@
 	<tbody>
 		<tr>
 			<th>Correlator</th>
-			<td>{{ last_time_updated_1 | round(1) }} ({{ time_segment_1 }})</td>
-			<td rowspan='3' style='color:red;vertical-align:middle;'>{{ recent_jd_1 }}</td>
+			<td>{{ corr_time | round(1) }} ({{ corr_time_segment }})</td>
+			<td rowspan='3' style='color:red;vertical-align:middle;'>{{ corr_day }}</td>
 		</tr>
 		<tr>
 			<th>RTP</th>
-			<td>{{ last_time_updated_2 | round(1) }} ({{ time_segment_2 }})</td>
-			<td rowspan='3' style='color:red;vertical-align:middle;'>{{ recent_jd_2 }}</td>
+			<td>{{ rtp_time | round(1) }} ({{ rtp_time_segment }})</td>
+			<td rowspan='3' style='color:red;vertical-align:middle;'>{{ rtp_day }}</td>
 		</tr>
 		<tr>
 			<th>Folio Scan</th>
-			<td>{{ last_time_updated_3 | round(1) }} ({{ time_segment_3 }})</td>
-			<td rowspan='3' style='color:red;vertical-align:middle;'>{{ recent_jd_3 }}</td>
+			<td>{{ folio_time | round(1) }} ({{ folio_time_segment }})</td>
+			<td rowspan='3' style='color:red;vertical-align:middle;'>{{ folio_day }}</td>
 		</tr>
 	</tbody>
 </table>

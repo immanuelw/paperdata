@@ -6,6 +6,7 @@ from datetime import datetime
 import os
 import paperdata_dbi as pdbi
 import pyganglia as pyg
+import time
 
 @app.route('/')
 @app.route('/index')
@@ -144,22 +145,47 @@ def data_amount():
 
 @app.route('/source_table', methods = ['GET'])
 def source_table():
-	data = db_utils.get_query_results(database='paperdata', table='rtp_file',
-										field_tuples=None,
-										sort_tuples=(('timestamp', 'desc'),), output_vars=None)
+	sort_tuples = (('timestamp', 'desc'),)
+	output_vars = ('timestamp', 'julian_day')
+	
+	corr_source = db_utils.get_query_results(database='paperdata', table='rtp_file',
+										field_tuples=(('transferred', '==', None),),
+										sort_tuples=sort_tuples, output_vars=output_vars)
 
+	rtp_source = db_utils.get_query_results(database='paperdata', table='rtp_file',
+										field_tuples=(('transferred', '==', True),),
+										sort_tuples=sort_tuples, output_vars=output_vars)
 
-	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
+	paper_source = db_utils.get_query_results(database='paperdata', table='observation',
+										sort_tuples=sort_tuples, output_vars=output_vars)
 
-	if data is not None:
-		data = data.to_json()
-		data_time = data['created_on']
-		hours_sadb = data['hours_sadb']
-		hours_paperdata = data['hours_paperdata']
-		hours_with_data = data['hours_with_data']
+	corr_time = corr_day = rtp_time = rtp_day = paper_time = paper_day = corr_time_segment = rtp_time_segment = paper_time_segment = 'N/A'
 
-	return render_template('data_amount_table.html', hours_sadb=hours_sadb, hours_paperdata=hours_paperdata,
-							hours_with_data=hours_with_data, data_time=data_time)
+	source_dict = {'corr_time':corr_time, 'corr_day':corr_day, 'corr_time_segment':corr_time_segment,
+					'rtp_time':rtp_time, 'rtp_day':rtp_day, 'rtp_time_segment':rtp_time_segment,
+					'paper_time':paper_time, 'paper_day':paper_day, 'paper_time_segment':paper_time_segment}
+
+	source_tuples = ((cour_source, 'corr'), (rtp_source, 'rtp'), (paper_source, 'paper'))
+	for source, source_name in source_tuples:
+		if source is not None:
+			time_str = '{source_name}_time'.format(source_name=source_name)
+			segment_str = '{source_name}_time_segment'.format(source_name=source_name)
+			day_str = '{source_name}_day'.format(source_name=source_name)
+
+			source_dict[time_str] = int(time.time() - getattr(source_source[0], 'timestamp'))
+
+			source_time_val = 1 if source_dict[time_str] < 500 else 60 if source_dict[time_str] < 3600\
+								else 3600 if source_dict[time_str] < 86400 else 86400
+
+			source_dict[segment_str] = 'seconds' if source_dict[time_str] < 500 else 'minutes' if source_dict[time_str] < 3600\
+											else 'hours' if source_dict[time_str] < 86400 else 'days'
+			source_dict[segment_str] = ' 'join(source_dict[segment_str], 'ago')
+
+			source_dict[time_str] /= source_time_val
+
+			source_dict[day_str] = getattr(source[0], 'julian_day')
+
+	return render_template('source_table.html', **source_dict)
 
 @app.route('/error_table', methods = ['POST'])
 def error_table():
