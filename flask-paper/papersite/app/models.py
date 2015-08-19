@@ -60,8 +60,9 @@ class Set(db.Model):
 	name = db.Column(db.String(50))
 	start = db.Column(db.Integer)
 	end = db.Column(db.Integer)
-	low_or_high = db.Column(db.String(4)) # Whether this set contains 'low', 'high', or 'any' observations.
-	eor = db.Column(db.String(4)) # Whether this set contains 'EOR0', 'EOR1', or 'any' observations.
+	polarization = db.Column(db.String(4)) #'all', 'xy', 'yy', etc.
+	era = db.Column(db.Integer)
+	era_type = db.Column(db.String(10))
 	total_data_hrs = db.Column(db.Float)
 	flagged_data_hrs = db.Column(db.Float)
 	created_on = db.Column(db.DateTime, default=datetime.utcnow)

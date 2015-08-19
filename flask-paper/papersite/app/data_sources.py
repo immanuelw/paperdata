@@ -250,8 +250,12 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 	return data
 
 def which_data_set(the_set):
-	is_any = the_set.low_or_high == 'any' or the_set.eor == 'any'
-	return 'any' if is_any else the_set.low_or_high[0] + the_set.eor[3]
+	polarization = getattr(the_set, 'polarization')
+	era =  getattr(the_set, 'era')
+	era_type = getattr(the_set, 'era_type')
+
+	which_data = (polarization, era, era_type)
+	return which_data
 
 def separate_data_into_sets(data, data_source_results, columns, data_source, start_gps, end_gps):
 	obsid_results = db_utils.get_query_results(data_source, database=None, table=None,

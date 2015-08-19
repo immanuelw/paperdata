@@ -3,14 +3,15 @@ from app.flask_app import app, db
 from flask import request, g, make_response, jsonify, render_template
 from datetime import datetime
 
-def insert_set_into_db(name, start, end, flagged_range_dicts, low_or_high, eor, total_data_hrs, flagged_data_hrs):
+def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era, era_type, total_data_hrs, flagged_data_hrs):
 	new_set = getattr(models, 'Set')()
 	setattr(new_set, 'username', g.user.username)
 	setattr(new_set, 'name', name)
 	setattr(new_set, 'start', start)
 	setattr(new_set, 'end', end)
-	setattr(new_set, 'low_or_high', low_or_high)
-	setattr(new_set, 'eor', eor)
+	setattr(new_set, 'polarization', polarization)
+	setattr(new_set, 'era', era)
+	setattr(new_set, 'era_type', era_type)
 	setattr(new_set, 'total_data_hrs', total_data_hrs)
 	setattr(new_set, 'flagged_data_hrs', flagged_data_hrs)
 
@@ -43,18 +44,19 @@ def is_obs_flagged(obs_id, flagged_range_dicts):
 			return True
 	return False
 
-def get_data_hours_in_set(start, end, low_or_high, eor, flagged_range_dicts):
+def get_data_hours_in_set(start, end, polarization, era, era_type, flagged_range_dicts):
 	total_data_hrs = flagged_data_hrs = 0
 
-	all_obs_ids_tuples = db_utils.get_query_results(database='eor', table='mwa_setting',
-										(('starttime', '>=', start), ('starttime', '<=', end),
-										('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
-										('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
-										sort_tuples=(('starttime', 'asc'),), output_vars=('starttime', 'stoptime'))
-
-	for obs in all_obs_ids_tuples:
-		obs_id = obs[0]
-		data_hrs = (obs[1] - obs_id) / 3600
+	all_obs_ids_tuples = db_utils.get_query_results(database='paperdata', table='observation',
+										field_tuples=(('time_start', '>=', start), ('time_end', '<=', end),
+										('polarization', None if polarization == 'any' else '==', polarization),
+										('era', None if era == 0 else '==', era),
+										('era_type', None if era_type == 'any' else '==', era_type)),
+										sort_tuples=(('time_start', 'asc'),), output_vars=('time_start', 'time_end'))
+	for times in all_obs_ids_tuples:
+		time_start = getattr(time, 'time_start')
+		time_end = getattr(time, 'time_end')
+		data_hrs = (time_start - time_end) / 3600
 		total_data_hrs += data_hrs
 		if is_obs_flagged(obs_id, flagged_range_dicts):
 			flagged_data_hrs += data_hrs
@@ -76,7 +78,8 @@ def save_new_set():
 		if len(name) == 0:
 			return jsonify(error=True, message='Name cannot be empty.')
 
-		if models.Set.query.filter(models.Set.name == name).count() > 0:
+		sets = db_utils.get_query_results(database='eorlive', table='set', field_tuples=(('name', '>=', name),))
+		if len(sets) > 0:
 			return jsonify(error=True, message='Name must be unique.')
 
 		flagged_range_dicts = []
@@ -94,14 +97,15 @@ def save_new_set():
 
 		start_gps = request_content['startObsId']
 		end_gps = request_content['endObsId']
-		low_or_high = request_content['lowOrHigh']
-		eor = request_content['eor']
+		polarization = request_content['polarization']
+		era = request_content['era']
+		era_type = request_content['era_type']
 
 		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(
-			start_gps, end_gps, low_or_high, eor, flagged_range_dicts)
+			start_gps, end_gps, polarization, era, era_type flagged_range_dicts)
 
 		insert_set_into_db(name, start_gps, end_gps, flagged_range_dicts,
-			low_or_high, eor, total_data_hrs, flagged_data_hrs)
+			polarization, era, era_type, total_data_hrs, flagged_data_hrs)
 
 		return jsonify()
 	else:
@@ -120,7 +124,8 @@ def upload_set():
 		if len(set_name) == 0:
 			return jsonify(error=True, message='Name cannot be empty.')
 
-		if models.Set.query.filter(models.Set.name == set_name).count() > 0:
+		sets = db_utils.get_query_results(database='eorlive', table='set', field_tuples=(('name', '>=', set_name),))
+		if len(sets) > 0:
 			return jsonify(error=True, message='Name must be unique.')
 
 		f = request.files['file']
@@ -142,16 +147,18 @@ def upload_set():
 		start_gps = good_obs_ids[0]
 		end_gps = good_obs_ids[len(good_obs_ids) - 1]
 
-		low_or_high = request.form['low_or_high']
-		eor = request.form['eor']
+		polarization = request.form['polarization']
+		era = request.form['era']
+		era_type = request.form['era_type']
 
-		all_obs_ids_tuples = db_utils.get_query_results(database='eor', table='mwa_setting',
-											(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-											('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
-											('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
-											sort_tuples=(('starttime', 'asc'),), output_vars=('starttime',))
+		all_obs_ids_tuples = db_utils.get_query_results(database='paperdata', table='observation',
+										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										('polarization', None if polarization == 'any' else '==', polarization),
+										('era', None if era == 0 else '==', era),
+										('era_type', None if era_type == 'any' else '==', era_type)),
+										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
 
-		all_obs_ids = [tup[0] for tup in all_obs_ids_tuples]
+		all_obs_ids = [getattr(obs, 'obsnum') for obs in all_obs_ids_tuples]
 
 		last_index = 0
 
@@ -161,9 +168,10 @@ def upload_set():
 			try:
 				next_index = all_obs_ids.index(good_obs_id)
 			except ValueError as e:
-				return jsonify(error=True, message=''.join('Obs ID ', str(good_obs_id),
-					''' not found in the set of observations corresponding
-						to Low/High: {low_high} and EOR: {eor}'''.format(low_high=low_or_high, eor=eor)))
+				return jsonify(error=True, message=''.join('''Obs ID {obsnum}
+						not found in the set of observations corresponding
+						to Polarization: {polarization}, ERA:{era}, and ERA_TYPE: {era_type}'''\
+						.format(obsnum=good_obs_id, polarization=polarization, era=era, era_type=era_type)))
 			if next_index > last_index:
 				bad_range_dict = {}
 				bad_range_dict['start_gps'] = all_obs_ids[last_index]
@@ -174,10 +182,10 @@ def upload_set():
 			last_index = next_index + 1
 
 		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(
-			start_gps, end_gps, low_or_high, eor, bad_ranges)
+			start_gps, end_gps, polarization, era, era_type, bad_ranges)
 
 		insert_set_into_db(set_name, start_gps, end_gps, bad_ranges,
-			low_or_high, eor, total_data_hrs, flagged_data_hrs)
+			polarization, era, era_type, total_data_hrs, flagged_data_hrs)
 
 		return 'OK'
 	else:
@@ -188,31 +196,31 @@ def download_set():
 	set_id = request.args['set_id']
 
 	the_set = db_utils.get_query_results(database='eorlive', table='set',
-													field_tuples=(('id', '==', set_id),),
-													sort_tuples=None, output_vars=None)[0]
+											field_tuples=(('id', '==', set_id),),)[0]
 
 	if the_set is not None:
 		flagged_subsets = db_utils.get_query_results(database='eorlive', table='flagged_subset',
-														field_tuples=(('set_id', '==', getattr(the_set, 'id')),),
-														sort_tuples=None, output_vars=None)
+														field_tuples=(('set_id', '==', getattr(the_set, 'id')),),)
 
-		low_or_high = the_set.low_or_high
-		eor = the_set.eor
+		polarization = getattr(the_set, 'polarization')
+		era = getattr(the_set, 'era')
+		era_type = getattr(the_set, 'era_type')
 
-		all_obs_id_tuples = db_utils.get_query_results(database='eor', table='mwa_setting',
-											(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
-											('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
-											('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
-											sort_tuples=(('starttime', 'asc'),), output_vars=('starttime',))
+		all_obs_ids_tuples = db_utils.get_query_results(database='paperdata', table='observation',
+										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										('polarization', None if polarization == 'any' else '==', polarization),
+										('era', None if era == 0 else '==', era),
+										('era_type', None if era_type == 'any' else '==', era_type)),
+										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
 
-		all_obs_ids = [tup[0] for tup in all_obs_ids_tuples]
+		all_obs_ids = [getattr(obs, 'obsnum') for obs in all_obs_ids_tuples]
 
 		good_obs_ids_text_file = ''
 
 		for obs_id in all_obs_ids:
 			good = True # assume obs_id is good
 			for flagged_subset in flagged_subsets:
-				if obs_id >= flagged_subset.start and obs_id <= flagged_subset.end: # obs_id is flagged, so it's not good
+				if obs_id >= getattr(flagged_subset, 'start') and obs_id <= getattr(flagged_subset, 'end'): # obs_id is flagged, so it's not good
 					good = False
 					break
 			if good:
@@ -227,9 +235,7 @@ def download_set():
 
 @app.route('/get_filters')
 def get_filters():
-	users = db_utils.get_query_results(database='eorlive', table='user',
-													field_tuples=None sort_tuples=None, output_vars=None)
-
+	users = db_utils.get_query_results(database='eorlive', table='user')
 	return render_template('filters.html', users=users)
 
 @app.route('/get_sets', methods = ['POST'])
@@ -238,8 +244,9 @@ def get_sets():
 		request_content = request.get_json()
 		set_controls = request_content['set_controls']
 		username = set_controls['user']
-		eor = set_controls['eor']
-		high_low = set_controls['high_low']
+		polarization = set_controls['polarization']
+		era = set_controls['era']
+		era_type = set_controls['era_type']
 		sort = set_controls['sort']
 		ranged = set_controls['ranged']
 
@@ -250,8 +257,10 @@ def get_sets():
 			end_datetime = datetime.strptime(end_utc, '%Y-%m-%dT%H:%M:%SZ')
 			start_gps, end_gps = db_utils.get_gps_from_datetime(start_datetime, end_datetime)
 
-		field_tuples = (('username', '==' if username else None, username), ('eor', '==' if eor else None, eor),
-							('low_or_high', '==' if high_low else None, high_low),
+		field_tuples = (('username', '==' if username else None, username),
+							('polarization', '==' if polarization else None, polarization),
+							('era', '==' if era else None, era),
+							('era_type', '==' if era_type else None, era_type),
 							('start', '>=' if ranged else None, start_gps),
 							('end', '>=' if ranged else None, end_gps))
 	
@@ -263,12 +272,11 @@ def get_sets():
 				sort_tuples = (('created_on', 'desc'),)
 
 		setList = db_utils.get_query_results(database='eorlive', table='set',
-														field_tuples=field_tuples, sort_tuples=sort_tuples, output_vars=None)
+											field_tuples=field_tuples, sort_tuples=sort_tuples)
 
 		include_delete_buttons = request_content['includeDeleteButtons']
 
-		return render_template('setList.html', sets=setList,
-			include_delete_buttons=include_delete_buttons)
+		return render_template('setList.html', sets=setList, include_delete_buttons=include_delete_buttons)
 	else:
 		return render_template('setList.html', logged_out=True)
 
@@ -277,9 +285,7 @@ def delete_set():
 	if (g.user is not None and g.user.is_authenticated()):
 		set_id = request.form['set_id']
 
-		theSet = db_utils.get_query_results(database='eorlive', table='set',
-														field_tuples=(('id', '==', set_id),),
-														sort_tuples=None, output_vars=None)[0]
+		theSet = db_utils.get_query_results(database='eorlive', table='set', field_tuples=(('id', '==', set_id),),)[0]
 
 		db.session.delete(theSet)
 		db.session.commit()
