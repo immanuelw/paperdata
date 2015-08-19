@@ -7,7 +7,7 @@ import re
 
 @lm.user_loader
 def load_user(id):
-	user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+	user = db_utils.get_query_results(database='eorlive', table='user',
 										field_tuples=(('username', '==', id),), sort_tuples=None, output_vars=None)[0]
 	return user
 
@@ -20,7 +20,7 @@ def login():
 		username = request.form['username'].strip()
 		password = request.form['password'].strip()
 
-		u = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+		u = db_utils.get_query_results(database='eorlive', table='user',
 											field_tuples=(('username', '==', username),), sort_tuples=None, output_vars=None)[0]
 
 		password = password.encode('UTF-8')
@@ -47,7 +47,7 @@ def signup():
 		fname = request.form['fname'].strip()
 		lname = request.form['lname'].strip()
 
-		testU = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+		testU = db_utils.get_query_results(database='eorlive', table='user',
 											field_tuples=(('username', '==', username),), sort_tuples=None, output_vars=None)[0]
 
 		if password != password2:
@@ -67,7 +67,7 @@ def signup():
 			db.session.refresh(new_user)
 			db.session.commit()
 
-			u = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+			u = db_utils.get_query_results(database='eorlive', table='user',
 												field_tuples=(('username', '==', username),), sort_tuples=None, output_vars=None)[0]
 
 			login_user(u)
@@ -92,7 +92,7 @@ def delete_user():
 		for aSet in setList:
 			field_tuples = field_tuple_base + (('id', '==', getattr(aSet, 'id')),)
 
-			theSet = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+			theSet = db_utils.get_query_results(database='eorlive', table='set',
 												field_tuples=field_tuples, sort_tuples=None, output_vars=None)[0]
 
 			if action == 'transfer':
@@ -102,7 +102,7 @@ def delete_user():
 				db.session.delete(theSet)
 			db.session.commit()
 
-		u = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+		u = db_utils.get_query_results(database='eorlive', table='user',
 											field_tuples=(('username', '==', username),), sort_tuples=None, output_vars=None)[0]
 
 		db.session.delete(u)

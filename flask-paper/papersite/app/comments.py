@@ -5,11 +5,11 @@ from datetime import datetime
 
 @app.route('/get_all_comments')
 def get_all_comments():
-	threads = db_utils.get_query_result(data_source=None, database='eorlive', table='thread', field_tuples=None,
+	threads = db_utils.get_query_result(database='eorlive', table='thread', field_tuples=None,
 										sort_tuples=(('last_updated', 'desc'),), output_vars=None)
 
 	for thread in threads:
-		setattr(thread, 'comments', db_utils.get_query_result(data_source=None, database='eorlive', table='comment',
+		setattr(thread, 'comments', db_utils.get_query_result(database='eorlive', table='comment',
 																field_tuples=(('thread_id', '==', getattr(thread, 'id')),),
 																sort_tuples=None, output_vars=None))
 
@@ -28,7 +28,7 @@ def thread_reply():
 
 		db.session.add(new_comment)
 
-		thread = db_utils.get_query_result(data_source=None, database='eorlive', table='thread',
+		thread = db_utils.get_query_result(database='eorlive', table='thread',
 											field_tuples=(('id', '==', thread_id),),
 											sort_tuples=None, output_vars=None)
 		setattr(thread, 'last_updated', datetime.utcnow())

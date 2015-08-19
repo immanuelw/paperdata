@@ -18,7 +18,7 @@ def index(setName = None):
 		active_data_sources = g.user.active_data_sources
 
 	if setName is not None:
-		the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		the_set = db_utils.get_query_results(database='eorlive', table='set',
 														field_tuples=(('name', '==', setName),),
 														sort_tuples=None, output_vars=None)[0]
 
@@ -51,7 +51,7 @@ def get_graph():
 	if data_source_str is None:
 		return make_response('No data source', 500)
 
-	data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+	data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
 													field_tuples=(('name', '==', data_source_str),),
 													sort_tuples=None, output_vars=None)[0]
 
@@ -85,7 +85,7 @@ def get_graph():
 				end_time_str_short=end_datetime.strftime('%Y-%m-%d %H:%M'),
 				width_slider=data_source.width_slider)
 	else:
-		the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		the_set = db_utils.get_query_results(database='eorlive', table='set',
 														field_tuples=(('name', '==', set_str),),
 														sort_tuples=None, output_vars=None)[0]
 
@@ -125,7 +125,7 @@ def get_graph():
 
 @app.route('/data_amount', methods = ['GET'])
 def data_amount():
-	data = db_utils.get_query_results(data_source=None, database='eorlive', table='data_amount',
+	data = db_utils.get_query_results(database='eorlive', table='data_amount',
 										field_tuples=None,
 										sort_tuples=(('created_on', 'desc'),), output_vars=None)[0]
 
@@ -144,7 +144,7 @@ def data_amount():
 
 @app.route('/source_table', methods = ['GET'])
 def source_table():
-	data = db_utils.get_query_results(data_source=None, database='paperdata', table='rtp_file',
+	data = db_utils.get_query_results(database='paperdata', table='rtp_file',
 										field_tuples=None,
 										sort_tuples=(('timestamp', 'desc'),), output_vars=None)
 
@@ -169,12 +169,12 @@ def error_table():
 
 	start_gps, end_gps = db_utils.get_gps_from_datetime(starttime, endtime)
 
-	obscontroller_response = db_utils.get_query_results(data_source=None, database='eor', table='obscontroller_log',
+	obscontroller_response = db_utils.get_query_results(database='eor', table='obscontroller_log',
 														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
 														sort_tuples=(('reference_time', 'asc'),),
 														output_vars=('reference_time', 'observation_number', 'comment'))
 
-	recvstatuspolice_response = db_utils.get_query_results(data_source=None, database='eor', table='recvstatuspolice_log',
+	recvstatuspolice_response = db_utils.get_query_results(database='eor', table='recvstatuspolice_log',
 														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
 														sort_tuples=(('reference_time', 'asc'),),
 														output_vars=('reference_time', 'observation_number', 'comment'))
@@ -209,10 +209,10 @@ def teardown_request(exception):
 @app.route('/profile')
 def profile():
 	if (g.user is not None and g.user.is_authenticated()):
-		user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+		user = db_utils.get_query_results(database='eorlive', table='user',
 											field_tuples=(('username', '==', g.user.username),), sort_tuples=None, output_vars=None)[0]
 
-		setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		setList = db_utils.get_query_results(database='eorlive', table='set',
 														field_tuples=(('username', '==', g.user.username),),
 														sort_tuples=None, output_vars=None)[0]
 
@@ -223,13 +223,13 @@ def profile():
 @app.route('/user_page')
 def user_page():
 	if (g.user is not None and g.user.is_authenticated()):
-		user = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+		user = db_utils.get_query_results(database='eorlive', table='user',
 											field_tuples=(('username', '==', g.user.username),), sort_tuples=None, output_vars=None)[0]
 
-		userList = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+		userList = db_utils.get_query_results(database='eorlive', table='user',
 											field_tuples=None, sort_tuples=None, output_vars=None)[0]
 
-		setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		setList = db_utils.get_query_results(database='eorlive', table='set',
 														field_tuples=None, sort_tuples=None, output_vars=None)[0]
 
 		return render_template('user_page.html', theUser=user, userList=userList, setList=setList)
@@ -247,7 +247,7 @@ def data_summary_table():
 
 	start_gps, end_gps = db_utils.get_gps_from_datetime(startdatetime, enddatetime)
 
-	response = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+	response = db_utils.get_query_results(database='eor', table='mwa_setting',
 										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
 										sort_tuples=(('starttime', 'asc'),),
 										output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center'))

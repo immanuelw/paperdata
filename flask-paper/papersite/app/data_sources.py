@@ -45,7 +45,7 @@ def get_users_data_sources():
 @app.route('/get_unsubscribed_data_sources')
 def get_unsubscribed_data_sources():
 	if g.user is not None and g.user.is_authenticated():
-		all_data_sources = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+		all_data_sources = db_utils.get_query_results(database='eorlive', table='graph_data_source',
 														field_tuples=None, sort_tuples=None, output_vars=None)
 
 		subscribed_data_sources = g.user.subscribed_data_sources
@@ -64,7 +64,7 @@ def update_active_data_sources():
 		request_content = request.get_json()
 		new_active_data_sources_names = request_content['activeDataSources']
 
-		new_active_data_sources = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+		new_active_data_sources = db_utils.get_query_results(database='eorlive', table='graph_data_source',
 														field_tuples=(('name', 'in', new_active_data_sources_names),),
 														sort_tuples=None, output_vars=None)
 
@@ -91,7 +91,7 @@ def subscribe_to_data_source():
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
-		data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+		data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
 														field_tuples=(('name', '==', data_source_name),),
 														sort_tuples=None, output_vars=None)[0]
 
@@ -107,7 +107,7 @@ def unsubscribe_from_data_source():
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
-		data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+		data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
 														field_tuples=(('name', '==', data_source_name),),
 														sort_tuples=None, output_vars=None)[0]
 
@@ -125,7 +125,7 @@ def unsubscribe_from_data_source():
 
 @app.route('/get_graph_types')
 def get_graph_types():
-	graph_types = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_type',
+	graph_types = db_utils.get_query_results(database='eorlive', table='graph_type',
 													field_tuples=(('name', '!=', 'Obs_Err'),),
 													sort_tuples=None, output_vars=None)
 
@@ -164,7 +164,7 @@ def create_data_source():
 				letters, _, or spaces.''')
 
 		#Is the data source name unique?
-		data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+		data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
 														field_tuples=(('name', '==', data_source_name),),
 														sort_tuples=None, output_vars=None)[0]
 		if data_source is not None:
@@ -213,7 +213,7 @@ def create_data_source():
 		return make_response('You must be logged in to use this feature.', 401)
 
 def get_graph_data(data_source_str, start_gps, end_gps, the_set):
-	data_source = db_utils.get_query_results(data_source=None, database='eorlive', table='graph_data_source',
+	data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
 													field_tuples=(('name', '==', data_source_str),),
 													sort_tuples=None, output_vars=None)[0]
 

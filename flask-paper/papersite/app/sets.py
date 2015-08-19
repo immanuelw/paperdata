@@ -46,7 +46,7 @@ def is_obs_flagged(obs_id, flagged_range_dicts):
 def get_data_hours_in_set(start, end, low_or_high, eor, flagged_range_dicts):
 	total_data_hrs = flagged_data_hrs = 0
 
-	all_obs_ids_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+	all_obs_ids_tuples = db_utils.get_query_results(database='eor', table='mwa_setting',
 										(('starttime', '>=', start), ('starttime', '<=', end),
 										('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 										('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
@@ -145,7 +145,7 @@ def upload_set():
 		low_or_high = request.form['low_or_high']
 		eor = request.form['eor']
 
-		all_obs_ids_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+		all_obs_ids_tuples = db_utils.get_query_results(database='eor', table='mwa_setting',
 											(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
 											('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 											('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
@@ -187,19 +187,19 @@ def upload_set():
 def download_set():
 	set_id = request.args['set_id']
 
-	the_set = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+	the_set = db_utils.get_query_results(database='eorlive', table='set',
 													field_tuples=(('id', '==', set_id),),
 													sort_tuples=None, output_vars=None)[0]
 
 	if the_set is not None:
-		flagged_subsets = db_utils.get_query_results(data_source=None, database='eorlive', table='flagged_subset',
+		flagged_subsets = db_utils.get_query_results(database='eorlive', table='flagged_subset',
 														field_tuples=(('set_id', '==', getattr(the_set, 'id')),),
 														sort_tuples=None, output_vars=None)
 
 		low_or_high = the_set.low_or_high
 		eor = the_set.eor
 
-		all_obs_id_tuples = db_utils.get_query_results(data_source=None, database='eor', table='mwa_setting',
+		all_obs_id_tuples = db_utils.get_query_results(database='eor', table='mwa_setting',
 											(('starttime', '>=', the_set.start), ('starttime', '<=', the_set.end),
 											('obsname', None if low_or_high == 'any' else 'like', ''.join(low_or_high, '%')),
 											('ra_phase_center', None if eor == 'any' else '==', 0 if eor == 'EOR0' else 60))
@@ -227,7 +227,7 @@ def download_set():
 
 @app.route('/get_filters')
 def get_filters():
-	users = db_utils.get_query_results(data_source=None, database='eorlive', table='user',
+	users = db_utils.get_query_results(database='eorlive', table='user',
 													field_tuples=None sort_tuples=None, output_vars=None)
 
 	return render_template('filters.html', users=users)
@@ -262,7 +262,7 @@ def get_sets():
 			elif sort == 'time':
 				sort_tuples = (('created_on', 'desc'),)
 
-		setList = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		setList = db_utils.get_query_results(database='eorlive', table='set',
 														field_tuples=field_tuples, sort_tuples=sort_tuples, output_vars=None)
 
 		include_delete_buttons = request_content['includeDeleteButtons']
@@ -277,7 +277,7 @@ def delete_set():
 	if (g.user is not None and g.user.is_authenticated()):
 		set_id = request.form['set_id']
 
-		theSet = db_utils.get_query_results(data_source=None, database='eorlive', table='set',
+		theSet = db_utils.get_query_results(database='eorlive', table='set',
 														field_tuples=(('id', '==', set_id),),
 														sort_tuples=None, output_vars=None)[0]
 
