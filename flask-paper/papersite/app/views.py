@@ -8,6 +8,17 @@ import paperdata_dbi as pdbi
 import pyganglia as pyg
 import time
 
+def time_val(value):
+	#determines how much time to divide by
+	time_val = 1 if value < 500 else 60 if value < 3600 else 3600 if value < 86400 else 86400
+	return value / time_val
+
+def str_val(value):
+	#determines which time segment to use
+	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
+	str_val = ' '.join(str_val, 'ago')
+	return str_val
+
 @app.route('/')
 @app.route('/index')
 @app.route('/index/set/<setName>')
@@ -175,14 +186,9 @@ def source_table():
 			source_dict[time_str] = int(time.time() - getattr(source_source[0], 'timestamp'))
 
 			#limiting if seconds or minutes or hours shows up on last report
-			source_time_val = 1 if source_dict[time_str] < 500 else 60 if source_dict[time_str] < 3600\
-								else 3600 if source_dict[time_str] < 86400 else 86400
+			source_dict[segment_str] = str_val(source_dict[time_str])
 
-			source_dict[segment_str] = 'seconds' if source_dict[time_str] < 500 else 'minutes' if source_dict[time_str] < 3600\
-											else 'hours' if source_dict[time_str] < 86400 else 'days'
-			source_dict[segment_str] = ' 'join(source_dict[segment_str], 'ago')
-
-			source_dict[time_str] /= source_time_val
+			source_dict[time_str] = time_val(source_dict[time_str])
 
 			source_dict[day_str] = getattr(source[0], 'julian_day')
 
@@ -215,14 +221,10 @@ def filesystem():
 		space_str = '{host}_space'.format(host=host)
 
 		system_dict[time_str] = int(time.time() - timestamp)
-		system_time_val = 1 if system_dict[time_str] < 500 else 60 if system_dict[time_str] < 3600\
-								else 3600 if system_dict[time_str] < 86400 else 86400
 
-		system_dict[segment_str] = 'seconds' if system_dict[time_str] < 500 else 'minutes' if system_dict[time_str] < 3600\
-											else 'hours' if system_dict[time_str] < 86400 else 'days'
-		system_dict[segment_str] = ' 'join(system_dict[segment_str], 'ago')
+		system_dict[segment_str] = str_val(system_dict[time_str])
 
-		system_dict[time_str] /= system_time_val
+		system_dict[time_str] = time_val(system_dict[time_str])
 
 		system_dict[space_str] = percent_usage
 
