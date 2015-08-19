@@ -8,6 +8,7 @@ from datetime import datetime
 from app import models
 from app.flask_app import db
 from app import db_utils
+import time
 
 profiling_mark = None
 
@@ -92,43 +93,34 @@ def update():
 		else:
 			not_weird += 1
 
-		total_data_hours += (float(num_paperdata_files) /
-							 float(num_obsnum_files)) * length / 3600.
+		total_data_hours += (float(num_paperdata_files) / float(num_sadb_files)) * length / 3600.0
 
 	print('match = {match} no_match = {no_match}'.format(match=match, no_match=no_match))
 	print('weird = {weird} not_weird = {not_weird}'.format(weird=weird, not_weird=not_weird))
 
 	write_to_log('The giant iteration ran in {profile_time} seconds'.format(profile_time=profile()))
 
-	# UVFITS hours
-	total_uvfits_hours = float (send_mwa_query('''
-						SELECT COUNT(*) FROM uvfits_location WHERE version = 4 AND subversion = 1
-						''').fetchone()[0]) * 112. / 3600.
+	#amount of hours back to check
+	time_span = 4
+	time_secs = time_span * 3600.0
 
-	
-	log_query_time('total_uvfits_hours')
-
-	# Data transfer rate
-	data_transfer_rate = send_ngas_query('''
-					select sum(uncompressed_file_size) / date_part('epoch', to_timestamp('%(now)s','YYYY-MM-DD'T'HH24:MI:SS.MS') -
-						to_timestamp(min(ingestion_date), 'YYYY-MM-DD'T'HH24:MI:SS.MS')) / (1024^2) as 'data_transfer_rate'
-					from ngas_files
-					where ingestion_date between to_char(to_timestamp('%(now)s','YYYY-MM-DD'T'HH24:MI:SS.MS') -
-						interval '24 hours','YYYY-MM-DD'T'HH24:MI:SS.MS') and '%(now)s';
-					''' % {'now': datetime.now().strftime('%Y-%m-%dT%H:%M:%S.000')}).fetchone()[0] or 0
-	data_transfer_rate = float(data_transfer_rate)
+	#data transfer rate XXXX need to add table or check fields to generate
+	#total filesize from rtp_files that have been transferred in the past 4 hours / 4 hours
+	data_transfer_total = sum(db_utils.get_query_results(data_source=None, database='paperdata', table='rtp_file',
+													field_tuples=(('timestamp', '>=', time.time() - time_secs), ('transferred', '==', True)),
+													field_sort_tuple=None, output_vars=('filesize',)))
+	#in MB per second
+	data_transfer_rate = data_transfer_total / time_secs
 
 	log_query_time('data_transfer_rate')
 
 	write_to_log('\nTotal Scheduled Hours = {time}'.format(time=round(total_sadb_hours), 6))
 	write_to_log('Total Observed Hours = {time}'.format(time=round(total_paperdata_hours), 6))
 	write_to_log('Total Hours that have data = {time}'.format(time=round(total_data_hours), 6))
-	write_to_log('Total Hours that have uvfits data = {time}'.format(time=round(total_uvfits_hours), 6))
 	write_to_log('Data transfer rate = {time}'.format(time=round(data_transfer_rate), 6))
 
 	graph_datum = getattr(models, 'Data_Amount')(hours_scheduled=total_sadb_hours, hours_observed=total_paperdata_hours,
-												hours_with_data=total_data_hours, hours_with_uvfits=total_uvfits_hours,
-												data_transfer_rate=data_transfer_rate)
+												hours_with_data=total_data_hours, data_transfer_rate=data_transfer_rate)
 
 	db.session.add(graph_datum)
 	db.session.commit()
