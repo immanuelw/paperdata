@@ -48,7 +48,7 @@ class Filesystem(Base):
 	total_space = Column(BigInteger)
 	used_space = Column(BigInteger)
 	free_space = Column(BigInteger)
-	percent_space = Numeric(4,1)
+	percent_space = Column(Numeric(4,1))
 	timestamp = Column(BigInteger) #seconds since 1970
 
 	def to_json(self):
