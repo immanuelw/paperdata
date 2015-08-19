@@ -6,8 +6,9 @@
 					<th>Name</th>
 					<th>Creator</th>
 					<th>Data hrs</th>
-					<th>Hi/Lo</th>
-					<th>EOR</th>
+					<th>Polarization</th>
+					<th>Era</th>
+					<th>Era Type</th>
 				</tr>
 			</thead>
 			<tbody>
@@ -23,18 +24,13 @@
 						{{ set.total_data_hrs | round(1) }}
 					</td>
 					<td>
-						{% if set.low_or_high == 'any' %}
-							h/l
-						{% else %}
-							{{ set.low_or_high[0] }}
-						{% endif %}
+						{{ set.polarization }}
 					</td>
 					<td>
-						{% if set.eor == 'any' %}
-							0/1
-						{% else %}
-							{{ set.eor[3] }}
-						{% endif %}
+						{{ set.era }}
+					</td>
+					<td>
+						{{ set.era_type }}
 					</td>
 					{% if include_delete_buttons %}
 					<td>
