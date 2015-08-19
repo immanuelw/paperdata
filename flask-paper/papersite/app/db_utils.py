@@ -70,7 +70,7 @@ def sort_clause(table, sort_tuples):
 
 def group_clause(table, group_tuples):
 	#grab the group clause of the query
-	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in field_group_tuples]
+	clause_list = [getattr(table, field_name) for field_name, field_order in field_group_tuples]
 	return clause_list
 
 def get_results(s, table, field_tuples, sort_tuples, output_vars):
@@ -82,8 +82,10 @@ def get_results(s, table, field_tuples, sort_tuples, output_vars):
 	if sort_tuples is not None:
 		results = results.order_by(*sort_clause(sort_tuples))
 	if group_tuples is not None:
-		results = results.group_by(
-.all()
+		results = results.group_by(*group_clause(group_tuples))
+
+	results = results.all()
+
 	if output_vars is not None:
 		results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results))
 	return results
