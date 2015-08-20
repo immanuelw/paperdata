@@ -190,15 +190,17 @@ function getDate(datestr) {
 
 var applyFiltersAndSort = function() {
 	var user = $('#user_setlist_dropdown').val();
-	var eor = $('#eor_setlist_dropdown').val();
-	var high_low = $('#high_low_setlist_dropdown').val();
+	var polarization = $('#polarization_setlist_dropdown').val();
+	var era = $('#era_setlist_dropdown').val();
+	var era_type = $('#era_type_setlist_dropdown').val();
 	var sort = $('#sort_setlist_dropdown').val();
 	var ranged = $('#range_filter').prop('checked');
 
 	var set_controls = {
 		'user': user,
-		'eor': eor,
-		'high_low': high_low,
+		'polarization': polarization,
+		'era': era,
+		'era_type': era_type,
 		'sort': sort,
 		'ranged': ranged
 	};
