@@ -213,19 +213,26 @@ var dataSetChanged = function() {
 	}
 };
 
-var setEorData = function(select) {
+var setPolarizationData = function(select) {
 	currentData[1] = select.value;
 
 	dataSetChanged();
 };
-dataSourceObj.setEorData = setEorData;
+dataSourceObj.setPolarizationData = setPolarizationData;
 
-var setLowOrHighData = function(select) {
-	currentData[0] = select.value;
+var setEraData = function(select) {
+	currentData[1] = select.value;
 
 	dataSetChanged();
 };
-dataSourceObj.setLowOrHighData = setLowOrHighData;
+dataSourceObj.setEraData = setEraData;
+
+var setEraTypeData = function(select) {
+	currentData[1] = select.value;
+
+	dataSetChanged();
+};
+dataSourceObj.setEraTypeData = setEraTypeData;
 
 var setClickDragMode = function(select) {
 	clickDragMode = select.value;
