@@ -35,20 +35,20 @@ def update():
 	profiling_mark = datetime.now()
 
 	#total hours in SADB
-	total_sadb_hours = sum(db_utils.get_query_results(data_source=None, database='sadb', table='observation',
-									field_tuples=(('length', '!=', None),), field_sort_tuple=None, output_vars=('length',))) / 3600.0
+	total_sadb_hours = sum(db_utils.get_query_results(database='sadb', table='observation',
+									field_tuples=(('length', '!=', None),), output_vars=('length',))) / 3600.0
 
 	log_query_time('total_sadb_hours')
 
 	#total hours in paperdata
-	total_paperdata_hours = sum(db_utils.get_query_results(data_source=None, database='paperdata', table='observation',
-									field_tuples=(('length', '!=', None),), field_sort_tuple=None, output_vars=('length',))) / 3600.0
+	total_paperdata_hours = sum(db_utils.get_query_results(database='paperdata', table='observation',
+									field_tuples=(('length', '!=', None),), output_vars=('length',))) / 3600.0
 
 
 	log_query_time('total_paperdata_hours')
 
 	#total that has data in observations
-	sadb_obs_rows = db_utils.get_query_results(data_source=None, database='sadb', table='observation',
+	sadb_obs_rows = db_utils.get_query_results(database='sadb', table='observation',
 												field_tuples=(('files', '!=', None),), field_sort_tuple=(('obsnum', 'asc'),),
 												output_vars=('length', 'obsnum', 'files'))
 
@@ -57,9 +57,8 @@ def update():
 
 	log_query_time('sadb_obs_rows')
 
-	paperdata_files_rows = db_utils.get_query_results(data_source=None, database='paperdata', table='file',
-												field_tuples=None, field_sort_tuple=(('obsnum', 'asc'),),
-												output_vars=('obsnum',))
+	paperdata_files_rows = db_utils.get_query_results(database='paperdata', table='file',
+												field_sort_tuple=(('obsnum', 'asc'),), output_vars=('obsnum',))
 
 	log_query_time('paperdata_files_rows')
 
@@ -106,9 +105,9 @@ def update():
 
 	#data transfer rate XXXX need to add table or check fields to generate
 	#total filesize from rtp_files that have been transferred in the past 4 hours / 4 hours
-	data_transfer_total = sum(db_utils.get_query_results(data_source=None, database='paperdata', table='rtp_file',
+	data_transfer_total = sum(db_utils.get_query_results(database='paperdata', table='rtp_file',
 													field_tuples=(('timestamp', '>=', time.time() - time_secs), ('transferred', '==', True)),
-													field_sort_tuple=None, output_vars=('filesize',)))
+													output_vars=('filesize',)))
 	#in MB per second
 	data_transfer_rate = data_transfer_total / time_secs
 
