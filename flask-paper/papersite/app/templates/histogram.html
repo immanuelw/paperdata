@@ -16,10 +16,8 @@ var obs_err = (function($) {
 	};
 	dataSourceObj.backToHistogram = backToHistogram;
 
-	var obs_counts = {{ obs_counts | tojson }};
 	var error_counts = {{ error_counts | tojson }};
 	var error_counts_copy = {{ error_counts | tojson }};
-	var utc_obs_map = {{ utc_obs_map | tojson}};
 
 	{% include 'js/obs_err_set_construction.js' %}
 
@@ -163,7 +161,8 @@ var obs_err = (function($) {
 			series: [{
 				type: 'column',
 				name: 'observations',
-				data: obs_counts[('all', 0, 'all')]
+				//supposed to be a default?
+				data: obs_counts['all'][0]['all']
 			},
 			{
 				type: 'column',
