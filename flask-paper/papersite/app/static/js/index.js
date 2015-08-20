@@ -36,7 +36,7 @@ $(function() {
 	window.dataAmountRequest = null;
 	window.dataSummaryTableRequest = null;
 
-	$('#data_amount_table').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+	$('#data_amount_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 	window.dataAmountRequest = $.ajax({
 		type: 'GET',
@@ -47,7 +47,18 @@ $(function() {
 		dataType: 'html'
 	});
 
-	$('#filesystem_table').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+	$('#source_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+
+	window.dataAmountRequest = $.ajax({
+		type: 'GET',
+		url: '/source',
+		success: function(data) {
+			$('#source_table').html(data);
+		},
+		dataType: 'html'
+	});
+
+	$('#filesystem_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 	window.dataAmountRequest = $.ajax({
 		type: 'GET',
