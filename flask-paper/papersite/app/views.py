@@ -164,7 +164,7 @@ def source_table():
 
 	source_tuples = (('Correlator', corr_source), ('RTP', rtp_source), ('Folio Scan', paper_source))
 	source_names = (source_name for source_name, _ in source_tuples)
-	source_dict = {source_name:{'time':'N/A', 'day':'N/A', 'time_segment':'N/A'} for source_name in source_names}
+	source_dict = {source_name: {'time': 'N/A', 'day': 'N/A', 'time_segment': 'N/A'} for source_name in source_names}
 
 	for source_name, source in source_tuples:
 		if source is not None:
@@ -184,7 +184,7 @@ def filesystem():
 										group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space'))
 
 	system_names = (getattr(system, 'host') for system in systems)
-	system_dict = {system_name:{'time':'N/A', 'space':100.0, 'time_segment':'N/A'} for system_name in system_names}
+	system_dict = {system_name: {'time': 'N/A', 'space': 100.0, 'time_segment': 'N/A'} for system_name in system_names}
 
 	for system in systems:
 		if system is not None:
@@ -284,7 +284,7 @@ def data_summary_table():
 
 	pol_strs = ('xx', 'xy', 'yx', 'yy')
 	era_strs = (32, 64, 128)
-	obs_map = {pol_str:{era_str: {'obs_count':0, 'obs_hours':0} for era_str in era_strs} for pol_str in pol_strs}
+	obs_map = {pol_str: {era_str: {'obs_count': 0, 'obs_hours': 0} for era_str in era_strs} for pol_str in pol_strs}
 
 	for obs in response:
 		polarization = getattr(obs, 'polarization')
