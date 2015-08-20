@@ -47,6 +47,17 @@ $(function() {
 		dataType: 'html'
 	});
 
+	$('#filesystem_table').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+
+	window.dataAmountRequest = $.ajax({
+		type: 'GET',
+		url: '/filesystem',
+		success: function(data) {
+			$('#filesystem_table').html(data);
+		},
+		dataType: 'html'
+	});
+
 	// Set up the tabs.
 	$('#tabs').tabs({
 		beforeLoad: function(event, ui) {
