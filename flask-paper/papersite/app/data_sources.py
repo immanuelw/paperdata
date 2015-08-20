@@ -211,7 +211,8 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 													field_tuples=(('name', '==', data_source_str),))[0]
 
 	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
-	data = {(pol_str, era_str, era_type_str):[] for pol_str in pol_strs for era_str in era_strs for era_type_str in era_type_strs}
+	data = {'{pol_str}-{era_str}-{era_type_str}'.format(pol_str=pol_str, era_str=era_str, era_type_str=era_type_str):[]
+														for pol_str in pol_strs	for era_str in era_strs for era_type_str in era_type_strs}
 
 	if the_set is not None:
 		polarization = getattr(the_set, 'polarization')
@@ -224,8 +225,9 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 										('era_type', None if era_type == 'any' else '==', era_type)),
 										sort_tuples=(('time_start', 'asc'),), output_vars=('time_start', 'obsnum'))
 
+		pol_era = '{polarization}-{era}-{era_type}'.format(polarization=polarization, era=era, era_type=era_type)
 		for obs in results:
-			data[(polarization, era, era_type)].append((getattr(obs, 'time_start'), getattr(obs, 'obsnum')))
+			data[pol_era].append((getattr(obs, 'time_start'), getattr(obs, 'obsnum')))
 
 	else: #No set, so we need to separate the data into sets for low/high and EOR0/EOR1
 		data = separate_data_into_sets(data, data_source, start_gps, end_gps)
@@ -237,7 +239,7 @@ def which_data_set(the_set):
 	era =  getattr(the_set, 'era')
 	era_type = getattr(the_set, 'era_type')
 
-	which_data = (polarization, era, era_type)
+	which_data = '{polarization}-{era}-{era_type}'.format(polarization=polarization, era=era, era_type=era_type)
 	return which_data
 
 def separate_data_into_sets(data, data_source, start_gps, end_gps):
@@ -255,23 +257,7 @@ def separate_data_into_sets(data, data_source, start_gps, end_gps):
 		era_type = getattr(obs, 'era_type')
 		obsnum = getattr(obs, 'obsnum')
 
-		data[(polarization, era, era_type)].append((obs_time, obsnum))
+		pol_era = '{polarization}-{era}-{era_type}'.format(polarization=polarization, era=era, era_type=era_type)
+		data[pol_era].append((obs_time, obsnum))
 
 	return data
-
-def join_with_obsids_from_set(data_source_results, the_set, data_source):
-	polarization = getattr(the_set, 'polarization')
-	era = getattr(the_set, 'era')
-	era_type = getattr(the_set, 'era_type')
-	all_obs_ids_tuples = db_utils.get_query_results(data_source=data_source,
-										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
-										('polarization', None if polarization == 'any' else '==', polarization),
-										('era', None if era == 0 else '==', era),
-										('era_type', None if era_type == 'any' else '==', era_type)),
-										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
-
-	all_obs_ids = [getattr(obs, 'obsnum') for obs in all_obs_ids_tuples]
-
-	filtered_results = [obs_tuple for obs_tuple in data_source_results if obs_tuple[0] in all_obs_ids]
-
-	return filtered_results

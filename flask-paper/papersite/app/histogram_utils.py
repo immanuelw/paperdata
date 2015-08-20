@@ -86,8 +86,10 @@ def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 										output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum'))
 
 	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
-	utc_obs_map = {(pol_str, era_str, era_type_str):[] for pol_str in pol_strs for era_str in era_strs for era_type_str in era_type_strs}
-	obs_counts = {(pol_str, era_str, era_type_str):[] for pol_str in pol_strs for era_str in era_strs for era_type_str in era_type_strs}
+	obs_counts = {'{pol_str}-{era_str}-{era_type_str}'.format(pol_str=pol_str, era_str=era_str, era_type_str=era_type_str):[]
+														for pol_str in pol_strs	for era_str in era_strs for era_type_str in era_type_strs}
+	utc_obs_map = {'{pol_str}-{era_str}-{era_type_str}'.format(pol_str=pol_str, era_str=era_str, era_type_str=era_type_str):[]
+														for pol_str in pol_strs	for era_str in era_strs for era_type_str in era_type_strs}
 
 	error_counts, error_count = get_error_counts(start_gps, end_gps)
 
@@ -100,8 +102,10 @@ def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 		era_type = getattr(observation, 'era_type')
 		obsnum = getattr(observation, 'obsnum')
 
-		obs_counts[(polarization, era, era_type)].append((obs_time, 1))
-		utc_obs_map[(polarization, era, era_type)].append((obs_time, obsnum))
+		pol_era = '{polarization}-{era}-{era_type}'.format(polarization=polarization, era=era, era_type=era_type)
+
+		obs_counts[pol_era].append((obs_time, 1))
+		utc_obs_map[pol_era].append((obs_time, obsnum))
 
 	return render_template('histogram.html', error_counts=error_counts,
 							low_eor0_counts=low_eor0_counts, high_eor0_counts=high_eor0_counts,
