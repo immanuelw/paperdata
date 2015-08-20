@@ -83,29 +83,27 @@ def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 	response = db_utils.get_query_results(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										sort_tuples=(('time_start', 'asc'),),
-										output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum'))
+										output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum')))
 
 	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
-	obs_counts = {'{pol_str}-{era_str}-{era_type_str}'.format(pol_str=pol_str, era_str=era_str, era_type_str=era_type_str):[]
-														for pol_str in pol_strs	for era_str in era_strs for era_type_str in era_type_strs}
-	utc_obs_map = {'{pol_str}-{era_str}-{era_type_str}'.format(pol_str=pol_str, era_str=era_str, era_type_str=era_type_str):[]
+	obs_map = {'{pol_str}-{era_str}-{era_type_str}'.format(pol_str=pol_str, era_str=era_str, era_type_str=era_type_str):[]
 														for pol_str in pol_strs	for era_str in era_strs for era_type_str in era_type_strs}
 
-	error_counts, error_count = get_error_counts(start_gps, end_gps)
-
-	for observation in response:
-		# Actual UTC time of the observation (for the graph)
-		obs_time = getattr(observation, 'time_start')
-
-		polarization = getattr(observation, 'polarization')
-		era = getattr(observation, 'era')
-		era_type = getattr(observation, 'era_type')
-		obsnum = getattr(observation, 'obsnum')
+	for obs in response:
+		polarization = getattr(obs, 'polarization')
+		era = getattr(obs, 'era')
+		era_type = getattr(obs, 'era_type')
 
 		pol_era = '{polarization}-{era}-{era_type}'.format(polarization=polarization, era=era, era_type=era_type)
 
-		obs_counts[pol_era].append((obs_time, 1))
-		utc_obs_map[pol_era].append((obs_time, obsnum))
+		# Actual UTC time of the obs (for the graph)
+		obs_time = getattr(obs, 'time_start')
+		obsnum = getattr(obs, 'obsnum')
+
+		obs_dict = {'obs_time':obs_time, 'obsnum':obsnum, 'obs_count':1}
+		obs_map[pol_era].append(obs_dict)
+
+	error_counts, error_count = get_error_counts(start_gps, end_gps)
 
 	return render_template('histogram.html', error_counts=error_counts,
 							low_eor0_counts=low_eor0_counts, high_eor0_counts=high_eor0_counts,

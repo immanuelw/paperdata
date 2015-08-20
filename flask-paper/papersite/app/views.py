@@ -302,40 +302,30 @@ def data_summary_table():
 
 	start_gps, end_gps = db_utils.get_gps_from_datetime(startdatetime, enddatetime)
 
-	response = db_utils.get_query_results(database='eor', table='mwa_setting',
-										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-										sort_tuples=(('starttime', 'asc'),),
-										output_vars=('starttime', 'stoptime', 'obsname', 'ra_phase_center'))
+	response = db_utils.get_query_results(database='paperdata', table='observation',
+										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										sort_tuples=(('time_start', 'asc'),),
+										output_vars=('time_start', 'time_end', 'polarization', 'era', 'era_type')))
 
-	low_eor0_count = low_eor1_count = high_eor0_count = high_eor1_count = 0
-	low_eor0_hours = low_eor1_hours = high_eor0_hours = high_eor1_hours = 0
+	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
+	obs_map = {'{pol_str}-{era_str}-{era_type_str}'\
+				.format(pol_str=pol_str, era_str=era_str, era_type_str=era_type_str):{'obs_count':0, 'obs_hours':0}
+				for pol_str in pol_strs	for era_str in era_strs for era_type_str in era_type_strs}
 
-	for observation in response:
-		start_time = observation[0]
-		stop_time = observation[1]
-		obs_name = observation[2]
+	for obs in response:
+		polarization = getattr(obs, 'polarization')
+		era = getattr(obs, 'era')
+		era_type = getattr(obs, 'era_type')
 
-		try:
-			ra_phase_center = int(observation[3])
-		except TypeError as te:
-			ra_phase_center = -1
+		pol_era = '{polarization}-{era}-{era_type}'.format(polarization=polarization, era=era, era_type=era_type)
 
-		data_hours = (stop_time - start_time) / 3600
+		# Actual UTC time of the obs (for the graph)
+		obs_start = getattr(obs, 'time_start')
+		obs_end = getattr(obs, 'time_end')
 
-		if 'low' in obs_name:
-			if ra_phase_center == 0:
-				low_eor0_count += 1
-				low_eor0_hours += data_hours
-			elif ra_phase_center == 60:
-				low_eor1_count += 1
-				low_eor1_hours += data_hours
-		elif 'high' in obs_name:
-			if ra_phase_center == 0:
-				high_eor0_count += 1
-				high_eor0_hours += data_hours
-			elif ra_phase_center == 60:
-				high_eor1_count += 1
-				high_eor1_hours += data_hours
+		obs_dict = {'obs_time':obs_time, 'obsnum':obsnum, 'obs_count':1}
+		obs_map[pol_era]['obs_count'] += 1
+		obs_map[pol_era]['obs_hours'] += (obs_end - obs_start) / 3600.0
 
 	error_counts, error_count = histogram_utils.get_error_counts(start_gps, end_gps)
 
