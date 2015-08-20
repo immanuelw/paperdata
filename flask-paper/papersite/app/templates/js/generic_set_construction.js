@@ -1,13 +1,12 @@
 var _chart;
 var inConstructionMode = false;
 {% if is_set %}
-var flaggedRanges = {{ plot_bands | tojson }};
-var currentData = ['{{the_set.low_or_high}}', '{{the_set.eor}}'];
+var flaggedRanges = plot_bands;
+var currentData = {'polarization': '{{ the_set.polarization }}', 'era': '{{ the_set.era }}', 'era_type': '{{ the_set.era_type }}'};
 {% else %}
-var lowEOR0FlaggedRanges = [], highEOR0FlaggedRanges = [];
-var lowEOR1FlaggedRanges = [], highEOR1FlaggedRanges = [];
-var flaggedRanges = highEOR0FlaggedRanges;
-var currentData = ['high', 'EOR0'];
+var flaggedRangesDict = {pol_str: {era_str: {era_type: [] for (era_type_str of era_type_strs} for (era_str of era_strs)} for (pol_str of pol_strs)};
+var flaggedRanges = flaggedRangesDict['all'][0]['all'];
+var currentData = {'polarization':'all', 'era':0, 'era_type':'all'};
 {% endif %}
 var clickDragMode = 'zoom';
 var dataSourceObj = {};
@@ -51,22 +50,22 @@ var saveSet = function() {
 	setSaveButton('Working...', true);
 
 	var getFlaggedObsIdsMapIndices = function(start_millis, end_millis) {
-		var utc_obsid_map = getCurrentObsIdMap();
+		var obs_map = getCurrentObsIdMap();
 
 		var startIndex = 0; endIndex = 0;
 
-		for (var i = 0; i < utc_obsid_map.length; ++i) {
-			if (utc_obsid_map[i][0] >= start_millis) {
+		for (var i = 0; i < obs_map.length; ++i) {
+			if (obs_map[i]['obs_time'] >= start_millis) {
 				startIndex = i;
 				break;
 			}
 		}
 
-		for (var i = startIndex; i < utc_obsid_map.length; ++i) {
-			if (utc_obsid_map[i][0] > end_millis) {
+		for (var i = startIndex; i < obs_map.length; ++i) {
+			if (obs_map[i]['obs_time'] > end_millis) {
 				endIndex = i - 1;
 				break;
-			} else if (i === utc_obsid_map.length - 1) {
+			} else if (i === obs_map.length - 1) {
 				endIndex = i;
 				break;
 			}
@@ -97,11 +96,12 @@ var saveSet = function() {
 		url: '/save_new_set',
 		data: JSON.stringify({
 			name: $('#set_name_textbox_{{data_source_str_nospace}}').val(),
-			startObsId: currentObsIdMap[0][1],
-			endObsId: currentObsIdMap[currentObsIdMap.length - 1][1],
+			startObsId: currentObsIdMap[0]['obsnum'],
+			endObsId: currentObsIdMap[currentObsIdMap.length - 1]['obsnum'],
 			flaggedRanges: rangesOfFlaggedObsIds,
-			lowOrHigh: currentData[0],
-			eor: currentData[1]
+			polarization: currentData['polarization'],
+			era: currentData['era'],
+			era_type: currentData['era_type'],
 		}),
 		success: function(data) {
 			if (data.error) {
@@ -129,48 +129,28 @@ var saveSet = function() {
 dataSourceObj.saveSet = saveSet;
 
 var getCurrentFlaggedSet = function() {
-	if (currentData[0] === 'low' && currentData[1] === 'EOR0')
-		return lowEOR0FlaggedRanges;
-	else if (currentData[0] === 'low' && currentData[1] === 'EOR1')
-		return lowEOR1FlaggedRanges;
-	else if (currentData[0] === 'high' && currentData[1] === 'EOR0')
-		return highEOR0FlaggedRanges;
-	else if (currentData[0] === 'high' && currentData[1] === 'EOR1')
-		return highEOR1FlaggedRanges;
+	var polarization = currentData['polarization'];
+	var era = currentData['era'];
+	var era_type = currentData['era_type'];
+	return flaggedRangesDict[polarization][era][era_type];
 };
 
 var getCurrentObsIdMap = function() {
-	if (currentData[0] === 'low' && currentData[1] === 'EOR0')
-		return utc_obsid_map_l0;
-	else if (currentData[0] === 'low' && currentData[1] === 'EOR1')
-		return utc_obsid_map_l1;
-	else if (currentData[0] === 'high' && currentData[1] === 'EOR0')
-		return utc_obsid_map_h0;
-	else if (currentData[0] === 'high' && currentData[1] === 'EOR1')
-		return utc_obsid_map_h1;
-	else
-		return utc_obsid_map_any;
-};
-
-var getVariableSuffix = function() {
-	if (currentData[0] === 'low' && currentData[1] === 'EOR0') {
-		return '_l0';
-	} else if (currentData[0] === 'low' && currentData[1] === 'EOR1') {
-		return '_l1';
-	} else if (currentData[0] === 'high' && currentData[1] === 'EOR0') {
-		return '_h0';
-	} else if (currentData[0] === 'high' && currentData[1] === 'EOR1') {
-		return '_h1';
-	}
+	var polarization = currentData['polarization'];
+	var era = currentData['era'];
+	var era_type = currentData['era_type'];
+	return obs_map[polarization][era][era_type];
 };
 
 var updateAllDataSeriesWithHiddenData = function() {
-	var suffix = getVariableSuffix();
 	var remove = $('#remove_flagged_data_checkbox_{{data_source_str_nospace}}').is(':checked');
 	for (var seriesIndex = 0; seriesIndex < _chart.series.length - 1; ++seriesIndex) {
 		var thisSeries = _chart.series[seriesIndex];
 
-		var seriesData = graph_data[thisSeries.name + suffix + '_copy'];
+		var polarization = currentData['polarization'];
+		var era = currentData['era'];
+		var era_type = currentData['era_type'];
+		var seriesData = graph_data[polarization][era][era_type];
 		var seriesDataCopy = seriesData.map(function(arr) {
 			return arr.slice();
 		});
@@ -179,7 +159,7 @@ var updateAllDataSeriesWithHiddenData = function() {
 			for (var flaggedRangeIndex = 0; flaggedRangeIndex < flaggedRanges.length; ++flaggedRangeIndex) {
 				var thisRange = flaggedRanges[flaggedRangeIndex];
 				for (var dataIndex = thisRange.start_index; dataIndex <= thisRange.end_index; ++dataIndex) {
-					seriesDataCopy[dataIndex][1] = null;
+					seriesDataCopy[dataIndex]['obsnum'] = null;
 				}
 			}
 		}
@@ -214,21 +194,21 @@ var dataSetChanged = function() {
 };
 
 var setPolarizationData = function(select) {
-	currentData[1] = select.value;
+	currentData['polarization'] = select.value;
 
 	dataSetChanged();
 };
 dataSourceObj.setPolarizationData = setPolarizationData;
 
 var setEraData = function(select) {
-	currentData[1] = select.value;
+	currentData['era'] = select.value;
 
 	dataSetChanged();
 };
 dataSourceObj.setEraData = setEraData;
 
 var setEraTypeData = function(select) {
-	currentData[1] = select.value;
+	currentData['era_type'] = select.value;
 
 	dataSetChanged();
 };
@@ -241,10 +221,7 @@ dataSourceObj.setClickDragMode = setClickDragMode;
 
 var clearSetConstructionData = function() {
 	flaggedRanges = [];
-	lowEOR0FlaggedRanges = [];
-	highEOR0FlaggedRanges = [];
-	lowEOR1FlaggedRanges = [];
-	highEOR1FlaggedRanges = [];
+	flaggedRangesDict = {pol_str:{era_str: {era_type:[] for (era_type_str of era_type_strs} for (era_str of era_strs)} for (pol_str of pol_strs)};
 };
 
 var mergeOverlappingRanges = function() {
@@ -297,14 +274,14 @@ var getObsCountInRange = function(startTime, endTime) {
 	var startIndex = 0, endIndex = 0;
 
 	for (var i = 0; i < currentObsIdMap.length; ++i) {
-		if (currentObsIdMap[i][0] >= startTime) {
+		if (currentObsIdMap[i]['obs_time'] >= startTime) {
 			startIndex = i;
 			break;
 		}
 	}
 
 	for (var i = 0; i < currentObsIdMap.length; ++i) {
-		if (currentObsIdMap[i][0] > endTime) {
+		if (currentObsIdMap[i]['obs_time'] > endTime) {
 			endIndex = i - 1;
 			break;
 		} else if (i === currentObsIdMap.length - 1) { // At end of list but haven't found range end yet.
@@ -324,7 +301,7 @@ var getObsCountInRange = function(startTime, endTime) {
 
 var updateFlaggedRangeIdsAndLabels = function() {
 	for (var i = 0; i < flaggedRanges.length; ++i) {
-		flaggedRanges[i].id = (currentData[0] + currentData[1] + i).toString();
+		flaggedRanges[i].id = (currentData['obs_time'] + currentData['obsnum'] + i).toString();
 		flaggedRanges[i].label = { text: (i + 1).toString() };
 	}
 };
@@ -411,19 +388,21 @@ dataSourceObj.unflagRange = unflagRange;
 var reinsertDataForRange = function(index) {
 	if ($('#remove_flagged_data_checkbox_{{data_source_str_nospace}}').is(':checked')) {
 		var thisRange = flaggedRanges[index];
-		var suffix = getVariableSuffix();
 		for (var seriesIndex = 0; seriesIndex < _chart.series.length - 1; ++seriesIndex) {
 			var thisSeries = _chart.series[seriesIndex];
 
 			{% if is_set %}
 				var seriesData = copies[thisSeries.name];
 			{% else %}
-				var seriesData = graph_data[thisSeries.name + suffix + '_copy'];
+				var polarization = currentData['polarization'];
+				var era = currentData['era'];
+				var era_type = currentData['era_type'];
+				var seriesData = graph_data[polarization][era][era_type];
 			{% endif %}
 			var seriesDataCopy = getSeriesDataCopyFromGraph(thisSeries);
 
 			for (var dataIndex = thisRange.start_index; dataIndex <= thisRange.end_index; ++dataIndex) {
-				seriesDataCopy[dataIndex][1] = seriesData[dataIndex][1];
+				seriesDataCopy[dataIndex]['obsnum'] = seriesData[dataIndex]['obsnum'];
 			}
 
 			if (seriesIndex < _chart.series.length - 2) {
@@ -492,8 +471,10 @@ var clickRemoveFlaggedDataCheckbox = function(checkbox) {
 			{% if is_set %}
 			var seriesData = copies[thisSeries.name]; // Get the original, unmodified copy of the data since
 			{% else %}								// Highcharts modifies the data used to create the chart.
-			var suffix = getVariableSuffix();
-			var seriesData = graph_data[thisSeries.name + suffix + '_copy'];
+			var polarization = currentData['polarization'];
+			var era = currentData['era'];
+			var era_type = currentData['era_type'];
+			var seriesData = graph_data[polarization][era][era_type];
 			{% endif %}
 		}
 		var seriesDataCopy = getSeriesDataCopyFromGraph(thisSeries);
@@ -502,9 +483,9 @@ var clickRemoveFlaggedDataCheckbox = function(checkbox) {
 			var thisRange = flaggedRanges[flaggedRangeIndex];
 			for (var dataIndex = thisRange.start_index; dataIndex <= thisRange.end_index; ++dataIndex) {
 				if (remove) {
-					seriesDataCopy[dataIndex][1] = null;
+					seriesDataCopy[dataIndex]['obsnum'] = null;
 				} else {
-					seriesDataCopy[dataIndex][1] = seriesData[dataIndex][1];
+					seriesDataCopy[dataIndex]['obsnum'] = seriesData[dataIndex]['obsnum'];
 				}
 			}
 		}
