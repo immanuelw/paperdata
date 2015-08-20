@@ -163,7 +163,7 @@ def source_table():
 										sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
 	source_tuples = (('Correlator', corr_source), ('RTP', rtp_source), ('Folio Scan', paper_source))
-	souce_names = (source_name for source_name, _ in source_tuples)
+	source_names = (source_name for source_name, _ in source_tuples)
 	source_dict = {source_name:{'time':'N/A', 'day':'N/A', 'time_segment':'N/A'} for source_name in source_names}
 
 	for source_name, source in source_tuples:
@@ -180,38 +180,22 @@ def source_table():
 @app.route('/filesystem', methods = ['GET'])
 def filesystem():
 	systems = db_utils.get_query_results(database='ganglia', table='filesystem',
-										sort_tuples=(('timestamp', 'desc'),),
+										sort_tuples=(('timestamp', 'desc'), ('host', 'asc')),
 										group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space'))
 
-	pot1_host = pot1_time = pot1_time_segment = pot2_host = pot2_time = pot2_time_segment =	pot3_host = pot3_time = pot3_time_segment = \
-	folio_host = folio_time = folio_time_segment = pot8_host = pot8_time = pot8_time_segment = nas1_host = nas1_time = nas1_time_segment = 'N/A'
-	pot1_space = pot2_space = pot3_space = folio_space = pot8_space = nas1_space = 0
-
-	system_dict = {'pot1_time':pot1_time, 'pot1_time_segment':pot1_time_segment, 'pot1_space':pot1_space,
-					'pot2_time':pot2_time, 'pot2_time_segment':pot2_time_segment, 'pot2_space':pot2_space,
-					'pot3_time':pot3_time, 'pot3_time_segment':pot3_time_segment, 'pot3_space':pot3_space,
-					'folio_time':folio_time, 'folio_time_segment':folio_time_segment, 'folio_space':folio_space,
-					'pot8_time':pot8_time, 'pot8_time_segment':pot8_time_segment, 'pot8_space':pot8_space,
-					'nas1_time':nas1_time, 'nas1_time_segment':nas1_time_segment, 'nas1_space':nas1_space}
+	system_names = (getattr(system, 'host') for system in systems)
+	system_dict = {system_name:{'time':'N/A', 'space':100.0, 'time_segment':'N/A'} for system_name in system_names}
 
 	for system in systems:
-		host = getattr(system, 'host')
-		timestamp = getattr(system, 'timestamp')
-		percent_usage = getattr(system, 'percent_space')
+		if system is not None:
+			system_time = int(time.time() - getattr(system, 'timestamp'))
 
-		time_str = '{host}_time'.format(host=host)
-		segment_str = '{host}_time_segment'.format(host=host)
-		space_str = '{host}_space'.format(host=host)
+			#limiting if seconds or minutes or hours shows up on last report
+			system_dict[system_name]['time_segment'] = str_val(system_time)
+			system_dict[system_name]['time'] = time_val(system_time)
+			system_dict[system_name]['space'] = getattr(system, 'percent_space')
 
-		system_dict[time_str] = int(time.time() - timestamp)
-
-		system_dict[segment_str] = str_val(system_dict[time_str])
-
-		system_dict[time_str] = time_val(system_dict[time_str])
-
-		system_dict[space_str] = percent_usage
-
-	return render_template('filesystem_table.html', **system_dict)
+	return render_template('filesystem_table.html', system_names=system_names, system_dict=system_dict)
 
 @app.route('/error_table', methods = ['POST'])
 def error_table():

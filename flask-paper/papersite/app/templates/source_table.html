@@ -14,8 +14,8 @@
 		<tr>
 			{% for source_name in source_names %}
 				<th>{{ source_name }}</th>
-				<td>{{ source_dict[source_name]['time'] | round(1) }} ({{ source_dict[source_name]['time_segment'] }}</td>
-				<td rowspan='3' style='color:red;vertical-align:middle;'>{{ source_dict[source_name]['time_segment'] }}</td>
+				<td>{{ source_dict[source_name]['time'] | round(1) }} ({{ source_dict[source_name]['time_segment'] }})</td>
+				<td rowspan='3' style='color:red;vertical-align:middle;'>{{ source_dict[source_name]['day'] }}</td>
 			{% endif %}
 		</tr>
 	</tbody>
