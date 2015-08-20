@@ -36,13 +36,13 @@ def update():
 
 	#total hours in SADB
 	total_sadb_hours = sum(db_utils.get_query_results(database='sadb', table='observation',
-									field_tuples=(('length', '!=', None),), output_vars=('length',))) / 3600.0
+														field_tuples=(('length', '!=', None),), output_vars=('length',))) / 3600.0
 
 	log_query_time('total_sadb_hours')
 
 	#total hours in paperdata
 	total_paperdata_hours = sum(db_utils.get_query_results(database='paperdata', table='observation',
-									field_tuples=(('length', '!=', None),), output_vars=('length',))) / 3600.0
+															field_tuples=(('length', '!=', None),), output_vars=('length',))) / 3600.0
 
 
 	log_query_time('total_paperdata_hours')
@@ -53,12 +53,13 @@ def update():
 												output_vars=('length', 'obsnum', 'files'))
 
 	#make tuple of length and file_count for sadb_obs_rows
-	sadb_obs_rows = tuple((length, obsnum, len(files)) for length, obsnum, files in sadb_obs_rows)
+	sadb_obs_rows = tuple((getattr(sadb_obs, 'length'), getattr(sadb_obs, 'obsnum'), len(getattr(saddb_obs, 'files')))
+							for sadb_obs in sadb_obs_rows)
 
 	log_query_time('sadb_obs_rows')
 
 	paperdata_files_rows = db_utils.get_query_results(database='paperdata', table='file',
-												field_sort_tuple=(('obsnum', 'asc'),), output_vars=('obsnum',))
+														field_sort_tuple=(('obsnum', 'asc'),), output_vars=('obsnum',))
 
 	log_query_time('paperdata_files_rows')
 
