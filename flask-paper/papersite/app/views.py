@@ -138,14 +138,13 @@ def data_amount():
 	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
 
 	if data is not None:
-		data = data.to_json()
-		data_time = data['created_on']
-		hours_sadb = data['hours_sadb']
-		hours_paperdata = data['hours_paperdata']
-		hours_with_data = data['hours_with_data']
+		data_time = getattr(data, 'created_on')
+		hours_sadb = getattr(data, 'hours_sadb')
+		hours_paperdata = getattr(data, 'hours_paperdata')
+		hours_with_data = getattr(data, 'hours_with_data')
 
-	return render_template('data_amount_table.html', hours_sadb=hours_sadb, hours_paperdata=hours_paperdata,
-							hours_with_data=hours_with_data, data_time=data_time)
+	return render_template('data_amount_table.html', data_time=data_time,
+							hours_sadb=hours_sadb, hours_paperdata=hours_paperdata,	hours_with_data=hours_with_data, data_time=data_time)
 
 @app.route('/source_table', methods = ['GET'])
 def source_table():
@@ -154,38 +153,29 @@ def source_table():
 	
 	corr_source = db_utils.get_query_results(database='paperdata', table='rtp_file',
 										field_tuples=(('transferred', '==', None),),
-										sort_tuples=sort_tuples, output_vars=output_vars)
+										sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
 	rtp_source = db_utils.get_query_results(database='paperdata', table='rtp_file',
 										field_tuples=(('transferred', '==', True),),
-										sort_tuples=sort_tuples, output_vars=output_vars)
+										sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
 	paper_source = db_utils.get_query_results(database='paperdata', table='observation',
-										sort_tuples=sort_tuples, output_vars=output_vars)
+										sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
-	corr_time = corr_day = rtp_time = rtp_day = paper_time = paper_day = corr_time_segment = rtp_time_segment = paper_time_segment = 'N/A'
+	source_tuples = (('Correlator', corr_source), ('RTP', rtp_source), ('Folio Scan', paper_source))
+	souce_names = (source_name for source_name, _ in source_tuples)
+	source_dict = {source_name:{'time':'N/A', 'day':'N/A', 'time_segment':'N/A'} for source_name in source_names}
 
-	source_dict = {'corr_time':corr_time, 'corr_day':corr_day, 'corr_time_segment':corr_time_segment,
-					'rtp_time':rtp_time, 'rtp_day':rtp_day, 'rtp_time_segment':rtp_time_segment,
-					'paper_time':paper_time, 'paper_day':paper_day, 'paper_time_segment':paper_time_segment}
-
-	source_tuples = ((cour_source, 'corr'), (rtp_source, 'rtp'), (paper_source, 'paper'))
-	for source, source_name in source_tuples:
+	for source_name, source in source_tuples:
 		if source is not None:
-			time_str = '{source_name}_time'.format(source_name=source_name)
-			segment_str = '{source_name}_time_segment'.format(source_name=source_name)
-			day_str = '{source_name}_day'.format(source_name=source_name)
-
-			source_dict[time_str] = int(time.time() - getattr(source_source[0], 'timestamp'))
+			source_time = int(time.time() - getattr(source, 'timestamp'))
 
 			#limiting if seconds or minutes or hours shows up on last report
-			source_dict[segment_str] = str_val(source_dict[time_str])
+			source_dict[source_name]['time_segment'] = str_val(source_time)
+			source_dict[source_name]['time'] = time_val(source_time)
+			source_dict[source_name]['day'] = getattr(source, 'julian_day')
 
-			source_dict[time_str] = time_val(source_dict[time_str])
-
-			source_dict[day_str] = getattr(source[0], 'julian_day')
-
-	return render_template('source_table.html', **source_dict)
+	return render_template('source_table.html', source_names=source_names, source_dict=source_dict)
 
 @app.route('/filesystem', methods = ['GET'])
 def filesystem():

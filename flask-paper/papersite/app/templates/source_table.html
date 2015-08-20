@@ -12,19 +12,11 @@
 	</thead>
 	<tbody>
 		<tr>
-			<th>Correlator</th>
-			<td>{{ corr_time | round(1) }} ({{ corr_time_segment }})</td>
-			<td rowspan='3' style='color:red;vertical-align:middle;'>{{ corr_day }}</td>
-		</tr>
-		<tr>
-			<th>RTP</th>
-			<td>{{ rtp_time | round(1) }} ({{ rtp_time_segment }})</td>
-			<td rowspan='3' style='color:red;vertical-align:middle;'>{{ rtp_day }}</td>
-		</tr>
-		<tr>
-			<th>Folio Scan</th>
-			<td>{{ folio_time | round(1) }} ({{ folio_time_segment }})</td>
-			<td rowspan='3' style='color:red;vertical-align:middle;'>{{ folio_day }}</td>
+			{% for source_name in source_names %}
+				<th>{{ source_name }}</th>
+				<td>{{ source_dict[source_name]['time'] | round(1) }} ({{ source_dict[source_name]['time_segment'] }}</td>
+				<td rowspan='3' style='color:red;vertical-align:middle;'>{{ source_dict[source_name]['time_segment'] }}</td>
+			{% endif %}
 		</tr>
 	</tbody>
 </table>
