@@ -83,18 +83,13 @@ def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 	response = db_utils.get_query_results(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										sort_tuples=(('time_start', 'asc'),),
-										output_vars=('time_start', 'time_end', 'polarization', 'era', 'era_type', 'obsnum'))
+										output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum'))
 
-	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
-	era_strs = (0, 32, 64, 128)
-	era_type_strs = ('all',)
+	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
 	utc_obs_map = {(pol_str, era_str, era_type_str):[] for pol_str in pol_strs for era_str in era_strs for era_type_str in era_type_strs}
 	obs_counts = {(pol_str, era_str, era_type_str):[] for pol_str in pol_strs for era_str in era_strs for era_type_str in era_type_strs}
 
 	error_counts, error_count = get_error_counts(start_gps, end_gps)
-
-	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
-
 
 	for observation in response:
 		# Actual UTC time of the observation (for the graph)
@@ -108,11 +103,10 @@ def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 		obs_counts[(polarization, era, era_type)].append((obs_time, 1))
 		utc_obs_map[(polarization, era, era_type)].append((obs_time, obsnum))
 
-	return render_template('histogram.html',
-		low_eor0_counts=low_eor0_counts, high_eor0_counts=high_eor0_counts,
-		low_eor1_counts=low_eor1_counts, high_eor1_counts=high_eor1_counts,
-		error_counts=error_counts,
-		utc_obsid_map_l0=utc_obsid_map_l0, utc_obsid_map_l1=utc_obsid_map_h0,
-		utc_obsid_map_h0=utc_obsid_map_l1, utc_obsid_map_h1=utc_obsid_map_h1,
-		range_start=start_time_str,	range_end=end_time_str,
-		start_time_str_short=start_time_str.replace('T', ' ')[0:16], end_time_str_short=end_time_str.replace('T', ' ')[0:16])
+	return render_template('histogram.html', error_counts=error_counts,
+							low_eor0_counts=low_eor0_counts, high_eor0_counts=high_eor0_counts,
+							low_eor1_counts=low_eor1_counts, high_eor1_counts=high_eor1_counts,
+							utc_obsid_map_l0=utc_obsid_map_l0, utc_obsid_map_l1=utc_obsid_map_h0,
+							utc_obsid_map_h0=utc_obsid_map_l1, utc_obsid_map_h1=utc_obsid_map_h1,
+							range_start=start_time_str,	range_end=end_time_str,
+							start_time_str_short=start_time_str.replace('T', ' ')[0:16], end_time_str_short=end_time_str.replace('T', ' ')[0:16])

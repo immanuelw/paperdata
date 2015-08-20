@@ -105,7 +105,8 @@ def get_query_results(data_source=None, database=None, table=None, field_tuples=
 		dbi, module = get_dbi(database)
 		table = getattr(module, table.title())
 	else:
-		return None
+		dbi, module = get_dbi(getattr(data_source, 'database')
+		table = getattr(data_source, 'table')
 
 	if table == 'eorlive'.title():
 		s = db.session
@@ -115,6 +116,12 @@ def get_query_results(data_source=None, database=None, table=None, field_tuples=
 							output_vars=output_vars)
 	s.close()
 	return results
+
+def set_strings():
+	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
+	era_strs = (0, 32, 64, 128)
+	era_type_strs = ('all',)
+	return (pol_strs, era_strs, era_type_strs)
 
 def get_gps_utc_constants():
 	leap_seconds_result = get_query_results(data_source=None, database='eor', table='leap_seconds',

@@ -210,34 +210,25 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 	data_source = db_utils.get_query_results(database='eorlive', table='graph_data_source',
 													field_tuples=(('name', '==', data_source_str),))[0]
 
-	results = db_utils.get_query_results(data_source, field_tuples=(('obs_column', '>=', start_gps), ('obs_column', '<=', end_gps)),
-											sort_tuples=('obs_column', 'asc'))
-
-	data = {}
+	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
+	data = {(pol_str, era_str, era_type_str):[] for pol_str in pol_strs for era_str in era_strs for era_type_str in era_type_strs}
 
 	if the_set is not None:
-		# Initialize empty data structure
-		data['series_dict'] = {} # 'series_dict' holds the data for each series (table column) in the data source
-		for column in columns:
-			data['series_dict'][column.name] = []
+		polarization = getattr(the_set, 'polarization')
+		era = getattr(the_set, 'era')
+		era_type = getattr(the_set, 'era_type')
+		results = db_utils.get_query_results(data_source=data_source,
+										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										('polarization', None if polarization == 'any' else '==', polarization),
+										('era', None if era == 0 else '==', era),
+										('era_type', None if era_type == 'any' else '==', era_type)),
+										sort_tuples=(('time_start', 'asc'),), output_vars=('time_start', 'obsnum'))
 
-		GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
+		for obs in results:
+			data[(polarization, era, era_type)].append((getattr(obs, 'time_start'), getattr(obs, 'obsnum')))
 
-		utc_obsid_map = []
-		results = join_with_obsids_from_set(results, the_set, data_source)
-
-		for row in results:
-								# Actual UTC time of the observation (for the graph)
-			utc_millis = int((row[0] - GPS_LEAP_SECONDS_OFFSET + GPS_UTC_DELTA) * 1000)
-			for column_index in range(1, len(row)):
-				data['series_dict'][columns[column_index - 1].name].append([utc_millis, row[column_index]])
-			utc_obsid_map.append([utc_millis, row[0]])
-
-		# l0, l1, h0, h1, or 'any'
-		whichDataSet = which_data_set(the_set)
-		data[whichDataSet] = utc_obsid_map
 	else: #No set, so we need to separate the data into sets for low/high and EOR0/EOR1
-		data = separate_data_into_sets(data, results, columns, data_source, start_gps, end_gps)
+		data = separate_data_into_sets(data, data_source, start_gps, end_gps)
 
 	return data
 
@@ -249,77 +240,22 @@ def which_data_set(the_set):
 	which_data = (polarization, era, era_type)
 	return which_data
 
-def separate_data_into_sets(data, data_source_results, columns, data_source, start_gps, end_gps):
-	obsid_results = db_utils.get_query_results(database='paperdata', table='observation',
+def separate_data_into_sets(data, data_source, start_gps, end_gps):
+	obsid_results = db_utils.get_query_results(data_source=data_source,
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
-										('polarization', None if polarization == 'any' else '==', polarization),
-										('era', None if era == 0 else '==', era),
-										('era_type', None if era_type == 'any' else '==', era_type)),
-										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
+										sort_tuples=(('time_start', 'asc'),),
+										output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum'))
 
-	all_obs_ids = [getattr(obs, 'obsnum') for obs in all_obs_ids_tuples]
+	for obs in obsid_results:
+		# Actual UTC time of the obs (for the graph)
+		obs_time = getattr(obs, 'time_start')
 
-	obsid_results = db_utils.get_query_results(data_source,
-										(('starttime', '>=', start_gps), ('starttime', '<=', end_gps),
-										((('obsname', 'like', 'low%'), ('obsname', 'like', 'high%')), 'or', None),
-										((('ra_phase_center', '==', 0), ('ra_phase_center', '==', 60)), 'or', None)),
-										sort_tuples=(('starttime', 'asc'),), output_vars=('starttime', 'obsname', 'ra_phase_center'))
+		polarization = getattr(obs, 'polarization')
+		era = getattr(obs, 'era')
+		era_type = getattr(obs, 'era_type')
+		obsnum = getattr(obs, 'obsnum')
 
-	data['l0'] = {}
-	data['l1'] = {}
-	data['h0'] = {}
-	data['h1'] = {}
-
-	for key in data:
-		for column in columns:
-			data[key][column.name] = []
-
-	data['utc_obsid_map_l0'] = []
-	data['utc_obsid_map_l1'] = []
-	data['utc_obsid_map_h0'] = []
-	data['utc_obsid_map_h1'] = []
-
-	all_obsids = [obsid_tuple[0] for obsid_tuple in obsid_results]
-
-	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
-
-	for data_source_result_tuple in data_source_results:
-		obsid = data_source_result_tuple[0]
-
-		try:
-			obsid_index = all_obsids.index(obsid)
-		except Exception as e:
-			continue
-
-		utc_millis = (obsid - GPS_LEAP_SECONDS_OFFSET + GPS_UTC_DELTA) * 1000
-
-		obsname = obsid_results[obsid_index][1]
-		ra_phase_center = obsid_results[obsid_index][2]
-
-		if obsname.startswith('low') and ra_phase_center == 0:
-			for column_index in range(1, len(data_source_result_tuple)):
-				column_name = columns[column_index - 1].name
-				column_data = data_source_result_tuple[column_index]
-				data['l0'][column_name].append([utc_millis, column_data])
-			data['utc_obsid_map_l0'].append([utc_millis, obsid])
-		elif obsname.startswith('low') and ra_phase_center == 60:
-			for column_index in range(1, len(data_source_result_tuple)):
-				column_name = columns[column_index - 1].name
-				column_data = data_source_result_tuple[column_index]
-				data['l1'][column_name].append([utc_millis, column_data])
-			data['utc_obsid_map_l1'].append([utc_millis, obsid])
-		elif obsname.startswith('high') and ra_phase_center == 0:
-			for column_index in range(1, len(data_source_result_tuple)):
-				column_name = columns[column_index - 1].name
-				column_data = data_source_result_tuple[column_index]
-				data['h0'][column_name].append([utc_millis, column_data])
-			data['utc_obsid_map_h0'].append([utc_millis, obsid])
-		elif obsname.startswith('high') and ra_phase_center == 60:
-			for column_index in range(1, len(data_source_result_tuple)):
-				column_name = columns[column_index - 1].name
-				column_data = data_source_result_tuple[column_index]
-				data['h1'][column_name].append([utc_millis, column_data])
-			data['utc_obsid_map_h1'].append([utc_millis, obsid])
+		data[(polarization, era, era_type)].append((obs_time, obsnum))
 
 	return data
 
@@ -327,7 +263,7 @@ def join_with_obsids_from_set(data_source_results, the_set, data_source):
 	polarization = getattr(the_set, 'polarization')
 	era = getattr(the_set, 'era')
 	era_type = getattr(the_set, 'era_type')
-	response = db_utils.get_query_results(data_source=data_source,
+	all_obs_ids_tuples = db_utils.get_query_results(data_source=data_source,
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										('polarization', None if polarization == 'any' else '==', polarization),
 										('era', None if era == 0 else '==', era),
@@ -336,6 +272,6 @@ def join_with_obsids_from_set(data_source_results, the_set, data_source):
 
 	all_obs_ids = [getattr(obs, 'obsnum') for obs in all_obs_ids_tuples]
 
-	filtered_results = [obs_tuple for obs_tuple in data_source_results if obs_tuple[0] in obs_id_list]
+	filtered_results = [obs_tuple for obs_tuple in data_source_results if obs_tuple[0] in all_obs_ids]
 
 	return filtered_results
