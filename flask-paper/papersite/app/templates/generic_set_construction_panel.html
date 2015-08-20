@@ -9,13 +9,21 @@
 		<td style='text-align:right'>
 			{% if not is_set %}
 			<span id='data_set_span_{{data_source_str_nospace}}'>Data set:&nbsp;&nbsp;&nbsp;&nbsp;</span>
-			<select id='low_high_dropdown_{{data_source_str_nospace}}' onchange=	   '{{data_source_str_nospace}}.setLowOrHighData(this)'>
-				<option value='high'>High</option>
-				<option value='low'>Low</option>
+			<select id='polarization_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setPolarizationData(this)'>
+				<option value='all'>all</option>
+				<option value='xx'>xx</option>
+				<option value='xy'>xy</option>
+				<option value='yx'>yx</option>
+				<option value='yy'>yy</option>
 			</select>
-			<select id='eor_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setEorData(this)'>
-				<option value='EOR0'>EOR0</option>
-				<option value='EOR1'>EOR1</option>
+			<select id='era_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setEraData(this)'>
+				<option value=0>all</option>
+				<option value=32>32</option>
+				<option value=64>64</option>
+				<option value=128>128</option>
+			</select>
+			<select id='era_type_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setEraTypeData(this)'>
+				<option value='all'>all</option>
 			</select>
 			<br>
 			{% endif %}
