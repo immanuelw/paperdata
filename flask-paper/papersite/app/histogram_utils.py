@@ -82,56 +82,37 @@ def get_plot_bands(the_set):
 def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 	response = db_utils.get_query_results(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
-										sort_tuples=(('time_start', 'asc'),), output_vars=('time_start', 'time_end'))
+										sort_tuples=(('time_start', 'asc'),),
+										output_vars=('time_start', 'time_end', 'polarization', 'era', 'era_type', 'obsnum'))
 
-	low_eor0_counts = []
-
-	high_eor0_counts = []
-
-	low_eor1_counts = []
-
-	high_eor1_counts = []
+	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
+	era_strs = (0, 32, 64, 128)
+	era_type_strs = ('all',)
+	utc_obs_map = {(pol_str, era_str, era_type_str):[] for pol_str in pol_strs for era_str in era_strs for era_type_str in era_type_strs}
+	obs_counts = {(pol_str, era_str, era_type_str):[] for pol_str in pol_strs for era_str in era_strs for era_type_str in era_type_strs}
 
 	error_counts, error_count = get_error_counts(start_gps, end_gps)
 
-	utc_obsid_map_l0 = []
-	utc_obsid_map_l1 = []
-	utc_obsid_map_h0 = []
-	utc_obsid_map_h1 = []
-
 	GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
 
+
 	for observation in response:
-						# Actual UTC time of the observation (for the graph)
-		utc_millis = int((observation[0] - GPS_LEAP_SECONDS_OFFSET + GPS_UTC_DELTA) * 1000)
+		# Actual UTC time of the observation (for the graph)
+		obs_time = getattr(observation, 'time_start')
 
-		obs_name = observation[2]
+		polarization = getattr(observation, 'polarization')
+		era = getattr(observation, 'era')
+		era_type = getattr(observation, 'era_type')
+		obsnum = getattr(observation, 'obsnum')
 
-		try:
-			ra_phase_center = int(observation[3])
-		except TypeError as te:
-			ra_phase_center = -1
-
-		if 'low' in obs_name:
-			if ra_phase_center == 0: # EOR0
-				low_eor0_counts.append([utc_millis, 1])
-				utc_obsid_map_l0.append([utc_millis, int(observation[0])])
-			elif ra_phase_center == 60: # EOR1
-				low_eor1_counts.append([utc_millis, 1])
-				utc_obsid_map_l1.append([utc_millis, int(observation[0])])
-		elif 'high' in obs_name:
-			if ra_phase_center == 0: # EOR0
-				high_eor0_counts.append([utc_millis, 1])
-				utc_obsid_map_h0.append([utc_millis, int(observation[0])])
-			elif ra_phase_center == 60: # EOR1
-				high_eor1_counts.append([utc_millis, 1])
-				utc_obsid_map_h1.append([utc_millis, int(observation[0])])
+		obs_counts[(polarization, era, era_type)].append((obs_time, 1))
+		utc_obs_map[(polarization, era, era_type)].append((obs_time, obsnum))
 
 	return render_template('histogram.html',
 		low_eor0_counts=low_eor0_counts, high_eor0_counts=high_eor0_counts,
 		low_eor1_counts=low_eor1_counts, high_eor1_counts=high_eor1_counts,
-		error_counts=error_counts, utc_obsid_map_l0=utc_obsid_map_l0,
-		utc_obsid_map_l1=utc_obsid_map_l1, utc_obsid_map_h0=utc_obsid_map_h0,
-		utc_obsid_map_h1=utc_obsid_map_h1, range_start=start_time_str,
-		range_end=end_time_str, start_time_str_short=start_time_str.replace('T', ' ')[0:16],
-		end_time_str_short=end_time_str.replace('T', ' ')[0:16])
+		error_counts=error_counts,
+		utc_obsid_map_l0=utc_obsid_map_l0, utc_obsid_map_l1=utc_obsid_map_h0,
+		utc_obsid_map_h0=utc_obsid_map_l1, utc_obsid_map_h1=utc_obsid_map_h1,
+		range_start=start_time_str,	range_end=end_time_str,
+		start_time_str_short=start_time_str.replace('T', ' ')[0:16], end_time_str_short=end_time_str.replace('T', ' ')[0:16])
