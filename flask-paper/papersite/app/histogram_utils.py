@@ -86,22 +86,20 @@ def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 										output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum')))
 
 	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
-	obs_map = {'{pol_str}-{era_str}-{era_type_str}'.format(pol_str=pol_str, era_str=era_str, era_type_str=era_type_str):[]
-														for pol_str in pol_strs	for era_str in era_strs for era_type_str in era_type_strs}
+	obs_map = {pol_str:{era_str: {era_type:{'obs_count':0, 'obs_hours':0 for era_type_str in era_type_strs}
+									 for era_str in era_strs} for pol_str in pol_strs}
 
 	for obs in response:
 		polarization = getattr(obs, 'polarization')
 		era = getattr(obs, 'era')
 		era_type = getattr(obs, 'era_type')
 
-		pol_era = '{polarization}-{era}-{era_type}'.format(polarization=polarization, era=era, era_type=era_type)
-
 		# Actual UTC time of the obs (for the graph)
 		obs_time = getattr(obs, 'time_start')
 		obsnum = getattr(obs, 'obsnum')
 
 		obs_dict = {'obs_time':obs_time, 'obsnum':obsnum, 'obs_count':1}
-		obs_map[pol_era].append(obs_dict)
+		obs_map[polarization][era].append(obs_dict)
 
 	error_counts, error_count = get_error_counts(start_gps, end_gps)
 

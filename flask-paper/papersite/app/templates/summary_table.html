@@ -1,32 +1,32 @@
+{% block content %}
 <table class='table-bordered table-striped'>
 	<thead>
 		<tr>
-			<th>hrs (#)</th>
-			<th>Low</th>
-			<th>High</th>
+			<th>Hours (#)</th>
+				{% for pol in pol_strs %}
+					<th>{{ pol }}</th>
+				{% endfor %}
 			<th>Total</th>
 			<th>Errors</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<th>EOR0</th>
-			<td>{{ low_eor0_hours | round(1) }} ({{ low_eor0_count }})</td>
-			<td>{{ high_eor0_hours | round(1) }} ({{ high_eor0_count }})</td>
-			<td>{{ (low_eor0_hours + high_eor0_hours) | round(1) }} ({{ low_eor0_count + high_eor0_count }})</td>
+			{% for era in era_strs %}
+				<th>{{ era }}</th>
+					{% for pol in pol_strs %}
+						<td>{{ obs_map[pol][era]['obs_hours'] | round(1) }} ({{ obs_map[pol][era]['obs_count'] }})</td>
+					{% endfor %}
+				<td>{{ obs_total[era]['obs_hours'] | round(1) }} ({{ obs_total[era]['obs_count'] }})</td>
+			{% endfor %}
 			<td rowspan='3' style='color:red;vertical-align:middle;'>{{ error_count }}</td>
 		</tr>
 		<tr>
-			<th>EOR1</th>
-			<td>{{ low_eor1_hours | round(1) }} ({{ low_eor1_count }})</td>
-			<td>{{ high_eor1_hours | round(1) }} ({{ high_eor1_count }})</td>
-			<td>{{ (low_eor1_hours + high_eor1_hours) | round(1) }} ({{ low_eor1_count + high_eor1_count }})</td>
-		</tr>
-		<tr>
 			<th>Total</th>
-			<td>{{ (low_eor0_hours + low_eor1_hours) | round(1) }} ({{ low_eor0_count + low_eor1_count }})</td>
-			<td>{{ (high_eor0_hours + high_eor1_hours) | round(1) }} ({{ high_eor0_count + high_eor1_count }})</td>
-			<td>{{ (low_eor0_hours + high_eor0_hours + low_eor1_hours + high_eor1_hours) | round(1) }} ({{ low_eor0_count + high_eor0_count + low_eor1_count + high_eor1_count }})</td>
+			{% for pol in pol_strs %}
+				<td>{{ obs_total[pol]['obs_hours'] | round(1) }} ({{ obs_total[pol]['obs_count'] }})</td>
+			{% endfor %}
 		</tr>
 	</tbody>
 </table>
+{% endblock %}

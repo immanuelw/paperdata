@@ -7,6 +7,7 @@ import os
 import paperdata_dbi as pdbi
 import pyganglia as pyg
 import time
+from collections import OrderedDict
 
 def time_val(value):
 	#determines how much time to divide by
@@ -307,30 +308,35 @@ def data_summary_table():
 										sort_tuples=(('time_start', 'asc'),),
 										output_vars=('time_start', 'time_end', 'polarization', 'era', 'era_type')))
 
-	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
-	obs_map = {'{pol_str}-{era_str}-{era_type_str}'\
-				.format(pol_str=pol_str, era_str=era_str, era_type_str=era_type_str):{'obs_count':0, 'obs_hours':0}
-				for pol_str in pol_strs	for era_str in era_strs for era_type_str in era_type_strs}
+	pol_strs = ('xx', 'xy', 'yx', 'yy')
+	era_strs = (32, 64, 128)
+	obs_map = {pol_str:{era_str: {'obs_count':0, 'obs_hours':0} for era_str in era_strs} for pol_str in pol_strs}
 
 	for obs in response:
 		polarization = getattr(obs, 'polarization')
 		era = getattr(obs, 'era')
 		era_type = getattr(obs, 'era_type')
 
-		pol_era = '{polarization}-{era}-{era_type}'.format(polarization=polarization, era=era, era_type=era_type)
+		pol_era = '{polarization}-{era}'.format(polarization=polarization, era=era)
 
 		# Actual UTC time of the obs (for the graph)
 		obs_start = getattr(obs, 'time_start')
 		obs_end = getattr(obs, 'time_end')
 
-		obs_dict = {'obs_time':obs_time, 'obsnum':obsnum, 'obs_count':1}
-		obs_map[pol_era]['obs_count'] += 1
-		obs_map[pol_era]['obs_hours'] += (obs_end - obs_start) / 3600.0
+		obs_map[polarization][era]['obs_count'] += 1
+		obs_map[polarization][era]['obs_hours'] += (obs_end - obs_start) / 3600.0
+
+	all_strs = pol_strs + era_strs
+	obs_total = {all_str: {'count':0, 'hours':0} for all_str in all_strs}
+
+	for pol_era, obs_dict in obs_map.iteritems():
+		for pol, era in pol_era.split('-'):
+			obs_total[era]['count'] += obs_dict['obs_count']
+			obs_total[era]['hours'] += obs_dict['obs_hours']
+			obs_total[pol]['count'] += obs_dict['obs_count']
+			obs_total[pol]['hours'] += obs_dict['obs_hours']
 
 	error_counts, error_count = histogram_utils.get_error_counts(start_gps, end_gps)
 
-	return render_template('summary_table.html', error_count=error_count,
-		low_eor0_count=low_eor0_count, high_eor0_count=high_eor0_count,
-		low_eor1_count=low_eor1_count, high_eor1_count=high_eor1_count,
-		low_eor0_hours=low_eor0_hours, high_eor0_hours=high_eor0_hours,
-		low_eor1_hours=low_eor1_hours, high_eor1_hours=high_eor1_hours)
+	return render_template('summary_table.html', error_count=error_count, pol_strs=pol_strs, era_strs=era_strs,
+													obs_map=obs_map, obs_total=obs_total)

@@ -211,14 +211,13 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 													field_tuples=(('name', '==', data_source_str),))[0]
 
 	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
-	data = {'{pol_str}-{era_str}-{era_type_str}'.format(pol_str=pol_str, era_str=era_str, era_type_str=era_type_str):[]
-														for pol_str in pol_strs	for era_str in era_strs for era_type_str in era_type_strs}
+	data = {pol_str:{era_str: {era_type:{'obs_count':0, 'obs_hours':0 for era_type_str in era_type_strs}
+									 for era_str in era_strs} for pol_str in pol_strs}
 
 	if the_set is not None:
 		polarization = getattr(the_set, 'polarization')
 		era = getattr(the_set, 'era')
 		era_type = getattr(the_set, 'era_type')
-		pol_era = '{polarization}-{era}-{era_type}'.format(polarization=polarization, era=era, era_type=era_type)
 
 		results = db_utils.get_query_results(data_source=data_source,
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
@@ -231,7 +230,7 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 			obs_time = getattr(obs, 'time_start')
 			obsnum = getattr(obs, 'obsnum')
 			obs_dict = {'obs_time':obs_time, 'obsnum':obsnum, 'obs_count':1}
-			data[pol_era].append(obs_dict)
+			data[polarization][era].append(obs_dict)
 
 	else: #No set, so we need to separate the data into sets for low/high and EOR0/EOR1
 		data = separate_data_into_sets(data, data_source, start_gps, end_gps)
@@ -257,13 +256,11 @@ def separate_data_into_sets(data, data_source, start_gps, end_gps):
 		era = getattr(obs, 'era')
 		era_type = getattr(obs, 'era_type')
 
-		pol_era = '{polarization}-{era}-{era_type}'.format(polarization=polarization, era=era, era_type=era_type)
-
 		# Actual UTC time of the obs (for the graph)
 		obs_time = getattr(obs, 'time_start')
 		obsnum = getattr(obs, 'obsnum')
 
 		obs_dict = {'obs_time':obs_time, 'obsnum':obsnum, 'obs_count':1}
-		data[pol_era].append(obs_dict)
+		data[polarization][era].append(obs_dict)
 
 	return data
