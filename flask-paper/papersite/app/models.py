@@ -63,6 +63,8 @@ class Set(db.Model):
 	polarization = db.Column(db.String(4)) #'all', 'xy', 'yy', etc.
 	era = db.Column(db.Integer)
 	era_type = db.Column(db.String(10))
+	host = db.Column(db.String(10))
+	filetype = db.Column(db.String(10))
 	total_data_hrs = db.Column(db.Float)
 	flagged_data_hrs = db.Column(db.Float)
 	created_on = db.Column(db.DateTime, default=datetime.utcnow)

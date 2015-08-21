@@ -16,6 +16,7 @@ var obs_err = (function($) {
 	};
 	dataSourceObj.backToHistogram = backToHistogram;
 
+	var obs_count = {{ obs_count }};
 	var error_counts = {{ error_counts | tojson }};
 	var error_counts_copy = {{ error_counts | tojson }};
 
@@ -162,7 +163,7 @@ var obs_err = (function($) {
 				type: 'column',
 				name: 'observations',
 				//supposed to be a default?
-				data: obs_counts['all'][0]['all']
+				data: obs_count['all'][0]['all']
 			},
 			{
 				type: 'column',

@@ -106,22 +106,20 @@ def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 		obs_map[polarization][era][era_type].append({'obs_time':obs_time, 'obsnum':obsnum})
 		obs_count[polarization][era][era_type]['obs_count'] += 1
 
-	error_counts, error_count = get_error_counts(start_gps, end_gps)
+	#error_counts, error_count = get_error_counts(start_gps, end_gps)
 
 	return render_template('histogram.html', error_counts=error_counts, pol_strs=pol_strs, era_strs=era_strs, era_type_strs=era_type_strs,
 							obs_count=obs_count, obs_map=obs_map, range_start=start_time_str, range_end=end_time_str,
 							start_time_str_short=start_time_str.replace('T', ' ')[0:16], end_time_str_short=end_time_str.replace('T', ' ')[0:16])
 
 def get_file_histogram(start_gps, end_gps, start_time_str, end_time_str):
-	sort_tuples = (('timestamp', 'desc'),)
-	output_vars = ('timestamp', 'julian_day')
-
 	rtp_obs_list = db_utils.query(database='paperdata', table='rtp_observation',
 												field_tuples=(('julian_date', '>=', start_gps), ('julian_date', '<=', end_gps)),
 												output_vars=('obsnum', 'julian_day', 'polarization', 'era' 'length', 'files'))
 
+	base_length = 0.00696
 	paper_obs_list = db_utils.query(database='paperdata', table='observation',
-												field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps)),
+												field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps + base_length)),
 												output_vars=('obsnum', 'julian_day', 'polarization', 'era' 'length', 'files'))
 
 	all_obs_list = rtp_obs_list + paper_obs_list

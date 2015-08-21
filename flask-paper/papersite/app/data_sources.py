@@ -219,7 +219,8 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 		era = getattr(the_set, 'era')
 		era_type = getattr(the_set, 'era_type')
 
-		results = db_utils.query(data_source=data_source,
+		if polarization is not None:
+			results = db_utils.query(data_source=data_source,
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										('polarization', None if polarization == 'any' else '==', polarization),
 										('era', None if era == 0 else '==', era),
@@ -232,6 +233,11 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 			obs_dict = {'obs_time': obs_time, 'obsnum': obsnum, 'obs_count': 1}
 			data[polarization][era][era_type].append(obs_dict)
 
+		else:
+			host = getattr(the_set, 'host')
+			filetype = getattr(the_set, 'filetype')
+
+
 	else: #No set, so we need to separate the data into sets for low/high and EOR0/EOR1
 		data = separate_data_into_sets(data, data_source, start_gps, end_gps)
 
@@ -241,8 +247,10 @@ def which_data_set(the_set):
 	polarization = getattr(the_set, 'polarization')
 	era =  getattr(the_set, 'era')
 	era_type = getattr(the_set, 'era_type')
+	host = getattr(the_set, 'host')
+	filetype =  getattr(the_set, 'filetype')
 
-	which_data = (polarization, era, era_type)
+	which_data = (polarization, era, era_type, host, filetype)
 	return which_data
 
 def separate_data_into_sets(data, data_source, start_gps, end_gps):

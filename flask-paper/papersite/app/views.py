@@ -120,6 +120,16 @@ def get_graph():
 									end_time_str_short=end_time_str_short, range_end=range_end,
 									which_data_set=which_data_set, is_set=True, obs_map=obs_map)
 		elif graph_type_str == 'File':
+			set_host, set_filetype = getattr(the_set, 'host'), getattr(the_set, 'filetype')
+			file_count, file_map = histogram_utils.get_file_counts(set_start, set_end, set_host, set_filetype)
+			error_counts = histogram_utils.get_error_counts(set_start, set_end)[0]
+			range_end = end_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') # For the function in histogram_utils.js
+			which_data_set = data_sources.which_data_set(the_set)
+			return render_template('setView.html', the_set=the_set,
+									file_count=file_count, error_counts=error_counts,
+									plot_bands=plot_bands, start_time_str_short=start_time_str_short,
+									end_time_str_short=end_time_str_short, range_end=range_end,
+									which_data_set=which_data_set, is_set=True, file_map=file_map)
 		else:
 			graph_data = data_sources.get_graph_data(data_source_str, set_start, set_end, the_set)
 			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
