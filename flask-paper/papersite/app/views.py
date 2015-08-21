@@ -81,8 +81,9 @@ def get_graph():
 		start_gps, end_gps = db_utils.get_gps_from_datetime(start_datetime, end_datetime)
 
 		if graph_type_str == 'Obs_Err':
-			return histogram_utils.get_obs_err_histogram(start_gps, end_gps,
-				start_time_str, end_time_str)
+			return histogram_utils.get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str)
+		elif graph_type_str == 'File':
+			return histogram_utils.get_file_histogram(start_gps, end_gps, start_time_str, end_time_str)
 		else:
 			graph_data = data_sources.get_graph_data(data_source_str, start_gps, end_gps, None)
 			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
@@ -102,24 +103,23 @@ def get_graph():
 		plot_bands = histogram_utils.get_plot_bands(the_set)
 
 		set_start, set_end = getattr(the_set, 'start'), getattr(the_set, 'end')
-		set_polarization, set_era, set_era_type = getattr(the_set, 'polarization'), getattr(the_set, 'era'), getattr(the_set, 'era_type')
 		start_datetime, end_datetime = db_utils.get_datetime_from_gps(set_start, set_end)
 
 		start_time_str_short = start_datetime.strftime('%Y-%m-%d %H:%M')
 		end_time_str_short = end_datetime.strftime('%Y-%m-%d %H:%M')
 
 		if graph_type_str == 'Obs_Err':
-			observation_counts, utc_obsid_map = histogram_utils.get_observation_counts(
-												set_start, set_end, set_polarization, set_era, set_era_type)
+			set_polarization, set_era, set_era_type = getattr(the_set, 'polarization'), getattr(the_set, 'era'), getattr(the_set, 'era_type')
+			obs_count, obs_map = histogram_utils.get_observation_counts(set_start, set_end, set_polarization, set_era, set_era_type)
 			error_counts = histogram_utils.get_error_counts(set_start, set_end)[0]
 			range_end = end_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') # For the function in histogram_utils.js
 			which_data_set = data_sources.which_data_set(the_set)
 			return render_template('setView.html', the_set=the_set,
-				observation_counts=observation_counts, error_counts=error_counts,
-				plot_bands=plot_bands, start_time_str_short=start_time_str_short,
-				end_time_str_short=end_time_str_short, range_end=range_end,
-				which_data_set=which_data_set, is_set=True,
-				utc_obsid_map=utc_obsid_map)
+									obs_count=obs_count, error_counts=error_counts,
+									plot_bands=plot_bands, start_time_str_short=start_time_str_short,
+									end_time_str_short=end_time_str_short, range_end=range_end,
+									which_data_set=which_data_set, is_set=True, obs_map=obs_map)
+		elif graph_type_str == 'File':
 		else:
 			graph_data = data_sources.get_graph_data(data_source_str, set_start, set_end, the_set)
 			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
@@ -290,8 +290,6 @@ def data_summary_table():
 		polarization = getattr(obs, 'polarization')
 		era = getattr(obs, 'era')
 		era_type = getattr(obs, 'era_type')
-
-		pol_era = '{polarization}-{era}'.format(polarization=polarization, era=era)
 
 		# Actual UTC time of the obs (for the graph)
 		obs_start = getattr(obs, 'time_start')

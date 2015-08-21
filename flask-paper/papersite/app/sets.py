@@ -181,11 +181,9 @@ def upload_set():
 
 			last_index = next_index + 1
 
-		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(
-			start_gps, end_gps, polarization, era, era_type, bad_ranges)
+		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(start_gps, end_gps, polarization, era, era_type, bad_ranges)
 
-		insert_set_into_db(set_name, start_gps, end_gps, bad_ranges,
-			polarization, era, era_type, total_data_hrs, flagged_data_hrs)
+		insert_set_into_db(set_name, start_gps, end_gps, bad_ranges, polarization, era, era_type, total_data_hrs, flagged_data_hrs)
 
 		return 'OK'
 	else:

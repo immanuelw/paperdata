@@ -229,7 +229,7 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 		for obs in results:
 			obs_time = getattr(obs, 'time_start')
 			obsnum = getattr(obs, 'obsnum')
-			obs_dict = {'obs_time':obs_time, 'obsnum':obsnum, 'obs_count':1}
+			obs_dict = {'obs_time': obs_time, 'obsnum': obsnum, 'obs_count': 1}
 			data[polarization][era][era_type].append(obs_dict)
 
 	else: #No set, so we need to separate the data into sets for low/high and EOR0/EOR1
@@ -260,7 +260,7 @@ def separate_data_into_sets(data, data_source, start_gps, end_gps):
 		obs_time = getattr(obs, 'time_start')
 		obsnum = getattr(obs, 'obsnum')
 
-		obs_dict = {'obs_time':obs_time, 'obsnum':obsnum, 'obs_count':1}
+		obs_dict = {'obs_time': obs_time, 'obsnum': obsnum, 'obs_count': 1}
 		data[polarization][era][era_type].append(obs_dict)
 
 	return data
