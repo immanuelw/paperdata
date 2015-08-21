@@ -2,7 +2,6 @@
 import ddr_compress.dbi as ddbi
 from sqlalchemy import func
 import curses,time,os
-import jdcal
 import pyganglia_dbi as pyg
 
 #setup my output file
