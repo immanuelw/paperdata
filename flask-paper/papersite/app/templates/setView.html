@@ -10,12 +10,12 @@
 <script type='text/javascript'>
 var obs_err = (function($) {
 	var dataSourceObj = {};
-	var observation_counts = obs_counts;
-	var observation_counts_copy = obs_counts;
+	var observation_counts = {{ obs_counts }};
+	var observation_counts_copy = {{ obs_counts }};
 	var error_counts = {{ error_counts | tojson }};
 	var error_counts_copy = {{ error_counts | tojson }};
 	var plot_bands = {{ plot_bands | tojson }};
-	var obs_map;
+	var obs_map = {{ obs_map }};
 
 	{% include 'js/obs_err_set_construction.js' %}
 
