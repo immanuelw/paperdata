@@ -7,6 +7,7 @@ import paperdata_dbi as pdbi
 import pyganglia_dbi as pyg
 from sqlalchemy import or_, in_
 from sqlalchemy.engine import reflection
+from jdcal import gcal2jd
 
 def get_dbi(database):
 	if database == 'paperdata':
@@ -123,65 +124,19 @@ def set_strings():
 	era_type_strs = ('all',)
 	return (pol_strs, era_strs, era_type_strs)
 
-def get_gps_utc_constants():
-	leap_seconds_result = get_query_results(data_source=None, database='eor', table='leap_seconds',
-												field_tuples=None, sort_tuples=(('leap_seconds', 'desc'),),
-												output_vars=('leap_seconds',))[0]
+def get_jd_from_datetime(start_time=None, end_time=None):
+	time_start = None
+	time_end = None
+	if isinstance(start_time, str):
+		start_time = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
+	if isinstance(end_time, str):
+		end_time = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
+	if start_time is not None:
+		time_start = gcal2jd(start_time.year, start_time.month, start_time.day, start_time.hour, start_time.minute, start_time.second)
+	if end_time is not None:
+		time_end = gcal2jd(end_time.year, end_time.month, end_time.day, end_time.hour, end_time.minute, end_time.second)
+	return time_start, time_end
 
-	leap_seconds = leap_seconds_result[0]
-
-	GPS_LEAP_SECONDS_OFFSET = leap_seconds - 19
-
-	jan_1_1970 = datetime(1970, 1, 1)
-
-	jan_6_1980 = datetime(1980, 1, 6)
-
-	GPS_UTC_DELTA = (jan_6_1980 - jan_1_1970).total_seconds()
-
-	return (GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA)
-
-def get_gps_from_datetime(start_datetime, end_datetime):
-	session = FuturesSession()
-
-	baseUTCToGPSURL = 'http://ngas01.ivec.org/metadata/tconv/?utciso='
-
-	requestURLStart = ''.join(baseUTCToGPSURL, start_datetime.strftime('%Y-%m-%dT%H:%M:%S'))
-
-	requestURLEnd = ''.join(baseUTCToGPSURL, end_datetime.strftime('%Y-%m-%dT%H:%M:%S'))
-
-	#Start the first Web service request in the background.
-	future_start = session.get(requestURLStart)
-
-	#The second request is started immediately.
-	future_end = session.get(requestURLEnd)
-
-	#Wait for the first request to complete, if it hasn't already.
-	start_gps = int(future_start.result().content)
-
-	#Wait for the second request to complete, if it hasn't already.
-	end_gps = int(future_end.result().content)
-
-	return (start_gps, end_gps)
-
-def get_datetime_from_gps(start_gps, end_gps):
-	session = FuturesSession()
-
-	baseUTCToGPSURL = 'http://ngas01.ivec.org/metadata/tconv/?gpssec='
-
-	requestURLStart = ''.join(baseUTCToGPSURL, str(start_gps))
-
-	requestURLEnd = ''.join(baseUTCToGPSURL, str(end_gps))
-
-	#Start the first Web service request in the background.
-	future_start = session.get(requestURLStart)
-
-	#The second request is started immediately.
-	future_end = session.get(requestURLEnd)
-
-	#Wait for the first request to complete, if it hasn't already.
-	start_datetime = datetime.strptime(future_start.result().content.decode('utf-8'), '"%Y-%m-%dT%H:%M:%S"')
-
-	#Wait for the second request to complete, if it hasn't already.
-	end_datetime = datetime.strptime(future_end.result().content.decode('utf-8'), '"%Y-%m-%dT%H:%M:%S"')
-
-	return (start_datetime, end_datetime)
+def get_utc_from_datetime(date_time):
+	utc = (date_time - datetime.datetime(1970, 1, 1)).total_seconds()
+	return utc
