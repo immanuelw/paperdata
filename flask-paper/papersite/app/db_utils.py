@@ -96,7 +96,7 @@ def get_results(s, table, field_tuples, sort_tuples, output_vars):
 		results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results))
 	return results
 
-def get_query_results(data_source=None, database=None, table=None, field_tuples=None, sort_tuples=None, group_tuples=None, output_vars=None):
+def query(data_source=None, database=None, table=None, field_tuples=None, sort_tuples=None, group_tuples=None, output_vars=None):
 	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
 	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
 	if data_source is not None:

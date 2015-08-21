@@ -6,13 +6,13 @@ def get_error_counts(start_gps, end_gps):
 	error_counts = []
 	error_count = 0
 
-	obscontroller_response = db_utils.get_query_results(database='eor', table='obscontroller_log',
+	obscontroller_response = db_utils.query(database='eor', table='obscontroller_log',
 														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
 														sort_tuples=(('reference_time', 'asc'),),
 														output_vars=('reference_time', 'observation_number', 'comment'))
 	obscontroller_response = tuple(math.floor(ref_time) for ref_time in obscontroller_response)
 
-	recvstatuspolice_response = db_utils.get_query_results(database='eor', table='recvstatuspolice_log',
+	recvstatuspolice_response = db_utils.query(database='eor', table='recvstatuspolice_log',
 														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
 														sort_tuples=(('reference_time', 'asc'),),
 														output_vars=('reference_time',))
@@ -47,7 +47,7 @@ def get_error_counts(start_gps, end_gps):
 	return (error_counts, error_count)
 
 def get_observation_counts(start_gps, end_gps, polarization_var, era_var, era_type_var):
-	response = db_utils.get_query_results(database='paperdata', table='observation',
+	response = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										('polarization', None if polarization_var == 'any' else '==', polarization_var),
 										('era', None if era_var == 0 else '==', era_var),
@@ -75,7 +75,7 @@ def get_observation_counts(start_gps, end_gps, polarization_var, era_var, era_ty
 	return (obs_count, obs_map)
 
 def get_plot_bands(the_set):
-	flagged_subsets = db_utils.get_query_results(database='eorlive', table='flagged_subset',
+	flagged_subsets = db_utils.query(database='eorlive', table='flagged_subset',
 													field_tuples=(('set_id', '==', getattr(the_set, 'id')),))
 
 	plot_bands = [{'from': int((getattr(flagged_subset, 'start'), 'to': int((getattr(flagged_subset, 'end'), 'color': 'yellow'}
@@ -84,7 +84,7 @@ def get_plot_bands(the_set):
 	return plot_bands
 
 def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
-	response = db_utils.get_query_results(database='paperdata', table='observation',
+	response = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										sort_tuples=(('time_start', 'asc'),),
 										output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum')))
@@ -116,11 +116,11 @@ def get_file_histogram(start_gps, end_gps, start_time_str, end_time_str):
 	sort_tuples = (('timestamp', 'desc'),)
 	output_vars = ('timestamp', 'julian_day')
 
-	rtp_obs_list = db_utils.get_query_results(database='paperdata', table='rtp_observation',
+	rtp_obs_list = db_utils.query(database='paperdata', table='rtp_observation',
 												field_tuples=(('julian_date', '>=', start_gps), ('julian_date', '<=', end_gps)),
 												output_vars=('obsnum', 'julian_day', 'polarization', 'era' 'length', 'files'))
 
-	paper_obs_list = db_utils.get_query_results(database='paperdata', table='observation',
+	paper_obs_list = db_utils.query(database='paperdata', table='observation',
 												field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps)),
 												output_vars=('obsnum', 'julian_day', 'polarization', 'era' 'length', 'files'))
 

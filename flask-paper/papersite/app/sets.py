@@ -47,7 +47,7 @@ def is_obs_flagged(obs_id, flagged_range_dicts):
 def get_data_hours_in_set(start, end, polarization, era, era_type, flagged_range_dicts):
 	total_data_hrs = flagged_data_hrs = 0
 
-	all_obs_ids_tuples = db_utils.get_query_results(database='paperdata', table='observation',
+	all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start), ('time_end', '<=', end),
 										('polarization', None if polarization == 'any' else '==', polarization),
 										('era', None if era == 0 else '==', era),
@@ -78,7 +78,7 @@ def save_new_set():
 		if len(name) == 0:
 			return jsonify(error=True, message='Name cannot be empty.')
 
-		sets = db_utils.get_query_results(database='eorlive', table='set', field_tuples=(('name', '>=', name),))
+		sets = db_utils.query(database='eorlive', table='set', field_tuples=(('name', '>=', name),))
 		if len(sets) > 0:
 			return jsonify(error=True, message='Name must be unique.')
 
@@ -124,7 +124,7 @@ def upload_set():
 		if len(set_name) == 0:
 			return jsonify(error=True, message='Name cannot be empty.')
 
-		sets = db_utils.get_query_results(database='eorlive', table='set', field_tuples=(('name', '>=', set_name),))
+		sets = db_utils.query(database='eorlive', table='set', field_tuples=(('name', '>=', set_name),))
 		if len(sets) > 0:
 			return jsonify(error=True, message='Name must be unique.')
 
@@ -151,7 +151,7 @@ def upload_set():
 		era = request.form['era']
 		era_type = request.form['era_type']
 
-		all_obs_ids_tuples = db_utils.get_query_results(database='paperdata', table='observation',
+		all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										('polarization', None if polarization == 'any' else '==', polarization),
 										('era', None if era == 0 else '==', era),
@@ -193,18 +193,18 @@ def upload_set():
 def download_set():
 	set_id = request.args['set_id']
 
-	the_set = db_utils.get_query_results(database='eorlive', table='set',
+	the_set = db_utils.query(database='eorlive', table='set',
 											field_tuples=(('id', '==', set_id),),)[0]
 
 	if the_set is not None:
-		flagged_subsets = db_utils.get_query_results(database='eorlive', table='flagged_subset',
+		flagged_subsets = db_utils.query(database='eorlive', table='flagged_subset',
 														field_tuples=(('set_id', '==', getattr(the_set, 'id')),),)
 
 		polarization = getattr(the_set, 'polarization')
 		era = getattr(the_set, 'era')
 		era_type = getattr(the_set, 'era_type')
 
-		all_obs_ids_tuples = db_utils.get_query_results(database='paperdata', table='observation',
+		all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										('polarization', None if polarization == 'any' else '==', polarization),
 										('era', None if era == 0 else '==', era),
@@ -233,7 +233,7 @@ def download_set():
 
 @app.route('/get_filters')
 def get_filters():
-	users = db_utils.get_query_results(database='eorlive', table='user')
+	users = db_utils.query(database='eorlive', table='user')
 	return render_template('filters.html', users=users)
 
 @app.route('/get_sets', methods = ['POST'])
@@ -269,7 +269,7 @@ def get_sets():
 			elif sort == 'time':
 				sort_tuples = (('created_on', 'desc'),)
 
-		setList = db_utils.get_query_results(database='eorlive', table='set',
+		setList = db_utils.query(database='eorlive', table='set',
 											field_tuples=field_tuples, sort_tuples=sort_tuples)
 
 		include_delete_buttons = request_content['includeDeleteButtons']
@@ -283,7 +283,7 @@ def delete_set():
 	if (g.user is not None and g.user.is_authenticated()):
 		set_id = request.form['set_id']
 
-		theSet = db_utils.get_query_results(database='eorlive', table='set', field_tuples=(('id', '==', set_id),),)[0]
+		theSet = db_utils.query(database='eorlive', table='set', field_tuples=(('id', '==', set_id),),)[0]
 
 		db.session.delete(theSet)
 		db.session.commit()

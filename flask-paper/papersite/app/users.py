@@ -7,7 +7,7 @@ import re
 
 @lm.user_loader
 def load_user(id):
-	user = db_utils.get_query_results(database='eorlive', table='user',	field_tuples=(('username', '==', id),))[0]
+	user = db_utils.query(database='eorlive', table='user',	field_tuples=(('username', '==', id),))[0]
 	return user
 
 @app.route('/login', methods = ['GET', 'POST'])
@@ -19,7 +19,7 @@ def login():
 		username = request.form['username'].strip()
 		password = request.form['password'].strip()
 
-		u = db_utils.get_query_results(database='eorlive', table='user', field_tuples=(('username', '==', username),))[0]
+		u = db_utils.query(database='eorlive', table='user', field_tuples=(('username', '==', username),))[0]
 
 		password = password.encode('UTF-8')
 		if not u:
@@ -45,7 +45,7 @@ def signup():
 		fname = request.form['fname'].strip()
 		lname = request.form['lname'].strip()
 
-		testU = db_utils.get_query_results(database='eorlive', table='user', field_tuples=(('username', '==', username),))[0]
+		testU = db_utils.query(database='eorlive', table='user', field_tuples=(('username', '==', username),))[0]
 
 		if password != password2:
 			error = 'Passwords must be the same.'
@@ -64,7 +64,7 @@ def signup():
 			db.session.refresh(new_user)
 			db.session.commit()
 
-			u = db_utils.get_query_results(database='eorlive', table='user', field_tuples=(('username', '==', username),))[0]
+			u = db_utils.query(database='eorlive', table='user', field_tuples=(('username', '==', username),))[0]
 
 			login_user(u)
 			flash('You were logged in', 'flash')
@@ -88,7 +88,7 @@ def delete_user():
 		for aSet in setList:
 			field_tuples = field_tuple_base + (('id', '==', getattr(aSet, 'id')),)
 
-			theSet = db_utils.get_query_results(database='eorlive', table='set', field_tuples=field_tuples)[0]
+			theSet = db_utils.query(database='eorlive', table='set', field_tuples=field_tuples)[0]
 
 			if action == 'transfer':
 				setattr(theSet, 'username', g.user.username)
@@ -97,7 +97,7 @@ def delete_user():
 				db.session.delete(theSet)
 			db.session.commit()
 
-		u = db_utils.get_query_results(database='eorlive', table='user', field_tuples=(('username', '==', username),))[0]
+		u = db_utils.query(database='eorlive', table='user', field_tuples=(('username', '==', username),))[0]
 
 		db.session.delete(u)
 		db.session.commit()
