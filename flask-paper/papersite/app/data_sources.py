@@ -89,8 +89,7 @@ def subscribe_to_data_source():
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
-		data_source = db_utils.query(database='eorlive', table='graph_data_source',
-													field_tuples=(('name', '==', data_source_name),))[0]
+		data_source = db_utils.query(database='eorlive', table='graph_data_source',	field_tuples=(('name', '==', data_source_name),))[0]
 
 		g.user.subscribed_data_sources.append(data_source)
 		db.session.add(g.user)
@@ -104,8 +103,7 @@ def unsubscribe_from_data_source():
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
-		data_source = db_utils.query(database='eorlive', table='graph_data_source',
-													field_tuples=(('name', '==', data_source_name),))[0]
+		data_source = db_utils.query(database='eorlive', table='graph_data_source',	field_tuples=(('name', '==', data_source_name),))[0]
 
 		g.user.subscribed_data_sources.remove(data_source)
 		try:
@@ -121,8 +119,7 @@ def unsubscribe_from_data_source():
 
 @app.route('/get_graph_types')
 def get_graph_types():
-	graph_types = db_utils.query(database='eorlive', table='graph_type',
-													field_tuples=(('name', '!=', 'Obs_Err'),))
+	graph_types = db_utils.query(database='eorlive', table='graph_type', field_tuples=(('name', '!=', 'Obs_File'),))
 
 	return render_template('graph_type_list.html', graph_types=graph_types)
 
@@ -159,8 +156,7 @@ def create_data_source():
 				letters, _, or spaces.''')
 
 		#Is the data source name unique?
-		data_source = db_utils.query(database='eorlive', table='graph_data_source',
-														field_tuples=(('name', '==', data_source_name),))[0]
+		data_source = db_utils.query(database='eorlive', table='graph_data_source',	field_tuples=(('name', '==', data_source_name),))[0]
 		if data_source is not None:
 			return jsonify(error=True, message='The data source name must be unique.')
 
@@ -207,35 +203,28 @@ def create_data_source():
 		return make_response('You must be logged in to use this feature.', 401)
 
 def get_graph_data(data_source_str, start_gps, end_gps, the_set):
-	data_source = db_utils.query(database='eorlive', table='graph_data_source',
-													field_tuples=(('name', '==', data_source_str),))[0]
+	data_source = db_utils.query(database='eorlive', table='graph_data_source',	field_tuples=(('name', '==', data_source_str),))[0]
 
-	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
-	data = {pol_str: {era_str: {era_type: {'obs_count': 0, 'obs_hours': 0 for era_type_str in era_type_strs}
-									 for era_str in era_strs} for pol_str in pol_strs}
+	pol_strs, era_type_strs, host_strs, filetype_strs = db.utils.get_set_strings()
+	data = {pol_str: {era_type: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
 
 	if the_set is not None:
 		polarization = getattr(the_set, 'polarization')
-		era = getattr(the_set, 'era')
 		era_type = getattr(the_set, 'era_type')
+		host = getattr(the_set, 'host')
+		filetype = getattr(the_set, 'filetype')
 
-		if polarization is not None:
-			results = db_utils.query(data_source=data_source,
-										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
-										('polarization', None if polarization == 'any' else '==', polarization),
-										('era', None if era == 0 else '==', era),
-										('era_type', None if era_type == 'any' else '==', era_type)),
-										sort_tuples=(('time_start', 'asc'),), output_vars=('time_start', 'obsnum'))
+		results = db_utils.query(data_source=data_source,
+									field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+									('polarization', None if polarization == 'all' else '==', polarization),
+									('era_type', None if era_type == 'all' else '==', era_type)),
+									sort_tuples=(('time_start', 'asc'),), output_vars=('time_start', 'obsnum'))
 
 		for obs in results:
 			obs_time = getattr(obs, 'time_start')
 			obsnum = getattr(obs, 'obsnum')
 			obs_dict = {'obs_time': obs_time, 'obsnum': obsnum, 'obs_count': 1}
-			data[polarization][era][era_type].append(obs_dict)
-
-		else:
-			host = getattr(the_set, 'host')
-			filetype = getattr(the_set, 'filetype')
+			data[polarization][era_type].append(obs_dict)
 
 
 	else: #No set, so we need to separate the data into sets for low/high and EOR0/EOR1
@@ -255,13 +244,12 @@ def which_data_set(the_set):
 
 def separate_data_into_sets(data, data_source, start_gps, end_gps):
 	obsid_results = db_utils.query(data_source=data_source,
-										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
-										sort_tuples=(('time_start', 'asc'),),
-										output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum')))
+									field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+									sort_tuples=(('time_start', 'asc'),),
+									output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum')))
 
 	for obs in obsid_results:
 		polarization = getattr(obs, 'polarization')
-		era = getattr(obs, 'era')
 		era_type = getattr(obs, 'era_type')
 
 		# Actual UTC time of the obs (for the graph)
@@ -269,6 +257,6 @@ def separate_data_into_sets(data, data_source, start_gps, end_gps):
 		obsnum = getattr(obs, 'obsnum')
 
 		obs_dict = {'obs_time': obs_time, 'obsnum': obsnum, 'obs_count': 1}
-		data[polarization][era][era_type].append(obs_dict)
+		data[polarization][era_type].append(obs_dict)
 
 	return data
