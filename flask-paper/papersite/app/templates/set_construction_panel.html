@@ -18,14 +18,23 @@
 				<option value='yx'>yx</option>
 				<option value='yy'>yy</option>
 			</select>
-			<select id='era_dropdown' onchange='obs_err.setEraData(this)'>
-				<option value=0>all</option>
-				<option value=32>32</option>
-				<option value=64>64</option>
-				<option value=128>128</option>
-			</select>
 			<select id='era_type_dropdown' onchange='obs_err.setEraTypeData(this)'>
 				<option value='all'>all</option>
+			</select>
+			<select id='host_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setHostData(this)'>
+				<option value='all'>all</option>
+				<option value='pot1'>pot1</option>
+				<option value='pot2'>pot2</option>
+				<option value='pot3'>pot3</option>
+				<option value='folio'>folio</option>
+				<option value='pot8'>pot8</option>
+				<option value='nas1'>nas1</option>
+			</select>
+			<select id='filetype_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setFiletypeData(this)'>
+				<option value='all'>all</option>
+				<option value='uv'>raw</option>
+				<option value='uvcRRE'>compressed</option>
+				<option value='npz'>flags</option>
 			</select>
 			<br>
 			{% endif %}
