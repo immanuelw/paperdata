@@ -206,7 +206,7 @@ def obs_table():
 
 	log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response]
 
-	return render_template('obs_table.html', log_list=log_list, output_vars = output_vars,
+	return render_template('obs_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime.strftime('%Y-%m-%dT%H:%M:%SZ'), end_time=endtime.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
 @app.route('/file_table', methods = ['POST'])
@@ -227,7 +227,7 @@ def file_table():
 	output_vars=('host', 'full_path', 'obsnum', 'filesize')
 	log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response]
 
-	return render_template('file_table.html', log_list=log_list, output_vars = output_vars,
+	return render_template('file_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime.strftime('%Y-%m-%dT%H:%M:%SZ'), end_time=endtime.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
 @app.before_request
