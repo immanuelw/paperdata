@@ -2,13 +2,21 @@
 
 var _chart;
 var inConstructionMode = false;
+var	pol_strs = ['all', 'xx', 'xy', 'yx', 'yy']
+var	era_type_strs = ['all',]
+var	host_strs = ['all', 'pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1']
+var	filetype_strs = ['all', 'uv', 'uvcRRE', 'npz']
 {% if is_set %}
-var flaggedRanges = plot_bands;
-var currentData = {'polarization': '{{ the_set.polarization }}', 'era': '{{ the_set.era }}', 'era_type': '{{ the_set.era_type }}'};
+var flaggedObsRanges = plot_bands;
+var currentObsData = {'polarization': '{{ the_set.polarization }}', 'era_type': '{{ the_set.era_type }}'};
+var currentFileData = {'host': '{{ the_set.host }}', 'filetype': '{{ the_set.filetype }}'};
 {% else %}
-var flaggedRangesDict = {pol_str: {era_str: {era_type: [] for (era_type_str of era_type_strs} for (era_str of era_strs)} for (pol_str of pol_strs)};
-var flaggedRanges = flaggedRangesDict['all'][0]['all'];
-var currentData = {'polarization':'all', 'era':0, 'era_type':'all'};
+var flaggedObsDict = {pol_str: {era_type_str: [] for (era_type_str of era_type_strs)} for (pol_str of pol_strs)};
+var flaggedObsRanges = flaggedObsDict['all']['all'];
+var currentObsData = {'polarization': 'all', 'era_type': 'all'};
+var flaggedFileDict = {host_str: {filetype_str: [] for (filetype_str of filetype_strs)} for (host_str of host_strs)};
+var flaggedFileRanges = flaggedFileDict['all']['all'];
+var currentFileData = {'host': 'all', 'filetype': 'all'};
 {% endif %}
 var clickDragMode = 'zoom';
 
@@ -20,15 +28,15 @@ var setup = function() {
 		// Draw the plot bands.
 		addAllPlotBands();
 		// Count the # of observations in each band.
-		for (var i = 0; i < flaggedRanges.length; ++i) {
-			var thisRange = flaggedRanges[i];
-			var counts = getObsAndErrorCountInRange(thisRange.from, thisRange.to);
+		for (var i = 0; i < flaggedObsRanges.length; ++i) {
+			var thisRange = flaggedObsRanges[i];
+			var counts = getObsAndFileCountInRange(thisRange.from, thisRange.to);
 			thisRange.obs_count = counts.obsCount;
-			thisRange.err_count = counts.errCount;
+			thisRange.file_count = counts.fileCount;
 			thisRange.obs_start_index = counts.obsStartIndex;
 			thisRange.obs_end_index = counts.obsEndIndex;
-			thisRange.err_start_index = counts.errStartIndex;
-			thisRange.err_end_index = counts.errEndIndex;
+			thisRange.file_start_index = counts.fileStartIndex;
+			thisRange.file_end_index = counts.fileEndIndex;
 		}
 		// Update the information in the panel.
 		updateSetConstructionTable();
@@ -42,6 +50,7 @@ var saveSet = function() {
 	};
 
 	var currentObsIdMap = getCurrentObsIdMap();
+	var currentFileIdMap = getCurrentFileIdMap();
 
 	if (currentObsIdMap.length === 0) {
 		alert('There aren't any obs ids in this set!');
@@ -83,13 +92,13 @@ var saveSet = function() {
 
 	var rangesOfFlaggedObsIds = [];
 
-	for (var i = 0; i < flaggedRanges.length; ++i) {
-		if (flaggedRanges[i].obs_count > 0) { // There are observations in this range!
-			var indices = getFlaggedObsIdsMapIndices(flaggedRanges[i].from, flaggedRanges[i].to);
+	for (var i = 0; i < flaggedObsRanges.length; ++i) {
+		if (flaggedObsRanges[i].obs_count > 0) { // There are observations in this range!
+			var indices = getFlaggedObsIdsMapIndices(flaggedObsRanges[i].from, flaggedObsRanges[i].to);
 			var rangeOfFlaggedObsIds = currentObsIdMap.slice(indices.startObsIdMapIndex, indices.endObsIdMapIndex + 1);
 			rangesOfFlaggedObsIds.push({
-				start_millis: flaggedRanges[i].from,
-				end_millis: flaggedRanges[i].to,
+				start_millis: flaggedObsRanges[i].from,
+				end_millis: flaggedObsRanges[i].to,
 				flaggedRange: rangeOfFlaggedObsIds
 			});
 		}
@@ -102,10 +111,11 @@ var saveSet = function() {
 			name: $('#set_name_textbox').val(),
 			startObsId: currentObsIdMap[0]['obsnum'],
 			endObsId: currentObsIdMap[currentObsIdMap.length - 1]['obsnum'],
-			flaggedRanges: rangesOfFlaggedObsIds,
-			polarization: currentData['polarization'],
-			era: currentData['era'],
-			era_type: currentData['era_type'],
+			flaggedObsRanges: rangesOfFlaggedObsIds,
+			polarization: currentObsData['polarization'],
+			era_type: currentObsData['era_type'],
+			host: currentFileData['host'],
+			filetype: currentFileData['filetype']
 		}),
 		success: function(data) {
 			if (data.error) {
@@ -128,72 +138,94 @@ var saveSet = function() {
 };
 dataSourceObj.saveSet = saveSet;
 
-var getCurrentDataSeries = function() {
+var getCurrentObsDataSeries = function() {
 	{% if is_set %} // The user can't change the EOR or low/high, so there is only one set of observations that
 	return observation_counts; // corresponds to the EOR and low/high specified by the set.
 	{% else %}
-	var polarization = currentData['polarization'];
-	var era = currentData['era'];
-	var era_type = currentData['era_type'];
-	return obs_counts[polarization][era][era_type];
+	var polarization = currentObsData['polarization'];
+	var era_type = currentObsData['era_type'];
+	return obs_counts[polarization][era_type];
 	{% endif %}
 };
 
 var getCurrentFlaggedSet = function() {
-	var polarization = currentData['polarization'];
-	var era = currentData['era'];
-	var era_type = currentData['era_type'];
-	return flaggedRangesDict[polarization][era][era_type];
+	var polarization = currentObsData['polarization'];
+	var era_type = currentObsData['era_type'];
+	return flaggedObsDict[polarization][era_type];
 };
 
 var getCurrentObsIdMap = function() {
-	var polarization = currentData['polarization'];
-	var era = currentData['era'];
-	var era_type = currentData['era_type'];
-	return obs_map[polarization][era][era_type];
+	var polarization = currentObsData['polarization'];
+	var era_type = currentObsData['era_type'];
+	return obs_map[polarization][era_type];
+};
+
+var getCurrentFileDataSeries = function() {
+	{% if is_set %} // The user can't change the EOR or low/high, so there is only one set of fileervations that
+	return file_counts; // corresponds to the EOR and low/high specified by the set.
+	{% else %}
+	var host = currentFileData['host'];
+	var filetype = currentFileData['filetype'];
+	return file_counts[host][filetype];
+	{% endif %}
+};
+
+var getCurrentFlaggedSet = function() {
+	var host = currentFileData['host'];
+	var filetype = currentFileData['filetype'];
+	return flaggedFileDict[host][filetype];
+};
+
+var getCurrentFileIdMap = function() {
+	var host = currentFileData['host'];
+	var filetype = currentFileData['filetype'];
+	return file_map[host][filetype];
 };
 
 var hideDataOnDataSetChange = function() {
 	var remove = $('#remove_flagged_data_checkbox').is(':checked');
 	var obsSeries = _chart.series[0];
-	var errSeries = _chart.series[1];
+	var fileSeries = _chart.series[1];
 
-	var polarization = currentData['polarization'];
-	var era = currentData['era'];
-	var era_type = currentData['era_type'];
-	var obsSeriesData = obs_count[polarization][era][era_type];
+	var polarization = currentObsData['polarization'];
+	var era_type = currentObsData['era_type'];
+	var obsSeriesData = obs_counts[polarization][era_type];
 	var obsSeriesDataCopy = obsSeriesData.map(function(arr) {
 		return arr.slice();
 	});
-	var errSeriesData = error_counts_copy;
-	var errSeriesDataCopy = errSeriesData.map(function(arr) {
+	var host = currentFileData['host'];
+	var filetype = currentFileData['filetype'];
+	var fileSeriesData = file_counts[host][filetype];
+	var fileSeriesDataCopy = fileSeriesData.map(function(arr) {
 		return arr.slice();
 	});
 
 	if (remove) {
-		for (var flaggedRangeIndex = 0; flaggedRangeIndex < flaggedRanges.length; ++flaggedRangeIndex) {
-			var thisRange = flaggedRanges[flaggedRangeIndex];
+		for (var flaggedRangeIndex = 0; flaggedRangeIndex < flaggedObsRanges.length; ++flaggedRangeIndex) {
+			var thisRange = flaggedObsRanges[flaggedRangeIndex];
 			for (var obsIndex = thisRange.obs_start_index; obsIndex <= thisRange.obs_end_index; ++obsIndex) {
 				obsSeriesDataCopy[obsIndex]['obsnum'] = null;
 			}
-			for (var errIndex = thisRange.err_start_index; errIndex <= thisRange.err_end_index; ++errIndex) {
-				errSeriesDataCopy[errIndex][1] = null;
+			for (var fileIndex = thisRange.file_start_index; fileIndex <= thisRange.file_end_index; ++fileIndex) {
+				fileSeriesDataCopy[fileIndex]['obsnum'] = null;
 			}
 		}
 	}
 
 	obsSeries.setData(obsSeriesDataCopy, false);
-	errSeries.setData(errSeriesDataCopy);
+	fileSeries.setData(fileSeriesDataCopy);
 };
 
 var dataSetChanged = function() {
-	_chart.series[0].setData(getCurrentDataSeries());
+	_chart.series[0].setData(getCurrentObsDataSeries());
+	_chart.series[1].setData(getCurrentFileDataSeries());
 
 	if (inConstructionMode) {
 		removeAllPlotBands();
 
 		// Set the correct flagged ranges.
-		flaggedRanges = getCurrentFlaggedSet();
+		flaggedObsRanges = getCurrentFlaggedSet();
+		flaggedFileRanges = getCurrentFlaggedSet();
 		hideDataOnDataSetChange();
 
 		addAllPlotBands();
@@ -202,31 +234,39 @@ var dataSetChanged = function() {
 		updateSetConstructionTable();
 	} else {
 		// Set the correct flagged ranges.
-		flaggedRanges = getCurrentFlaggedSet();
+		flaggedObsRanges = getCurrentFlaggedSet();
+		flaggedFileRanges = getCurrentFlaggedSet();
 		hideDataOnDataSetChange();
 	}
 };
 
 var setPolarizationData = function(select) {
-	currentData[1] = select.value;
+	currentObsData['polarization'] = select.value;
 
 	dataSetChanged();
 };
 dataSourceObj.setPolarizationData = setPolarizationData;
 
-var setEraData = function(select) {
-	currentData[1] = select.value;
-
-	dataSetChanged();
-};
-dataSourceObj.setEraData = setEraData;
-
 var setEraTypeData = function(select) {
-	currentData[1] = select.value;
+	currentObsData['era_type'] = select.value;
 
 	dataSetChanged();
 };
 dataSourceObj.setEraTypeData = setEraTypeData;
+
+var setHostData = function(select) {
+	currentFileData['host'] = select.value;
+
+	dataSetChanged();
+};
+dataSourceObj.setHostData = setHostData;
+
+var setFiletypeData = function(select) {
+	currentFileData['filetype'] = select.value;
+
+	dataSetChanged();
+};
+dataSourceObj.setFiletypeData = setFiletypeData;
 
 var setClickDragMode = function(select) {
 	clickDragMode = select.value;
@@ -234,13 +274,15 @@ var setClickDragMode = function(select) {
 dataSourceObj.setClickDragMode = setClickDragMode;
 
 var clearSetConstructionData = function() {
-	flaggedRanges = [];
-	flaggedRangesDict = {pol_str:{era_str: {era_type:[] for (era_type_str of era_type_strs} for (era_str of era_strs)} for (pol_str of pol_strs)};
+	flaggedObsRanges = [];
+	flaggedObsDict = {pol_str: {era_type_str: [] for (era_type_str of era_type_strs} for (pol_str of pol_strs)};
+	flaggedFileRanges = [];
+	flaggedFileDict = {host_str: {filetype_str: [] for (filetype_str of filetype_strs)} for (host_str of host_strs)};
 };
 
-var getDataIndices = function(startTime, endTime, obsSeries, errSeries) {
+var getDataIndices = function(startTime, endTime, obsSeries, fileSeries) {
 	var obsStartIndex = 0, obsEndIndex = -1;
-	var errStartIndex = 0, errEndIndex = -1;
+	var fileStartIndex = 0, fileEndIndex = -1;
 
 	for (var i = 0; i < obsSeries.xData.length; ++i) {
 		if (obsSeries.xData[i] >= startTime) {
@@ -257,17 +299,17 @@ var getDataIndices = function(startTime, endTime, obsSeries, errSeries) {
 		}
 	}
 
-	for (var i = 0; i < errSeries.xData.length; ++i) {
-		if (errSeries.xData[i] >= startTime) {
-			errStartIndex = i;
-			errEndIndex = errSeries.xData.length - 1;
+	for (var i = 0; i < fileSeries.xData.length; ++i) {
+		if (fileSeries.xData[i] >= startTime) {
+			fileStartIndex = i;
+			fileEndIndex = fileSeries.xData.length - 1;
 			break;
 		}
 	}
 
-	for (var i = errStartIndex; i < errSeries.xData.length; ++i) {
-		if (errSeries.xData[i] > endTime) {
-			errEndIndex = i - 1;
+	for (var i = fileStartIndex; i < fileSeries.xData.length; ++i) {
+		if (fileSeries.xData[i] > endTime) {
+			fileEndIndex = i - 1;
 			break;
 		}
 	}
@@ -275,13 +317,13 @@ var getDataIndices = function(startTime, endTime, obsSeries, errSeries) {
 	return {
 		obsStartIndex: obsStartIndex,
 		obsEndIndex: obsEndIndex,
-		errStartIndex: errStartIndex,
-		errEndIndex: errEndIndex
+		fileStartIndex: fileStartIndex,
+		fileEndIndex: fileEndIndex
 	};
 };
 
 var mergeOverlappingRanges = function() {
-	if (flaggedRanges.length === 0)
+	if (flaggedObsRanges.length === 0)
 		return;
 
 	var comparator = function(a, b) {
@@ -295,31 +337,31 @@ var mergeOverlappingRanges = function() {
 	// Need to copy by slicing because sort() returns the reference
 	// to the array tracking flagged ranges, and we need to empty
 	// that array.
-	var sortedFlaggedRanges = flaggedRanges.sort(comparator).slice();
+	var sortedObsFlaggedRanges = flaggedObsRanges.sort(comparator).slice();
 
-	flaggedRanges.length = 0; // Maintain reference to flaggedRanges,
+	flaggedObsRanges.length = 0; // Maintain reference to flaggedObsRanges,
 							  // which points to the correct underlying
 							  // subset.
 
-	flaggedRanges.push(sortedFlaggedRanges[0]);
+	flaggedObsRanges.push(sortedFlaggedRanges[0]);
 
 	for (var i = 1; i < sortedFlaggedRanges.length; ++i) {
-		var lowerRange = flaggedRanges[flaggedRanges.length - 1]; // Get top element in stack.
+		var lowerRange = flaggedObsRanges[flaggedObsRanges.length - 1]; // Get top element in stack.
 		var higherRange = sortedFlaggedRanges[i];
 
 		if (higherRange.from <= lowerRange.to) { // Current interval overlaps with previous interval.
 			lowerRange.to = Math.max(lowerRange.to, higherRange.to);
 
 			// Since we merged two intervals, we have to update the observation & error counts.
-			var counts = getObsAndErrorCountInRange(lowerRange.from, lowerRange.to);
+			var counts = getObsAndFileCountInRange(lowerRange.from, lowerRange.to);
 			lowerRange.obs_count = counts.obsCount;
-			lowerRange.err_count = counts.errCount;
+			lowerRange.file_count = counts.fileCount;
 			lowerRange.obs_start_index = counts.obsStartIndex;
 			lowerRange.obs_end_index = counts.obsEndIndex;
-			lowerRange.err_start_index = counts.errStartIndex;
-			lowerRange.err_end_index = counts.errEndIndex;
+			lowerRange.file_start_index = counts.fileStartIndex;
+			lowerRange.file_end_index = counts.fileEndIndex;
 		} else { // No overlap.
-			flaggedRanges.push(higherRange);
+			flaggedObsRanges.push(higherRange);
 		}
 	}
 };
@@ -328,51 +370,61 @@ var flagClickAndDraggedRange = function(event) {
 	flagRangeInSet(event.xAxis[0].min, event.xAxis[0].max);
 };
 
-var getObsAndErrorCountInRange = function(startTime, endTime) {
-	var obsSeries = _chart.series[0], errSeries = _chart.series[1];
+var getObsAndFileCountInRange = function(startTime, endTime) {
+	var obsSeries = _chart.series[0], fileSeries = _chart.series[1];
 
-	var dataIndices = getDataIndices(startTime, endTime, obsSeries, errSeries);
+	var dataIndices = getDataIndices(startTime, endTime, obsSeries, fileSeries);
 
-	var flaggedObs = getCurrentDataSeries().slice(dataIndices.obsStartIndex, dataIndices.obsEndIndex + 1);
+	var flaggedObs = getCurrentObsDataSeries().slice(dataIndices.obsStartIndex, dataIndices.obsEndIndex + 1);
 
-	var flaggedErr = error_counts.slice(dataIndices.errStartIndex, dataIndices.errEndIndex + 1);
+	var flaggedFile = file_counts.slice(dataIndices.fileStartIndex, dataIndices.fileEndIndex + 1);
 
-	var obsCount = 0, errCount = 0;
+	var obsCount = 0, fileCount = 0;
 
 	for (var i = 0; i < flaggedObs.length; ++i) {
 		obsCount += flaggedObs[i][1];
 	}
 
-	for (var i = 0; i < flaggedErr.length; ++i) {
-		errCount += flaggedErr[i][1];
+	for (var i = 0; i < flaggedFile.length; ++i) {
+		fileCount += flaggedFile[i][1];
 	}
 
 	return {
 		obsCount: obsCount,
-		errCount: errCount,
+		fileCount: fileCount,
 		obsStartIndex: dataIndices.obsStartIndex,
 		obsEndIndex: dataIndices.obsEndIndex,
-		errStartIndex: dataIndices.errStartIndex,
-		errEndIndex: dataIndices.errEndIndex
+		fileStartIndex: dataIndices.fileStartIndex,
+		fileEndIndex: dataIndices.fileEndIndex
 	};
 };
 
 var updateFlaggedRangeIdsAndLabels = function() {
-	for (var i = 0; i < flaggedRanges.length; ++i) {
-		flaggedRanges[i].id = (currentData[0] + currentData[1] + i).toString();
-		flaggedRanges[i].label = { text: (i + 1).toString() };
+	for (var i = 0; i < flaggedObsRanges.length; ++i) {
+		flaggedObsRanges[i].id = (currentObsData['polarization'] + currentData['era_type'] + i).toString();
+		flaggedObsRanges[i].label = { text: (i + 1).toString() };
+	}
+	for (var i = 0; i < flaggedFileRanges.length; ++i) {
+		flaggedFileRanges[i].id = (currentFileData['host'] + currentData['filetype'] + i).toString();
+		flaggedFileRanges[i].label = { text: (i + 1).toString() };
 	}
 };
 
 var addAllPlotBands = function() {
-	for (var i = 0; i < flaggedRanges.length; ++i) {
-		_chart.xAxis[0].addPlotBand(flaggedRanges[i]);
+	for (var i = 0; i < flaggedObsRanges.length; ++i) {
+		_chart.xAxis[0].addPlotBand(flaggedObsRanges[i]);
+	}
+	for (var i = 0; i < flaggedFileRanges.length; ++i) {
+		_chart.xAxis[1].addPlotBand(flaggedFileRanges[i]);
 	}
 };
 
 var removeAllPlotBands = function() {
-	for (var i = 0; i < flaggedRanges.length; ++i) {
-		_chart.xAxis[0].removePlotBand(flaggedRanges[i].id);
+	for (var i = 0; i < flaggedObsRanges.length; ++i) {
+		_chart.xAxis[0].removePlotBand(flaggedObsRanges[i].id);
+	}
+	for (var i = 0; i < flaggedFileRanges.length; ++i) {
+		_chart.xAxis[1].removePlotBand(flaggedFileRanges[i].id);
 	}
 };
 
@@ -380,7 +432,8 @@ var addedNewFlaggedRange = function(plotBand) {
 	removeAllPlotBands();
 
 	// Add new plot band.
-	flaggedRanges.push(plotBand);
+	flaggedObsRanges.push(plotBand);
+	flaggedFileRanges.push(plotBand);
 	removeDataForNewFlaggedRangeIfNecessary(plotBand);
 	mergeOverlappingRanges();
 	updateFlaggedRangeIdsAndLabels();
@@ -397,11 +450,11 @@ var flagRangeInSet = function(startTime, endTime) {
 		from: startTime,
 		to: endTime,
 		obs_count: counts.obsCount,
-		err_count: counts.errCount,
+		file_count: counts.fileCount,
 		obs_start_index: counts.obsStartIndex,
 		obs_end_index: counts.obsEndIndex,
-		err_start_index: counts.errStartIndex,
-		err_end_index: counts.errEndIndex
+		file_start_index: counts.fileStartIndex,
+		file_end_index: counts.fileEndIndex
 	};
 
 	addedNewFlaggedRange(plotBand);
@@ -412,14 +465,14 @@ var flagRangeInSet = function(startTime, endTime) {
 var updateSetConstructionTable = function() {
 	var tableHtml = '';
 
-	for (var i = 0; i < flaggedRanges.length; ++i) {
-		var flaggedRange = flaggedRanges[i];
+	for (var i = 0; i < flaggedObsRanges.length; ++i) {
+		var flaggedRange = flaggedObsRanges[i];
 		tableHtml += '<tr><td>' + flaggedRange.label.text + '</td>' +
 		'<td>' + new Date(flaggedRange.from).toISOString() + '</td>' +
 		'<td>' + new Date(flaggedRange.to).toISOString() + '</td>' +
 		'<td>' + flaggedRange.obs_count + '</td>' +
-		'<td>' + flaggedRange.err_count + '</td>' +
-		'<td><button onclick=\'obs_err.unflagRange('' + flaggedRange.id +
+		'<td>' + flaggedRange.file_count + '</td>' +
+		'<td><button onclick=\'obs_file.unflagRange('' + flaggedRange.id +
 		'')\'>Unflag range</button></td></tr>';
 	}
 
@@ -429,14 +482,21 @@ var updateSetConstructionTable = function() {
 var removedFlaggedRange = function(index) {
 	removeAllPlotBands();
 	reinsertDataForRange(index);
-	flaggedRanges.splice(index, 1);
+	flaggedObsRanges.splice(index, 1);
+	flaggedFileRanges.splice(index, 1);
 	updateFlaggedRangeIdsAndLabels();
 	addAllPlotBands();
 };
 
 var unflagRange = function(flaggedRangeId) {
-	for (var i = 0; i < flaggedRanges.length; ++i) {
-		if (flaggedRanges[i].id === flaggedRangeId) {
+	for (var i = 0; i < flaggedObsRanges.length; ++i) {
+		if (flaggedObsRanges[i].id === flaggedRangeId) {
+			removedFlaggedRange(i);
+			break;
+		}
+	}
+	for (var i = 0; i < flaggedFileRanges.length; ++i) {
+		if (flaggedFileRanges[i].id === flaggedRangeId) {
 			removedFlaggedRange(i);
 			break;
 		}
@@ -448,31 +508,30 @@ dataSourceObj.unflagRange = unflagRange;
 
 var reinsertDataForRange = function(index) {
 	if ($('#remove_flagged_data_checkbox').is(':checked')) {
-		var thisRange = flaggedRanges[index];
+		var thisRange = flaggedObsRanges[index];
 		var obsSeries = _chart.series[0];
-		var errSeries = _chart.series[1];
+		var fileSeries = _chart.series[1];
 		{% if is_set %}
-		var obsSeriesData = observation_counts_copy;
+		var obsSeriesData = obs_counts;
 		{% else %}
-		var polarization = currentData['polarization'];
-		var era = currentData['era'];
-		var era_type = currentData['era_type'];
-		var obsSeriesData = obs_count[polarization][era][era_type];
+		var polarization = currentObsData['polarization'];
+		var era_type = currentObsData['era_type'];
+		var obsSeriesData = obs_counts[polarization][era_type];
 		{% endif %}
-		var errSeriesData = error_counts_copy;
+		var fileSeriesData = file_counts;
 
 		var obsSeriesGraphData = getSeriesDataCopyFromGraph(obsSeries);
-		var errSeriesGraphData = getSeriesDataCopyFromGraph(errSeries);
+		var fileSeriesGraphData = getSeriesDataCopyFromGraph(fileSeries);
 
 		for (var obsIndex = thisRange.obs_start_index; obsIndex <= thisRange.obs_end_index; ++obsIndex) {
-			obsSeriesGraphData[obsIndex][1] = obsSeriesData[obsIndex][1];
+			obsSeriesGraphData[obsIndex]['obsnum'] = obsSeriesData[obsIndex]['obsnum'];
 		}
-		for (var errIndex = thisRange.err_start_index; errIndex <= thisRange.err_end_index; ++errIndex) {
-			errSeriesGraphData[errIndex][1] = errSeriesData[errIndex][1];
+		for (var fileIndex = thisRange.file_start_index; fileIndex <= thisRange.file_end_index; ++fileIndex) {
+			fileSeriesGraphData[fileIndex]['obsnum'] = fileSeriesData[fileIndex]['obsnum'];
 		}
 
 		obsSeries.setData(obsSeriesGraphData, false);
-		errSeries.setData(errSeriesGraphData);
+		fileSeries.setData(fileSeriesGraphData, false);
 	}
 };
 
@@ -508,19 +567,19 @@ var getSeriesDataCopyFromGraph = function(series) {
 var removeDataForNewFlaggedRangeIfNecessary = function(flaggedRange) {
 	if ($('#remove_flagged_data_checkbox').is(':checked')) {
 		var obsSeries = _chart.series[0];
-		var errSeries = _chart.series[1];
+		var fileSeries = _chart.series[1];
 		var obsSeriesGraphData = getSeriesDataCopyFromGraph(obsSeries);
-		var errSeriesGraphData = getSeriesDataCopyFromGraph(errSeries);
+		var fileSeriesGraphData = getSeriesDataCopyFromGraph(fileSeries);
 
 		for (var obsIndex = flaggedRange.obs_start_index; obsIndex <= flaggedRange.obs_end_index; ++obsIndex) {
-			obsSeriesGraphData[obsIndex][1] = null;
+			obsSeriesGraphData[obsIndex]['obsnum'] = null;
 		}
-		for (var errIndex = flaggedRange.err_start_index; errIndex <= flaggedRange.err_end_index; ++errIndex) {
-			errSeriesGraphData[errIndex][1] = null;
+		for (var fileIndex = flaggedRange.file_start_index; fileIndex <= flaggedRange.file_end_index; ++fileIndex) {
+			fileSeriesGraphData[fileIndex]['obsnum'] = null;
 		}
 
 		obsSeries.setData(obsSeriesGraphData, false);
-		errSeries.setData(errSeriesGraphData);
+		fileSeries.setData(fileSeriesGraphData, false);
 	}
 };
 
@@ -528,24 +587,26 @@ var clickRemoveFlaggedDataCheckbox = function(checkbox) {
 	var remove = checkbox.checked;
 
 	var obsSeries = _chart.series[0];
-	var errSeries = _chart.series[1];
+	var fileSeries = _chart.series[1];
 
 	if (!remove) {
 		{% if is_set %}
-		var obsSeriesData = observation_counts_copy;
+		var obsSeriesData = obs_counts;
+		var fileSeriesData = file_counts;
 		{% else %}
-		var polarization = currentData['polarization'];
-		var era = currentData['era'];
-		var era_type = currentData['era_type'];
-		var obsSeriesData = obs_count[polarization][era][era_type];
+		var polarization = currentObsData['polarization'];
+		var era_type = currentObsData['era_type'];
+		var obsSeriesData = obs_counts[polarization][era_type];
+		var host = currentFileData['host'];
+		var filetype = currentFileData['filetype'];
+		var fileSeriesData = file_counts[host][filetype];
 		{% endif %}
-		var errSeriesData = error_counts_copy;
 	}
 	var obsSeriesGraphData = getSeriesDataCopyFromGraph(obsSeries);
-	var errSeriesGraphData = getSeriesDataCopyFromGraph(errSeries);
+	var fileSeriesGraphData = getSeriesDataCopyFromGraph(fileSeries);
 
-	for (var flaggedRangeIndex = 0; flaggedRangeIndex < flaggedRanges.length; ++flaggedRangeIndex) {
-		var thisRange = flaggedRanges[flaggedRangeIndex];
+	for (var flaggedRangeIndex = 0; flaggedRangeIndex < flaggedObsRanges.length; ++flaggedRangeIndex) {
+		var thisRange = flaggedObsRanges[flaggedRangeIndex];
 		for (var obsIndex = thisRange.obs_start_index; obsIndex <= thisRange.obs_end_index; ++obsIndex) {
 			if (remove) {
 				obsSeriesGraphData[obsIndex]['obsnum'] = null;
@@ -553,17 +614,17 @@ var clickRemoveFlaggedDataCheckbox = function(checkbox) {
 				obsSeriesGraphData[obsIndex]['obsnum'] = obsSeriesData[obsIndex]['obsnum'];
 			}
 		}
-		for (var errIndex = thisRange.err_start_index; errIndex <= thisRange.err_end_index; ++errIndex) {
+		for (var fileIndex = thisRange.file_start_index; fileIndex <= thisRange.file_end_index; ++fileIndex) {
 			if (remove) {
-				errSeriesGraphData[errIndex][1] = null;
+				fileSeriesGraphData[fileIndex]['obsnum'] = null;
 			} else {
-				errSeriesGraphData[errIndex][1] = errSeriesData[errIndex][1];
+				fileSeriesGraphData[fileIndex]['obsnum'] = fileSeriesData[fileIndex]['obsnum'];
 			}
 		}
 	}
 
 	obsSeries.setData(obsSeriesGraphData, false);
-	errSeries.setData(errSeriesGraphData);
+	fileSeries.setData(fileSeriesGraphData, false);
 };
 dataSourceObj.clickRemoveFlaggedDataCheckbox = clickRemoveFlaggedDataCheckbox;
 
