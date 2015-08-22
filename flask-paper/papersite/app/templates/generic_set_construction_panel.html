@@ -16,13 +16,17 @@
 				<option value='yx'>yx</option>
 				<option value='yy'>yy</option>
 			</select>
-			<select id='era_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setEraData(this)'>
-				<option value=0>all</option>
-				<option value=32>32</option>
-				<option value=64>64</option>
-				<option value=128>128</option>
-			</select>
 			<select id='era_type_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setEraTypeData(this)'>
+				<option value='all'>all</option>
+			</select>
+			<select id='host_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setHostData(this)'>
+				<option value='all'>all</option>
+				<option value='xx'>xx</option>
+				<option value='xy'>xy</option>
+				<option value='yx'>yx</option>
+				<option value='yy'>yy</option>
+			</select>
+			<select id='filetype_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setFiletypeData(this)'>
 				<option value='all'>all</option>
 			</select>
 			<br>
