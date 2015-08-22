@@ -109,11 +109,11 @@ def get_graph():
 			set_polarization, set_era_type = getattr(the_set, 'polarization'), getattr(the_set, 'era_type')
 			set_host, set_filetype = getattr(the_set, 'host'), getattr(the_set, 'filetype')
 			obs_count, obs_map = histogram_utils.get_observation_counts(set_start, set_end, set_polarization, set_era_type)
-			_, file_map = histogram_utils.get_file_counts(set_start, set_end, set_host, set_filetype)
+			file_count, file_map = histogram_utils.get_file_counts(set_start, set_end, set_host=set_host, set_filetype=set_filetype)
 			range_end = end_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') # For the function in histogram_utils.js
 			which_data_set = data_sources.which_data_set(the_set)
 			return render_template('setView.html', the_set=the_set, is_set=True,
-									obs_count=obs_count, obs_map=obs_map, file_map=file_map,
+									obs_count=obs_count, obs_map=obs_map, file_count=file_count, file_map=file_map,
 									plot_bands=plot_bands, start_time_str_short=start_time_str_short,
 									end_time_str_short=end_time_str_short, range_end=range_end,
 									which_data_set=which_data_set)
@@ -148,16 +148,13 @@ def source_table():
 	sort_tuples = (('timestamp', 'desc'),)
 	output_vars = ('timestamp', 'julian_day')
 	
-	corr_source = db_utils.query(database='paperdata', table='rtp_file',
-									field_tuples=(('transferred', '==', None),),
+	corr_source = db_utils.query(database='paperdata', table='rtp_file', field_tuples=(('transferred', '==', None),),
 									sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
-	rtp_source = db_utils.query(database='paperdata', table='rtp_file',
-									field_tuples=(('transferred', '==', True),),
-									sort_tuples=sort_tuples, output_vars=output_vars)[0]
+	rtp_source = db_utils.query(database='paperdata', table='rtp_file',	field_tuples=(('transferred', '==', True),),
+								sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
-	paper_source = db_utils.query(database='paperdata', table='observation',
-									sort_tuples=sort_tuples, output_vars=output_vars)[0]
+	paper_source = db_utils.query(database='paperdata', table='observation', sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
 	source_tuples = (('Correlator', corr_source), ('RTP', rtp_source), ('Folio Scan', paper_source))
 	source_names = (source_name for source_name, _ in source_tuples)
@@ -194,28 +191,44 @@ def filesystem():
 
 	return render_template('filesystem_table.html', system_names=system_names, system_dict=system_dict)
 
-@app.route('/error_table', methods = ['POST'])
-def error_table():
+@app.route('/obs_table', methods = ['POST'])
+def obs_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
-
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
 	start_gps, end_gps = db_utils.get_gps_from_datetime(starttime, endtime)
 
-	obscontroller_response = db_utils.query(database='eor', table='obscontroller_log',
-														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
-														sort_tuples=(('reference_time', 'asc'),),
-														output_vars=('reference_time', 'observation_number', 'comment'))
+	output_vars=('obsnum', 'julian_date', 'polarization', 'length')
+	response = db_utils.query(database='paperdata', table='observation', 
+								field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps)),
+								sort_tuples=(('time_start', 'asc'),),
+								output_vars=output_vars)
 
-	recvstatuspolice_response = db_utils.query(database='eor', table='recvstatuspolice_log',
-														(('reference_time', '>=', start_gps), ('reference_time', '<=', end_gps)),
-														sort_tuples=(('reference_time', 'asc'),),
-														output_vars=('reference_time', 'observation_number', 'comment'))
+	log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response]
 
-	return render_template('error_table.html', obscontroller_error_list=obscontroller_response,
-							recvstatuspolice_error_list=recvstatuspolice_response,
-							start_time=starttime.strftime('%Y-%m-%dT%H:%M:%SZ'),
-							end_time=endtime.strftime('%Y-%m-%dT%H:%M:%SZ'))
+	return render_template('obs_table.html', log_list=log_list, output_vars = output_vars,
+							start_time=starttime.strftime('%Y-%m-%dT%H:%M:%SZ'), end_time=endtime.strftime('%Y-%m-%dT%H:%M:%SZ'))
+
+@app.route('/file_table', methods = ['POST'])
+def file_table():
+	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
+	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
+
+	start_gps, end_gps = db_utils.get_gps_from_datetime(starttime, endtime)
+
+	all_obs_list = db_utils.query(database='paperdata', table='observation', 
+								field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps)),
+								sort_tuples=(('time_start', 'asc'),),
+								output_vars=('files',))
+
+	files_list = (getattr(obs, 'files') for obs in all_obs_list)
+	file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
+
+	output_vars=('host', 'full_path', 'obsnum', 'filesize')
+	log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response]
+
+	return render_template('file_table.html', log_list=log_list, output_vars = output_vars,
+							start_time=starttime.strftime('%Y-%m-%dT%H:%M:%SZ'), end_time=endtime.strftime('%Y-%m-%dT%H:%M:%SZ'))
 
 @app.before_request
 def before_request():

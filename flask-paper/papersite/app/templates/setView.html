@@ -1,21 +1,23 @@
 {% block body %}
 <div id='main_content_div'>
 	<button id='backbutton' onclick='obs_err.backToHistogram()'>Back to histogram</button>
-	<div id='error_table'></div>
-	<div id='obs_err'></div>
+	<div id='obs_table'></div>
+	<div id='file_table'></div>
+	<div id='obs_file'></div>
 	<div id='set_construction_panel'>
 		{% include 'set_construction_panel.html' %}
 	</div>
 </div>
 <script type='text/javascript'>
-var obs_err = (function($) {
+var obs_file = (function($) {
 	var dataSourceObj = {};
-	var observation_counts = {{ obs_counts }};
-	var observation_counts_copy = {{ obs_counts }};
-	var error_counts = {{ error_counts | tojson }};
-	var error_counts_copy = {{ error_counts | tojson }};
+	var observation_counts = {{ obs_count }};
+	var observation_counts_copy = {{ obs_count }};
+	var file_counts = {{ file_counts | tojson }};
+	var file_counts_copy = {{ file_counts | tojson }};
 	var plot_bands = {{ plot_bands | tojson }};
 	var obs_map = {{ obs_map }};
+	var file_map = {{ file_map }};
 
 	{% include 'js/obs_err_set_construction.js' %}
 
@@ -72,31 +74,54 @@ var obs_err = (function($) {
 					pointPadding: 0,
 					events: {
 						click: function(event) {
-							if (this.name === 'errors') {
+							if (this.name === 'observations' || this.name === 'files') {
 								var columnLimits = getColumnRangeLimits(event, this.xAxis.series[1]);
 								var startTime = columnLimits.startTime, endTime = columnLimits.endTime;
 
-								$('#obs_err').hide();
+								$('#obs_file').hide();
 								$('#set_construction_panel').hide();
-								$('#error_table').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
-								$('#error_table').show();
+								if (this.name === 'observations') {
+									$('#obs_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+									$('#obs_table').show();
 
-								$.ajax({
-									type: 'POST',
-									url: '/error_table',
-									data: {
-										'starttime': startTime,
-										'endtime': endTime
-									},
-									success: function(data) {
-										$('#error_table').html(data);
-										$('#backbutton').show();
-									},
-									error: function(xhr, ajaxOptions, thrownError) {
-										backToHistogram();
-									},
-									dataType: 'html'
-								});
+									$.ajax({
+										type: 'POST',
+										url: '/obs_table',
+										data: {
+											'starttime': startTime,
+											'endtime': endTime
+										},
+										success: function(data) {
+											$('#obs_table').html(data);
+											$('#backbutton').show();
+										},
+										error: function(xhr, ajaxOptions, thrownError) {
+											backToHistogram();
+										},
+										dataType: 'html'
+									});
+								}
+								else if (this.name === 'files') {
+									$('#file_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+									$('#file_table').show();
+
+									$.ajax({
+										type: 'POST',
+										url: '/file_table',
+										data: {
+											'starttime': startTime,
+											'endtime': endTime
+										},
+										success: function(data) {
+											$('#file_table').html(data);
+											$('#backbutton').show();
+										},
+										error: function(xhr, ajaxOptions, thrownError) {
+											backToHistogram();
+										},
+										dataType: 'html'
+									});
+								}
 							}
 						}
 					}
@@ -151,14 +176,14 @@ var obs_err = (function($) {
 				selected: 10
 			},
 			title: {
-				text: 'Observation & Error Count'
+				text: 'Observation & File Count'
 			},
 			xAxis: {
 				ordinal: false
 			},
 			yAxis: {
 				title: {
-					text: 'Number of Observations/Errors'
+					text: 'Number of Observations/Files'
 				},
 				min: 0,
 				allowDecimals: false
@@ -170,8 +195,8 @@ var obs_err = (function($) {
 			},
 			{
 				type: 'column',
-				name: 'errors',
-				data: error_counts
+				name: 'files',
+				data: file_counts
 			}]
 		}, function(chart) {
 			_chart = chart;
