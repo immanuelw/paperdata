@@ -109,8 +109,8 @@ def get_graph():
 		end_time_str_short = end_datetime.strftime('%Y-%m-%d %H:%M')
 
 		if graph_type_str == 'Obs_Err':
-			set_polarization, set_era, set_era_type = getattr(the_set, 'polarization'), getattr(the_set, 'era'), getattr(the_set, 'era_type')
-			obs_count, obs_map = histogram_utils.get_observation_counts(set_start, set_end, set_polarization, set_era, set_era_type)
+			set_polarization, set_era_type = getattr(the_set, 'polarization'), getattr(the_set, 'era_type')
+			obs_count, obs_map = histogram_utils.get_observation_counts(set_start, set_end, set_polarization, set_era_type)
 			error_counts = histogram_utils.get_error_counts(set_start, set_end)[0]
 			range_end = end_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') # For the function in histogram_utils.js
 			which_data_set = data_sources.which_data_set(the_set)
@@ -290,35 +290,34 @@ def data_summary_table():
 	response = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										sort_tuples=(('time_start', 'asc'),),
-										output_vars=('time_start', 'time_end', 'polarization', 'era', 'era_type')))
+										output_vars=('time_start', 'time_end', 'polarization', 'era_type')))
 
 	pol_strs = ('xx', 'xy', 'yx', 'yy')
-	era_strs = (32, 64, 128)
-	obs_map = {pol_str: {era_str: {'obs_count': 0, 'obs_hours': 0} for era_str in era_strs} for pol_str in pol_strs}
+	era_type_strs = ('all',)
+	obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
 
 	for obs in response:
 		polarization = getattr(obs, 'polarization')
-		era = getattr(obs, 'era')
 		era_type = getattr(obs, 'era_type')
 
 		# Actual UTC time of the obs (for the graph)
 		obs_start = getattr(obs, 'time_start')
 		obs_end = getattr(obs, 'time_end')
 
-		obs_map[polarization][era]['obs_count'] += 1
-		obs_map[polarization][era]['obs_hours'] += (obs_end - obs_start) / 3600.0
+		obs_map[polarization][era_type]['obs_count'] += 1
+		obs_map[polarization][era_type]['obs_hours'] += (obs_end - obs_start) / 3600.0
 
-	all_strs = pol_strs + era_strs
+	all_strs = pol_strs + era_type_strs
 	obs_total = {all_str: {'count':0, 'hours':0} for all_str in all_strs}
 
 	for pol_era, obs_dict in obs_map.iteritems():
-		for pol, era in pol_era.split('-'):
-			obs_total[era]['count'] += obs_dict['obs_count']
-			obs_total[era]['hours'] += obs_dict['obs_hours']
+		for pol, era_type in pol_era.split('-'):
+			obs_total[era_type]['count'] += obs_dict['obs_count']
+			obs_total[era_type]['hours'] += obs_dict['obs_hours']
 			obs_total[pol]['count'] += obs_dict['obs_count']
 			obs_total[pol]['hours'] += obs_dict['obs_hours']
 
 	error_counts, error_count = histogram_utils.get_error_counts(start_gps, end_gps)
 
-	return render_template('summary_table.html', error_count=error_count, pol_strs=pol_strs, era_strs=era_strs,
+	return render_template('summary_table.html', error_count=error_count, pol_strs=pol_strs, era_type_strs=era_type_strs,
 													obs_map=obs_map, obs_total=obs_total)

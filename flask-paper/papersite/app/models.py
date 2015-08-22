@@ -61,7 +61,6 @@ class Set(db.Model):
 	start = db.Column(db.Integer)
 	end = db.Column(db.Integer)
 	polarization = db.Column(db.String(4)) #'all', 'xy', 'yy', etc.
-	era = db.Column(db.Integer)
 	era_type = db.Column(db.String(10))
 	host = db.Column(db.String(10))
 	filetype = db.Column(db.String(10))

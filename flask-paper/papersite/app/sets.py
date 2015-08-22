@@ -10,7 +10,6 @@ def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era,
 	setattr(new_set, 'start', start)
 	setattr(new_set, 'end', end)
 	setattr(new_set, 'polarization', polarization)
-	setattr(new_set, 'era', era)
 	setattr(new_set, 'era_type', era_type)
 	setattr(new_set, 'total_data_hrs', total_data_hrs)
 	setattr(new_set, 'flagged_data_hrs', flagged_data_hrs)
@@ -44,13 +43,12 @@ def is_obs_flagged(obs_id, flagged_range_dicts):
 			return True
 	return False
 
-def get_data_hours_in_set(start, end, polarization, era, era_type, flagged_range_dicts):
+def get_data_hours_in_set(start, end, polarization, era_type, flagged_range_dicts):
 	total_data_hrs = flagged_data_hrs = 0
 
 	all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start), ('time_end', '<=', end),
 										('polarization', None if polarization == 'any' else '==', polarization),
-										('era', None if era == 0 else '==', era),
 										('era_type', None if era_type == 'any' else '==', era_type)),
 										sort_tuples=(('time_start', 'asc'),), output_vars=('time_start', 'time_end'))
 	for times in all_obs_ids_tuples:
@@ -98,14 +96,13 @@ def save_new_set():
 		start_gps = request_content['startObsId']
 		end_gps = request_content['endObsId']
 		polarization = request_content['polarization']
-		era = request_content['era']
 		era_type = request_content['era_type']
 
 		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(
-			start_gps, end_gps, polarization, era, era_type flagged_range_dicts)
+			start_gps, end_gps, polarization, era_type flagged_range_dicts)
 
 		insert_set_into_db(name, start_gps, end_gps, flagged_range_dicts,
-			polarization, era, era_type, total_data_hrs, flagged_data_hrs)
+			polarization, era_type, total_data_hrs, flagged_data_hrs)
 
 		return jsonify()
 	else:
@@ -148,13 +145,11 @@ def upload_set():
 		end_gps = good_obs_ids[len(good_obs_ids) - 1]
 
 		polarization = request.form['polarization']
-		era = request.form['era']
 		era_type = request.form['era_type']
 
 		all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										('polarization', None if polarization == 'any' else '==', polarization),
-										('era', None if era == 0 else '==', era),
 										('era_type', None if era_type == 'any' else '==', era_type)),
 										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
 
@@ -170,8 +165,8 @@ def upload_set():
 			except ValueError as e:
 				return jsonify(error=True, message=''.join('''Obs ID {obsnum}
 						not found in the set of observations corresponding
-						to Polarization: {polarization}, ERA:{era}, and ERA_TYPE: {era_type}'''\
-						.format(obsnum=good_obs_id, polarization=polarization, era=era, era_type=era_type)))
+						to Polarization: {polarization} and ERA_TYPE: {era_type}'''\
+						.format(obsnum=good_obs_id, polarization=polarization, era_type=era_type)))
 			if next_index > last_index:
 				bad_range_dict = {}
 				bad_range_dict['start_gps'] = all_obs_ids[last_index]
@@ -181,9 +176,9 @@ def upload_set():
 
 			last_index = next_index + 1
 
-		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(start_gps, end_gps, polarization, era, era_type, bad_ranges)
+		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(start_gps, end_gps, polarization, era_type, bad_ranges)
 
-		insert_set_into_db(set_name, start_gps, end_gps, bad_ranges, polarization, era, era_type, total_data_hrs, flagged_data_hrs)
+		insert_set_into_db(set_name, start_gps, end_gps, bad_ranges, polarization, era_type, total_data_hrs, flagged_data_hrs)
 
 		return 'OK'
 	else:
@@ -201,13 +196,11 @@ def download_set():
 														field_tuples=(('set_id', '==', getattr(the_set, 'id')),),)
 
 		polarization = getattr(the_set, 'polarization')
-		era = getattr(the_set, 'era')
 		era_type = getattr(the_set, 'era_type')
 
 		all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										('polarization', None if polarization == 'any' else '==', polarization),
-										('era', None if era == 0 else '==', era),
 										('era_type', None if era_type == 'any' else '==', era_type)),
 										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
 
@@ -243,7 +236,6 @@ def get_sets():
 		set_controls = request_content['set_controls']
 		username = set_controls['user']
 		polarization = set_controls['polarization']
-		era = set_controls['era']
 		era_type = set_controls['era_type']
 		sort = set_controls['sort']
 		ranged = set_controls['ranged']
@@ -257,7 +249,6 @@ def get_sets():
 
 		field_tuples = (('username', '==' if username else None, username),
 							('polarization', '==' if polarization else None, polarization),
-							('era', '==' if era else None, era),
 							('era_type', '==' if era_type else None, era_type),
 							('start', '>=' if ranged else None, start_gps),
 							('end', '>=' if ranged else None, end_gps))

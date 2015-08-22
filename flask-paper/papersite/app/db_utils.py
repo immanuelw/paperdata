@@ -120,9 +120,10 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 
 def set_strings():
 	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
-	era_strs = (0, 32, 64, 128)
 	era_type_strs = ('all',)
-	return (pol_strs, era_strs, era_type_strs)
+	host_strs = ('pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1')
+	filetype_strs = ('uv', 'uvcRRE', 'npz')
+	return (pol_strs, era_type_strs, host_strs, filetype_strs)
 
 def get_jd_from_datetime(start_time=None, end_time=None):
 	time_start = None

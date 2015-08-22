@@ -46,37 +46,33 @@ def get_error_counts(start_gps, end_gps):
 
 	return (error_counts, error_count)
 
-def get_observation_counts(start_gps, end_gps, polarization_var, era_var, era_type_var):
+def get_observation_counts(start_gps, end_gps, polarization_var, era_type_var):
 	response = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										('polarization', None if polarization_var == 'any' else '==', polarization_var),
-										('era', None if era_var == 0 else '==', era_var),
 										('era_type', None if era_type_var == 'any' else '==', era_type_var)),
 										sort_tuples=(('time_start', 'asc'),),
 										output_vars=('time_start', 'time_end', 'polarization', 'era'. 'era_type'))
 
-	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
-	obs_map = {pol_str: {era_str: {era_type: [] for era_type_str in era_type_strs} for era_str in era_strs} for pol_str in pol_strs}
-	obs_count = {pol_str: {era_str: {era_type: {'obs_count': 0} for era_type_str in era_type_strs}
-																for era_str in era_strs} for pol_str in pol_strs}
+	pol_strs, era_type_strs = db.utils.set_strings()
+	obs_map = {pol_str: {era_type: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
+	obs_count = {pol_str: {era_type: {'obs_count': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
 
 	for obs in response:
 		polarization = getattr(obs, 'polarization')
-		era = getattr(obs, 'era')
 		era_type = getattr(obs, 'era_type')
 
 		# Actual UTC time of the obs (for the graph)
 		obs_time = getattr(obs, 'time_start')
 		obsnum = getattr(obs, 'obsnum')
 
-		obs_map[polarization][era][era_type].append({'obs_time':obs_time, 'obsnum':obsnum})
-		obs_count[polarization][era][era_type]['obs_count'] += 1
+		obs_map[polarization][era_type].append({'obs_time':obs_time, 'obsnum':obsnum})
+		obs_count[polarization][era_type]['obs_count'] += 1
 
 	return (obs_count, obs_map)
 
 def get_plot_bands(the_set):
-	flagged_subsets = db_utils.query(database='eorlive', table='flagged_subset',
-													field_tuples=(('set_id', '==', getattr(the_set, 'id')),))
+	flagged_subsets = db_utils.query(database='eorlive', table='flagged_subset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),))
 
 	plot_bands = [{'from': int((getattr(flagged_subset, 'start'), 'to': int((getattr(flagged_subset, 'end'), 'color': 'yellow'}
 					for flagged_subset in flagged_subsets]
@@ -87,24 +83,22 @@ def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
 	response = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
 										sort_tuples=(('time_start', 'asc'),),
-										output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum')))
+										output_vars=('time_start', 'polarization', 'era_type', 'obsnum')))
 
-	pol_strs, era_strs, era_type_strs = db.utils.set_strings()
-	obs_map = {pol_str: {era_str: {era_type: [] for era_type_str in era_type_strs} for era_str in era_strs} for pol_str in pol_strs}
-	obs_count = {pol_str: {era_str: {era_type: {'obs_count': 0} for era_type_str in era_type_strs}
-																for era_str in era_strs} for pol_str in pol_strs}
+	pol_strs, era_type_strs = db.utils.set_strings()
+	obs_map = {pol_str: {era_type: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
+	obs_count = {pol_str: {era_type: {'obs_count': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
 
 	for obs in response:
 		polarization = getattr(obs, 'polarization')
-		era = getattr(obs, 'era')
 		era_type = getattr(obs, 'era_type')
 
 		# Actual UTC time of the obs (for the graph)
 		obs_time = getattr(obs, 'time_start')
 		obsnum = getattr(obs, 'obsnum')
 
-		obs_map[polarization][era][era_type].append({'obs_time':obs_time, 'obsnum':obsnum})
-		obs_count[polarization][era][era_type]['obs_count'] += 1
+		obs_map[polarization][era_type].append({'obs_time':obs_time, 'obsnum':obsnum})
+		obs_count[polarization][era_type]['obs_count'] += 1
 
 	#error_counts, error_count = get_error_counts(start_gps, end_gps)
 
