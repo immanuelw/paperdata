@@ -118,11 +118,11 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 	s.close()
 	return results
 
-def set_strings():
+def get_set_strings():
 	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
 	era_type_strs = ('all',)
-	host_strs = ('pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1')
-	filetype_strs = ('uv', 'uvcRRE', 'npz')
+	host_strs = ('all', 'pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1')
+	filetype_strs = ('all', 'uv', 'uvcRRE', 'npz')
 	return (pol_strs, era_type_strs, host_strs, filetype_strs)
 
 def get_jd_from_datetime(start_time=None, end_time=None):

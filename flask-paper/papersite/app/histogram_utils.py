@@ -79,53 +79,23 @@ def get_plot_bands(the_set):
 
 	return plot_bands
 
-def get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str):
-	response = db_utils.query(database='paperdata', table='observation',
-										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
-										sort_tuples=(('time_start', 'asc'),),
-										output_vars=('time_start', 'polarization', 'era_type', 'obsnum')))
-
-	pol_strs, era_type_strs = db.utils.set_strings()
-	obs_map = {pol_str: {era_type: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
-	obs_count = {pol_str: {era_type: {'obs_count': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
-
-	for obs in response:
-		polarization = getattr(obs, 'polarization')
-		era_type = getattr(obs, 'era_type')
-
-		# Actual UTC time of the obs (for the graph)
-		obs_time = getattr(obs, 'time_start')
-		obsnum = getattr(obs, 'obsnum')
-
-		obs_map[polarization][era_type].append({'obs_time':obs_time, 'obsnum':obsnum})
-		obs_count[polarization][era_type]['obs_count'] += 1
-
-	#error_counts, error_count = get_error_counts(start_gps, end_gps)
-
-	return render_template('histogram.html', error_counts=error_counts, pol_strs=pol_strs, era_strs=era_strs, era_type_strs=era_type_strs,
-							obs_count=obs_count, obs_map=obs_map, range_start=start_time_str, range_end=end_time_str,
-							start_time_str_short=start_time_str.replace('T', ' ')[0:16], end_time_str_short=end_time_str.replace('T', ' ')[0:16])
-
-def get_file_histogram(start_gps, end_gps, start_time_str, end_time_str):
+def get_file_counts(start_gps, end_gps, host_strs, filetype_strs):
 	rtp_obs_list = db_utils.query(database='paperdata', table='rtp_observation',
 												field_tuples=(('julian_date', '>=', start_gps), ('julian_date', '<=', end_gps)),
-												output_vars=('obsnum', 'julian_day', 'polarization', 'era' 'length', 'files'))
+												output_vars=('obsnum', 'julian_date', 'polarization', 'length', 'files'))
 
 	base_length = 0.00696
 	paper_obs_list = db_utils.query(database='paperdata', table='observation',
 												field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps + base_length)),
-												output_vars=('obsnum', 'julian_day', 'polarization', 'era' 'length', 'files'))
+												output_vars=('obsnum', 'julian_date', 'polarization', 'length', 'files'))
 
 	all_obs_list = rtp_obs_list + paper_obs_list
 
-	obs_dict = {getattr(obs, 'obsnum'): {'julian_day': getattr(obs, 'julian_day'), 'polarization': getattr(obs, 'polarization'),
-											'era': getattr(obs, 'era'), 'length': getattr(obs, 'length')} for obs in all_obs_list}
+	obs_dict = {getattr(obs, 'obsnum'): {'julian_date': getattr(obs, 'julian_date'), 'polarization': getattr(obs, 'polarization'),
+											'length': getattr(obs, 'length')} for obs in all_obs_list}
 
 	files_list = (getattr(obs, 'files') for obs in all_obs_list)
 	response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
-
-	host_strs = ('pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1')
-	filetype_strs = ('uv', 'uvcRRE', 'npz')
 
 	file_map = {host_str: {filetype: [] for filetype_str in filetype_strs} for host_str in host_strs}
 	file_count = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
@@ -137,11 +107,33 @@ def get_file_histogram(start_gps, end_gps, start_time_str, end_time_str):
 		obsnum = getattr(file_obj, 'obsnum')
 		full_path = getattr(file_obj, 'full_path')
 
-		file_map[host][filetype].append({'file_day': obs_dict[obsnum]['julian_day'], 'obsnum': obsnum})
+		file_map[host][filetype].append({'file_date': obs_dict[obsnum]['julian_date'], 'obsnum': obsnum})
 		file_count[host][filetype]['file_count'] += 1
 
-	#error_counts, error_count = get_error_counts(start_gps, end_gps)
+	return (file_count, file_map)
 
-	return render_template('histogram.html', error_counts=error_counts, host_strs=host_strs, filetype_strs=filetype_strs,
-							file_count=file_count, file_map=file_map, range_start=start_time_str, range_end=end_time_str,
+def get_obs_file_histogram(start_gps, end_gps, start_time_str, end_time_str):
+	response = db_utils.query(database='paperdata', table='observation',
+										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										sort_tuples=(('time_start', 'asc'),),
+										output_vars=('julian_date', 'polarization', 'era_type', 'obsnum')))
+
+	pol_strs, era_type_strs, host_strs, filetype_strs = db.utils.get_set_strings()
+	obs_map = {pol_str: {era_type: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
+	obs_count = {pol_str: {era_type: {'obs_count': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
+
+	for obs in response:
+		polarization = getattr(obs, 'polarization')
+		era_type = getattr(obs, 'era_type')
+
+		obs_date = getattr(obs, 'julian_date')
+		obsnum = getattr(obs, 'obsnum')
+
+		obs_map[polarization][era_type].append({'obs_date':obs_date, 'obsnum':obsnum})
+		obs_count[polarization][era_type]['obs_count'] += 1
+
+	_, file_map = get_file_counts(start_gps, end_gps, host_strs, filetype_strs)
+
+	return render_template('histogram.html', pol_strs=pol_strs, era_type_strs=era_type_strs, host_strs=host_strs, filetype_strs=filetype_strs,
+							file_map=file_map, obs_map=obs_map, obs_count=obs_count, range_start=start_time_str, range_end=end_time_str,
 							start_time_str_short=start_time_str.replace('T', ' ')[0:16], end_time_str_short=end_time_str.replace('T', ' ')[0:16])

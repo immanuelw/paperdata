@@ -34,8 +34,7 @@ def index(setName = None):
 		the_set = db_utils.query(database='eorlive', table='set', field_tuples=(('name', '==', setName),))[0]
 
 		if the_set is not None:
-			start_datetime, end_datetime = db_utils.get_datetime_from_gps(
-				the_set.start, the_set.end)
+			start_datetime, end_datetime = db_utils.get_datetime_from_gps(the_set.start, the_set.end)
 			start_time_str_full = start_datetime.strftime('%Y-%m-%d %H:%M:%S')
 			end_time_str_full = end_datetime.strftime('%Y-%m-%d %H:%M:%S')
 			start_time_str_short = start_datetime.strftime('%Y/%m/%d %H:%M')
@@ -80,10 +79,8 @@ def get_graph():
 
 		start_gps, end_gps = db_utils.get_gps_from_datetime(start_datetime, end_datetime)
 
-		if graph_type_str == 'Obs_Err':
-			return histogram_utils.get_obs_err_histogram(start_gps, end_gps, start_time_str, end_time_str)
-		elif graph_type_str == 'File':
-			return histogram_utils.get_file_histogram(start_gps, end_gps, start_time_str, end_time_str)
+		if graph_type_str == 'Obs_File':
+			return histogram_utils.get_obs_file_histogram(start_gps, end_gps, start_time_str, end_time_str)
 		else:
 			graph_data = data_sources.get_graph_data(data_source_str, start_gps, end_gps, None)
 			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
@@ -108,38 +105,28 @@ def get_graph():
 		start_time_str_short = start_datetime.strftime('%Y-%m-%d %H:%M')
 		end_time_str_short = end_datetime.strftime('%Y-%m-%d %H:%M')
 
-		if graph_type_str == 'Obs_Err':
+		if graph_type_str == 'Obs_File':
 			set_polarization, set_era_type = getattr(the_set, 'polarization'), getattr(the_set, 'era_type')
-			obs_count, obs_map = histogram_utils.get_observation_counts(set_start, set_end, set_polarization, set_era_type)
-			error_counts = histogram_utils.get_error_counts(set_start, set_end)[0]
-			range_end = end_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') # For the function in histogram_utils.js
-			which_data_set = data_sources.which_data_set(the_set)
-			return render_template('setView.html', the_set=the_set,
-									obs_count=obs_count, error_counts=error_counts,
-									plot_bands=plot_bands, start_time_str_short=start_time_str_short,
-									end_time_str_short=end_time_str_short, range_end=range_end,
-									which_data_set=which_data_set, is_set=True, obs_map=obs_map)
-		elif graph_type_str == 'File':
 			set_host, set_filetype = getattr(the_set, 'host'), getattr(the_set, 'filetype')
-			file_count, file_map = histogram_utils.get_file_counts(set_start, set_end, set_host, set_filetype)
-			error_counts = histogram_utils.get_error_counts(set_start, set_end)[0]
+			obs_count, obs_map = histogram_utils.get_observation_counts(set_start, set_end, set_polarization, set_era_type)
+			_, file_map = histogram_utils.get_file_counts(set_start, set_end, set_host, set_filetype)
 			range_end = end_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') # For the function in histogram_utils.js
 			which_data_set = data_sources.which_data_set(the_set)
-			return render_template('setView.html', the_set=the_set,
-									file_count=file_count, error_counts=error_counts,
+			return render_template('setView.html', the_set=the_set, is_set=True,
+									obs_count=obs_count, obs_map=obs_map, file_map=file_map,
 									plot_bands=plot_bands, start_time_str_short=start_time_str_short,
 									end_time_str_short=end_time_str_short, range_end=range_end,
-									which_data_set=which_data_set, is_set=True, file_map=file_map)
+									which_data_set=which_data_set)
 		else:
 			graph_data = data_sources.get_graph_data(data_source_str, set_start, set_end, the_set)
 			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
 			which_data_set = data_sources.which_data_set(the_set)
 			return render_template('graph.html',
-				data_source_str=data_source_str, graph_data=graph_data, plot_bands=plot_bands,
-				template_name=template_name, is_set=True, data_source_str_nospace=data_source_str_nospace,
-				width_slider=data_source.width_slider, the_set=the_set,
-				which_data_set=which_data_set, start_time_str_short=start_time_str_short,
-				end_time_str_short=end_time_str_short)
+									data_source_str=data_source_str, graph_data=graph_data, plot_bands=plot_bands,
+									template_name=template_name, is_set=True, data_source_str_nospace=data_source_str_nospace,
+									width_slider=data_source.width_slider, the_set=the_set,
+									which_data_set=which_data_set, start_time_str_short=start_time_str_short,
+									end_time_str_short=end_time_str_short)
 
 @app.route('/data_amount', methods = ['GET'])
 def data_amount():
@@ -162,15 +149,15 @@ def source_table():
 	output_vars = ('timestamp', 'julian_day')
 	
 	corr_source = db_utils.query(database='paperdata', table='rtp_file',
-										field_tuples=(('transferred', '==', None),),
-										sort_tuples=sort_tuples, output_vars=output_vars)[0]
+									field_tuples=(('transferred', '==', None),),
+									sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
 	rtp_source = db_utils.query(database='paperdata', table='rtp_file',
-										field_tuples=(('transferred', '==', True),),
-										sort_tuples=sort_tuples, output_vars=output_vars)[0]
+									field_tuples=(('transferred', '==', True),),
+									sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
 	paper_source = db_utils.query(database='paperdata', table='observation',
-										sort_tuples=sort_tuples, output_vars=output_vars)[0]
+									sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
 	source_tuples = (('Correlator', corr_source), ('RTP', rtp_source), ('Folio Scan', paper_source))
 	source_names = (source_name for source_name, _ in source_tuples)
@@ -190,8 +177,8 @@ def source_table():
 @app.route('/filesystem', methods = ['GET'])
 def filesystem():
 	systems = db_utils.query(database='ganglia', table='filesystem',
-										sort_tuples=(('timestamp', 'desc'), ('host', 'asc')),
-										group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space'))
+								sort_tuples=(('timestamp', 'desc'), ('host', 'asc')),
+								group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space'))
 
 	system_names = (getattr(system, 'host') for system in systems)
 	system_dict = {system_name: {'time': 'N/A', 'space': 100.0, 'time_segment': 'N/A'} for system_name in system_names}
@@ -288,13 +275,13 @@ def data_summary_table():
 	start_gps, end_gps = db_utils.get_gps_from_datetime(startdatetime, enddatetime)
 
 	response = db_utils.query(database='paperdata', table='observation',
-										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
-										sort_tuples=(('time_start', 'asc'),),
-										output_vars=('time_start', 'time_end', 'polarization', 'era_type')))
+								field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+								sort_tuples=(('time_start', 'asc'),),
+								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files')))
 
-	pol_strs = ('xx', 'xy', 'yx', 'yy')
-	era_type_strs = ('all',)
+	pol_strs, era_type_strs, host_strs, filetype_strs = db_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
+	file_map = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
 
 	for obs in response:
 		polarization = getattr(obs, 'polarization')
@@ -307,17 +294,33 @@ def data_summary_table():
 		obs_map[polarization][era_type]['obs_count'] += 1
 		obs_map[polarization][era_type]['obs_hours'] += (obs_end - obs_start) / 3600.0
 
-	all_strs = pol_strs + era_type_strs
-	obs_total = {all_str: {'count':0, 'hours':0} for all_str in all_strs}
+		for paper_file in getattr(obs, 'files'):
+			host = getattr(paper_file, 'host')
+			filetype = getattr(paper_file, 'filetype')
+			file_map[host][filetype]['file_count'] += 1
+				
 
-	for pol_era, obs_dict in obs_map.iteritems():
-		for pol, era_type in pol_era.split('-'):
-			obs_total[era_type]['count'] += obs_dict['obs_count']
-			obs_total[era_type]['hours'] += obs_dict['obs_hours']
-			obs_total[pol]['count'] += obs_dict['obs_count']
-			obs_total[pol]['hours'] += obs_dict['obs_hours']
+	all_obs_strs = pol_strs + era_type_strs
+	obs_total = {all_obs_str: {'count': 0, 'hours': 0} for all_obs_str in all_obs_strs}
 
-	error_counts, error_count = histogram_utils.get_error_counts(start_gps, end_gps)
+	for pol in pol_strs:
+		for era_type in era_type_strs:
+			obs_count = obs_map[pol][era_type]['obs_count']
+			obs_hours = obs_map[pol][era_type]['obs_hours']
+			obs_total[era_type]['count'] += obs_count
+			obs_total[era_type]['hours'] += obs_hours
+			obs_total[pol]['count'] += obs_count
+			obs_total[pol]['hours'] += obs_hours
 
-	return render_template('summary_table.html', error_count=error_count, pol_strs=pol_strs, era_type_strs=era_type_strs,
-													obs_map=obs_map, obs_total=obs_total)
+	all_file_strs = host_strs + filetype_strs
+	file_total = {all_file_str: {'count': 0} for all_file_str in all_file_strs}
+
+	for host in host_strs:
+		for filetype in filetype_strs:
+			file_count = file_map[host][filetype]['file_count']
+			file_total[filetype]['count'] += file_count
+			file_total[host]['count'] += file_count
+
+	return render_template('summary_table.html',
+							pol_strs=pol_strs, era_type_strs=era_type_strs, host_strs=host_strs, filetype_strs=filetype_strs,
+							obs_map=obs_map, obs_total=obs_total, file_map=file_map, file_total=file_total)
