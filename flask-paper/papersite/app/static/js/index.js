@@ -213,16 +213,18 @@ function getDate(datestr) {
 var applyFiltersAndSort = function() {
 	var user = $('#user_setlist_dropdown').val();
 	var polarization = $('#polarization_setlist_dropdown').val();
-	var era = $('#era_setlist_dropdown').val();
 	var era_type = $('#era_type_setlist_dropdown').val();
+	var host = $('#host_setlist_dropdown').val();
+	var filetype = $('#filetype_setlist_dropdown').val();
 	var sort = $('#sort_setlist_dropdown').val();
 	var ranged = $('#range_filter').prop('checked');
 
 	var set_controls = {
 		'user': user,
 		'polarization': polarization,
-		'era': era,
 		'era_type': era_type,
+		'host': host,
+		'filetype': filetype,
 		'sort': sort,
 		'ranged': ranged
 	};

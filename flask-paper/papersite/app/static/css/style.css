@@ -1,11 +1,11 @@
-#error_table, #set_construction_div, #comments_div {
+#error_table, #obs_table, #file_table, #set_construction_div, #comments_div {
 	width: 100%;
 	max-width: 100%;
 	max-height: 400px;
 	overflow: auto;
 }
 
-#error_table table {
+#error_table, #obs_table, #file_table table {
 	table-layout: fixed;
 	float: left;
 	width: 50%;
@@ -17,7 +17,11 @@
 	text-align: center;
 }
 
-#summary_table table {
+#filesystem_table th, #filesystem_table td {
+	text-align: center;
+}
+
+#summary_table, #filesystem_table table {
 	width: 100%;
 }
 
