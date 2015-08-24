@@ -202,7 +202,7 @@ def create_data_source():
 	else:
 		return make_response('You must be logged in to use this feature.', 401)
 
-def get_graph_data(data_source_str, start_gps, end_gps, the_set):
+def get_graph_data(data_source_str, start_utc, end_utc, the_set):
 	data_source = db_utils.query(database='eorlive', table='graph_data_source',	field_tuples=(('name', '==', data_source_str),))[0]
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = db.utils.get_set_strings()
@@ -215,7 +215,7 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 		filetype = getattr(the_set, 'filetype')
 
 		results = db_utils.query(data_source=data_source,
-									field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 									('polarization', None if polarization == 'all' else '==', polarization),
 									('era_type', None if era_type == 'all' else '==', era_type)),
 									sort_tuples=(('time_start', 'asc'),), output_vars=('time_start', 'obsnum'))
@@ -228,7 +228,7 @@ def get_graph_data(data_source_str, start_gps, end_gps, the_set):
 
 
 	else: #No set, so we need to separate the data into sets for low/high and EOR0/EOR1
-		data = separate_data_into_sets(data, data_source, start_gps, end_gps)
+		data = separate_data_into_sets(data, data_source, start_utc, end_utc)
 
 	return data
 
@@ -242,9 +242,9 @@ def which_data_set(the_set):
 	which_data = (polarization, era, era_type, host, filetype)
 	return which_data
 
-def separate_data_into_sets(data, data_source, start_gps, end_gps):
+def separate_data_into_sets(data, data_source, start_utc, end_utc):
 	obsid_results = db_utils.query(data_source=data_source,
-									field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 									sort_tuples=(('time_start', 'asc'),),
 									output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum')))
 

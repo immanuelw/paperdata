@@ -34,7 +34,7 @@ def index(setName = None):
 		the_set = db_utils.query(database='eorlive', table='set', field_tuples=(('name', '==', setName),))[0]
 
 		if the_set is not None:
-			start_datetime, end_datetime = db_utils.get_datetime_from_gps(the_set.start, the_set.end)
+			start_datetime, end_datetime = db_utils.get_datetime_from_utc(the_set.start, the_set.end)
 			start_time_str_full = start_datetime.strftime('%Y-%m-%d %H:%M:%S')
 			end_time_str_full = end_datetime.strftime('%Y-%m-%d %H:%M:%S')
 			start_time_str_short = start_datetime.strftime('%Y/%m/%d %H:%M')
@@ -77,12 +77,12 @@ def get_graph():
 
 		end_datetime = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M:%SZ')
 
-		start_gps, end_gps = db_utils.get_gps_from_datetime(start_datetime, end_datetime)
+		start_utc, end_utc = db_utils.get_utc_from_datetime(start_datetime, end_datetime)
 
 		if graph_type_str == 'Obs_File':
-			return histogram_utils.get_obs_file_histogram(start_gps, end_gps, start_time_str, end_time_str)
+			return histogram_utils.get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str)
 		else:
-			graph_data = data_sources.get_graph_data(data_source_str, start_gps, end_gps, None)
+			graph_data = data_sources.get_graph_data(data_source_str, start_utc, end_utc, None)
 			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
 			return render_template('graph.html',
 				data_source_str=data_source_str, graph_data=graph_data,
@@ -100,7 +100,7 @@ def get_graph():
 		plot_bands = histogram_utils.get_plot_bands(the_set)
 
 		set_start, set_end = getattr(the_set, 'start'), getattr(the_set, 'end')
-		start_datetime, end_datetime = db_utils.get_datetime_from_gps(set_start, set_end)
+		start_datetime, end_datetime = db_utils.get_datetime_from_utc(set_start, set_end)
 
 		start_time_str_short = start_datetime.strftime('%Y-%m-%d %H:%M')
 		end_time_str_short = end_datetime.strftime('%Y-%m-%d %H:%M')
@@ -196,11 +196,11 @@ def obs_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
-	start_gps, end_gps = db_utils.get_gps_from_datetime(starttime, endtime)
+	start_utc, end_utc = db_utils.get_utc_from_datetime(starttime, endtime)
 
 	output_vars=('obsnum', 'julian_date', 'polarization', 'length')
 	response = db_utils.query(database='paperdata', table='observation', 
-								field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps)),
+								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),),
 								output_vars=output_vars)
 
@@ -214,10 +214,10 @@ def file_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
-	start_gps, end_gps = db_utils.get_gps_from_datetime(starttime, endtime)
+	start_utc, end_utc = db_utils.get_utc_from_datetime(starttime, endtime)
 
 	all_obs_list = db_utils.query(database='paperdata', table='observation', 
-									field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps)),
+									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 									sort_tuples=(('time_start', 'asc'),),
 									output_vars=('files',))
 
@@ -344,10 +344,10 @@ def data_summary_table():
 	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
 	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
 
-	start_gps, end_gps = db_utils.get_gps_from_datetime(startdatetime, enddatetime)
+	start_utc, end_utc = db_utils.get_utc_from_datetime(startdatetime, enddatetime)
 
 	response = db_utils.query(database='paperdata', table='observation',
-								field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 								sort_tuples=(('time_start', 'asc'),),
 								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files')))
 

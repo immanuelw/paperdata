@@ -23,8 +23,8 @@ def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era,
 	for flagged_range_dict in flagged_range_dicts:
 		flagged_subset = getattr(models, 'Flagged_Subset')()
 		setattr(flagged_subset, 'set_id', getattr(new_set, 'id'))
-		setattr(flagged_subset, 'start', flagged_range_dict['start_gps'])
-		setattr(flagged_subset, 'end', flagged_range_dict['end_gps'])
+		setattr(flagged_subset, 'start', flagged_range_dict['start_utc'])
+		setattr(flagged_subset, 'end', flagged_range_dict['end_utc'])
 
 		db.session.add(flagged_subset)
 		db.session.flush()
@@ -41,7 +41,7 @@ def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era,
 
 def is_obs_flagged(obs_id, flagged_range_dicts):
 	for flagged_range_dict in flagged_range_dicts:
-		if obs_id >= flagged_range_dict['start_gps'] and obs_id <= flagged_range_dict['end_gps']:
+		if obs_id >= flagged_range_dict['start_utc'] and obs_id <= flagged_range_dict['end_utc']:
 			return True
 	return False
 
@@ -84,27 +84,27 @@ def save_new_set():
 
 		flagged_range_dicts = []
 
-		GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_gps_utc_constants()
+		GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_utc_utc_constants()
 
 		for flagged_range_dict in request_content['flaggedRanges']:
-			flagged_gps_dict = {}
-			flagged_gps_dict['flaggedRange'] = [pair[1] for pair in flagged_range_dict['flaggedRange']]
-			flagged_gps_dict['start_gps'] = int(flagged_range_dict['start_millis'] / 1000) +\
+			flagged_utc_dict = {}
+			flagged_utc_dict['flaggedRange'] = [pair[1] for pair in flagged_range_dict['flaggedRange']]
+			flagged_utc_dict['start_utc'] = int(flagged_range_dict['start_millis'] / 1000) +\
 				GPS_LEAP_SECONDS_OFFSET - GPS_UTC_DELTA
-			flagged_gps_dict['end_gps'] = int(flagged_range_dict['end_millis'] / 1000) +\
+			flagged_utc_dict['end_utc'] = int(flagged_range_dict['end_millis'] / 1000) +\
 				GPS_LEAP_SECONDS_OFFSET - GPS_UTC_DELTA
-			flagged_range_dicts.append(flagged_gps_dict)
+			flagged_range_dicts.append(flagged_utc_dict)
 
-		start_gps = request_content['startObsId']
-		end_gps = request_content['endObsId']
+		start_utc = request_content['startObsId']
+		end_utc = request_content['endObsId']
 		polarization = request_content['polarization']
 		era_type = request_content['era_type']
 		host = request_content['host']
 		filetype = request_content['filetype']
 
-		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(start_gps, end_gps, polarization, era_type, flagged_range_dicts)
+		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(start_utc, end_utc, polarization, era_type, flagged_range_dicts)
 
-		insert_set_into_db(name, start_gps, end_gps, flagged_range_dicts,
+		insert_set_into_db(name, start_utc, end_utc, flagged_range_dicts,
 							polarization, era_type, host, filetype, total_data_hrs, flagged_data_hrs)
 
 		return jsonify()
@@ -144,8 +144,8 @@ def upload_set():
 
 		good_obs_ids.sort()
 
-		start_gps = good_obs_ids[0]
-		end_gps = good_obs_ids[len(good_obs_ids) - 1]
+		start_utc = good_obs_ids[0]
+		end_utc = good_obs_ids[len(good_obs_ids) - 1]
 
 		polarization = request.form['polarization']
 		era_type = request.form['era_type']
@@ -153,7 +153,7 @@ def upload_set():
 		filetype = request.form['filetype']
 
 		all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
-										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),
 										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
@@ -174,16 +174,16 @@ def upload_set():
 						.format(obsnum=good_obs_id, polarization=polarization, era_type=era_type)))
 			if next_index > last_index:
 				bad_range_dict = {}
-				bad_range_dict['start_gps'] = all_obs_ids[last_index]
-				bad_range_dict['end_gps'] = all_obs_ids[next_index - 1]
+				bad_range_dict['start_utc'] = all_obs_ids[last_index]
+				bad_range_dict['end_utc'] = all_obs_ids[next_index - 1]
 				bad_range_dict['flaggedRange'] = all_obs_ids[last_index:next_index]
 				bad_ranges.append(bad_range_dict)
 
 			last_index = next_index + 1
 
-		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(start_gps, end_gps, polarization, era_type, bad_ranges)
+		total_data_hrs, flagged_data_hrs = get_data_hours_in_set(start_utc, end_utc, polarization, era_type, bad_ranges)
 
-		insert_set_into_db(set_name, start_gps, end_gps, bad_ranges, polarization, era_type, host, filetype, total_data_hrs, flagged_data_hrs)
+		insert_set_into_db(set_name, start_utc, end_utc, bad_ranges, polarization, era_type, host, filetype, total_data_hrs, flagged_data_hrs)
 
 		return 'OK'
 	else:
@@ -205,7 +205,7 @@ def download_set():
 		filetype = getattr(the_set, 'filetype')
 
 		all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
-										field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps),
+										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),
 										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
@@ -253,15 +253,15 @@ def get_sets():
 			end_utc = request_content['endtime']
 			start_datetime = datetime.strptime(start_utc, '%Y-%m-%dT%H:%M:%SZ')
 			end_datetime = datetime.strptime(end_utc, '%Y-%m-%dT%H:%M:%SZ')
-			start_gps, end_gps = db_utils.get_gps_from_datetime(start_datetime, end_datetime)
+			start_utc, end_utc = db_utils.get_utc_from_datetime(start_datetime, end_datetime)
 
 		field_tuples = (('username', '==' if username else None, username),
 							('polarization', '==' if polarization else None, polarization),
 							('era_type', '==' if era_type else None, era_type),
 							('host', '==' if host else None, host),
 							('filetype', '==' if filetype else None, filetype),
-							('start', '>=' if ranged else None, start_gps),
-							('end', '>=' if ranged else None, end_gps))
+							('start', '>=' if ranged else None, start_utc),
+							('end', '>=' if ranged else None, end_utc))
 	
 		sort_tuples = None
 		if sort:
