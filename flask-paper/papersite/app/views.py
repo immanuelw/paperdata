@@ -7,7 +7,7 @@ import os
 import paperdata_dbi as pdbi
 import pyganglia as pyg
 import time
-from collections import OrderedDict
+import jdcal
 
 def time_val(value):
 	#determines how much time to divide by
@@ -217,9 +217,9 @@ def file_table():
 	start_gps, end_gps = db_utils.get_gps_from_datetime(starttime, endtime)
 
 	all_obs_list = db_utils.query(database='paperdata', table='observation', 
-								field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps)),
-								sort_tuples=(('time_start', 'asc'),),
-								output_vars=('files',))
+									field_tuples=(('time_start', '>=', start_gps), ('time_end', '<=', end_gps)),
+									sort_tuples=(('time_start', 'asc'),),
+									output_vars=('files',))
 
 	files_list = (getattr(obs, 'files') for obs in all_obs_list)
 	file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
@@ -229,6 +229,60 @@ def file_table():
 
 	return render_template('file_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime.strftime('%Y-%m-%dT%H:%M:%SZ'), end_time=endtime.strftime('%Y-%m-%dT%H:%M:%SZ'))
+
+@app.route('/rtp_summary_table', methods = ['POST'])
+def rtp_summary_table():
+	obs_vars = ('files',)
+	file_vars = ('host', 'path', 'julian_day', 'transferred', 'new_host', 'new_path', 'timestamp')
+
+	rtp_obs = db_utils.query(database='paperdata', table='rtp_observation', sort_tuples=(('julian_day', 'desc'),), output_vars=obs_vars)
+	files_list = (getattr(obs, 'files') for obs in rtp_obs)
+	rtp_files = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
+
+	file_list = [{var: getattr(rtp_file, var) for var in file_vars} for rtp_file in rtp_files]
+	
+	file_info = {}
+
+	for rtp_file in file_list:
+		sa_host_path = ':'.join(rtp_file['host'], rtp_file['path'])
+		usa_host_path = ':'.join(rtp_file['new_host'], rtp_file['new_path'])
+
+		julian_day = rtp_file['julian_day']
+		transferred = rtp_file['transferred']
+		timestamp = rtp_file['time_stamp']
+
+		if julian_day in file_info.keys():
+			file_info[julian_day]['count'] += 1
+			file_info[julian_day]['transfer']['all'] += 1
+		else:
+			file_info.update({julian_day: {'count': 1, 'transfer': {'all': 1, 'moved': 0},
+											'host_path': {'sa_host_path': sa_host_path, 'usa_host_path': usa_host_path},
+											'activity': 'N/A', 'last_updated': timestamp, 'lst_range': 'N/A'}})
+		if transferred:
+			file_info[julian_day]['transfer']['moved'] += 1
+
+	julian_days = file_info.keys()
+
+	output_vars = ('gregorian_day', 'lst_range', 'file_count', 'sa_host_path', 'usa_host_path',
+					'output_host', 'transfer_percent', 'activity', 'last_updated')
+	summary_dict = {julian_day: {var: 0 for var in output_vars} for julian_day in julian_days}
+	#need a dict of julian_day: (gregorian_day, lst_range, file_count, sa, usa, output_host?, trans_perc, activity, last_updated)
+	for julian_day in julian_days:
+		file_dict = file_info[julian_day]
+		sum_dict = summary_dict[julian_day]
+		year, month, day, _ = jdcal.jd2cal(jdcal.MJD_0, julian_day - jdcal.MJD_0)
+		gd = datetime(year, month, day)
+		sum_dict['gregorian_day'] = gd.strftime('%Y-%m-%d') 
+		sum_dict['lst_range'] = file_dict['lst_range'] 
+		sum_dict['file_count'] = file_dict['count']
+		sum_dict['sa_host_path'] = file_dict['host_path']['sa_host_path']
+		sum_dict['usa_host_path'] = file_dict['host_path']['usa_host_path']
+		sum_dict['output_host'] = file_dict['host_path']['output_host']
+		sum_dict['transfer_percent'] = file_dict['transfer']['moved'] / file_dict['transfer']['all']
+		sum_dict['activity'] = file_dict['activity']
+		sum_dict['last_updated'] = file_dict['last_updated']
+		
+	return render_template('rtp_summary_table.html', log_list=log_list, output_vars=output_vars)
 
 @app.before_request
 def before_request():
