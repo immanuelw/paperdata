@@ -5,13 +5,11 @@ from datetime import datetime
 
 @app.route('/get_all_comments')
 def get_all_comments():
-	threads = db_utils.get_query_result(database='eorlive', table='thread', field_tuples=None,
-										sort_tuples=(('last_updated', 'desc'),), output_vars=None)
+	threads = db_utils.query(database='eorlive', table='thread', sort_tuples=(('last_updated', 'desc'),))
 
 	for thread in threads:
-		setattr(thread, 'comments', db_utils.get_query_result(database='eorlive', table='comment',
-																field_tuples=(('thread_id', '==', getattr(thread, 'id')),),
-																sort_tuples=None, output_vars=None))
+		setattr(thread, 'comments',
+				db_utils.query(database='eorlive', table='comment',	field_tuples=(('thread_id', '==', getattr(thread, 'id')),))
 
 	return render_template('comments_list.html', threads=threads)
 
@@ -28,9 +26,7 @@ def thread_reply():
 
 		db.session.add(new_comment)
 
-		thread = db_utils.get_query_result(database='eorlive', table='thread',
-											field_tuples=(('id', '==', thread_id),),
-											sort_tuples=None, output_vars=None)
+		thread = db_utils.query(database='eorlive', table='thread',	field_tuples=(('id', '==', thread_id),))
 		setattr(thread, 'last_updated', datetime.utcnow())
 
 		db.session.add(thread)
