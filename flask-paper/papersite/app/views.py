@@ -265,6 +265,8 @@ def rtp_summary_table():
 
 	output_vars = ('gregorian_day', 'lst_range', 'file_count', 'sa_host_path', 'usa_host_path',
 					'output_host', 'transfer_percent', 'activity', 'last_updated')
+	rtp_header = ('Date', 'Julian Day', 'LST Range', 'Count', 'RTP status',
+					'SA Location', 'USA Location', 'Output Host', 'Last Activity', 'Last Updated')
 	summary_dict = {julian_day: {var: 0 for var in output_vars} for julian_day in julian_days}
 	#need a dict of julian_day: (gregorian_day, lst_range, file_count, sa, usa, output_host?, trans_perc, activity, last_updated)
 	for julian_day in julian_days:
@@ -282,7 +284,7 @@ def rtp_summary_table():
 		sum_dict['activity'] = file_dict['activity']
 		sum_dict['last_updated'] = file_dict['last_updated']
 		
-	return render_template('rtp_summary_table.html', log_list=log_list, output_vars=output_vars)
+	return render_template('rtp_summary_table.html', rtp_header=rtp_header, summary_dict=summary_dict, output_vars=output_vars)
 
 @app.before_request
 def before_request():
