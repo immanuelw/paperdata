@@ -265,8 +265,11 @@ def rtp_summary_table():
 
 	output_vars = ('gregorian_day', 'lst_range', 'file_count', 'sa_host_path', 'usa_host_path',
 					'output_host', 'transfer_percent', 'activity', 'last_updated')
-	rtp_header = ('Date', 'Julian Day', 'LST Range', 'Count', 'RTP status',
-					'SA Location', 'USA Location', 'Output Host', 'Last Activity', 'Last Updated')
+	rtp_header = (('Date', 'Observation Date'), ('JD', 'Julian Day'), ('LST Range', 'Local Sidereal Time Range'),
+					('Count', 'File Count'), ('RTP status', 'Percent of Files transferred'),
+					('SA Location', 'Host and Path of files on SADB'), ('USA Location', 'Host and Path of files on paperdata'),
+					('Output Host', 'Host raw files are backup up'), ('Last Activity', 'Last backend action taken'),
+					('Last Updated', 'Last time action was taken'))
 	summary_dict = {julian_day: {var: 0 for var in output_vars} for julian_day in julian_days}
 	#need a dict of julian_day: (gregorian_day, lst_range, file_count, sa, usa, output_host?, trans_perc, activity, last_updated)
 	for julian_day in julian_days:

@@ -2,23 +2,23 @@
 <table class='table table-striped table-bordered'>
 	<thead>
 		<tr>
-			{% for header in rtp_header %}
-				<th>{{ header }}</th>
+			{% for header, description in rtp_header %}
+				<th title={{ description }}>{{ header }}</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
 			{% for julian_day, sum_dict in summary_dict.items() %}
-				<th>{{ sum_dict['gregorian_day'] }}</th>
-				<th>{{ julian_day }}</th>
-				<th>{{ sum_dict['lst_range'] }}</th>
-				<th>{{ sum_dict['file_count'] }}</th>
-				<th>{{ sum_dict['transfer_percent'] }}(%)</th>
-				<th>{{ sum_dict['sa_host_path'] }}</th>
-				<th>{{ sum_dict['usa_host_path'] }}</th>
-				<th>{{ sum_dict['output_host'] }}</th>
-				<th>{{ sum_dict['activity'] }}</th>
-				<th>{{ sum_dict['last_updated'] }}</th>
+				<td>{{ sum_dict['gregorian_day'] }}</td>
+				<td>{{ julian_day }}</td>
+				<td>{{ sum_dict['lst_range'] }}</td>
+				<td>{{ sum_dict['file_count'] }}</td>
+				<td>{{ sum_dict['transfer_percent'] }}(%)</td>
+				<td>{{ sum_dict['sa_host_patd'] }}</td>
+				<td>{{ sum_dict['usa_host_patd'] }}</td>
+				<td>{{ sum_dict['output_host'] }}</td>
+				<td>{{ sum_dict['activity'] }}</td>
+				<td>{{ sum_dict['last_updated'] }}</td>
 		</tr>
 	</tbody>
 </table>
