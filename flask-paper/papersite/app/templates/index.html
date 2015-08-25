@@ -55,11 +55,11 @@
 					{% else %} <!-- Not logged in, just see the histogram -->
 						<li>
 							{% if the_set %}
-							<a href='/get_graph?graphType=Obs_Err&dataSource=Obs_Err&set={{the_set.name}}'>
+							<a href='/get_graph?graphType=Obs_File&dataSource=Obs_File&set={{the_set.name}}'>
 							{% else %}
-							<a href='/get_graph?graphType=Obs_Err&dataSource=Obs_Err'>
+							<a href='/get_graph?graphType=Obs_File&dataSource=Obs_File'>
 							{% endif %}
-								Obs &amp; Err
+								Obs &amp; File
 							</a>
 						</li>
 					{% endif %}

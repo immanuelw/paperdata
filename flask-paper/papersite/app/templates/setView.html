@@ -11,13 +11,13 @@
 <script type='text/javascript'>
 var obs_file = (function($) {
 	var dataSourceObj = {};
-	var observation_counts = {{ obs_count }};
+	var observation_counts = {{ obs_count | tojson }};
 	var observation_counts_copy = {{ obs_count }};
 	var file_counts = {{ file_counts | tojson }};
 	var file_counts_copy = {{ file_counts | tojson }};
 	var plot_bands = {{ plot_bands | tojson }};
-	var obs_map = {{ obs_map }};
-	var file_map = {{ file_map }};
+	var obs_map = {{ obs_map | tojson }};
+	var file_map = {{ file_map | tojson }};
 
 	{% include 'js/obs_file_set_construction.js' %}
 
