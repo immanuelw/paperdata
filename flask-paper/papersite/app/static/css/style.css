@@ -13,11 +13,7 @@
 	word-wrap: break-word;
 }
 
-#summary_table th, #summary_table td {
-	text-align: center;
-}
-
-#filesystem_table th, #filesystem_table td {
+#summary_table th, #summary_table td, #filesystem_table th, #filesystem_table td {
 	text-align: center;
 }
 
