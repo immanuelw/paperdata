@@ -29,17 +29,34 @@
 		<td class='cellClass profileCell'>
 			<h3>Upload Set From Text File</h3>
 			<input type='file' id='upload_set_file'>
-			Low/High:
-			<select id='low_high_dropdown' onchange='setLowOrHigh(this)'>
-				<option value='high'>High</option>
-				<option value='low'>Low</option>
-				<option value='any'>Any</option>
+			Polarization:
+			<select id='polarization_dropdown' onchange='setPolarization(this)'>
+				<option value='all'>all</option>
+				<option value='xx'>xx</option>
+				<option value='xy'>xy</option>
+				<option value='yx'>yx</option>
+				<option value='yy'>yy</option>
 			</select>
-			EOR0/EOR1:
-			<select id='eor_dropdown' onchange='setEOR(this)'>
-				<option value='EOR0'>EOR0</option>
-				<option value='EOR1'>EOR1</option>
-				<option value='any'>Any</option>
+			Era Type:
+			<select id='era_type_dropdown' onchange='setEraType(this)'>
+				<option value='all'>all</option>
+			</select>
+			Host:
+			<select id='host_dropdown' onchange='setHost(this)'>
+				<option value='all'>all</option>
+				<option value='pot1'>pot1</option>
+				<option value='pot2'>pot2</option>
+				<option value='pot3'>pot3</option>
+				<option value='folio'>folio</option>
+				<option value='pot8'>pot8</option>
+				<option value='nas1'>nas1</option>
+			</select>
+			Filetype:
+			<select id='filetype_dropdown' onchange='setFiletype(this)'>
+				<option value='all'>all</option>
+				<option value='uv'>raw</option>
+				<option value='uvcRRE'>compressed</option>
+				<option value='npz'>flags</option>
 			</select>
 			<br>
 			<input type='text' id='upload_set_name' placeholder='Enter set name...'>
@@ -63,14 +80,18 @@
 <script src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
 <script src='../static/js/setsAndComments.js'></script>
 <script>
-	var low_or_high = 'high';
-	var eor = 'EOR0';
+	var polarization = 'all';
+	var era_type = 'all';
+	var host = 'all';
+	var filetype = 'all';
 	var hostname, database, table;
 
 	var set_controls = {
 		'user': '{{user.username}}',
-		'eor': '',
-		'high_low': '',
+		'polarization': '',
+		'era_type': '',
+		'host': '',
+		'filetype': '',
 		'sort': '',
 		'ranged': false
 	};
@@ -112,7 +133,7 @@
 	};
 
 	function getGraphTypes() {
-		$('#graph_type_div').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+		$('#graph_type_div').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 		$.ajax({
 			type: 'GET',
@@ -129,7 +150,7 @@
 
 	function getUsersDataSources() {
 		$('#change_active_data_sources').prop('disabled', true);
-		$('#data_source_list').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+		$('#data_source_list').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 		$.ajax({
 			type: 'GET',
 			url: '/get_users_data_sources',
@@ -152,7 +173,7 @@
 			activeDataSources.push($(this).attr('value'));
 		});
 
-		$('#data_source_list').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+		$('#data_source_list').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 		$.ajax({
 			type: 'POST',
@@ -172,7 +193,7 @@
 	};
 
 	function getUnsubscribedDataSources() {
-		$('#unsubscribed_data_source_list').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+		$('#unsubscribed_data_source_list').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 		$.ajax({
 			type: 'GET',
@@ -188,8 +209,8 @@
 	};
 
 	function subscribeToDataSource(button) {
-		$('#unsubscribed_data_source_list').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
-		$('#data_source_list').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+		$('#unsubscribed_data_source_list').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+		$('#data_source_list').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 		$('#change_active_data_sources').prop('disabled', true);
 
 		var dataSource = button.value;
@@ -211,8 +232,8 @@
 	};
 
 	function unsubscribeFromDataSource(button) {
-		$('#unsubscribed_data_source_list').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
-		$('#data_source_list').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+		$('#unsubscribed_data_source_list').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+		$('#data_source_list').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 		$('#change_active_data_sources').prop('disabled', true);
 
 		var dataSource = button.value;
@@ -292,12 +313,20 @@
 		}
 	};
 
-	function setLowOrHigh(select) {
-		low_or_high = select.value;
+	function setPolarization(select) {
+		polarization = select.value;
 	};
 
-	function setEOR(select) {
-		eor = select.value;
+	function setEraType(select) {
+		era_type = select.value;
+	};
+
+	function setHost(select) {
+		host = select.value;
+	};
+
+	function setFiletype(select) {
+		filetype = select.value;
 	};
 
 	function uploadSet() {
@@ -362,7 +391,7 @@
 		database = $('#database').val();
 
 		setTablesButton('Working...', true);
-		$('#table_list').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+		$('#table_list').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 		$('#column_list').hide();
 
 		$.ajax({
@@ -397,7 +426,7 @@
 
 		setTablesButton('View tables', true);
 		setTableListDisabled(true);
-		$('#column_list').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+		$('#column_list').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 		$('#column_list').show();
 
 		$.ajax({
