@@ -74,7 +74,6 @@ def get_graph():
 			return make_response('No date range specified', 500)
 
 		start_datetime = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%SZ')
-
 		end_datetime = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M:%SZ')
 
 		start_utc, end_utc = db_utils.get_utc_from_datetime(start_datetime, end_datetime)
@@ -175,24 +174,35 @@ def source_table():
 def filesystem():
 	systems = db_utils.query(database='ganglia', table='filesystem',
 								sort_tuples=(('timestamp', 'desc'), ('host', 'asc')),
-								group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space'))
+								group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space', 'used_space'))
+	#							group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space', 'used_space', 'ping'))
 
 	system_names = (getattr(system, 'host') for system in systems)
-	system_dict = {system_name: {'time': 'N/A', 'space': 100.0, 'time_segment': 'N/A'} for system_name in system_names}
-
+	system_dict = {system_name: {'time': 'N/A', 'used_perc': 100.0, 'time_segment': 'N/A'} for system_name in system_names}
+	#system_dict = {system_name: {'time': 'N/A', 'used_perc': 100.0, 'time_segment': 'N/A',
+	#								'stats': 'N/A', 'free_perc': 100.0, 'used_space': 'N/A', 'ping': 'N/A'}
+	#								for system_name in system_names}
+	
 	system_header = (('Free', None), ('File Host', None), ('Last Report', None) , ('Usage Percent', None))
-	#system_descr = (getattr(system, 'host')
 
 	for system in systems:
 		if system is not None:
 			system_time = int(time.time() - getattr(system, 'timestamp'))
 			system_name = getattr(system, 'host')
+			used_perc = getattr(system, 'percent_space')
 			this_sys = system_dict[system_name]
 
 			#limiting if seconds or minutes or hours shows up on last report
 			this_sys['time_segment'] = str_val(system_time)
 			this_sys['time'] = time_val(system_time)
-			this_sys['space'] = getattr(system, 'percent_space')
+			this_sys['used_perc'] = used_perc
+
+			#this_sys['stats'] = ' '.join(system_name, 'stats')
+			#this_sys['free_perc'] = 100 - used_space
+			#used_space = getattr(system, 'used_space') / 1024.0 ** 3 #convert to GiB
+			#this_sys['used_space'] = ' '.join(str(used_space), 'GB')
+			#ping = getattr(system, 'ping')
+			#this_sys['ping'] = ' '.join(str(ping), 'ms')
 
 	return render_template('filesystem_table.html', system_header=system_header, system_dict=system_dict)
 
