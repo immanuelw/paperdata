@@ -53,7 +53,7 @@ var saveSet = function() {
 	var currentFileIdMap = getCurrentFileIdMap();
 
 	if (currentObsIdMap.length === 0) {
-		alert('There aren't any obs ids in this set!');
+		alert('There aren\'t any obs ids in this set!');
 		return;
 	} else if ($('#set_name_textbox').val().length === 0) {
 		alert('The set must have a name!');
