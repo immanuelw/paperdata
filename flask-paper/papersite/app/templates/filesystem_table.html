@@ -5,17 +5,17 @@
 			<th>Archive Status</th>
 		</tr>
 		<tr>
-			<th>File Host</th>
-			<th>Last Report</th>
-			<th>Usage</th>
+			{% for header, description in system_header %}
+				<th title={{ description }}>{{ header }}</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			{% for system_name in system_names %}
-				<th>{{ system_name }}</th>
-				<td>{{ system_dict[system_name]['time'] | round(1) }} ({{ system_dict[system_name]['time_segment'] }})</td>
-				<td rowspan='3' style='color:red;vertical-align:middle;'>{{ system_dict[system_name]['space'] }} (%)</td>
+			{% for system_name, sys_dict in system_dict.items() %}
+				<td rowspan='3' style='color:red;vertical-align:middle;'>{{ 100 - sys_dict['space'] }} (%)</td>
+				<td>{{ system_name }}</td>
+				<td>{{ sys_dict['time'] | round(1) }} ({{ sys_dict['time_segment'] }})</td>
+				<td rowspan='3' style='color:red;vertical-align:middle;'>{{ sys_dict['space'] }} (%)</td>
 			{% endif %}
 		</tr>
 	</tbody>

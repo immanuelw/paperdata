@@ -180,16 +180,21 @@ def filesystem():
 	system_names = (getattr(system, 'host') for system in systems)
 	system_dict = {system_name: {'time': 'N/A', 'space': 100.0, 'time_segment': 'N/A'} for system_name in system_names}
 
+	system_header = (('Free', None), ('File Host', None), ('Last Report', None) , ('Usage Percent', None))
+	#system_descr = (getattr(system, 'host')
+
 	for system in systems:
 		if system is not None:
 			system_time = int(time.time() - getattr(system, 'timestamp'))
+			system_name = getattr(system, 'host')
+			this_sys = system_dict[system_name]
 
 			#limiting if seconds or minutes or hours shows up on last report
-			system_dict[system_name]['time_segment'] = str_val(system_time)
-			system_dict[system_name]['time'] = time_val(system_time)
-			system_dict[system_name]['space'] = getattr(system, 'percent_space')
+			this_sys['time_segment'] = str_val(system_time)
+			this_sys['time'] = time_val(system_time)
+			this_sys['space'] = getattr(system, 'percent_space')
 
-	return render_template('filesystem_table.html', system_names=system_names, system_dict=system_dict)
+	return render_template('filesystem_table.html', system_header=system_header, system_names=system_names, system_dict=system_dict)
 
 @app.route('/obs_table', methods = ['POST'])
 def obs_table():
@@ -198,7 +203,7 @@ def obs_table():
 
 	start_utc, end_utc = db_utils.get_utc_from_datetime(starttime, endtime)
 
-	output_vars=('obsnum', 'julian_date', 'polarization', 'length')
+	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 	response = db_utils.query(database='paperdata', table='observation', 
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),),
