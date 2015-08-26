@@ -41,11 +41,11 @@ def index(setName = None):
 			end_time_str_short = end_datetime.strftime('%Y/%m/%d %H:%M')
 
 			return render_template('index.html', the_set=the_set,
-				start_time_str_full=start_time_str_full,
-				end_time_str_full=end_time_str_full,
-				start_time_str_short=start_time_str_short,
-				end_time_str_short=end_time_str_short,
-				active_data_sources=active_data_sources)
+									start_time_str_full=start_time_str_full,
+									end_time_str_full=end_time_str_full,
+									start_time_str_short=start_time_str_short,
+									end_time_str_short=end_time_str_short,
+									active_data_sources=active_data_sources)
 		else:
 			flash('That set doesn\'t exist', 'error')
 
@@ -85,12 +85,12 @@ def get_graph():
 			graph_data = data_sources.get_graph_data(data_source_str, start_utc, end_utc, None)
 			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
 			return render_template('graph.html',
-				data_source_str=data_source_str, graph_data=graph_data,
-				plot_bands=[], template_name=template_name, is_set=False,
-				data_source_str_nospace=data_source_str_nospace,
-				start_time_str_short=start_datetime.strftime('%Y-%m-%d %H:%M'),
-				end_time_str_short=end_datetime.strftime('%Y-%m-%d %H:%M'),
-				width_slider=data_source.width_slider)
+									data_source_str=data_source_str, graph_data=graph_data,
+									plot_bands=[], template_name=template_name, is_set=False,
+									data_source_str_nospace=data_source_str_nospace,
+									start_time_str_short=start_datetime.strftime('%Y-%m-%d %H:%M'),
+									end_time_str_short=end_datetime.strftime('%Y-%m-%d %H:%M'),
+									width_slider=data_source.width_slider)
 	else:
 		the_set = db_utils.query(database='eorlive', table='set', field_tuples=(('name', '==', set_str),))[0]
 
@@ -194,7 +194,7 @@ def filesystem():
 			this_sys['time'] = time_val(system_time)
 			this_sys['space'] = getattr(system, 'percent_space')
 
-	return render_template('filesystem_table.html', system_header=system_header, system_names=system_names, system_dict=system_dict)
+	return render_template('filesystem_table.html', system_header=system_header, system_dict=system_dict)
 
 @app.route('/obs_table', methods = ['POST'])
 def obs_table():
@@ -375,7 +375,6 @@ def data_summary_table():
 			host = getattr(paper_file, 'host')
 			filetype = getattr(paper_file, 'filetype')
 			file_map[host][filetype]['file_count'] += 1
-				
 
 	all_obs_strs = pol_strs + era_type_strs
 	obs_total = {all_obs_str: {'count': 0, 'hours': 0} for all_obs_str in all_obs_strs}
