@@ -49,6 +49,7 @@ class Filesystem(Base):
 	used_space = Column(BigInteger)
 	free_space = Column(BigInteger)
 	percent_space = Column(Numeric(4,1))
+	#ping = Column(Numeric(5, 1))
 	timestamp = Column(BigInteger) #seconds since 1970
 
 	def to_json(self):
@@ -58,6 +59,7 @@ class Filesystem(Base):
 						'used_space':self.used_space,
 						'free_space':self.free_space,
 						'percent_space':self.percent_space,
+		#				'ping':self.ping,
 						'timestamp':self.timestamp}
 		return self.data_dict
 
