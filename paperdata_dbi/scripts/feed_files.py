@@ -49,12 +49,10 @@ def gen_feed_data(host, full_path):
 
 	action = 'add by feed'
 	table = 'feed'
+	identifier = full_path
 	log_data = {'action':action,
 				'table':table,
-				'obsnum':None,
-				'host':host,
-				'full_path':None,
-				'feed_path':full_path,
+				'identifier':identifier,
 				'timestamp':timestamp}
 
 	return feed_data, log_data

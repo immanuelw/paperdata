@@ -79,12 +79,10 @@ def set_move_table(input_host, source, output_host, output_dir):
 	dbi.set_entry(FILE, 'host', output_host)
 	dbi.set_entry(FILE, 'path', output_dir)
 	dbi.set_entry(FILE, 'timestamp', timestamp)
+	identifier = getattr(FILE, 'full_path')
 	log_data = {'action':action,
 				'table':table,
-				'obsnum':None,
-				'host':input_host,
-				'full_path':source,
-				'feed_path':None,
+				'identifier':identifier,
 				'timestamp':timestamp}
 	dbi.add_to_table('log', log_data)
 	return None
