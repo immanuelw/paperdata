@@ -171,83 +171,92 @@ class Feed(Base):
 						'timestamp':self.timestamp}
 		return self.feed_data
 
-#def Rtp_File(Base):
-	#__tablename__ = 'rtp_file'
-	#host = Column(String(100), nullable=False)
-	#path = Column(String(100), nullable=False) #directory
-	#filename = Column(String(100), nullable=False) #zen.*.*.uv/uvcRRE/uvcRREzx...
-	#filetype = Column(String(20), nullable=False) #uv, uvcRRE, etc.
-	#full_path = Column(String(200), primary_key=True)
-	#obsnum = Column(BigInteger, ForeignKey('rtp_observation.obsnum'))
-	#filesize = Column(Numeric(7,2))
-	#md5sum = Column(String(32))
-	#transferred = Column(Boolean)
-	#julian_day = Column(Integer)
-	#new_host = Column(String(100))
-	#new_path = Column(String(100))
-	#timestamp = Column(BigInteger)
-	#observation = relationship(Rtp_Observation, backref=backref('files', uselist=True))
-
-	#def to_json(self):
-	#	self.rtp_file_data = {'host':self.host,
-	#						'path':self.path,
-	#						'filename':self.filename,
-	#						'filetype':self.filetype,
-	#						'full_path':self.full_path,
-	#						'obsnum':self.obsnum,
-	#						'filesize':self.filesize,
-	#						'md5sum':self.md5sum,
-	#						'transferred':self.transferred,
-	#						'julian_day':self.julian_day,
-	#						'new_host':self.new_host,
-	#						'new_path':self.new_path,
-	#						'timestamp':self.timestamp}
-	#	return self.rtp_data
-
-#class Rtp_Observation(Base):
-	#__tablename__ = 'rtp_observation'
-	#obsnum = Column(BigInteger, primary_key=True)
-	#julian_date = Column(Numeric(12,5))
-	#polarization = Column(String(4))
-	#julian_day = Column(Integer)
-	#era = Column(Integer)
-	#length = Column(Numeric(6,5)) #length of rtp_observation in fraction of a day
-	#prev_obs = Column(BigInteger, unique=True)
-	#next_obs = Column(BigInteger, unique=True)
-	#timestamp = Column(BigInteger)
-
-	#def to_json(self):
-	#	self.rtp_obs_data = {'obsnum':self.obsnum,
-	#						'julian_date':self.julian_date,
-	#						'polarization':self.polarization,
-	#						'julian_day':self.julian_day,
-	#						'era':self.era,
-	#						'length':self.length,
-	#						'prev_obs':self.prev_obs, 
-	#						'next_obs':self.next_obs,
-	#						'timestamp':self.timestamp}
-	#	return self.rtp_obs_data
-
 class Log(Base):
 	__tablename__ = 'log'
-	__table_args__ = (PrimaryKeyConstraint('action', 'full_path', 'feed_path', 'timestamp', name='action_time'),)
+	__table_args__ = (PrimaryKeyConstraint('action', 'identifier', 'timestamp', name='action_time'),)
 	action = Column(String(100), nullable=False)
 	table = Column(String(100))
-	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
-	host = Column(String(100))
-	full_path = Column(String(200), ForeignKey('file.full_path'))
-	feed_path = Column(String(200), ForeignKey('feed.full_path'))
+	identifier = Column(String(200)) #the primary key that is used in other tables of the object being acted on
 	timestamp = Column(BigInteger)
 
 	def to_json(self):
 		self.log_data = {'action':self.action,
 						'table':self.table,
-						'obsnum':self.obsnum,
-						'host':self.host,
-						'full_path':self.full_path,
-						'feed_path':self.feed_path,
+						'identifier':self.identifier,
 						'timestamp':self.timestamp}
 		return log_data
+
+#def Rtp_File(Base):
+#	__tablename__ = 'rtp_file'
+#	host = Column(String(100), nullable=False)
+#	path = Column(String(100), nullable=False) #directory
+#	filename = Column(String(100), nullable=False) #zen.*.*.uv/uvcRRE/uvcRREzx...
+#	filetype = Column(String(20), nullable=False) #uv, uvcRRE, etc.
+#	full_path = Column(String(200), primary_key=True)
+#	obsnum = Column(BigInteger, ForeignKey('rtp_observation.obsnum'))
+#	filesize = Column(Numeric(7,2))
+#	md5sum = Column(String(32))
+#	transferred = Column(Boolean)
+#	julian_day = Column(Integer)
+#	new_host = Column(String(100))
+#	new_path = Column(String(100))
+#	timestamp = Column(BigInteger)
+#	observation = relationship(Rtp_Observation, backref=backref('files', uselist=True))
+
+#	def to_json(self):
+#		self.rtp_file_data = {'host':self.host,
+#							'path':self.path,
+#							'filename':self.filename,
+#							'filetype':self.filetype,
+#							'full_path':self.full_path,
+#							'obsnum':self.obsnum,
+#							'filesize':self.filesize,
+#							'md5sum':self.md5sum,
+#							'transferred':self.transferred,
+#							'julian_day':self.julian_day,
+#							'new_host':self.new_host,
+#							'new_path':self.new_path,
+#							'timestamp':self.timestamp}
+#		return self.rtp_data
+
+#class Rtp_Observation(Base):
+#	__tablename__ = 'rtp_observation'
+#	obsnum = Column(BigInteger, primary_key=True)
+#	julian_date = Column(Numeric(12,5))
+#	polarization = Column(String(4))
+#	julian_day = Column(Integer)
+#	era = Column(Integer)
+#	length = Column(Numeric(6,5)) #length of rtp_observation in fraction of a day
+#	prev_obs = Column(BigInteger, unique=True)
+#	next_obs = Column(BigInteger, unique=True)
+#	timestamp = Column(BigInteger)
+
+#	def to_json(self):
+#		self.rtp_obs_data = {'obsnum':self.obsnum,
+#							'julian_date':self.julian_date,
+#							'polarization':self.polarization,
+#							'julian_day':self.julian_day,
+#							'era':self.era,
+#							'length':self.length,
+#							'prev_obs':self.prev_obs, 
+#							'next_obs':self.next_obs,
+#							'timestamp':self.timestamp}
+#		return self.rtp_obs_data
+
+#class Rtp_Log(Base):
+#	__tablename__ = 'rtp_log'
+#	__table_args__ = (PrimaryKeyConstraint('action', 'identifier', 'timestamp', name='action_time'),)
+#	action = Column(String(100), nullable=False)
+#	table = Column(String(100))
+#	identifier = Column(String(200)) #the primary key that is used in other tables of the object being acted on
+#	timestamp = Column(BigInteger)
+#
+#	def to_json(self):
+#		self.rtp_log_data = {'action':self.action,
+#							'table':self.table,
+#							'identifier':self.identifier,
+#							'timestamp':self.timestamp}
+#		return rtp_log_data
 
 
 class DataBaseInterface(object):
@@ -363,7 +372,7 @@ class DataBaseInterface(object):
 		create a new entry.
 		"""
 		table = getattr(sys.modules[__name__], TABLE.title())
-		if TABLE in ('observation', 'feed', 'log', 'rtp_file', 'rtp_observation'):
+		if TABLE in ('observation', 'feed', 'log', 'rtp_file', 'rtp_observation', 'rtp_log'):
 			ENTRY = table(**entry_dict)
 		elif TABLE in ('file',):
 			#files linked to observations

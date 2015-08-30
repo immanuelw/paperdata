@@ -248,12 +248,10 @@ def calc_obs_data(host, full_path):
 
 	action = 'add by scan'
 	table = None
+	identifier = full_path
 	log_data = {'action':action,
 				'table':table,
-				'obsnum':obsnum,
-				'host':host,
-				'full_path':full_path,
-				'feed_path':None,
+				'identifier':identifier,
 				'timestamp':timestamp}
 
 	return obs_data, file_data, log_data

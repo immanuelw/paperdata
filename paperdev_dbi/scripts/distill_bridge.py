@@ -142,11 +142,10 @@ def add_data():
 					'timestamp':timestamp}
 		action = 'add by bridge'
 		table = None
+		identifier = full_path
 		log_data = {'action':action,
 					'table':table,
-					'obsnum':obsnum,
-					'full_path':full_path,
-					'feed_path':None,
+					'identifier':identifier,
 					'timestamp':timestamp}
 		data_dbi.add_to_table('observation', obs_data)
 		data_dbi.add_to_table('file', raw_data)

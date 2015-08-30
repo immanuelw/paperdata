@@ -41,12 +41,10 @@ def set_delete_table(input_host, source, output_host, output_dir):
 	dbi.set_entry(FILE, 'path', output_dir)
 	dbi.set_entry(FILE, 'delete_file', False)
 	dbi.set_entry(FILE, 'timestamp', timestamp)
+	identifier = full_path
 	log_data = {'action':action,
 				'table':table,
-				'obsnum':None,
-				'host':input_host,
-				'full_path':source,
-				'feed_path':None,
+				'identifier':identifier,
 				'timestamp':timestamp}
 	dbi.add_to_table('log', log_data)
 	return None

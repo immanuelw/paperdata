@@ -16,7 +16,7 @@ LIST = 6
 NONE = 7
 
 options = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
-classes = ('File', 'Observation', 'Feed', 'Log', 'RTP_File', 'RTP_Observation')
+classes = ('File', 'Observation', 'Feed', 'Log', 'Rtp_File', 'Rtp_Observation', 'Rtp_Log')
 
 class File:
 	def __init__(self):
@@ -109,24 +109,16 @@ class Log:
 		self.table = 'Log'
 		self.db_list = ('action',
 						'table',
-						'obsnum',
-						'host',
-						'full_path',
-						'feed_path',
+						'identifier',
 						'timestamp')
 		self.db_descr = {'action':('VARCHAR(100)', 'None', 'No', 'action taken by script'),
 						'table':('VARCHAR(100)', 'None', 'No', 'table script is acting on'),
-						'obsnum':('BIGINT', 'None', 'Foreign', 'observation number used to track files using integer'),
-						'host':('VARCHAR(100)', 'None', 'No', 'host of file system that file is located on'),
-						'full_path':('VARCHAR(200)', 'None', 'Foreign',
-										'combination of host, path, and filename which is a unique identifier for each file'),
-						'feed_path':('VARCHAR(200)', 'None', 'Foreign',
-										'combination of host, path, and filename which is a unique identifier for each file'),
+						'identifier':('VARCHAR(200)', 'None', 'No', 'primary key of item that was changed'),
 						'timestamp':('BIGINT', 'None', 'No', 'time action was taken')}
 
-class RTP_File:
+class Rtp_File:
 	def __init__(self):
-		self.table = 'RTP_File'
+		self.table = 'Rtp_File'
 		self.db_list = ('host',
 						'path',
 						'filename',
@@ -154,9 +146,9 @@ class RTP_File:
 						'new_path':('VARCHAR(100)', 'None', 'No', 'new path of file of new host'),
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was last updated')}
 
-class RTP_Observation:
+class Rtp_Observation:
 	def __init__(self):
-		self.table = 'RTP_Observation'
+		self.table = 'Rtp_Observation'
 		self.db_list = ('obsnum',
 						'julian_date',
 						'polarization',
@@ -177,10 +169,22 @@ class RTP_Observation:
 						'next_obs':('BIGINT', 'None', 'Unique', 'rtp_observation number of next rtp_observation'),
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was last updated')}
 
+class Rtp_Log:
+	def __init__(self):
+		self.table = 'Rtp_Log'
+		self.db_list = ('action',
+						'table',
+						'identifier',
+						'timestamp')
+		self.db_descr = {'action':('VARCHAR(100)', 'None', 'No', 'action taken by script'),
+						'table':('VARCHAR(100)', 'None', 'No', 'table script is acting on'),
+						'identifier':('VARCHAR(200)', 'None', 'No', 'primary key of item that was changed'),
+						'timestamp':('BIGINT', 'None', 'No', 'time action was taken')}
+
 #dictionary of instantiated classes
 instant_class = {'File':File(), 'Observation':Observation(), 'Feed':Feed(), 'Log':Log(),
-				'RTP_File':RTP_File(), 'RTP_Observation':RTP_Observation()}
-all_classes = (File(), Observation(), Feed(), Log(), RTP_File(), RTP_Observation())
+				'Rtp_File':Rtp_File(), 'Rtp_Observation':Rtp_Observation(), 'Rtp_Log':Rtp_Log()}
+all_classes = (File(), Observation(), Feed(), Log(), Rtp_File(), Rtp_Observation(), Rtp_Log())
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':
