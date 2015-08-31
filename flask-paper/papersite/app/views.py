@@ -201,8 +201,6 @@ def filesystem():
 			#this_sys['free_perc'] = 100 - used_space
 			#used_space = getattr(system, 'used_space') / 1024.0 ** 3 #convert to GiB
 			#this_sys['used_space'] = ' '.join(str(used_space), 'GB')
-			#ping = getattr(system, 'ping')
-			#this_sys['ping'] = ' '.join(str(ping), 'ms')
 
 	return render_template('filesystem_table.html', system_header=system_header, system_dict=system_dict)
 
