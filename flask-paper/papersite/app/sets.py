@@ -192,41 +192,42 @@ def upload_set():
 @app.route('/download_set')
 def download_set():
 	set_id = request.args['set_id']
+	arg_type = request.args['arg_type']
 
-	the_set = db_utils.query(database='eorlive', table='set',
-											field_tuples=(('id', '==', set_id),),)[0]
+	the_set = db_utils.query(database='eorlive', table='set', field_tuples=(('id', '==', set_id),),)[0]
 
 	if the_set is not None:
 		flagged_subsets = db_utils.query(database='eorlive', table='flagged_subset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),),)
-
 		polarization = getattr(the_set, 'polarization')
 		era_type = getattr(the_set, 'era_type')
-		host = getattr(the_set, 'host')
-		filetype = getattr(the_set, 'filetype')
+		if arg_type == 'obs':
+			output_vars = ('obsnum', 'julian_date', 'polarization', 'era_type', 'length', 'time_start', 'time_end')
 
-		all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
+			obs_objs = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),
-										sort_tuples=(('time_start', 'asc'),), output_vars=('obsnum',))
+										sort_tuples=(('time_start', 'asc'),), output_vars=output_vars)
 
-		all_obs_ids = [getattr(obs, 'obsnum') for obs in all_obs_ids_tuples]
+			info_dict = {getattr(obs_obj, 'obsnum'): {var: getattr(obs_obj, var) for var in output_vars} for obs_obj in obs_objs}
 
-		good_obs_ids_text_file = ''
+		elif arg_type == 'file':
+			obs_objs = db_utils.query(database='paperdata', table='observation',
+										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
+										('polarization', None if polarization == 'all' else '==', polarization),
+										('era_type', None if era_type == 'all' else '==', era_type)),
+										sort_tuples=(('time_start', 'asc'),), output_vars=('files',))
+			host = getattr(the_set, 'host')
+			filetype = getattr(the_set, 'filetype')
 
-		for obs_id in all_obs_ids:
-			good = True # assume obs_id is good
-			for flagged_subset in flagged_subsets:
-				if obs_id >= getattr(flagged_subset, 'start') and obs_id <= getattr(flagged_subset, 'end'): # obs_id is flagged, so it's not good
-					good = False
-					break
-			if good:
-				good_obs_ids_text_file = ''.join(good_obs_ids_text_file, str(obs_id), '\n')
+			output_vars = ('host', 'path', 'filename', 'obsnum', 'filesize', 'md5sum', 'write_to_tape', 'delete_file')
 
-		response = make_response(good_obs_ids_text_file)
-		filename = ''.join(the_set.name.replace(' ', '_'), '.txt')
-		response.headers['Content-Disposition'] = ''.join('attachment; filename=', filename)
-		return response
+			file_list = (obs_file for obs in obs_objs for obs_file in getattr(obs, 'files'))
+			file_objs = (file_obj for file_obj in file_list if getattr(file_obj, 'host') == host and getattr(file_obj, 'filetype') == filetype)
+
+			info_dict = {getattr(file_obj, 'full_path'): {var: getattr(file_obj, var) for var in output_vars} for file_obj in file_objs}
+
+		return jsonify(info_dict)
 	else:
 		return make_response('That set was not found.', 500)
 

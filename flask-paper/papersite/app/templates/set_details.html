@@ -9,12 +9,17 @@
 		<td class='cellClass'>
 			Data hours: {{ the_set.total_data_hrs | round(2) }} ({{ the_set.flagged_data_hrs | round(2) }} flagged)
 		</td>
-		<td class='cellClass'><button type='button' onclick='downloadSet()'>Download set</button></td>
+		<td class='cellClass'><button type='button' onclick='downloadObs()'>Download obs</button></td>
+		<td class='cellClass'><button type='button' onclick='downloadFile()'>Download file</button></td>
 	</tr>
 </table>
 <script>
 
-function downloadSet() {
-	window.open('/download_set?set_id={{the_set.id}}', '_blank');
+function downloadObs() {
+	window.open('/download_set?set_id={{the_set.id}}?arg_type=obs', '_blank');
+};
+
+function downloadFile() {
+	window.open('/download_set?set_id={{the_set.id}}?arg_type=file', '_blank');
 };
 </script>
