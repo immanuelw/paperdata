@@ -7,7 +7,7 @@ import paperdata_dbi as pdbi
 import pyganglia_dbi as pyg
 from sqlalchemy import or_, in_
 from sqlalchemy.engine import reflection
-from jdcal import gcal2jd
+from convert import gcal2jd
 
 def get_dbi(database):
 	if database == 'paperdata':

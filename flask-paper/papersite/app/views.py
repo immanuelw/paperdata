@@ -7,7 +7,6 @@ import os
 import paperdata_dbi as pdbi
 import pyganglia as pyg
 import time
-import jdcal
 
 def time_val(value):
 	#determines how much time to divide by
@@ -288,7 +287,7 @@ def rtp_summary_table():
 	for julian_day in julian_days:
 		file_dict = file_info[julian_day]
 		sum_dict = summary_dict[julian_day]
-		year, month, day, _ = jdcal.jd2cal(jdcal.MJD_0, julian_day - jdcal.MJD_0)
+		year, month, day, _ = convert.jd2cal(convert.MJD_0, julian_day - convert.MJD_0)
 		gd = datetime(year, month, day)
 		sum_dict['gregorian_day'] = gd.strftime('%Y-%m-%d') 
 		sum_dict['lst_range'] = file_dict['lst_range'] 
