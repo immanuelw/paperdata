@@ -294,12 +294,12 @@ class DataBaseInterface(object):
 			config = configparser.ConfigParser()
 			configfile = os.path.expanduser(configfile)
 			if os.path.exists(configfile):
-				logger.info(' '.join('loading file', configfile))
+				logger.info(' '.join(('loading file', configfile)))
 				config.read(configfile)
 				self.dbinfo = config['dbinfo']
 				self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
 			else:
-				logging.info(' '.join(configfile, 'Not Found'))
+				logging.info(' '.join((configfile, 'Not Found')))
 		if test:
 			self.engine = create_engine('sqlite:///',
 										connect_args={'check_same_thread':False},
