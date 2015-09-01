@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship, backref, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool, QueuePool
-import aipy as a, os, numpy as n, sys, logging
+import os, numpy as n, sys, logging
 import configparser
 import hashlib
 #Based on example here: http://www.pythoncentral.io/overview-sqlalchemys-expression-language-orm-queries/
@@ -17,16 +17,34 @@ logger = logging.getLogger('paperdata_dbi')
 #   Useful helper functions
 #
 #########
+
+str2pol = {	'I' :  1,   # Stokes Paremeters
+			'Q' :  2,
+			'U' :  3,
+			'V' :  4,
+			'rr': -1,   # Circular Polarizations
+			'll': -2,
+			'rl': -3,
+			'lr': -4,
+			'xx': -5,   # Linear Polarizations
+			'yy': -6,
+			'xy': -7,
+			'yx': -8}
+
 def jdpol2obsnum(jd,pol,djd):
 	"""
 	input: julian date float, pol string. and length of obs in fraction of julian date
 	output: a unique index
 	"""
 	dublinjd = jd - 2415020  #use Dublin Julian Date
-	obsint = int(dublinjd/djd)  #divide up by length of obs
-	polnum = a.miriad.str2pol[pol]+10
-	assert(obsint < 2**31)
-	return int(obsint + polnum*(2**32))
+	obsint = int(dublinjd / djd)  #divide up by length of obs
+	try:
+		import aipy as a
+		polnum = a.miriad.str2pol[pol] + 10
+	except:
+		polnum = str2pol[pol]+10
+	assert(obsint < 2 ** 31)
+	return int(obsint + polnum * (2 ** 32))
 
 def updateobsnum(context):
 	"""
