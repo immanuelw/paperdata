@@ -1,6 +1,8 @@
 {% block body %}
 <div id='main_content_div'>
 	<button id='backbutton' onclick='obs_file.backToHistogram()'>Back to histogram</button>
+	<button type='button' onclick='obs_file.saveObs()' id='save_obs_button'>Save Observations as json</button>
+	<button type='button' onclick='obs_file.saveFile()' id='save_file_button'>Save Files as json</button>
 	<div id='obs_table'></div>
 	<div id='file_table'></div>
 	<div id='obs_file'></div>
@@ -12,7 +14,7 @@
 var obs_file = (function($) {
 	var dataSourceObj = {};
 	var observation_counts = {{ obs_count | tojson }};
-	var observation_counts_copy = {{ obs_count }};
+	var observation_counts_copy = {{ obs_count | tojson }};
 	var file_counts = {{ file_counts | tojson }};
 	var file_counts_copy = {{ file_counts | tojson }};
 	var plot_bands = {{ plot_bands | tojson }};
@@ -23,6 +25,8 @@ var obs_file = (function($) {
 
 	var backToHistogram = function() {
 		$('#backbutton').hide();
+		$('#save_obs_button').hide();
+		$('#save_file_button').hide();
 		$('#obs_table').hide();
 		$('#file_table').hide();
 		$('#obs_file').show();
@@ -30,8 +34,44 @@ var obs_file = (function($) {
 	};
 	dataSourceObj.backToHistogram = backToHistogram;
 
+	var saveObs = function(obs_map) {
+		$.ajax({
+			type: 'POST',
+			url: '/obs_json',
+			data: obs_map,
+			success: function(data) {
+				$('#obs_table').html(data);
+				$('#backbutton').show();
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				backToHistogram();
+			},
+			dataType: 'html'
+		});
+	};
+	dataSourceObj.saveObs = saveObs;
+
+	var saveFile = function(file_map) {
+		$.ajax({
+			type: 'POST',
+			url: '/file_json',
+			data: file_map,
+			success: function(data) {
+				$('#file_table').html(data);
+				$('#backbutton').show();
+			},
+			error: function(xhr, ajaxOptions, thrownError) {
+				backToHistogram();
+			},
+			dataType: 'html'
+		});
+	};
+	dataSourceObj.saveFile = saveFile;
+
 	$(function() {
 		$('#backbutton').hide();
+		$('#save_obs_button').hide();
+		$('#save_file_button').hide();
 		$('#obs_table').hide();
 		$('#file_table').hide();
 
@@ -96,6 +136,8 @@ var obs_file = (function($) {
 										success: function(data) {
 											$('#obs_table').html(data);
 											$('#backbutton').show();
+											$('#save_obs_button').hide();
+											$('#save_file_button').hide();
 										},
 										error: function(xhr, ajaxOptions, thrownError) {
 											backToHistogram();
@@ -117,6 +159,8 @@ var obs_file = (function($) {
 										success: function(data) {
 											$('#file_table').html(data);
 											$('#backbutton').show();
+											$('#save_obs_button').hide();
+											$('#save_file_button').hide();
 										},
 										error: function(xhr, ajaxOptions, thrownError) {
 											backToHistogram();
