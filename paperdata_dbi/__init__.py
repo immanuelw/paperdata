@@ -5,10 +5,13 @@ from sqlalchemy.orm import relationship, backref, sessionmaker
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool, QueuePool
-import os, numpy as n, sys, logging
-import configparser
 import hashlib
-#Based on example here: http://www.pythoncentral.io/overview-sqlalchemys-expression-language-orm-queries/
+import os, numpy as n, sys, logging
+try:
+	import configparser
+except:
+	import ConfigParser as configparser
+
 Base = declarative_base()
 logger = logging.getLogger('paperdata_dbi')
 
