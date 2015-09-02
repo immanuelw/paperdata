@@ -15,8 +15,8 @@ cd /mnt/papersite
 
 sudo virtualenv --python=/usr/bin/python3.4 flask
 source flask/bin/activate
-pip3 install flask requests Flask-SQLAlchemy Flask-Migrate Flask-Login requests-futures psycopg2
-#pip3 install -r ../requirements.txt
+pip install flask requests Flask-SQLAlchemy Flask-Migrate Flask-Login requests-futures psycopg2
+#pip install -r ../requirements.txt
 
 sudo -u postgres createuser vagrant
 

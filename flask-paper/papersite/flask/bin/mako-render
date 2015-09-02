@@ -1,4 +1,4 @@
-#!/mnt/eorlive_prototype/flask/bin/python3.4
+#!/mnt/papersite/flask/bin/python3.4
 # EASY-INSTALL-ENTRY-SCRIPT: 'Mako==1.0.1','console_scripts','mako-render'
 __requires__ = 'Mako==1.0.1'
 import sys
