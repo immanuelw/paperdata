@@ -35,6 +35,8 @@ def load_backup(backup, table=None):
 						dbi.add_to_table('log', row)
 					#elif table == 'rtp_file':
 					#	dbi.add_to_table('rtp_file', row)
+				except KeyboardInterrupt:
+					raise
 				except:
 					print('Failed to load in entry')
 

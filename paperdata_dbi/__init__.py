@@ -385,7 +385,7 @@ class DataBaseInterface(object):
 		try:
 			s.add(ENTRY)
 			s.commit()
-		except (exc.IntegrityError):
+		except (sqlalchemy.exc.IntegrityError):
 			s.rollback()
 			s.close()
 			print('Duplicate entry found ... skipping entry')
@@ -405,7 +405,9 @@ class DataBaseInterface(object):
 			obs_table = getattr(sys.modules[__name__], 'Observation')
 			ENTRY = table(**entry_dict)
 			#get the observation corresponding to this file
+			s = self.Session()
 			OBS = s.query(obs_table).get(entry_dict['obsnum'])
 			setattr(ENTRY, 'observation', OBS)  #associate the file with an observation
+			s.close()
 		self.add_entry(ENTRY)
 		return None
