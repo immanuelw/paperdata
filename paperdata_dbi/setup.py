@@ -15,4 +15,7 @@ setup_args = {
 
 if __name__ == '__main__':
 	from distutils.core import setup
-	apply(setup, (), setup_args)
+	try:
+		apply(setup, (), setup_args)
+	except:
+		setup(**setup_args)

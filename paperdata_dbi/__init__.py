@@ -194,16 +194,18 @@ class Feed(Base):
 
 class Log(Base):
 	__tablename__ = 'log'
-	__table_args__ = (PrimaryKeyConstraint('action', 'identifier', 'timestamp', name='action_time'),)
+	#__table_args__ = (PrimaryKeyConstraint('action', 'identifier', 'timestamp', name='action_time'),)
 	action = Column(String(100), nullable=False)
 	table = Column(String(100))
 	identifier = Column(String(200)) #the primary key that is used in other tables of the object being acted on
+	action_time = Column(String(200), primary_key=True)
 	timestamp = Column(BigInteger)
 
 	def to_json(self):
 		self.log_data = {'action':self.action,
 						'table':self.table,
 						'identifier':self.identifier,
+						'action_time':self.action_time,
 						'timestamp':self.timestamp}
 		return log_data
 
@@ -281,7 +283,7 @@ class Log(Base):
 
 
 class DataBaseInterface(object):
-	def __init__(self,configfile='~/paperdata.cfg',test=False):
+	def __init__(self, configfile='~/paperdata.cfg', test=False):
 		"""
 		Connect to the database and initiate a session creator.
 		 or
@@ -296,7 +298,10 @@ class DataBaseInterface(object):
 			if os.path.exists(configfile):
 				logger.info(' '.join(('loading file', configfile)))
 				config.read(configfile)
-				self.dbinfo = config['dbinfo']
+				try:
+					self.dbinfo = config['dbinfo']
+				except:
+					self.dbinfo = config._sections['dbinfo']
 				self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
 			else:
 				logging.info(' '.join((configfile, 'Not Found')))
@@ -319,7 +324,7 @@ class DataBaseInterface(object):
 		"""
 		Base.metadata.bind = self.engine
 		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
-										after INSERT or UPDATE on File \
+										after INSERT or UPDATE on file \
 										FOR EACH ROW \
 										SET NEW.full_path = concat(NEW.host, ':', NEW.path, '/', NEW.filename)''')
 		event.listen(File.__table__, 'after_create', insert_update_trigger)
