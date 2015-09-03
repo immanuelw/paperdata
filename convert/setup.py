@@ -1,6 +1,6 @@
 import glob
 
-__version__ = '1.0'
+__version__ = '0.1.0'
 
 setup_args = {
 	'name': 'convert',
@@ -14,4 +14,7 @@ setup_args = {
 
 if __name__ == '__main__':
 	from distutils.core import setup
-	apply(setup, (), setup_args)
+	try:
+		apply(setup, (), setup_args)
+	except:
+		setup(**setup_args)

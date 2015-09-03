@@ -6,7 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool, QueuePool
 import hashlib
-import os, numpy as n, sys, logging
+import os, sys, logging
 try:
 	import configparser
 except:
@@ -304,7 +304,13 @@ class DataBaseInterface(object):
 					self.dbinfo = config['dbinfo']
 				except:
 					self.dbinfo = config._sections['dbinfo']
-				self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
+				try:
+					self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
+				except:
+					try:
+						self.dbinfo['password'] = self.dbinfo['password'].decode('unicode_escape')
+					except:
+						self.dbinfo['password'] = self.dbinfo['password']
 			else:
 				logging.info(' '.join((configfile, 'Not Found')))
 		if test:
@@ -313,11 +319,13 @@ class DataBaseInterface(object):
 										poolclass=StaticPool)
 			self.create_db()
 		else:
-			self.engine = create_engine(
-					'mysql://{username}:{password}@{hostip}:{port}/{dbname}'.format(
-								**self.dbinfo),
-								pool_size=20,
-								max_overflow=40)
+			try:
+				connect_string = 'mysql://{username}:{password}@{hostip}:{port}/{dbname}'
+				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
+			except:
+				connect_string = 'mysql+mysqldb://{username}:{password}@{hostip}:{port}/{dbname}'
+				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
+
 		self.Session = sessionmaker(bind=self.engine)
 
 	def create_db(self):
@@ -387,7 +395,7 @@ class DataBaseInterface(object):
 		try:
 			s.add(ENTRY)
 			s.commit()
-		except (sqlalchemy.exc.IntegrityError):
+		except (exc.IntegrityError):
 			s.rollback()
 			s.close()
 			print('Duplicate entry found ... skipping entry')

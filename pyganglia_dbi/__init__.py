@@ -5,9 +5,12 @@ from sqlalchemy import exc
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool, QueuePool
-import os, numpy as n, sys, logging
-import configparser
-#Based on example here: http://www.pythoncentral.io/overview-sqlalchemys-expression-language-orm-queries/
+import os, sys, logging
+try:
+	import configparser
+except:
+	import ConfigParser as configparser
+
 Base = declarative_base()
 logger = logging.getLogger('pyganglia_dbi')
 
@@ -182,8 +185,17 @@ class DataBaseInterface(object):
 			if os.path.exists(configfile):
 				logger.info(' '.join(('loading file', configfile)))
 				config.read(configfile)
-				self.dbinfo = config['dbinfo']
-				self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
+				try:
+					self.dbinfo = config['dbinfo']
+				except:
+					self.dbinfo = config._sections['dbinfo']
+				try:
+					self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
+				except:
+					try:
+						self.dbinfo['password'] = self.dbinfo['password'].decode('unicode_escape')
+					except:
+						self.dbinfo['password'] = self.dbinfo['password']
 			else:
 				logging.info(' '.join((configfile, 'Not Found')))
 		if test:
@@ -192,11 +204,13 @@ class DataBaseInterface(object):
 										poolclass=StaticPool)
 			self.create_db()
 		else:
-			self.engine = create_engine(
-					'mysql://{username}:{password}@{hostip}:{port}/{dbname}'.format(
-								**self.dbinfo),
-								pool_size=20,
-								max_overflow=40)
+			try:
+				connect_string = 'mysql://{username}:{password}@{hostip}:{port}/{dbname}'
+				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
+			except:
+				connect_string = 'mysql+mysqldb://{username}:{password}@{hostip}:{port}/{dbname}'
+				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
+
 		self.Session = sessionmaker(bind=self.engine)
 
 	def create_db(self):
