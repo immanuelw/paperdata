@@ -77,7 +77,7 @@ $(function() {
 				return;
 			}
 
-			ui.panel.html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+			ui.panel.html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 			if (ui.ajaxSettings.url.search('&set=') === -1) { // There is no set, so we need to add the date range.
 				var startTimeStr = $('#datepicker_start').val().replaceAll('/', '-').replaceAll(' ', 'T') + ':00Z';
@@ -91,7 +91,7 @@ $(function() {
 		}
 	});
 
-	$('#filter_dropdown_div').html('<img src='/static/images/ajax-loader.gif' class='loading'/>');
+	$('#filter_dropdown_div').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 	$.ajax({
 		type: 'GET',

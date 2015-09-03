@@ -59,8 +59,10 @@ def get_graph():
 	data_source_str = request.args.get('dataSource')
 	if data_source_str is None:
 		return make_response('No data source', 500)
-
-	data_source = db_utils.query(database='eorlive', table='graph_data_source', field_tuples=(('name', '==', data_source_str),))[0]
+	try:
+		data_source = db_utils.query(database='eorlive', table='graph_data_source', field_tuples=(('name', '==', data_source_str),))[0]
+	except IndexError:
+		return make_response('Source not found', 500)
 
 	set_str = request.args.get('set')
 
@@ -128,7 +130,10 @@ def get_graph():
 
 @app.route('/data_amount', methods = ['GET'])
 def data_amount():
-	data = db_utils.query(database='eorlive', table='data_amount', sort_tuples=(('created_on', 'desc'),))[0]
+	try:
+		data = db_utils.query(database='eorlive', table='data_amount', sort_tuples=(('created_on', 'desc'),))[0]
+	except:
+		data = None
 
 	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
 

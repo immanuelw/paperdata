@@ -17,8 +17,8 @@ def get_dbi(database):
 		module = pyg
 		configfile = '/mnt/paperdata/ganglia.cfg'
 	elif database == 'eorlive':
-		module = db
-		dbi = edbi
+		module = edbi
+		dbi = None
 		return dbi, module
 	dbi = getattr(module, 'DataBaseInterface')(configfile=configfile)
 	return dbi, module
@@ -76,7 +76,7 @@ def group_clause(table, group_tuples):
 	clause_list = [getattr(table, field_name) for field_name in field_group_tuples]
 	return clause_list
 
-def get_results(s, table, field_tuples, sort_tuples, output_vars):
+def get_results(s, table, field_tuples, sort_tuples, group_tuples, output_vars):
 	results = s.query(table)
 	if field_tuples is not None:
 		clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
@@ -105,13 +105,13 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 		dbi, module = get_dbi(data_source.database)
 		table = getattr(module, data_source.table.title())
 	elif database is not None:
-		dbi, module = get_dbi(database)
+		_, module = get_dbi(database)
 		table = getattr(module, table.title())
 	else:
 		dbi, module = get_dbi(getattr(data_source, 'database'))
 		table = getattr(data_source, 'table')
 
-	if table == 'eorlive'.title():
+	if database == 'eorlive' or not data_source is None:
 		s = db.session
 	else:
 		s = dbi.Session()

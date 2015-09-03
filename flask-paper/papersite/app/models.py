@@ -29,9 +29,9 @@ class User(db.Model):
 	first_name = db.Column(db.String(50), nullable=False)
 	last_name = db.Column(db.String(50), nullable=False)
 	owned_sets = db.relationship('Set', backref='user')
-	subscribed_sets = db.relationship('Set', secondary='set_subscriptions')
-	subscribed_data_sources = db.relationship('GraphDataSource', secondary='data_source_subscriptions')
-	active_data_sources = db.relationship('GraphDataSource', secondary='active_data_sources')
+	subscribed_sets = db.relationship('Set', secondary=Set_Subscriptions.__table__)
+	subscribed_data_sources = db.relationship('Graph_Data_Source', secondary=Data_Source_Subscriptions.__table__)
+	active_data_sources = db.relationship('Graph_Data_Source', secondary=Active_Data_Sources.__table__)
 	admin = db.Column(db.Boolean, default=False)
 
 	def __init__(self, username, password, email, first_name, last_name):
@@ -65,8 +65,8 @@ class Set(db.Model):
 	end = db.Column(db.Integer)
 	polarization = db.Column(db.String(4)) #'all', 'xy', 'yy', etc.
 	era_type = db.Column(db.String(10))
-	host = db.Column(db.String(10))
-	filetype = db.Column(db.String(10))
+	host = db.Column(db.String(100))
+	filetype = db.Column(db.String(100))
 	total_data_hrs = db.Column(db.Float)
 	flagged_data_hrs = db.Column(db.Float)
 	created_on = db.Column(db.DateTime, default=datetime.utcnow)
