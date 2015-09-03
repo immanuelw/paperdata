@@ -5,16 +5,19 @@ class Set_Subscriptions(db.Model):
 	__tablename__ = 'set_subscriptions'
 	username =  db.Column(db.String(32), db.ForeignKey('user.username'))
 	set_id = db.Column(db.Integer, db.ForeignKey('set.id'))
+	id = db.Column(db.Integer, primary_key=True)
 
 class Data_Source_Subscriptions(db.Model):
 	__tablename__ = 'data_source_subscriptions'
 	username =  db.Column(db.String(32), db.ForeignKey('user.username'))
 	data_source = db.Column(db.String(100), db.ForeignKey('graph_data_source.name'))
+	id = db.Column(db.Integer, primary_key=True)
 
 class Active_Data_Sources(db.Model):
 	__tablename__ = 'active_data_sources'
 	username =  db.Column(db.String(32), db.ForeignKey('user.username'))
 	data_source = db.Column(db.String(100), db.ForeignKey('graph_data_source.name'))
+	id = db.Column(db.Integer, primary_key=True)
 
 class User(db.Model):
 	__tablename__ = 'user'

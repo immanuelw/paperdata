@@ -167,9 +167,9 @@ def create_data_source():
 		column_response = db_utils.get_column_names(database, table)
 
 		#check for existence of obs column along with others
-		column_with_obs_column = column_response + (obs_column,)
+		columns_with_obs_column = column_response + (obs_column,)
 
-		missing_columns = tuple(column if column not in column_reponse for columns_with_obs_column)
+		missing_columns = tuple(column for column in columns_with_obs_column if column not in column_response)
 		if missing_columns:
 			return jsonify(error=True,
 				message='The column {column} does not exist in that table or is not a numeric column.'.format(column=missing_columns[0]))
@@ -244,9 +244,9 @@ def which_data_set(the_set):
 
 def separate_data_into_sets(data, data_source, start_utc, end_utc):
 	obsid_results = db_utils.query(data_source=data_source,
-									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
+									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 									sort_tuples=(('time_start', 'asc'),),
-									output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum')))
+									output_vars=('time_start', 'polarization', 'era', 'era_type', 'obsnum'))
 
 	for obs in obsid_results:
 		polarization = getattr(obs, 'polarization')

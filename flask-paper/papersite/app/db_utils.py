@@ -5,20 +5,22 @@ from app.flask_app import db
 from app import models as edbi
 import paperdata_dbi as pdbi
 import pyganglia_dbi as pyg
-from sqlalchemy import or_, in_
+from sqlalchemy import or_
 from sqlalchemy.engine import reflection
 from convert import gcal2jd
 
 def get_dbi(database):
 	if database == 'paperdata':
 		module = pdbi
+		configfile = '/mnt/paperdata/paperdata.cfg'
 	elif database == 'ganglia':
 		module = pyg
+		configfile = '/mnt/paperdata/ganglia.cfg'
 	elif database == 'eorlive':
 		module = db
 		dbi = edbi
 		return dbi, module
-	dbi = getattr(module, 'DataBaseInterface')()
+	dbi = getattr(module, 'DataBaseInterface')(configfile=configfile)
 	return dbi, module
 
 def inspector(database):
@@ -31,7 +33,7 @@ def get_table_names(database):
 	table_names = insp.get_table_names()
 	return table_names
 
-def get_column_names(database, table)
+def get_column_names(database, table):
 	insp = inspector(database)
 	#it's a list of dicts
 	column_list = insp.get_column_names(table)
@@ -93,7 +95,7 @@ def get_results(s, table, field_tuples, sort_tuples, output_vars):
 	results = results.all()
 
 	if output_vars is not None:
-		results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results))
+		results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results)
 	return results
 
 def query(data_source=None, database=None, table=None, field_tuples=None, sort_tuples=None, group_tuples=None, output_vars=None):
@@ -106,7 +108,7 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 		dbi, module = get_dbi(database)
 		table = getattr(module, table.title())
 	else:
-		dbi, module = get_dbi(getattr(data_source, 'database')
+		dbi, module = get_dbi(getattr(data_source, 'database'))
 		table = getattr(data_source, 'table')
 
 	if table == 'eorlive'.title():

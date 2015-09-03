@@ -57,7 +57,7 @@ def signup():
 			real_pass = password.encode('UTF-8')
 
 			new_user = getattr(models, 'User')(username=username, password=hashlib.sha512(real_pass).hexdigest(),
-													email=email, firstname=fname, lastname=lname))
+													email=email, firstname=fname, lastname=lname)
 
 			db.session.add(new_user)
 			db.session.flush()

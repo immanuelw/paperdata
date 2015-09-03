@@ -266,7 +266,7 @@ def get_sets():
 	
 		sort_tuples = None
 		if sort:
-			if sort == 'hours'
+			if sort == 'hours':
 				sort_tuples = (('total_data_hrs', 'desc'),)
 			elif sort == 'time':
 				sort_tuples = (('created_on', 'desc'),)

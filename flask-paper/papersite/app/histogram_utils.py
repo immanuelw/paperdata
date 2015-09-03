@@ -5,7 +5,7 @@ import math
 def get_plot_bands(the_set):
 	flagged_subsets = db_utils.query(database='eorlive', table='flagged_subset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),))
 
-	plot_bands = [{'from': int((getattr(flagged_subset, 'start'), 'to': int((getattr(flagged_subset, 'end'), 'color': 'yellow'}
+	plot_bands = [{'from': int(getattr(flagged_subset, 'start')), 'to': int(getattr(flagged_subset, 'end')), 'color': 'yellow'}
 					for flagged_subset in flagged_subsets]
 
 	return plot_bands
@@ -16,7 +16,7 @@ def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
 										('polarization', None if set_pol == 'all' else '==', set_pol),
 										('era_type', None if set_era_type == 'all' else '==', set_era_type)),
 										sort_tuples=(('time_start', 'asc'),),
-										output_vars=('time_start', 'time_end', 'polarization', 'era'. 'era_type'))
+										output_vars=('time_start', 'time_end', 'polarization', 'era', 'era_type'))
 
 	pol_strs, era_type_strs = db.utils.set_strings()
 	obs_map = {pol_str: {era_type: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
@@ -30,7 +30,7 @@ def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
 		obs_time = getattr(obs, 'time_start')
 		obsnum = getattr(obs, 'obsnum')
 
-		obs_map[polarization][era_type].append({'obs_time':obs_time, 'obsnum':obsnum})
+		obs_map[polarization][era_type].append({'obs_time': obs_time, 'obsnum': obsnum})
 		obs_count[polarization][era_type]['obs_count'] += 1
 
 	return (obs_count, obs_map)
@@ -74,9 +74,9 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 
 def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 	response = db_utils.query(database='paperdata', table='observation',
-								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
+								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),),
-								output_vars=('julian_date', 'polarization', 'era_type', 'obsnum')))
+								output_vars=('julian_date', 'polarization', 'era_type', 'obsnum'))
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = db.utils.get_set_strings()
 	obs_map = {pol_str: {era_type: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
@@ -89,7 +89,7 @@ def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 		obs_date = getattr(obs, 'julian_date')
 		obsnum = getattr(obs, 'obsnum')
 
-		obs_map[polarization][era_type].append({'obs_date':obs_date, 'obsnum':obsnum})
+		obs_map[polarization][era_type].append({'obs_date': obs_date, 'obsnum': obsnum})
 		obs_count[polarization][era_type]['obs_count'] += 1
 
 	_, file_map = get_file_counts(start_utc, end_utc, host_strs, filetype_strs)

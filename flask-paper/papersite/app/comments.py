@@ -9,7 +9,7 @@ def get_all_comments():
 
 	for thread in threads:
 		setattr(thread, 'comments',
-				db_utils.query(database='eorlive', table='comment',	field_tuples=(('thread_id', '==', getattr(thread, 'id')),))
+				db_utils.query(database='eorlive', table='comment',	field_tuples=(('thread_id', '==', getattr(thread, 'id')),)))
 
 	return render_template('comments_list.html', threads=threads)
 

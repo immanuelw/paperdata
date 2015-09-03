@@ -5,7 +5,7 @@ from app import models, db_utils, histogram_utils, data_sources
 from datetime import datetime
 import os
 import paperdata_dbi as pdbi
-import pyganglia as pyg
+import pyganglia_dbi as pyg
 import time
 
 def time_val(value):
@@ -139,7 +139,7 @@ def data_amount():
 		hours_with_data = getattr(data, 'hours_with_data')
 
 	return render_template('data_amount_table.html', data_time=data_time,
-							hours_sadb=hours_sadb, hours_paperdata=hours_paperdata,	hours_with_data=hours_with_data, data_time=data_time)
+							hours_sadb=hours_sadb, hours_paperdata=hours_paperdata,	hours_with_data=hours_with_data)
 
 @app.route('/source_table', methods = ['GET'])
 def source_table():
@@ -304,8 +304,12 @@ def rtp_summary_table():
 @app.before_request
 def before_request():
 	g.user = current_user
-	paper_dbi = pdbi.DataBaseInterface()
-	pyg_dbi = pyg.DataBaseInterface()
+	try:
+		paper_dbi = pdbi.DataBaseInterface()
+		pyg_dbi = pyg.DataBaseInterface()
+	except:
+		paper_dbi = pdbi.DataBaseInterface(configfile='/mnt/paperdata/paperdata.cfg')
+		pyg_dbi = pyg.DataBaseInterface(configfile='/mnt/paperdata/ganglia.cfg')
 	try :
 		g.paper_session = paper_dbi.Session()
 		g.pyg_session = pyg_dbi.Session()
@@ -359,9 +363,9 @@ def data_summary_table():
 	start_utc, end_utc = db_utils.get_utc_from_datetime(startdatetime, enddatetime)
 
 	response = db_utils.query(database='paperdata', table='observation',
-								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
+								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),),
-								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files')))
+								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files'))
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = db_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
