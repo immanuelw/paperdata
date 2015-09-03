@@ -2,22 +2,23 @@
 <table class='table table-striped table-bordered'>
 	<thead>
 		<tr>
-			<th>Archive Status</th>
+			<th colspan='3'>Archive Status</th>
 		</tr>
 		<tr>
 			{% for header, description in system_header %}
 				<th title={{ description }}>{{ header }}</th>
+			{% endfor %}
 		</tr>
 	</thead>
 	<tbody>
-		<tr>
-			{% for system_name, sys_dict in system_dict.items() %}
-				<td rowspan='3' style='color:red;vertical-align:middle;'>{{ 100 - sys_dict['space'] }} (%)</td>
+		{% for system_name, sys_dict in system_dict.items() %}
+			<tr>
+				<{# <td style='color:red;vertical-align:middle;'>{{ 100 - sys_dict['space'] }} (%)</td> #}
 				<td>{{ system_name }}</td>
 				<td>{{ sys_dict['time'] | round(1) }} ({{ sys_dict['time_segment'] }})</td>
-				<td rowspan='3' style='color:red;vertical-align:middle;'>{{ sys_dict['space'] }} (%)</td>
-			{% endif %}
-		</tr>
+				<td style='color:red;vertical-align:middle;'>{{ sys_dict['space'] }} (%)</td>
+			</tr>
+		{% endfor %}
 	</tbody>
 </table>
 {% endblock %}

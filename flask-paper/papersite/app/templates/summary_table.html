@@ -3,9 +3,9 @@
 	<thead>
 		<tr>
 			<th>Hours (#)</th>
-				{% for pol in pol_strs %}
-					<th>{{ pol }}</th>
-				{% endfor %}
+			{% for pol in pol_strs %}
+				<th>{{ pol }}</th>
+			{% endfor %}
 			<th>Total</th>
 		</tr>
 	</thead>
@@ -36,15 +36,15 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr>
-			{% for filetype in filetype_strs %}
+		{% for filetype in filetype_strs %}
+			<tr>
 				<th>{{ filetype }}</th>
 					{% for host in host_strs %}
 						<td>{{ file_map[host][filetype]['file_count'] }}</td>
 					{% endfor %}
 				<td>{{ file_total[filetype]['count'] }}</td>
-			{% endfor %}
-		</tr>
+			</tr>
+		{% endfor %}
 		<tr>
 			<th>Total</th>
 			{% for host in host_strs %}

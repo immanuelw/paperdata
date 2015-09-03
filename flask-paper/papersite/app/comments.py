@@ -5,11 +5,13 @@ from datetime import datetime
 
 @app.route('/get_all_comments')
 def get_all_comments():
-	threads = db_utils.query(database='eorlive', table='thread', sort_tuples=(('last_updated', 'desc'),))
-
-	for thread in threads:
-		setattr(thread, 'comments',
-				db_utils.query(database='eorlive', table='comment',	field_tuples=(('thread_id', '==', getattr(thread, 'id')),)))
+	try:
+		threads = db_utils.query(database='eorlive', table='thread', sort_tuples=(('last_updated', 'desc'),))
+		for thread in threads:
+			setattr(thread, 'comments',
+					db_utils.query(database='eorlive', table='comment',	field_tuples=(('thread_id', '==', getattr(thread, 'id')),)))
+	except:
+		return make_response('Threads not found', 500)
 
 	return render_template('comments_list.html', threads=threads)
 

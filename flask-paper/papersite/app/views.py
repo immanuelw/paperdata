@@ -77,7 +77,8 @@ def get_graph():
 		start_datetime = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%SZ')
 		end_datetime = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M:%SZ')
 
-		start_utc, end_utc = db_utils.get_utc_from_datetime(start_datetime, end_datetime)
+		start_utc = db_utils.get_utc_from_datetime(start_datetime)
+		end_utc = db_utils.get_utc_from_datetime(start_datetime)
 
 		if graph_type_str == 'Obs_File':
 			return histogram_utils.get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str)
@@ -150,18 +151,22 @@ def data_amount():
 def source_table():
 	sort_tuples = (('timestamp', 'desc'),)
 	output_vars = ('timestamp', 'julian_day')
-	
-	corr_source = db_utils.query(database='paperdata', table='rtp_file', field_tuples=(('transferred', '==', None),),
+
+	try:	
+		corr_source = db_utils.query(database='paperdata', table='rtp_file', field_tuples=(('transferred', '==', None),),
+										sort_tuples=sort_tuples, output_vars=output_vars)[0]
+
+		rtp_source = db_utils.query(database='paperdata', table='rtp_file',	field_tuples=(('transferred', '==', True),),
 									sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
-	rtp_source = db_utils.query(database='paperdata', table='rtp_file',	field_tuples=(('transferred', '==', True),),
-								sort_tuples=sort_tuples, output_vars=output_vars)[0]
+		paper_source = db_utils.query(database='paperdata', table='observation', sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
-	paper_source = db_utils.query(database='paperdata', table='observation', sort_tuples=sort_tuples, output_vars=output_vars)[0]
+		source_tuples = (('Correlator', corr_source), ('RTP', rtp_source), ('Folio Scan', paper_source))
+	except:
+		source_tuples = (('Correlator', None), ('RTP', None), ('Folio Scan', None))
 
-	source_tuples = (('Correlator', corr_source), ('RTP', rtp_source), ('Folio Scan', paper_source))
-	source_names = (source_name for source_name, _ in source_tuples)
-	source_dict = {source_name: {'time': 'N/A', 'day': 'N/A', 'time_segment': 'N/A'} for source_name in source_names}
+	source_names = tuple(source_name for source_name, _ in source_tuples)
+	source_dict = {source_name: {'time': -1, 'day': -1, 'time_segment': 'N/A'} for source_name in source_names}
 
 	for source_name, source in source_tuples:
 		if source is not None:
@@ -176,18 +181,23 @@ def source_table():
 
 @app.route('/filesystem', methods = ['GET'])
 def filesystem():
-	systems = db_utils.query(database='ganglia', table='filesystem',
-								sort_tuples=(('timestamp', 'desc'), ('host', 'asc')),
-								group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space', 'used_space'))
-	#							group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space', 'used_space', 'ping'))
+	#system_header = (('Free', None), ('File Host', None), ('Last Report', None) , ('Usage Percent', None))
+	system_header = (('File Host', None), ('Last Report', None) , ('Usage Percent', None))
+	try:
+		systems = db_utils.query(database='ganglia', table='filesystem',
+									sort_tuples=(('timestamp', 'desc'), ('host', 'asc')),
+									group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space', 'used_space'))
 
-	system_names = (getattr(system, 'host') for system in systems)
-	system_dict = {system_name: {'time': 'N/A', 'used_perc': 100.0, 'time_segment': 'N/A'} for system_name in system_names}
+		system_names = (getattr(system, 'host') for system in systems)
+	except:
+		systems = (None,)
+		system_names = ('pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1')
+
+	system_dict = {system_name: {'time': -1, 'used_perc': 100.0, 'time_segment': 'N/A'} for system_name in system_names}
 	#system_dict = {system_name: {'time': 'N/A', 'used_perc': 100.0, 'time_segment': 'N/A',
-	#								'stats': 'N/A', 'free_perc': 100.0, 'used_space': 'N/A', 'ping': 'N/A'}
+	#								'stats': 'N/A', 'free_perc': 100.0, 'used_space': 'N/A'}
 	#								for system_name in system_names}
 	
-	system_header = (('Free', None), ('File Host', None), ('Last Report', None) , ('Usage Percent', None))
 
 	for system in systems:
 		if system is not None:
@@ -213,7 +223,8 @@ def obs_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
-	start_utc, end_utc = db_utils.get_utc_from_datetime(starttime, endtime)
+	start_utc = db_utils.get_utc_from_datetime(starttime)
+	end_utc = db_utils.get_utc_from_datetime(endtime)
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 	response = db_utils.query(database='paperdata', table='observation', 
@@ -231,7 +242,8 @@ def file_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
-	start_utc, end_utc = db_utils.get_utc_from_datetime(starttime, endtime)
+	start_utc = db_utils.get_utc_from_datetime(starttime)
+	end_utc = db_utils.get_utc_from_datetime(endtime)
 
 	all_obs_list = db_utils.query(database='paperdata', table='observation', 
 									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
@@ -365,32 +377,37 @@ def data_summary_table():
 	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
 	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
 
-	start_utc, end_utc = db_utils.get_utc_from_datetime(startdatetime, enddatetime)
+	start_utc =  db_utils.get_utc_from_datetime(startdatetime)
+	end_utc =  db_utils.get_utc_from_datetime(enddatetime)
 
-	response = db_utils.query(database='paperdata', table='observation',
-								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-								sort_tuples=(('time_start', 'asc'),),
-								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files'))
+	try:
+		response = db_utils.query(database='paperdata', table='observation',
+									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
+									sort_tuples=(('time_start', 'asc'),),
+									output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files'))
+	except:
+		response = (None,)
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = db_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
 	file_map = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
 
 	for obs in response:
-		polarization = getattr(obs, 'polarization')
-		era_type = getattr(obs, 'era_type')
+		if obs is not None:
+			polarization = getattr(obs, 'polarization')
+			era_type = getattr(obs, 'era_type')
 
-		# Actual UTC time of the obs (for the graph)
-		obs_start = getattr(obs, 'time_start')
-		obs_end = getattr(obs, 'time_end')
+			# Actual UTC time of the obs (for the graph)
+			obs_start = getattr(obs, 'time_start')
+			obs_end = getattr(obs, 'time_end')
 
-		obs_map[polarization][era_type]['obs_count'] += 1
-		obs_map[polarization][era_type]['obs_hours'] += (obs_end - obs_start) / 3600.0
+			obs_map[polarization][era_type]['obs_count'] += 1
+			obs_map[polarization][era_type]['obs_hours'] += (obs_end - obs_start) / 3600.0
 
-		for paper_file in getattr(obs, 'files'):
-			host = getattr(paper_file, 'host')
-			filetype = getattr(paper_file, 'filetype')
-			file_map[host][filetype]['file_count'] += 1
+			for paper_file in getattr(obs, 'files'):
+				host = getattr(paper_file, 'host')
+				filetype = getattr(paper_file, 'filetype')
+				file_map[host][filetype]['file_count'] += 1
 
 	all_obs_strs = pol_strs + era_type_strs
 	obs_total = {all_obs_str: {'count': 0, 'hours': 0} for all_obs_str in all_obs_strs}

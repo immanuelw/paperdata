@@ -2,7 +2,7 @@
 <table class='table table-striped table-bordered'>
 	<thead>
 		<tr>
-			<th>Sources of Data Files</th>
+			<th colspan='3'>Sources of Data Files</th>
 		</tr>
 		<tr>
 			<th>File Source</th>
@@ -11,13 +11,13 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr>
-			{% for source_name in source_names %}
-				<th>{{ source_name }}</th>
+		{% for source_name in source_names %}
+			<tr>
+				<td>{{ source_name }}</td>
 				<td>{{ source_dict[source_name]['time'] | round(1) }} ({{ source_dict[source_name]['time_segment'] }})</td>
-				<td rowspan='3' style='color:red;vertical-align:middle;'>{{ source_dict[source_name]['day'] }}</td>
-			{% endif %}
-		</tr>
+				<td style='color:red;vertical-align:middle;'>{{ source_dict[source_name]['day'] }}</td>
+			</tr>
+		{% endfor %}
 	</tbody>
 </table>
 {% endblock %}

@@ -84,13 +84,13 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples, output_vars):
 			results = results.filter(clause)
 	if group_tuples is not None:
 		if sort_tuples is not None:
-			order_first = results.order_by(*sort_clause(sort_tuples)).subquery()
-			results = s.query().add_entity(table, alias=order_first).group_by(*group_clause(group_tuples))
+			order_first = results.order_by(*sort_clause(table, sort_tuples)).subquery()
+			results = s.query().add_entity(table, alias=order_first).group_by(*group_clause(table, group_tuples))
 		else:
-			results = results.group_by(*group_clause(group_tuples))
+			results = results.group_by(*group_clause(table, group_tuples))
 	else:
 		if sort_tuples is not None:
-			results = results.order_by(*sort_clause(sort_tuples))
+			results = results.order_by(*sort_clause(table, sort_tuples))
 
 	results = results.all()
 
@@ -105,7 +105,7 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 		dbi, module = get_dbi(data_source.database)
 		table = getattr(module, data_source.table.title())
 	elif database is not None:
-		_, module = get_dbi(database)
+		dbi, module = get_dbi(database)
 		table = getattr(module, table.title())
 	else:
 		dbi, module = get_dbi(getattr(data_source, 'database'))
@@ -141,5 +141,5 @@ def get_jd_from_datetime(start_time=None, end_time=None):
 	return time_start, time_end
 
 def get_utc_from_datetime(date_time):
-	utc = (date_time - datetime.datetime(1970, 1, 1)).total_seconds()
+	utc = (date_time - datetime(1970, 1, 1)).total_seconds()
 	return utc

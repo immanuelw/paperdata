@@ -34,6 +34,8 @@ $(function() {
 	//global ajax vars
 	window.setRequest = null;
 	window.dataAmountRequest = null;
+	window.sourceRequest = null;
+	window.filesystemRequest = null;
 	window.dataSummaryTableRequest = null;
 
 	$('#data_amount_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
@@ -49,9 +51,9 @@ $(function() {
 
 	$('#source_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
-	window.dataAmountRequest = $.ajax({
+	window.sourceRequest = $.ajax({
 		type: 'GET',
-		url: '/source',
+		url: '/source_table',
 		success: function(data) {
 			$('#source_table').html(data);
 		},
@@ -60,7 +62,7 @@ $(function() {
 
 	$('#filesystem_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
-	window.dataAmountRequest = $.ajax({
+	window.filesystemRequest = $.ajax({
 		type: 'GET',
 		url: '/filesystem',
 		success: function(data) {
