@@ -13,7 +13,7 @@
 	<tbody>
 		{% for system_name, sys_dict in system_dict.items() %}
 			<tr>
-				<{# <td style='color:red;vertical-align:middle;'>{{ 100 - sys_dict['space'] }} (%)</td> #}
+				{# <td style='color:red;vertical-align:middle;'>{{ 100 - sys_dict['space'] }} (%)</td> #}
 				<td>{{ system_name }}</td>
 				<td>{{ sys_dict['time'] | round(1) }} ({{ sys_dict['time_segment'] }})</td>
 				<td style='color:red;vertical-align:middle;'>{{ sys_dict['space'] }} (%)</td>

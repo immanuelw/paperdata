@@ -7,6 +7,7 @@ import os
 import paperdata_dbi as pdbi
 import pyganglia_dbi as pyg
 import time
+import json
 
 def time_val(value):
 	#determines how much time to divide by
@@ -62,7 +63,8 @@ def get_graph():
 	try:
 		data_source = db_utils.query(database='eorlive', table='graph_data_source', field_tuples=(('name', '==', data_source_str),))[0]
 	except IndexError:
-		return make_response('Source not found', 500)
+		data_source = None
+		#return make_response('Source not found', 500)
 
 	set_str = request.args.get('set')
 
@@ -93,7 +95,10 @@ def get_graph():
 									end_time_str_short=end_datetime.strftime('%Y-%m-%d %H:%M'),
 									width_slider=data_source.width_slider)
 	else:
-		the_set = db_utils.query(database='eorlive', table='set', field_tuples=(('name', '==', set_str),))[0]
+		try:
+			the_set = db_utils.query(database='eorlive', table='set', field_tuples=(('name', '==', set_str),))[0]
+		except:
+			the_set = None
 
 		if the_set is None:
 			return make_response('Set not found', 500)
@@ -113,6 +118,10 @@ def get_graph():
 			file_count, file_map = histogram_utils.get_file_counts(set_start, set_end, set_host=set_host, set_filetype=set_filetype)
 			range_end = end_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') # For the function in histogram_utils.js
 			which_data_set = data_sources.which_data_set(the_set)
+			obs_count = json.dumps(obs_count)
+			obs_map = json.dumps(obs_map)
+			file_count = json.dumps(file_count)
+			file_map = json.dumps(file_map)
 			return render_template('setView.html', the_set=the_set, is_set=True,
 									obs_count=obs_count, obs_map=obs_map, file_count=file_count, file_map=file_map,
 									plot_bands=plot_bands, start_time_str_short=start_time_str_short,
@@ -347,9 +356,12 @@ def teardown_request(exception):
 @app.route('/profile')
 def profile():
 	if (g.user is not None and g.user.is_authenticated()):
-		user = db_utils.query(database='eorlive', table='user',	field_tuples=(('username', '==', g.user.username),),)[0]
-
-		setList = db_utils.query(database='eorlive', table='set', field_tuples=(('username', '==', g.user.username),))[0]
+		try:
+			user = db_utils.query(database='eorlive', table='user',	field_tuples=(('username', '==', g.user.username),),)[0]
+			setList = db_utils.query(database='eorlive', table='set', field_tuples=(('username', '==', g.user.username),))[0]
+		except:
+			user = (None,)
+			setList = (None,)
 
 		return render_template('profile.html', user=user, sets=setList)
 	else:
@@ -358,11 +370,14 @@ def profile():
 @app.route('/user_page')
 def user_page():
 	if (g.user is not None and g.user.is_authenticated()):
-		user = db_utils.query(database='eorlive', table='user',	field_tuples=(('username', '==', g.user.username),))[0]
-
-		userList = db_utils.query(database='eorlive', table='user')[0]
-
-		setList = db_utils.query(database='eorlive', table='set')[0]
+		try:
+			user = db_utils.query(database='eorlive', table='user',	field_tuples=(('username', '==', g.user.username),))[0]
+			userList = db_utils.query(database='eorlive', table='user')[0]
+			setList = db_utils.query(database='eorlive', table='set')[0]
+		except:
+			user = (None,)
+			userList = (None,)
+			setList = (None,)
 
 		return render_template('user_page.html', theUser=user, userList=userList, setList=setList)
 	else:
@@ -393,7 +408,7 @@ def data_summary_table():
 	file_map = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
 
 	for obs in response:
-		if obs is not None:
+		if not obs is None:
 			polarization = getattr(obs, 'polarization')
 			era_type = getattr(obs, 'era_type')
 
