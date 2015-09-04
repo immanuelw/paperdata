@@ -123,7 +123,7 @@ def get_graph():
 			file_count = json.dumps(file_count)
 			file_map = json.dumps(file_map)
 			return render_template('setView.html', the_set=the_set, is_set=True,
-									obs_count=obs_count, obs_map=obs_map, file_count=file_count, file_map=file_map,
+									obs_count=obs_count, obs_map=obs_map, file_counts=file_count, file_map=file_map,
 									plot_bands=plot_bands, start_time_str_short=start_time_str_short,
 									end_time_str_short=end_time_str_short, range_end=range_end,
 									which_data_set=which_data_set)
@@ -236,12 +236,14 @@ def obs_table():
 	end_utc = db_utils.get_utc_from_datetime(endtime)
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
-	response = db_utils.query(database='paperdata', table='observation', 
+	try:
+		response = db_utils.query(database='paperdata', table='observation', 
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),),
 								output_vars=output_vars)
-
-	log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response]
+		log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response]
+	except:
+		log_list = []
 
 	return render_template('obs_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime.strftime('%Y-%m-%dT%H:%M:%SZ'), end_time=endtime.strftime('%Y-%m-%dT%H:%M:%SZ'))
@@ -254,16 +256,19 @@ def file_table():
 	start_utc = db_utils.get_utc_from_datetime(starttime)
 	end_utc = db_utils.get_utc_from_datetime(endtime)
 
-	all_obs_list = db_utils.query(database='paperdata', table='observation', 
-									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-									sort_tuples=(('time_start', 'asc'),),
-									output_vars=('files',))
-
-	files_list = (getattr(obs, 'files') for obs in all_obs_list)
-	file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
-
 	output_vars=('host', 'full_path', 'obsnum', 'filesize')
-	log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response]
+
+	try:
+		all_obs_list = db_utils.query(database='paperdata', table='observation', 
+										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
+										sort_tuples=(('time_start', 'asc'),),
+										output_vars=('files',))
+		files_list = (getattr(obs, 'files') for obs in all_obs_list)
+		file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
+
+		log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response]
+	except:
+		log_list = []
 
 	return render_template('file_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime.strftime('%Y-%m-%dT%H:%M:%SZ'), end_time=endtime.strftime('%Y-%m-%dT%H:%M:%SZ'))
@@ -273,33 +278,39 @@ def rtp_summary_table():
 	obs_vars = ('files',)
 	file_vars = ('host', 'path', 'julian_day', 'transferred', 'new_host', 'new_path', 'timestamp')
 
-	rtp_obs = db_utils.query(database='paperdata', table='rtp_observation', sort_tuples=(('julian_day', 'desc'),), output_vars=obs_vars)
-	files_list = (getattr(obs, 'files') for obs in rtp_obs)
-	rtp_files = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
+	try:
+		rtp_obs = db_utils.query(database='paperdata', table='rtp_observation', sort_tuples=(('julian_day', 'desc'),), output_vars=obs_vars)
+		files_list = (getattr(obs, 'files') for obs in rtp_obs)
+		rtp_files = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
+		file_list = [{var: getattr(rtp_file, var) for var in file_vars} for rtp_file in rtp_files]
+	except:
+		file_list = (None,)
 
-	file_list = [{var: getattr(rtp_file, var) for var in file_vars} for rtp_file in rtp_files]
-	
 	file_info = {}
 
 	for rtp_file in file_list:
-		sa_host_path = ':'.join(rtp_file['host'], rtp_file['path'])
-		usa_host_path = ':'.join(rtp_file['new_host'], rtp_file['new_path'])
+		if not rtp_file is None:
+			sa_host_path = ':'.join(rtp_file['host'], rtp_file['path'])
+			usa_host_path = ':'.join(rtp_file['new_host'], rtp_file['new_path'])
 
-		julian_day = rtp_file['julian_day']
-		transferred = rtp_file['transferred']
-		timestamp = rtp_file['time_stamp']
+			julian_day = rtp_file['julian_day']
+			transferred = rtp_file['transferred']
+			timestamp = rtp_file['time_stamp']
 
-		if julian_day in file_info.keys():
-			file_info[julian_day]['count'] += 1
-			file_info[julian_day]['transfer']['all'] += 1
-		else:
-			file_info.update({julian_day: {'count': 1, 'transfer': {'all': 1, 'moved': 0},
-											'host_path': {'sa_host_path': sa_host_path, 'usa_host_path': usa_host_path},
-											'activity': 'N/A', 'last_updated': timestamp, 'lst_range': 'N/A'}})
-		if transferred:
-			file_info[julian_day]['transfer']['moved'] += 1
+			if julian_day in file_info.keys():
+				file_info[julian_day]['count'] += 1
+				file_info[julian_day]['transfer']['all'] += 1
+			else:
+				file_info.update({julian_day: {'count': 1, 'transfer': {'all': 1, 'moved': 0},
+												'host_path': {'sa_host_path': sa_host_path, 'usa_host_path': usa_host_path},
+												'activity': 'N/A', 'last_updated': timestamp, 'lst_range': 'N/A'}})
+			if transferred:
+				file_info[julian_day]['transfer']['moved'] += 1
 
-	julian_days = file_info.keys()
+	try:
+		julian_days = file_info.keys()
+	except:
+		julian_days = (None,)
 
 	output_vars = ('gregorian_day', 'lst_range', 'file_count', 'sa_host_path', 'usa_host_path',
 					'output_host', 'transfer_percent', 'activity', 'last_updated')
@@ -311,19 +322,20 @@ def rtp_summary_table():
 	summary_dict = {julian_day: {var: 0 for var in output_vars} for julian_day in julian_days}
 	#need a dict of julian_day: (gregorian_day, lst_range, file_count, sa, usa, output_host?, trans_perc, activity, last_updated)
 	for julian_day in julian_days:
-		file_dict = file_info[julian_day]
-		sum_dict = summary_dict[julian_day]
-		year, month, day, _ = convert.jd2cal(convert.MJD_0, julian_day - convert.MJD_0)
-		gd = datetime(year, month, day)
-		sum_dict['gregorian_day'] = gd.strftime('%Y-%m-%d') 
-		sum_dict['lst_range'] = file_dict['lst_range'] 
-		sum_dict['file_count'] = file_dict['count']
-		sum_dict['sa_host_path'] = file_dict['host_path']['sa_host_path']
-		sum_dict['usa_host_path'] = file_dict['host_path']['usa_host_path']
-		sum_dict['output_host'] = file_dict['host_path']['output_host']
-		sum_dict['transfer_percent'] = file_dict['transfer']['moved'] / file_dict['transfer']['all']
-		sum_dict['activity'] = file_dict['activity']
-		sum_dict['last_updated'] = file_dict['last_updated']
+		if not julian_day is None:
+			file_dict = file_info[julian_day]
+			sum_dict = summary_dict[julian_day]
+			year, month, day, _ = convert.jd2cal(convert.MJD_0, julian_day - convert.MJD_0)
+			gd = datetime(year, month, day)
+			sum_dict['gregorian_day'] = gd.strftime('%Y-%m-%d') 
+			sum_dict['lst_range'] = file_dict['lst_range'] 
+			sum_dict['file_count'] = file_dict['count']
+			sum_dict['sa_host_path'] = file_dict['host_path']['sa_host_path']
+			sum_dict['usa_host_path'] = file_dict['host_path']['usa_host_path']
+			sum_dict['output_host'] = file_dict['host_path']['output_host']
+			sum_dict['transfer_percent'] = file_dict['transfer']['moved'] / file_dict['transfer']['all']
+			sum_dict['activity'] = file_dict['activity']
+			sum_dict['last_updated'] = file_dict['last_updated']
 		
 	return render_template('rtp_summary_table.html', rtp_header=rtp_header, summary_dict=summary_dict, output_vars=output_vars)
 
