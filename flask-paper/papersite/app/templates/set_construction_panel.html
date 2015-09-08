@@ -21,7 +21,7 @@
 			<select id='era_type_dropdown' onchange='obs_file.setEraTypeData(this)'>
 				<option value='all'>all</option>
 			</select>
-			<select id='host_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setHostData(this)'>
+			<select id='host_dropdown' onchange='obs_file.setHostData(this)'>
 				<option value='all'>all</option>
 				<option value='pot1'>pot1</option>
 				<option value='pot2'>pot2</option>
@@ -30,7 +30,7 @@
 				<option value='pot8'>pot8</option>
 				<option value='nas1'>nas1</option>
 			</select>
-			<select id='filetype_dropdown_{{data_source_str_nospace}}' onchange='{{data_source_str_nospace}}.setFiletypeData(this)'>
+			<select id='filetype_dropdown' onchange='obs_file.setFiletypeData(this)'>
 				<option value='all'>all</option>
 				<option value='uv'>raw</option>
 				<option value='uvcRRE'>compressed</option>

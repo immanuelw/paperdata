@@ -18,13 +18,14 @@ var obs_file = (function($) {
 	};
 	dataSourceObj.backToHistogram = backToHistogram;
 
-	var obs_count = {{ obs_count | tojson }};
-	var file_count = {{ file_count | tojson }};
-	var file_count_copy = {{ file_count | tojson }};
-	var pol_strs = {{ pol_strs | safe }}
-	var era_type_strs = {{ era_type_strs | safe }}
-	var host_strs = {{ host_strs | safe }}
-	var filetype_strs = {{ filetype_strs | safe }}
+	var obs_counts = {{ obs_counts | tojson }};
+	var b = {{ obs_base | safe }};
+	var file_counts = {{ file_counts | tojson }};
+	var file_count_copy = {{ file_counts | tojson }};
+	var pol_strs = {{ pol_strs | safe }};
+	var era_type_strs = {{ era_type_strs | safe }};
+	var host_strs = {{ host_strs | safe }};
+	var filetype_strs = {{ filetype_strs | safe }};
 
 	{% include 'js/obs_file_set_construction.js' %}
 
@@ -81,6 +82,8 @@ var obs_file = (function($) {
 
 								$('#obs_file_histogram').hide();
 								$('#set_construction_panel').hide();
+								$('#obs_table').hide();
+								$('#file_table').hide();
 								if (this.name === 'observations') {
 									$('#obs_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 									$('#obs_table').show();
@@ -193,12 +196,12 @@ var obs_file = (function($) {
 				type: 'column',
 				name: 'observations',
 				//supposed to be a default?
-				data: obs_count['all']['all']
+				data: {{ obs_base }}
 			},
 			{
 				type: 'column',
 				name: 'files',
-				data: file_count['all']['all']
+				data: {{ file_base }}
 			}]
 		}, function (chart) {
 			_chart = chart;

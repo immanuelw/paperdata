@@ -85,15 +85,16 @@ def get_graph():
 		if graph_type_str == 'Obs_File':
 			return histogram_utils.get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str)
 		else:
-			graph_data = data_sources.get_graph_data(data_source_str, start_utc, end_utc, None)
-			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
-			return render_template('graph.html',
-									data_source_str=data_source_str, graph_data=graph_data,
-									plot_bands=[], template_name=template_name, is_set=False,
-									data_source_str_nospace=data_source_str_nospace,
-									start_time_str_short=start_datetime.strftime('%Y-%m-%d %H:%M'),
-									end_time_str_short=end_datetime.strftime('%Y-%m-%d %H:%M'),
-									width_slider=data_source.width_slider)
+			return make_response('No data source', 500)
+			#graph_data = data_sources.get_graph_data(data_source_str, start_utc, end_utc, None)
+			#data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
+			#return render_template('graph.html',
+			#						data_source_str=data_source_str, graph_data=graph_data,
+			#						plot_bands=[], template_name=template_name, is_set=False,
+			#						data_source_str_nospace=data_source_str_nospace,
+			#						start_time_str_short=start_datetime.strftime('%Y-%m-%d %H:%M'),
+			#						end_time_str_short=end_datetime.strftime('%Y-%m-%d %H:%M'),
+			#						width_slider=data_source.width_slider)
 	else:
 		try:
 			the_set = db_utils.query(database='eorlive', table='set', field_tuples=(('name', '==', set_str),))[0]
@@ -123,7 +124,7 @@ def get_graph():
 			file_count = json.dumps(file_count)
 			file_map = json.dumps(file_map)
 			return render_template('setView.html', the_set=the_set, is_set=True,
-									obs_count=obs_count, obs_map=obs_map, file_counts=file_count, file_map=file_map,
+									obs_counts=obs_count, obs_map=obs_map, file_counts=file_count, file_map=file_map,
 									plot_bands=plot_bands, start_time_str_short=start_time_str_short,
 									end_time_str_short=end_time_str_short, range_end=range_end,
 									which_data_set=which_data_set)

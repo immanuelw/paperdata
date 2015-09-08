@@ -21,7 +21,7 @@ def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
 
 	pol_strs, era_type_strs = db_utils.set_strings()
 	obs_map = {pol_str: {era_type_str: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
-	obs_count = {pol_str: {era_type_str: {'obs_count': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
+	obs_count = {pol_str: {era_type_str: 0 for era_type_str in era_type_strs} for pol_str in pol_strs}
 
 	for obs in response:
 		polarization = getattr(obs, 'polarization')
@@ -32,7 +32,7 @@ def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
 		obsnum = getattr(obs, 'obsnum')
 
 		obs_map[polarization][era_type].append({'obs_time': obs_time, 'obsnum': obsnum})
-		obs_count[polarization][era_type]['obs_count'] += 1
+		obs_count[polarization][era_type] += 1
 
 	return (obs_count, obs_map)
 
@@ -57,7 +57,7 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 		_, _, host_strs, filetype_strs = db_utils.get_set_strings()
 
 	file_map = {host_str: {filetype_str: [] for filetype_str in filetype_strs} for host_str in host_strs}
-	file_count = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
+	file_count = {host_str: {filetype_str: 0 for filetype_str in filetype_strs} for host_str in host_strs}
 
 	for file_obj in response:
 		if not file_obj is None:
@@ -72,7 +72,7 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 			julian_date = getattr(file_obs, 'julian_date')
 
 			file_map[host][filetype].append({'file_date': julian_date, 'obsnum': obsnum})
-			file_count[host][filetype]['file_count'] += 1
+			file_count[host][filetype] += 1
 
 	return (file_count, file_map)
 
@@ -87,7 +87,7 @@ def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = db_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
-	obs_count = {pol_str: {era_type_str: {'obs_count': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
+	obs_count = {pol_str: {era_type_str: 0 for era_type_str in era_type_strs} for pol_str in pol_strs}
 
 	for obs in response:
 		if not obs is None:
@@ -98,16 +98,25 @@ def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 			obsnum = getattr(obs, 'obsnum')
 
 			obs_map[polarization][era_type].append({'obs_date': obs_date, 'obsnum': obsnum})
-			obs_count[polarization][era_type]['obs_count'] += 1
+			obs_count[polarization][era_type] += 1
 
 	file_count, file_map = get_file_counts(start_utc, end_utc, host_strs, filetype_strs)
+
+	file_base = file_count['all']['all']
+	obs_base = obs_count['all']['all']
 
 	file_map = json.dumps(file_map)
 	file_count = json.dumps(file_count)
 	obs_map = json.dumps(obs_map)
 	obs_count = json.dumps(obs_count)
 
-	return render_template('histogram.html', pol_strs=pol_strs, era_type_strs=era_type_strs, host_strs=host_strs, filetype_strs=filetype_strs,
-							file_map=file_map, file_count=file_count, obs_map=obs_map, obs_count=obs_count,
+	return render_template('histogram.html', pol_strs=list(pol_strs), era_type_strs=list(era_type_strs),
+							host_strs=list(host_strs), filetype_strs=list(filetype_strs),
+							file_map=file_map, file_counts=file_count, obs_map=obs_map, obs_counts=obs_count,
+							obs_base=obs_base, file_base=file_base,
 							range_start=start_time_str, range_end=end_time_str,
 							start_time_str_short=start_time_str.replace('T', ' ')[0:16], end_time_str_short=end_time_str.replace('T', ' ')[0:16])
+	#return render_template('histogram.html', pol_strs=pol_strs, era_type_strs=era_type_strs, host_strs=host_strs, filetype_strs=filetype_strs,
+	#						file_map=file_map, file_count=file_count, obs_map=obs_map, obs_counts=obs_count,
+	#						range_start=start_time_str, range_end=end_time_str,
+	#						start_time_str_short=start_time_str.replace('T', ' ')[0:16], end_time_str_short=end_time_str.replace('T', ' ')[0:16])

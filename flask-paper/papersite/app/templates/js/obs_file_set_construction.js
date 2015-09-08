@@ -7,10 +7,10 @@ var flaggedObsRanges = plot_bands;
 var currentObsData = {'polarization': '{{ the_set.polarization }}', 'era_type': '{{ the_set.era_type }}'};
 var currentFileData = {'host': '{{ the_set.host }}', 'filetype': '{{ the_set.filetype }}'};
 {% else %}
-var flaggedObsDict = {pol_str: {era_type_str: [] for (era_type_str of era_type_strs)} for (pol_str of pol_strs)};
+var flaggedObsDict = {'all': {'all': []}};
 var flaggedObsRanges = flaggedObsDict['all']['all'];
 var currentObsData = {'polarization': 'all', 'era_type': 'all'};
-var flaggedFileDict = {host_str: {filetype_str: [] for (filetype_str of filetype_strs)} for (host_str of host_strs)};
+var flaggedFileDict = {'all': {'all': []}};
 var flaggedFileRanges = flaggedFileDict['all']['all'];
 var currentFileData = {'host': 'all', 'filetype': 'all'};
 {% endif %}
@@ -271,9 +271,9 @@ dataSourceObj.setClickDragMode = setClickDragMode;
 
 var clearSetConstructionData = function() {
 	flaggedObsRanges = [];
-	flaggedObsDict = {pol_str: {era_type_str: [] for (era_type_str of era_type_strs} for (pol_str of pol_strs)};
+	flaggedObsDict = {'all': {'all': []}};
 	flaggedFileRanges = [];
-	flaggedFileDict = {host_str: {filetype_str: [] for (filetype_str of filetype_strs)} for (host_str of host_strs)};
+	flaggedFileDict = {'all': {'all': []}};
 };
 
 var getDataIndices = function(startTime, endTime, obsSeries, fileSeries) {
@@ -468,8 +468,8 @@ var updateSetConstructionTable = function() {
 		'<td>' + new Date(flaggedRange.to).toISOString() + '</td>' +
 		'<td>' + flaggedRange.obs_count + '</td>' +
 		'<td>' + flaggedRange.file_count + '</td>' +
-		'<td><button onclick=\'obs_file.unflagRange('' + flaggedRange.id +
-		'')\'>Unflag range</button></td></tr>';
+		'<td><button onclick=\'obs_file.unflagRange("' + flaggedRange.id +
+		'")\'>Unflag range</button></td></tr>';
 	}
 
 	$('#set_construction_table > tbody').html(tableHtml);
