@@ -193,7 +193,7 @@ class DataBaseInterface(object):
 					self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
 				except:
 					try:
-						self.dbinfo['password'] = self.dbinfo['password'].decode('unicode_escape')
+						self.dbinfo['password'] = bytes(self.dbinfo['password'], 'ascii').decode('unicode_escape')
 					except:
 						self.dbinfo['password'] = self.dbinfo['password']
 			else:
