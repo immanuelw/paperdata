@@ -9,7 +9,7 @@ cat ~/.profile
 export DATABASE_URL=postgres:///postgres
 
 sudo apt-get update
-sudo apt-get install -y python-virtualenv python3-dev libpq-dev postgresql libmysqlclient-dev
+sudo apt-get install -y python-virtualenv python3-dev libpq-dev postgresql libmysqlclient-dev mysql-client
 
 cd /mnt/paperdata/flask-paper/papersite
 

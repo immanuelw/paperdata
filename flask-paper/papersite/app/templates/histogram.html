@@ -18,14 +18,17 @@ var obs_file = (function($) {
 	};
 	dataSourceObj.backToHistogram = backToHistogram;
 
-	var obs_counts = {{ obs_counts | tojson }};
-	var b = {{ obs_base | safe }};
-	var file_counts = {{ file_counts | tojson }};
-	var file_count_copy = {{ file_counts | tojson }};
+	var obs_counts = $.parseJSON({{ obs_counts | tojson }});
+	var file_counts = $.parseJSON({{ file_counts | tojson }});
+	var file_count_copy = $.parseJSON({{ file_counts | tojson }});
 	var pol_strs = {{ pol_strs | safe }};
 	var era_type_strs = {{ era_type_strs | safe }};
 	var host_strs = {{ host_strs | safe }};
 	var filetype_strs = {{ filetype_strs | safe }};
+	var file_dict = $.parseJSON({{ file_map | tojson }});
+
+	var obs_dict = $.parseJSON({{ obs_map | tojson }});
+	var file_dict = $.parseJSON({{ file_map | tojson }});
 
 	{% include 'js/obs_file_set_construction.js' %}
 
@@ -196,12 +199,12 @@ var obs_file = (function($) {
 				type: 'column',
 				name: 'observations',
 				//supposed to be a default?
-				data: {{ obs_base }}
+				data: obs_counts['all']['all']
 			},
 			{
 				type: 'column',
 				name: 'files',
-				data: {{ file_base }}
+				data: file_counts['all']['all']
 			}]
 		}, function (chart) {
 			_chart = chart;

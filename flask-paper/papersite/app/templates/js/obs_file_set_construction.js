@@ -7,10 +7,12 @@ var flaggedObsRanges = plot_bands;
 var currentObsData = {'polarization': '{{ the_set.polarization }}', 'era_type': '{{ the_set.era_type }}'};
 var currentFileData = {'host': '{{ the_set.host }}', 'filetype': '{{ the_set.filetype }}'};
 {% else %}
-var flaggedObsDict = {'all': {'all': []}};
+//var flaggedObsDict = {'all': {'all': []}};
+//var flaggedFileDict = {'all': {'all': []}};
+var flaggedObsDict = obs_dict;
 var flaggedObsRanges = flaggedObsDict['all']['all'];
 var currentObsData = {'polarization': 'all', 'era_type': 'all'};
-var flaggedFileDict = {'all': {'all': []}};
+var flaggedFileDict = file_dict;
 var flaggedFileRanges = flaggedFileDict['all']['all'];
 var currentFileData = {'host': 'all', 'filetype': 'all'};
 {% endif %}
@@ -271,9 +273,9 @@ dataSourceObj.setClickDragMode = setClickDragMode;
 
 var clearSetConstructionData = function() {
 	flaggedObsRanges = [];
-	flaggedObsDict = {'all': {'all': []}};
+	flaggedObsDict = obs_dict;
 	flaggedFileRanges = [];
-	flaggedFileDict = {'all': {'all': []}};
+	flaggedFileDict = file_dict;
 };
 
 var getDataIndices = function(startTime, endTime, obsSeries, fileSeries) {

@@ -102,18 +102,18 @@ def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 
 	file_count, file_map = get_file_counts(start_utc, end_utc, host_strs, filetype_strs)
 
-	file_base = file_count['all']['all']
-	obs_base = obs_count['all']['all']
-
 	file_map = json.dumps(file_map)
 	file_count = json.dumps(file_count)
 	obs_map = json.dumps(obs_map)
 	obs_count = json.dumps(obs_count)
 
+	#obs_dict = {pol_str: {era_type_str: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
+	#file_dict = {host_str: {filetype_str: [] for filetype_str in filetype_strs} for host_str in host_strs}
+
 	return render_template('histogram.html', pol_strs=list(pol_strs), era_type_strs=list(era_type_strs),
 							host_strs=list(host_strs), filetype_strs=list(filetype_strs),
 							file_map=file_map, file_counts=file_count, obs_map=obs_map, obs_counts=obs_count,
-							obs_base=obs_base, file_base=file_base,
+							file_dict=file_map, obs_dict=obs_map,
 							range_start=start_time_str, range_end=end_time_str,
 							start_time_str_short=start_time_str.replace('T', ' ')[0:16], end_time_str_short=end_time_str.replace('T', ' ')[0:16])
 	#return render_template('histogram.html', pol_strs=pol_strs, era_type_strs=era_type_strs, host_strs=host_strs, filetype_strs=filetype_strs,
