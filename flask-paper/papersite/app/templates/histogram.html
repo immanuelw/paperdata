@@ -21,6 +21,10 @@ var obs_file = (function($) {
 	var obs_count = {{ obs_count | tojson }};
 	var file_count = {{ file_count | tojson }};
 	var file_count_copy = {{ file_count | tojson }};
+	var pol_strs = {{ pol_strs | safe }}
+	var era_type_strs = {{ era_type_strs | safe }}
+	var host_strs = {{ host_strs | safe }}
+	var filetype_strs = {{ filetype_strs | safe }}
 
 	{% include 'js/obs_file_set_construction.js' %}
 

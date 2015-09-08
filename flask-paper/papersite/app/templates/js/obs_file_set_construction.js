@@ -2,21 +2,21 @@
 
 var _chart;
 var inConstructionMode = false;
-var	pol_strs = ['all', 'xx', 'xy', 'yx', 'yy']
-var	era_type_strs = ['all',]
-var	host_strs = ['all', 'pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1']
-var	filetype_strs = ['all', 'uv', 'uvcRRE', 'npz']
+//var pol_strs = ['all', 'xx', 'xy', 'yx', 'yy']
+//var era_type_strs = ['all',]
+//var host_strs = ['all', 'pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1']
+//var filetype_strs = ['all', 'uv', 'uvcRRE', 'npz']
 {% if is_set %}
 var flaggedObsRanges = plot_bands;
-var currentObsData = {'polarization': '{{ the_set.polarization }}', 'era_type': '{{ the_set.era_type }}'};
-var currentFileData = {'host': '{{ the_set.host }}', 'filetype': '{{ the_set.filetype }}'};
+//var currentObsData = {'polarization': '{{ the_set.polarization }}', 'era_type': '{{ the_set.era_type }}'};
+//var currentFileData = {'host': '{{ the_set.host }}', 'filetype': '{{ the_set.filetype }}'};
 {% else %}
-var flaggedObsDict = {pol_str: {era_type_str: [] for (era_type_str of era_type_strs)} for (pol_str of pol_strs)};
-var flaggedObsRanges = flaggedObsDict['all']['all'];
-var currentObsData = {'polarization': 'all', 'era_type': 'all'};
-var flaggedFileDict = {host_str: {filetype_str: [] for (filetype_str of filetype_strs)} for (host_str of host_strs)};
-var flaggedFileRanges = flaggedFileDict['all']['all'];
-var currentFileData = {'host': 'all', 'filetype': 'all'};
+//var flaggedObsDict = {pol_str: {era_type_str: [] for (era_type_str of era_type_strs)} for (pol_str of pol_strs)};
+//var flaggedObsRanges = flaggedObsDict['all']['all'];
+//var currentObsData = {'polarization': 'all', 'era_type': 'all'};
+//var flaggedFileDict = {host_str: {filetype_str: [] for (filetype_str of filetype_strs)} for (host_str of host_strs)};
+//var flaggedFileRanges = flaggedFileDict['all']['all'];
+//var currentFileData = {'host': 'all', 'filetype': 'all'};
 {% endif %}
 var clickDragMode = 'zoom';
 
