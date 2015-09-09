@@ -321,7 +321,7 @@ class DataBaseInterface(object):
 		else:
 			try:
 				connect_string = 'mysql://{username}:{password}@{hostip}:{port}/{dbname}'
-				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
+				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
 			except:
 				connect_string = 'mysql+mysqldb://{username}:{password}@{hostip}:{port}/{dbname}'
 				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
