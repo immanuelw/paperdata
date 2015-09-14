@@ -12,7 +12,7 @@ except:
 	import ConfigParser as configparser
 
 Base = declarative_base()
-logger = logging.getLogger('pyganglia_dbi')
+logger = logging.getLogger('ganglia')
 
 #########
 #
