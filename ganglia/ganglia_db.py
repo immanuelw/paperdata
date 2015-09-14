@@ -5,9 +5,9 @@
 ### Author: Immanuel Washington
 ### Date: 05-17-15
 
+from __future__ import print_function
 import sys
 import os
-from __future__ import print_function
 
 # Config variables
 

@@ -3,6 +3,7 @@
 # Load data into MySQL table 
 
 # import the MySQLdb and sys modules
+from __future__ import print_function
 import sys
 import time
 import os
@@ -14,7 +15,6 @@ from email import Encoders
 import dbi as pyg
 import json
 import time
-from __future__ import print_function
 
 ### Script to Backup pyganglia database
 ### Finds time and date and writes table into .csv file

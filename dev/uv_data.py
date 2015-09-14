@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 # Add files to paperdata
 
+from __future__ import print_function
 import sys
 import aipy as A
 import os
-from __future__ import print_function
 
 ### Script to calculate uv data on any/other hosts
 ### output uv_data in csv format: 

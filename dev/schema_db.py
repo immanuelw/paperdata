@@ -1,8 +1,8 @@
+from __future__ import print_function
 import sys
 import os
 import prettytable
 import dev_db as pdb
-from __future__ import print_function
 
 def main():
 	filename = os.path.expanduser('~/paperdata/data/src/schema.txt')

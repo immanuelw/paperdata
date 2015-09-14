@@ -1,8 +1,8 @@
+from __future__ import print_function
 import sys
 import os
 import prettytable
 import ganglia_db as gdb
-from __future__ import print_function
 
 def main():
 	filename = os.path.expanduser('~/paperdata/pyganglia_dbi/src/schema.txt')
