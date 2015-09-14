@@ -31,7 +31,7 @@ statheight = 50
 statusscr = curses.newwin(statheight,200,5,0)
 statusscr.keypad(1)
 statusscr.nodelay(1)
-curline = `2
+curline = 2
 colwidth = 50
 obslines = 20
 i=0
