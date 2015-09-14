@@ -32,12 +32,13 @@ db_names = config.get_main_option('databases')
 #       'engine1':mymodel.metadata1,
 #       'engine2':mymodel.metadata2
 #}
-import paperdata_dbi as pdbi
-import pyganglia_dbi as pyg
-import paperdev_dbi as pdbi2
+from paperdata.data import dbi as pdbi
+from paperdata.ganglia import dbi as pyg
+from paperdata.dev import dbi as dev
+
 target_metadata = {
 		'paperdata':pdbi.Base.metadata,
-		'paperdev':pdbi2.Base.metadata,
+		'paperdev':dev.Base.metadata,
 		'ganglia':pyg.Base.metadata
 }
 

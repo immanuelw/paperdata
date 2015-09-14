@@ -3,7 +3,7 @@
 # Load data into MySQL table 
 
 import ganglia as pyg
-import paperdata_dbi as pdb
+from paperdata.data import dbi as pdbi
 from sqlalchemy import func
 import sys
 import os
@@ -237,7 +237,7 @@ def plot_cpu(host=None, cpu=None, time_min=None, time_max=None):
 	return None
 
 def plot_jd_vs_file():
-	dbi = pdb.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	OBSs = s.query(pyg.Observation.julian_day, func.count(pyg.Observation.julian_day)).group_by(pyg.Observation.julian_day).all()
 	s.close()
@@ -255,7 +255,7 @@ def plot_jd_vs_file():
 	return None
 
 def plot_jd_vs_gaps():
-	dbi = pdb.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	OBSs = s.query(pyg.Observation.julian_day, func.count(pyg.Observation.julian_day)).group_by(pyg.Observation.julian_day).all()
 	s.close()
@@ -273,7 +273,7 @@ def plot_jd_vs_gaps():
 	return None
 
 def table_jdate_vs_pol():
-	dbi = pdb.DataBaseInterface()
+	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	OBSs = s.query(pyg.Observation).all()
 	s.close()

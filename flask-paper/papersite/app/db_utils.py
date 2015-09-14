@@ -3,11 +3,11 @@ from datetime import datetime
 from requests_futures.sessions import FuturesSession
 from app.flask_app import db
 from app import models as edbi
-import paperdata_dbi as pdbi
-import pyganglia_dbi as pyg
+from paperdata.data import dbi as pdbi
+from paperdata.ganglia import dbi as pyg
+from paperdata.convert import gcal2jd
 from sqlalchemy import or_
 from sqlalchemy.engine import reflection
-from convert import gcal2jd
 import socket
 
 host = socket.gethostname()

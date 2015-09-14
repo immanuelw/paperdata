@@ -4,8 +4,8 @@ from app.flask_app import app, db
 from app import models, db_utils, histogram_utils, data_sources
 from datetime import datetime
 import os
-import paperdata_dbi as pdbi
-import pyganglia_dbi as pyg
+from paperdata.data import dbi as pdbi
+from paperdata.ganglia import dbi as pyg
 import time
 import json
 
