@@ -2,7 +2,8 @@
 import ddr_compress.dbi as ddbi
 from sqlalchemy import func
 import curses,time,os
-import ganglia as pyg
+import dbi as pyg
+from __future__ import print_function
 
 #setup my output file
 file_log = []
@@ -25,7 +26,7 @@ dbi = ddbi.DataBaseInterface()
 pyg_dbi = pyg.DataBaseInterface()
 
 stdscr.addstr('PAPER Distiller Status Board')
-stdscr.addstr(1,0,'Press 'q' to exit')
+stdscr.addstr(1,0,'Press "q" to exit')
 statheight = 50
 statusscr = curses.newwin(statheight,200,5,0)
 statusscr.keypad(1)
@@ -67,7 +68,7 @@ try:
 				host, path, filename = 'host', '/path/to/', 'zen.2345672.23245.uv'
 				status = 'WTF'
 			col = int(j/statusscr.getmaxyx()[0])
-			#print col*colwidth
+			#print(col*colwidth)
 			if j == 0 or col == 0:
 				row = j
 			else:

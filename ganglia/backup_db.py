@@ -11,9 +11,10 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
-import ganglia as pyg
+import dbi as pyg
 import json
 import time
+from __future__ import print_function
 
 ### Script to Backup pyganglia database
 ### Finds time and date and writes table into .csv file
@@ -86,7 +87,7 @@ def paperbackup(timestamp):
 	json_data(dbo1, CPU_dump)
 
 	s.close()
-	print 'Table data backup saved'
+	print('Table data backup saved')
 
 	return None
 

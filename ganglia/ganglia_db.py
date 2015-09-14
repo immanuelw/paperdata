@@ -7,6 +7,7 @@
 
 import sys
 import os
+from __future__ import print_function
 
 # Config variables
 
@@ -142,4 +143,4 @@ all_classes = (filesystem(), monitor(), ram(), iostat(), cpu())
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':
-	print 'Not a script file, just a module'
+	print('Not a script file, just a module')

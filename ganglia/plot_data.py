@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Load data into MySQL table 
 
-import ganglia as pyg
+import dbi as pyg
 from paperdata.data import dbi as pdbi
 from sqlalchemy import func
 import sys
