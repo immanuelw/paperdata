@@ -34,7 +34,7 @@ def filesystem(ssh, host, path):
 		stdin, folio, stderr = ssh.exec_command('df -B 1')
 		for output in folio.split('\n'):
 			filesystem = output.split(' ')[-1]
-			if filesystem in (path,)
+			if filesystem in (path,):
 				total = int(output.split(' ')[-4])
 				used = int(output.split(' ')[-3])
 				free = int(output.split(' ')[-2])
