@@ -1,12 +1,13 @@
 import sys
 import os
 import prettytable
-import paperdata_db as pdb
+import paperdev_db as pdb
+from __future__ import print_function
 
 def main():
-	filename = os.path.expanduser('~/paperdata/data/src/schema.txt')
+	filename = os.path.expanduser('~/paperdata/dev/src/schema.txt')
 	with open(filename, 'wb') as df:
-		print 'Starting ..'
+		print('Starting ..')
 	var_classes = pdb.all_classes
 
 	for var_class in var_classes:
@@ -21,7 +22,7 @@ def main():
 			df.write(stuff)
 			df.write('\n')
 
-	print 'Done!'
+	print('Done!')
 
 if __name__ == "__main__":
 	main()
