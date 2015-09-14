@@ -3,3 +3,4 @@ output
 *pyc
 .*.swp
 .*.swo
+*.sh
