@@ -1,7 +1,7 @@
 import sys
 import os
 import prettytable
-import paperdata_db as pdb
+import data_db as pdb
 from __future__ import print_function
 
 def main():
