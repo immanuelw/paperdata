@@ -1,14 +1,12 @@
-import glob
-
-__version__ = '0.1.0'
+__version__ = '1.0.0-dev'
 
 setup_args = {
-	'name': 'convert',
+	'name': 'paperdata',
 	'author': 'Immanuel Washington',
 	'author_email': 'immwa at sas.upenn.edu',
-	'license': 'GPL',
-	'package_dir' : {'convert': ''},
-	'packages' : ['convert'],
+	'license': '?',
+	#'package_dir' : {'paperdata': ''},
+	'packages' : ['paperdata', 'paperdata.data', 'paperdata.ganglia', 'paperdata.dev', 'paperdata.convert'],
 	'version': __version__,
 }
 
