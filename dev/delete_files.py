@@ -10,7 +10,8 @@ import glob
 import socket
 import os
 import shutil
-import dbi as pdbi
+import dbi as dev
+from __future__ import print_function
 
 ### Script to move files and update paperdata database
 ### Move files and update db using dbi
@@ -19,9 +20,9 @@ import dbi as pdbi
 ### Date: 5-06-15
 
 def delete_check(input_host):
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	s = dbi.Session()
-	table = getattr(pdbi, 'File')
+	table = getattr(dev, 'File')
 	FILEs = s.query(table).filter(getattr(table, 'delete_file') == True).filter(getattr(table, 'tape_index') != None)\
 							.filter(getattr(table, 'host') == input_host).all()
 	s.close()
@@ -31,7 +32,7 @@ def delete_check(input_host):
 
 def set_delete_table(input_host, source, output_host, output_dir):
 	#change in database
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	action = 'delete'
 	table = 'file'
 	full_path = ''.join((input_host, ':', source))
@@ -62,7 +63,7 @@ def delete_files(input_host, input_paths, output_host, output_dir):
 			set_delete_table(input_host, source, output_host, output_dir)
 			shutil.rmtree(source)
 	else:
-		ssh = pdbi.login_ssh(host)
+		ssh = dev.login_ssh(host)
 		for source in input_paths:
 			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 			rsync_del_command = '''rm -r {source}'''.format(source=source)
@@ -71,7 +72,7 @@ def delete_files(input_host, input_paths, output_host, output_dir):
 			ssh.exec_command(rsync_del_command)
 		ssh.close()
 
-	print 'Completed transfer'
+	print('Completed transfer')
 	return None
 
 if __name__ == '__main__':

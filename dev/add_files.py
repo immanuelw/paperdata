@@ -7,7 +7,7 @@ import aipy as A
 import glob
 import socket
 import os
-import dbi as pdbi
+import dbi as dev
 import time
 import uv_data
 
@@ -41,7 +41,7 @@ def calc_size(host, path, filename):
 	if named_host == host:
 		size = sizeof_fmt(get_size(full_path))
 	else:
-		ssh = pdbi.login_ssh(host)
+		ssh = dev.login_ssh(host)
 		sftp = ssh.open_sftp()
 		size_bytes = sftp.stat(full_path).st_size
 		size = sizeof_fmt(size_bytes)
@@ -56,9 +56,9 @@ def calc_md5sum(host, path, filename):
 	#DEFAULT VALUE
 	md5 = None
 	if named_host == host:
-		md5 = pdbi.get_md5sum(full_path)
+		md5 = dev.get_md5sum(full_path)
 	else:
-		ssh = pdbi.login_ssh(host)
+		ssh = dev.login_ssh(host)
 		try:
 			sftp = ssh.open_sftp()
 			remote_path = sftp.file(full_path, mode='r')
@@ -72,7 +72,7 @@ def calc_md5sum(host, path, filename):
 	return md5
 
 def get_uv_data(host, full_path, mode=None):
-	ssh = pdbi.login_ssh(host)
+	ssh = dev.login_ssh(host)
 	uv_data_script = os.path.expanduser('~/paperdata/dbi/scripts/uv_data.py')
 	sftp = ssh.open_sftp()
 	moved_script = './uv_data.py'
@@ -123,7 +123,7 @@ def is_edge(prev_obs, next_obs):
 	return edge
 
 def obs_pn(s, obsnum):
-	table = getattr(pdbi, 'Observation')
+	table = getattr(dev, 'Observation')
 	PREV_OBS = s.query(table).filter(getattr(table, 'obsnum') == obsnum - 1).one()
 	if PREV_OBS is not None:
 		prev_obs = getattr(PREV_OBS, 'obsnum')
@@ -144,7 +144,7 @@ def obs_edge(obsnum, sess=None):
 		next_obs = None
 	else:
 		if sess is None:
-			dbi = pdbi.DataBaseInterface()
+			dbi = dev.DataBaseInterface()
 			s = dbi.Session()
 			prev_obs, next_obs = obs_pn(s, obsnum)
 			s.close()
@@ -182,7 +182,7 @@ def calc_obs_data(host, full_path):
 		jdate = ''.join(filename.split('.')[1], '.', filename.split('.')[2])
 		julian_date = round(float(jdate, 5))
 
-		dbi = pdbi.DataBaseInterface()
+		dbi = dev.DataBaseInterface()
 		s = dbi.Session()
 		if len(filename.split('.')) == 5:
 			polarization = 'all'
@@ -190,7 +190,7 @@ def calc_obs_data(host, full_path):
 		elif len(filename.split('.')) == 6:
 			polarization = filename.split('.')[3]
 			pol = polarization
-		table = getattr(pdbi, 'Observation')
+		table = getattr(dev, 'Observation')
 		OBS = s.query(table).filter(getattr(table, 'julian_date') == julian_date).filter(getattr(table, 'polarization') == pol).one()
 
 		time_start = getattr(OBS, 'time_start')
@@ -257,10 +257,10 @@ def calc_obs_data(host, full_path):
 	return obs_data, file_data, log_data
 
 def dupe_check(input_host, input_paths):
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	s = dbi.Session()
 	#all files on same host
-	table = getattr(pdbi, 'File')
+	table = getattr(dev, 'File')
 	FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
 	full_paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
 	s.close()
@@ -278,7 +278,7 @@ def set_obs(s, OBS, field):
 		edge_num = getattr(OBS, 'obsnum') + 1
 		edge_time = getattr(OBS, 'time_start') + getattr(OBS, 'delta_time')
 
-	table = getattr(pdbi, 'Observation')
+	table = getattr(dev, 'Observation')
 	EDGE_OBS = s.query(table).filter(getattr(table, 'julian_date') == edge_time).one()
 	if EDGE_OBS is not None:
 		edge_obs = getattr(EDGE_OBS, 'obsnum')
@@ -293,9 +293,9 @@ def set_obs(s, OBS, field):
 	return EDGE_OBS
 
 def update_obsnums():
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	s = dbi.Session()
-	table = getattr(pdbi, 'Observation')
+	table = getattr(dev, 'Observation')
 	OBSs = s.query(table).all()
 
 	for OBS in OBSs:
@@ -309,7 +309,7 @@ def update_obsnums():
 	return None
 
 def add_files(input_host, input_paths):
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	for input_path in input_paths:
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
@@ -347,7 +347,7 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(input_paths)
 	else:
-		ssh = pdbi.login_ssh(input_host)
+		ssh = dev.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
 		stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]

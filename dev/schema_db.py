@@ -1,14 +1,14 @@
 import sys
 import os
 import prettytable
-import dev_db as ddb
+import dev_db as pdb
 from __future__ import print_function
 
 def main():
-	filename = os.path.expanduser('~/paperdata/dev/src/schema.txt')
+	filename = os.path.expanduser('~/paperdata/data/src/schema.txt')
 	with open(filename, 'wb') as df:
 		print('Starting ..')
-	var_classes = ddb.all_classes
+	var_classes = pdb.all_classes
 
 	for var_class in var_classes:
 		x = prettytable.PrettyTable(['Field', 'Type', 'Default', 'Unique Key', 'Description'])

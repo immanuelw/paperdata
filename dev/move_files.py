@@ -14,7 +14,7 @@ import psutil
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
-import dbi as pdbi
+import dbi as dev
 
 ### Script to move files and update paperdata database
 ### Move files and update db using dbi
@@ -52,9 +52,9 @@ def email_space(table):
 	return None
 
 def null_check(input_host, input_paths):
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	s = dbi.Session()
-	table = getattr(pdbi, 'File')
+	table = getattr(dev, 'File')
 	FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
 	s.close()
 	#all files on same host
@@ -70,7 +70,7 @@ def null_check(input_host, input_paths):
 
 def set_move_table(input_host, source, output_host, output_dir):
 	#change in database
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	action = 'move'
 	table = 'file'
 	full_path = ''.join((input_host, ':', source))
@@ -101,7 +101,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			shutil.rmtree(source)
 		s.close()
 	else:
-		ssh = pdbi.login_ssh(output_host)
+		ssh = dev.login_ssh(output_host)
 		for source in input_paths:
 			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 			rsync_del_command = '''rm -r {source}'''.format(source=source)
@@ -120,7 +120,7 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(raw_input('Source directory path: '))
 	else:
-		ssh = pdbi.login_ssh(input_host)
+		ssh = dev.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
 		stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]

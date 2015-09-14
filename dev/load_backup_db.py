@@ -2,12 +2,13 @@
 # -*- coding: utf-8 -*-
 # Create paperdata tables
 
-import dbi as pdbi
+import dbi as dev
 import sys
 import json
-import paperdata_db as pdb
+import dev_db as pdb
 import glob
 import sqlalchemy.exc
+from __future__ import print_function
 
 ### Script to create paperdata database
 ### Instantiates tables
@@ -16,14 +17,14 @@ import sqlalchemy.exc
 ### Date: 5-06-15
 
 def load_backup(backup, table=None):
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	with open(backup, 'r') as backup_db:
 		read = json.load(backup_db)
 		if table is None:
 			return None
 		else:
 			for row in read:
-				print row.items()
+				print(row.items())
 				try:
 					if table == 'observation':
 						dbi.add_to_table('observation', row)

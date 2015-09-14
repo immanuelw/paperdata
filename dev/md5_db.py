@@ -4,7 +4,7 @@
 
 import time
 import ddr_compress.dbi as ddbi
-import dbi as pdbi
+import dbi as dev
 import add_files
 
 ### Script to load md5sums into paperdata database
@@ -14,16 +14,16 @@ import add_files
 ### Date: 5-06-15
 
 def md5_db():
-	data_dbi = pdbi.DataBaseInterface()
-	s = data_dbi.Session()
-	table = getattr(pdbi, 'File')
+	dev_dbi = dev.DataBaseInterface()
+	s = dev_dbi.Session()
+	table = getattr(dev, 'File')
 	FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
 	s.close()
 	for FILE in FILEs:
 		md5 = add_files.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
 		timestamp = int(time.time())
-		data_dbi.set_entry(FILE, 'md5sum', md5)
-		data_dbi.set_entry(FILE, 'timestamp', timestamp)
+		dev_dbi.set_entry(FILE, 'md5sum', md5)
+		dev_dbi.set_entry(FILE, 'timestamp', timestamp)
 		action = 'update md5sum'
 		table = 'file'
 		identifier = getattr(FILE, 'full_path')
@@ -32,7 +32,7 @@ def md5_db():
 					'obsnum':identifier,
 					'timestamp':timestamp}
 
-		data_dbi.add_log(log_data)
+		dev_dbi.add_log(log_data)
 
 	return None
 

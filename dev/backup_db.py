@@ -11,9 +11,10 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
-import dbi as pdbi
+import dbi as dev
 import json
 import time
+from __future__ import print_function
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
@@ -58,27 +59,27 @@ def paperbackup(timestamp):
 	dbo4 = os.path.join(backup_dir, db4)
 	print(dbo4)
 
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	s = dbi.Session()
 
-	OBS_table = getattr(pdbi, 'Observation')
+	OBS_table = getattr(dev, 'Observation')
 	OBS_dump = s.query(OBS_table).order_by(getattr(OBS_table, 'julian_date').asc(), getattr(OBS_table, 'polarization').asc())
 	json_data(dbo1, OBS_dump)
 
-	FILE_table = getattr(pdbi, 'File')
+	FILE_table = getattr(dev, 'File')
 	FILE_dump = s.query(FILE_table).order_by(getattr(FILE_table, 'obsnum').asc(), getattr(FILE_table, 'filename').asc())
 	json_data(dbo2, FILE_dump)
 
-	#FEED_table = getattr(pdbi, 'File')
+	#FEED_table = getattr(dev, 'File')
 	#FEED_dump = s.query(FEED_table).order_by(getattr(FEED_table, 'julian_day').asc(), getattr(FEED_table, 'filename').asc())
 	#json_data(dbo3, FEED_dump)
 
-	LOG_table = getattr(pdbi, 'Log')
+	LOG_table = getattr(dev, 'Log')
 	LOG_dump = s.query(LOG_table).order_by(getattr(LOG_table, 'timestamp').asc(), getattr(LOG_table, 'action').asc())
 	json_data(dbo4, LOG_dump)
 
 	s.close()
-	print 'Table data backup saved'
+	print('Table data backup saved')
 
 	return None
 

@@ -10,7 +10,7 @@ from collections import Counter
 import aipy as A
 import ddr_compress.dbi as ddbi
 from sqlalchemy import func
-import dbi as pdbi
+import dbi as dev
 import add_files
 import uv_data
 import move_files
@@ -21,7 +21,7 @@ import move_files
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 def calc_time_data(host):
-	ssh = pdbi.login_ssh(host)
+	ssh = dev.login_ssh(host)
 	time_data_script = os.path.expanduser('~/paperdata/dbi/scripts/time_data.py')
 	sftp = ssh.open_sftp()
 	moved_script = './time_data.py'
@@ -61,7 +61,7 @@ def add_data():
 	raw_OBSs = tuple(OBS for OBS, jday in julian_obs.items() if jday in complete_jdays)
 
 	#check for duplicates
-	data_dbi = pdbi.DataBaseInterface()
+	dev_dbi = dev.DataBaseInterface()
 
 	#need to keep dict of list of files to move of each type -- (host, path, filename, filetype)
 	movable_paths = {'uv':[], 'uvcRRE':[], 'npz':[]}
@@ -147,9 +147,9 @@ def add_data():
 					'table':table,
 					'identifier':identifier,
 					'timestamp':timestamp}
-		data_dbi.add_to_table('observation', obs_data)
-		data_dbi.add_to_table('file', raw_data)
-		data_dbi.add_to_table('log', log_data)
+		dev_dbi.add_to_table('observation', obs_data)
+		dev_dbi.add_to_table('file', raw_data)
+		dev_dbi.add_to_table('log', log_data)
 		movable_paths[filetype].append(os.path.join(path, filename))
 
 		compr_filename = ''.join((filename, 'cRRE'))
@@ -164,7 +164,7 @@ def add_data():
 			compr_data['filesize'] = compr_filesize
 			compr_data['md5sum'] = compr_md5
 			compr_data['write_to_tape'] = compr_write_to_tape
-			data_dbi.add_to_table('file', compr_data)
+			dev_dbi.add_to_table('file', compr_data)
 			movable_paths[compr_filetype].append(os.path.join(path, compr_filename))
 
 		npz_filename = ''.join((filename, 'cRE.npz'))
@@ -179,7 +179,7 @@ def add_data():
 			npz_data['filesize'] = npz_filesize
 			npz_data['md5sum'] = npz_md5
 			npz_data['write_to_tape'] = npz_write_to_tape
-			data_dbi.add_to_table('file', npz_data)
+			dev_dbi.add_to_table('file', npz_data)
 			movable_paths[npz_filetype].append(os.path.join(path, npz_filename))
 
 	return movable_paths

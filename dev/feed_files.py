@@ -8,7 +8,8 @@ import time
 import glob
 import socket
 import aipy as A
-import dbi as pdbi
+import dbi as dev
+from __future__ import print_function
 
 ### Script to load data from anywhere into paperfeed database
 ### Crawls folio or elsewhere and reads through .uv files to generate all field information
@@ -59,9 +60,9 @@ def gen_feed_data(host, full_path):
 
 def dupe_check(input_host, input_paths):
 	#checks for files already in feed table
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	s = dbi.Session()
-	table = getattr(pdbi, 'Feed')
+	table = getattr(dev, 'Feed')
 	FEEDs = s.query(table).all()
 	s.close()
 	#all files on same host
@@ -73,7 +74,7 @@ def dupe_check(input_host, input_paths):
 	return unique_paths
 
 def add_feeds_to_db(input_host, input_paths):
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	for source in input_paths:
 		feed_data, log_data = gen_feed_data(input_host, source)
 		dbi.add_to_table('feed', feed_data)
@@ -86,7 +87,7 @@ if __name__ == '__main__':
 	if len(sys.argv) == 2:
 		input_host = sys.argv[1].split(':')[0]
 		if input_host == sys.argv[1]:
-			print 'Needs host'
+			print('Needs host')
 			sys.exit()
 		input_paths = sys.argv[1].split(':')[1]
 	elif len(sys.argv) == 3:
@@ -99,7 +100,7 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(input_paths)
 	else:
-		ssh = pdbi.login_ssh(input_host)
+		ssh = dev.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
 		_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]

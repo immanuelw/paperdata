@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Load data into MySQL table 
 
-import dbi as pdbi
+import dbi as dev
 from sqlalchemy import func
 from sqlalchemy.sql import label
 import move_files
@@ -16,6 +16,7 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
+from __future__ import print_function
 
 ### Script to load paperdistiller with files from the paperfeed table
 ### Checks /data4 for space, moves entire days of data, then loads into paperdistiller
@@ -24,7 +25,7 @@ from email import Encoders
 ### Date: 11-23-14
 
 def set_feed(source, output_host, output_dir, moved_to_distill=True):
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	FEED = dbi.get_entry('feed', source)
 	dbi.set_entry(FEED, 'host', output_host)
 	dbi.set_entry(FEED, 'path', output_dir)
@@ -41,7 +42,7 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 			set_feed(source, output_host, output_dir)
 			shutil.rmtree(source)
 	else:
-		ssh = pdbi.login_ssh(output_host)
+		ssh = dev.login_ssh(output_host)
 		for source in input_paths:
 			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 			rsync_del_command = '''rm -r {source}'''.format(source=source)
@@ -50,13 +51,13 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 			ssh.exec_command(rsync_del_command)
 		ssh.close()
 
-	print 'Completed transfer'
+	print('Completed transfer')
 	return None
 
 def count_days():
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	s = dbi.Session()
-	table = getattr(pdbi, 'Feed')
+	table = getattr(dev, 'Feed')
 	count_FEEDs = s.query(getattr(table, 'julian_day'), label('count', func.count(getattr(table, 'julian_day'))))\
 							.group_by(getattr(table, 'julian_day')).all()
 	all_FEEDs = s.query(table).all()
@@ -71,9 +72,9 @@ def count_days():
 	return None
 
 def find_data():
-	dbi = pdbi.DataBaseInterface()
+	dbi = dev.DataBaseInterface()
 	s = dbi.Session()
-	table = getattr(pdbi, 'Feed')
+	table = getattr(dev, 'Feed')
 	FEEDs = s.query(table).filter(getattr(table, 'moved_to_distill') == False).filter(getattr(table, 'ready_to_move') == True).all()
 	s.close()
 
