@@ -14,16 +14,11 @@ sudo apt-get install -y python-virtualenv python3-dev libpq-dev postgresql libmy
 cd /mnt/paperdata/flask-paper/papersite
 
 sudo pip install --upgrade virtualenv
-sudo virtualenv --python=/usr/bin/python3.4 flask
+virtualenv --python=/usr/bin/python3.4 flask
 source flask/bin/activate
 pip install flask requests Flask-SQLAlchemy Flask-Migrate Flask-Login requests-futures psycopg2 mysqlclient
-#pip install -r ../requirements.txt
 
-cd /mnt/paperdata/paperdata_dbi/
-python3.4 setup.py install
-cd /mnt/paperdata/pyganglia_dbi/
-python3.4 setup.py install
-cd /mnt/paperdata/convert/
+cd /mnt/paperdata/
 python3.4 setup.py install
 
 cd /mnt/paperdata/flask-paper/papersite
