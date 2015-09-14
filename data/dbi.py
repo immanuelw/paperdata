@@ -13,7 +13,7 @@ except:
 	import ConfigParser as configparser
 
 Base = declarative_base()
-logger = logging.getLogger('paperdata_dbi')
+logger = logging.getLogger('dbi')
 
 #########
 #

@@ -10,7 +10,7 @@ import glob
 import socket
 import os
 import shutil
-import paperdata_dbi as pdbi
+import dbi as pdbi
 
 ### Script to move files and update paperdata database
 ### Move files and update db using dbi

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Create paperdata tables
 
-import paperdata_dbi as pdbi
+import dbi as pdbi
 import add_files
 import os
 import socket

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Load data into MySQL table 
 
-import paperdata_dbi as pdbi
+import dbi as pdbi
 from sqlalchemy import func
 from sqlalchemy.sql import label
 import move_files

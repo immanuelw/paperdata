@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 # Create paperdata tables
 
-import paperdata_dbi as pdbi
+import dbi as pdbi
 import sys
 import json
 import paperdata_db as pdb

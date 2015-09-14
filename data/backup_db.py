@@ -11,7 +11,7 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
-import paperdata_dbi as pdbi
+import dbi as pdbi
 import json
 import time
 

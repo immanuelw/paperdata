@@ -14,7 +14,7 @@ import psutil
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
-import paperdata_dbi as pdbi
+import dbi as pdbi
 
 ### Script to move files and update paperdata database
 ### Move files and update db using dbi

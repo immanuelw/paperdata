@@ -4,7 +4,7 @@
 
 import time
 import ddr_compress.dbi as ddbi
-import paperdata_dbi as pdbi
+import dbi as pdbi
 import add_files
 
 ### Script to load md5sums into paperdata database

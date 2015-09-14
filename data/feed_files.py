@@ -8,7 +8,7 @@ import time
 import glob
 import socket
 import aipy as A
-import paperdata_dbi as pdbi
+import dbi as pdbi
 
 ### Script to load data from anywhere into paperfeed database
 ### Crawls folio or elsewhere and reads through .uv files to generate all field information

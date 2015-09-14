@@ -7,7 +7,7 @@ import aipy as A
 import glob
 import socket
 import os
-import paperdata_dbi as pdbi
+import dbi as pdbi
 import time
 import uv_data
 
@@ -73,7 +73,7 @@ def calc_md5sum(host, path, filename):
 
 def get_uv_data(host, full_path, mode=None):
 	ssh = pdbi.login_ssh(host)
-	uv_data_script = os.path.expanduser('~/paperdata/paperdata_dbi/scripts/uv_data.py')
+	uv_data_script = os.path.expanduser('~/paperdata/dbi/scripts/uv_data.py')
 	sftp = ssh.open_sftp()
 	moved_script = './uv_data.py'
 	try:

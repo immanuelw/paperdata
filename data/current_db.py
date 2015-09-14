@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import prettytable
-import paperdata_dbi as pdbi
+import dbi as pdbi
 from sqlalchemy import func
 from sqlalchemy.sql import label
 

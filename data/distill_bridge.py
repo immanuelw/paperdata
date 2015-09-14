@@ -10,7 +10,7 @@ from collections import Counter
 import aipy as A
 import ddr_compress.dbi as ddbi
 from sqlalchemy import func
-import paperdata_dbi as pdbi
+import dbi as pdbi
 import add_files
 import uv_data
 import move_files
@@ -22,7 +22,7 @@ import move_files
 ### Date: 8-20-14
 def calc_time_data(host):
 	ssh = pdbi.login_ssh(host)
-	time_data_script = os.path.expanduser('~/paperdata/paperdata_dbi/scripts/time_data.py')
+	time_data_script = os.path.expanduser('~/paperdata/dbi/scripts/time_data.py')
 	sftp = ssh.open_sftp()
 	moved_script = './time_data.py'
 	try:
