@@ -259,7 +259,7 @@ def plot_jd_vs_gaps():
 	s = dbi.Session()
 	OBSs = s.query(pyg.Observation.julian_day, func.count(pyg.Observation.julian_day)).group_by(pyg.Observation.julian_day).all()
 	s.close()
-	jd_data = tuple((OBS[0], 288 - OBS[1]) if OBS[0] = 128 else (OBS[0], 72 - OBS[1]) for OBS in OBSs)
+	jd_data = tuple((OBS[0], 288 - OBS[1]) if OBS[0] == 128 else (OBS[0], 72 - OBS[1]) for OBS in OBSs)
 
 	plt.plot(*jd_data, 'r--')
 
