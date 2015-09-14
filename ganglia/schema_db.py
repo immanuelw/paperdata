@@ -7,7 +7,7 @@ from __future__ import print_function
 def main():
 	filename = os.path.expanduser('~/paperdata/pyganglia_dbi/src/schema.txt')
 	with open(filename, 'wb') as df:
-		print 'Starting ..'
+		print('Starting ..')
 	var_classes = gdb.all_classes
 
 	for var_class in var_classes:
