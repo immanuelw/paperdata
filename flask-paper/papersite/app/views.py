@@ -79,8 +79,8 @@ def get_graph():
 		start_datetime = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%SZ')
 		end_datetime = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M:%SZ')
 
-		start_utc = db_utils.get_utc_from_datetime(start_datetime)
-		end_utc = db_utils.get_utc_from_datetime(start_datetime)
+		start_utc = db_utils.get_jd_from_datetime(start_datetime)
+		end_utc = db_utils.get_jd_from_datetime(start_datetime)
 
 		if graph_type_str == 'Obs_File':
 			return histogram_utils.get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str)
@@ -233,8 +233,8 @@ def obs_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
-	start_utc = db_utils.get_utc_from_datetime(starttime)
-	end_utc = db_utils.get_utc_from_datetime(endtime)
+	start_utc = db_utils.get_jd_from_datetime(starttime)
+	end_utc = db_utils.get_jd_from_datetime(endtime)
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 	try:
@@ -254,8 +254,8 @@ def file_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
-	start_utc = db_utils.get_utc_from_datetime(starttime)
-	end_utc = db_utils.get_utc_from_datetime(endtime)
+	start_utc = db_utils.get_jd_from_datetime(starttime)
+	end_utc = db_utils.get_jd_from_datetime(endtime)
 
 	output_vars=('host', 'full_path', 'obsnum', 'filesize')
 
@@ -405,16 +405,20 @@ def data_summary_table():
 	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
 	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
 
-	start_utc =  db_utils.get_utc_from_datetime(startdatetime)
-	end_utc =  db_utils.get_utc_from_datetime(enddatetime)
+	start_utc =  db_utils.get_jd_from_datetime(startdatetime)
+	end_utc =  db_utils.get_jd_from_datetime(enddatetime)
 
-	try:
-		response = db_utils.query(database='paperdata', table='observation',
-									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-									sort_tuples=(('time_start', 'asc'),),
-									output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files'))
-	except:
-		response = (None,)
+	response = db_utils.query(database='paperdata', table='observation',
+								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
+								sort_tuples=(('time_start', 'asc'),),
+								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files'))
+	#try:
+	#	response = db_utils.query(database='paperdata', table='observation',
+	#								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
+	#								sort_tuples=(('time_start', 'asc'),),
+	#								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files'))
+	#except:
+	#	response = (None,)
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = db_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}

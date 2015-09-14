@@ -8,14 +8,21 @@ import pyganglia_dbi as pyg
 from sqlalchemy import or_
 from sqlalchemy.engine import reflection
 from convert import gcal2jd
+import socket
+
+host = socket.gethostname()
 
 def get_dbi(database):
 	if database == 'paperdata':
 		module = pdbi
 		configfile = '/mnt/paperdata/paperdata.cfg'
+		if host == 'seharu':
+			configfile = '~/paperdata/paperdata.cfg'
 	elif database == 'ganglia':
 		module = pyg
 		configfile = '/mnt/paperdata/ganglia.cfg'
+		if host == 'seharu':
+			configfile = '~/paperdata/ganglia.cfg'
 	elif database == 'eorlive':
 		module = edbi
 		dbi = None
@@ -94,8 +101,8 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples, output_vars):
 
 	results = results.all()
 
-	if output_vars is not None:
-		results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results)
+	#if output_vars is not None:
+		#results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results)
 	return results
 
 def query(data_source=None, database=None, table=None, field_tuples=None, sort_tuples=None, group_tuples=None, output_vars=None):
@@ -138,6 +145,8 @@ def get_jd_from_datetime(start_time=None, end_time=None):
 		time_start = gcal2jd(start_time.year, start_time.month, start_time.day, start_time.hour, start_time.minute, start_time.second)
 	if end_time is not None:
 		time_end = gcal2jd(end_time.year, end_time.month, end_time.day, end_time.hour, end_time.minute, end_time.second)
+	if time_end is None:
+		return time_start
 	return time_start, time_end
 
 def get_utc_from_datetime(date_time):
