@@ -96,7 +96,7 @@ def email_paperfeed(files):
 	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
 
 	header = 'From: PAPERFeed <paperfeed.paperdata@gmail.com>\nSubject: FILES ARE BEING MOVED\n'
-    msgs = header
+	msgs = header
 	#Send the mail
 	for filename in files:
 		msgs = ''.join(msgs, '\n', filename, ' is being moved.\n')
