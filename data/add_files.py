@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Add files to paperdata
 
+from __future__ import print_function
 import sys
 import aipy as A
 import glob
@@ -155,7 +156,7 @@ def obs_edge(obsnum, sess=None):
 
 	return prev_obs, next_obs, edge
 
-def file_names(full_path)
+def file_names(full_path):
 	path = os.path.dirname(full_path)
 	filename = os.path.basename(full_path)
 	filetype = filename.split('.')[-1]
@@ -334,7 +335,7 @@ if __name__ == '__main__':
 	if len(sys.argv) == 2:
 		input_host = sys.argv[1].split(':')[0]
 		if input_host == sys.argv[1]:
-			print 'Needs host'
+			print('Needs host')
 			sys.exit()
 		input_paths = sys.argv[1].split(':')[1]
 	elif len(sys.argv) == 3:
