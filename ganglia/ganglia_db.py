@@ -26,21 +26,21 @@ classes = ('filesystem', 'monitor', 'ram', 'iostat', 'cpu')
 
 class filesystem:
 	def __init__(self):
-	self.table = 'filesystem'
-	self.db_list = ('host',
-					'system',
-					'total_space',
-					'used_space',
-					'free_space',
-					'percent_space',
-					'timestamp')
-	self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that us being monitored'),
-					'system':('VARCHAR(100)', 'None', 'No', 'directory that is being searched for space'),
-					'total_space':('BIGINT', 'None', 'No', 'total space in system in bytes'),
-					'used_space':('BIGINT', 'None', 'No', 'used space in system in bytes'),
-					'free_space':('BIGINT', 'None', 'No', 'free space in system in bytes'),
-					'percent_space':('BIGINT', 'None', 'No', 'percent of used space in system'),
-					'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
+		self.table = 'filesystem'
+		self.db_list = ('host',
+						'system',
+						'total_space',
+						'used_space',
+						'free_space',
+						'percent_space',
+						'timestamp')
+		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that us being monitored'),
+						'system':('VARCHAR(100)', 'None', 'No', 'directory that is being searched for space'),
+						'total_space':('BIGINT', 'None', 'No', 'total space in system in bytes'),
+						'used_space':('BIGINT', 'None', 'No', 'used space in system in bytes'),
+						'free_space':('BIGINT', 'None', 'No', 'free space in system in bytes'),
+						'percent_space':('BIGINT', 'None', 'No', 'percent of used space in system'),
+						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
 
 class monitor:
 	def __init__(self):
