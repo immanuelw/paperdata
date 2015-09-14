@@ -9,6 +9,7 @@ import glob
 import socket
 import aipy as A
 import dbi as pdbi
+from __future__ import print_function
 
 ### Script to load data from anywhere into paperfeed database
 ### Crawls folio or elsewhere and reads through .uv files to generate all field information
@@ -86,7 +87,7 @@ if __name__ == '__main__':
 	if len(sys.argv) == 2:
 		input_host = sys.argv[1].split(':')[0]
 		if input_host == sys.argv[1]:
-			print 'Needs host'
+			print('Needs host')
 			sys.exit()
 		input_paths = sys.argv[1].split(':')[1]
 	elif len(sys.argv) == 3:

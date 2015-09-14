@@ -5,6 +5,8 @@
 ### Author: Immanuel Washington
 ### Date: 05-17-14
 
+from __future__ import print_function
+
 NOSEARCH = 0
 SEARCH = 1
 
@@ -188,4 +190,4 @@ all_classes = (File(), Observation(), Feed(), Log(), Rtp_File(), Rtp_Observation
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':
-	print 'Not a script file, just a module'
+	print('Not a script file, just a module')

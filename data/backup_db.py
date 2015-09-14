@@ -14,6 +14,7 @@ from email import Encoders
 import dbi as pdbi
 import json
 import time
+from __future__ import print_function
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
@@ -78,7 +79,7 @@ def paperbackup(timestamp):
 	json_data(dbo4, LOG_dump)
 
 	s.close()
-	print 'Table data backup saved'
+	print('Table data backup saved')
 
 	return None
 

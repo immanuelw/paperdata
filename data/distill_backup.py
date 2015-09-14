@@ -9,6 +9,7 @@ import os
 import subprocess
 import ddr_compress.dbi as ddbi
 import json
+from __future__ import print_function
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
@@ -71,8 +72,8 @@ def paperbackup(timestamp):
 	json_data(dbo3, LOG_dump)
 
 	s.close()
-	print timestamp
-	print 'Table data backup saved'
+	print(timestamp)
+	print('Table data backup saved')
 
 	return None
 

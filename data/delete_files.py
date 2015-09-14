@@ -11,6 +11,7 @@ import socket
 import os
 import shutil
 import dbi as pdbi
+from __future__ import print_function
 
 ### Script to move files and update paperdata database
 ### Move files and update db using dbi
@@ -71,7 +72,7 @@ def delete_files(input_host, input_paths, output_host, output_dir):
 			ssh.exec_command(rsync_del_command)
 		ssh.close()
 
-	print 'Completed transfer'
+	print('Completed transfer')
 	return None
 
 if __name__ == '__main__':

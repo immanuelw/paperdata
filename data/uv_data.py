@@ -5,6 +5,7 @@
 import sys
 import aipy as A
 import os
+from __future__ import print_function
 
 ### Script to calculate uv data on any/other hosts
 ### output uv_data in csv format: 
@@ -101,4 +102,4 @@ if __name__ == '__main__':
 	if uv_data is None:
 		sys.exit()
 	output_string = ','.join(uv_data)
-	print output_string
+	print(output_string)

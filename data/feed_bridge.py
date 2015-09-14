@@ -16,6 +16,7 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
+from __future__ import print_function
 
 ### Script to load paperdistiller with files from the paperfeed table
 ### Checks /data4 for space, moves entire days of data, then loads into paperdistiller
@@ -50,7 +51,7 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 			ssh.exec_command(rsync_del_command)
 		ssh.close()
 
-	print 'Completed transfer'
+	print('Completed transfer')
 	return None
 
 def count_days():
