@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Add files to paperdata
 
+from __future__ import print_function
 import sys
 import time
 import subprocess
@@ -111,7 +112,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 		ssh.close()
 		s.close()
 
-	print 'Completed transfer'
+	print('Completed transfer')
 	return None
 
 if __name__ == '__main__':
@@ -132,6 +133,6 @@ if __name__ == '__main__':
 	nulls = null_check(input_host, input_paths)
 	if not nulls:
 		#if any file not in db -- don't move anything
-		print 'File(s) not in database'
+		print('File(s) not in database')
 		sys.exit()
 	move_files(input_host, input_paths, output_host, output_dir)

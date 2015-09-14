@@ -48,7 +48,7 @@ def add_data():
 	OBSs_complete = s.query(table).filter(getattr(table, 'status') == 'COMPLETE').all()
 	s.close()
 
-	julian_obs = {OBS: int(str(getattr(OBS, 'julian_date'))[3:7]) for OBS in OBSs_complete)
+	julian_obs = {OBS: int(str(getattr(OBS, 'julian_date'))[3:7]) for OBS in OBSs_complete}
 	julian_days = tuple(jday for jday in julian_obs.values())
 	#dict of julian day as key, amount as value
 	count_jdays = Counter(julian_days)

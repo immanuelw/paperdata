@@ -2,13 +2,13 @@
 # -*- coding: utf-8 -*-
 # Create paperdata tables
 
+from __future__ import print_function
 import dbi as pdbi
 import sys
 import json
 import data_db as pdb
 import glob
 import sqlalchemy.exc
-from __future__ import print_function
 
 ### Script to create paperdata database
 ### Instantiates tables

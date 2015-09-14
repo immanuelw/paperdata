@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Add files to paperdata
 
+from __future__ import print_function
 import sys
 import time
 import subprocess
@@ -11,7 +12,6 @@ import socket
 import os
 import shutil
 import dbi as pdbi
-from __future__ import print_function
 
 ### Script to move files and update paperdata database
 ### Move files and update db using dbi

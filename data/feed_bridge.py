@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Load data into MySQL table 
 
+from __future__ import print_function
 import dbi as pdbi
 from sqlalchemy import func
 from sqlalchemy.sql import label
@@ -16,7 +17,6 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
-from __future__ import print_function
 
 ### Script to load paperdistiller with files from the paperfeed table
 ### Checks /data4 for space, moves entire days of data, then loads into paperdistiller

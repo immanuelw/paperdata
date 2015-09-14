@@ -86,7 +86,7 @@ def get_uv_data(host, full_path, mode=None):
 	sftp.close()
 
 	if mode is None:
-		uv_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path))
+		uv_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path)
 		_, uv_dat, _ = ssh.exec_command(uv_comm)
 		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [round(float(info), 5) if key in (0, 1, 2, 3, 5)
 																						else int(info) if key in (6,)

@@ -2,14 +2,13 @@
 # -*- coding: utf-8 -*-
 # Load data into MySQL table 
 
-# import the MySQLdb and sys modules
+from __future__ import print_function
 import sys
 import time
 import os
 import subprocess
 import ddr_compress.dbi as ddbi
 import json
-from __future__ import print_function
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file

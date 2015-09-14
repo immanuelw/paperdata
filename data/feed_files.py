@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 # Load data into MySQL table 
 
+from __future__ import print_function
 import sys
 import os
 import time
@@ -9,7 +10,6 @@ import glob
 import socket
 import aipy as A
 import dbi as pdbi
-from __future__ import print_function
 
 ### Script to load data from anywhere into paperfeed database
 ### Crawls folio or elsewhere and reads through .uv files to generate all field information
