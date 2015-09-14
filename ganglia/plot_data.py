@@ -30,7 +30,7 @@ def plot_monitor(filenames):
 	x_values = np.arange(1, len(STAGEs) + 1, 1)
 	stage_dict = dict(zip(STAGEs, x_values))
 	for uv_file in filenames:
-		full_path = host + ':' + uv_file
+		full_path = ':'.join(host, uv_file)
 		MONITORs = s.query(pyg.Monitor).filter(pyg.Monitor.full_path==full_path).all()
 		file_host = s.query(pyg.Monitor).filter(pyg.Monitor.full_path==full_path).one().host
 		status_data = tuple((MONITOR.status, MONITOR.del_time) for MONITOR in MONITORs if MONITOR.del_time is not -1)
@@ -47,7 +47,7 @@ def plot_monitor(filenames):
 		plt.scatter(*zip(*process_plot), 'r')
 		plt.axvline(xdata=x_values, linestyle='--')
 
-		plt.title(os.path.basename(uv_file) ' on ' + file_host)
+		plt.title(' on '.join(os.path.basename(uv_file), file_host))
 		plt.xticks(x_values, STAGEs)
 		plt.ylabel('Time Between stages')
 		plt.xlabel('Stage')
