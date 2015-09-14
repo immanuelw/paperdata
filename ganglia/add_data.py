@@ -5,7 +5,7 @@
 import sys
 import os
 import paramiko
-import pyganglia_dbi as pyg
+import ganglia as pyg
 import psutil
 import time
 

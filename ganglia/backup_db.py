@@ -11,7 +11,7 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
-import pyganglia_dbi as pyg
+import ganglia as pyg
 import json
 import time
 
