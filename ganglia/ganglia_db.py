@@ -60,7 +60,7 @@ class monitor:
 						'filename':('VARCHAR(100)', 'None', 'No', 'name/path of uv file being compressed'),
 						'full_path':('VARCHAR(200)', 'None', 'No', 'combination of host, path, and filename'),
 						'status':('VARCHAR(100)', 'None', 'No', 'state of compression file is currently doing'),
-						'full_stats':('VARCHAR(200)', 'None', 'Unique', 'combination of full_path and status
+						'full_stats':('VARCHAR(200)', 'None', 'Unique', 'combination of full_path and status \
 										which is a unique identifier for each file'),
 						'del_time':('BIGINT', 'None', 'No', 'time taken to finish step -- status transition'),
 						'time_start':('BIGINT', 'None', 'No', 'time process started as a integer -- process transition'),
@@ -130,7 +130,7 @@ class cpu:
 						'timestamp')
 		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that is being monitored'),
 						'cpu':('INT', 'None', 'No', 'No', 'number of cpu/processor being monitored'),
-						'user_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu being used by user)',
+						'user_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu being used by user'),
 						'sys_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu being used by system'),
 						'iowait_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu waiting'),
 						'idle_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu that is idle'),
