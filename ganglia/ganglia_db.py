@@ -55,7 +55,7 @@ class monitor:
 						'time_start',
 						'time_end',
 						'timestamp')
-		self.db_descr = {'host'('VARCHAR(100)', 'None', 'No', 'node that uv file is being compressed on'),
+		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'node that uv file is being compressed on'),
 						'path':('VARCHAR(100)', 'None', 'No', 'directory that file is located in'),
 						'filename':('VARCHAR(100)', 'None', 'No', 'name/path of uv file being compressed'),
 						'full_path':('VARCHAR(200)', 'None', 'No', 'combination of host, path, and filename'),
