@@ -10,19 +10,19 @@ from collections import Counter
 import aipy as A
 import ddr_compress.dbi as ddbi
 from sqlalchemy import func
-import paperdev_dbi as pdbi
+import dbi as pdbi
 import add_files
 import uv_data
 import move_files
 
-### Script to load infromation quickly from paperdistiller database into paperdev
-### Queries paperdistiller for relevant information, loads paperdev with complete info
+### Script to load infromation quickly from paperdistiller database into paperdata
+### Queries paperdistiller for relevant information, loads paperdata with complete info
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 def calc_time_data(host):
 	ssh = pdbi.login_ssh(host)
-	time_data_script = os.path.expanduser('~/paperdev/paperdev_dbi/scripts/time_data.py')
+	time_data_script = os.path.expanduser('~/paperdata/dbi/scripts/time_data.py')
 	sftp = ssh.open_sftp()
 	moved_script = './time_data.py'
 	try:

@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 import os
 import prettytable
-import paperdev_dbi as pdbi
+import dbi as pdbi
 from sqlalchemy import func
 from sqlalchemy.sql import label
 
-#script to show state of paperdev
+#script to show state of paperdata
 
 def main():
 	dbi = pdbi.DataBaseInterface()

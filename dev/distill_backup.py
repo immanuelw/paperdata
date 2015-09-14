@@ -10,7 +10,7 @@ import subprocess
 import ddr_compress.dbi as ddbi
 import json
 
-### Script to Backup paperdev database
+### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
 
 ### Author: Immanuel Washington

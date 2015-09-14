@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Create paperdev tables
+# Create paperdata tables
 
 import time
 import ddr_compress.dbi as ddbi
-import paperdev_dbi as pdbi
+import dbi as pdbi
 import add_files
 
-### Script to load md5sums into paperdev database
+### Script to load md5sums into paperdata database
 ### Loads md5sums
 
 ### Author: Immanuel Washington
@@ -57,8 +57,8 @@ def md5_distiller():
 
 if __name__ == '__main__':
 	if len(sys.argv) != 2:
-		print('Input argument -- [paperdev/paperdistiller] to select which database to update md5sums')
-	elif sys.argv[1] == 'paperdev':
+		print('Input argument -- [paperdata/paperdistiller] to select which database to update md5sums')
+	elif sys.argv[1] == 'paperdata':
 		md5_db()
 	elif sys.argv[1] == 'paperdistiller':
 		md5_distiller()

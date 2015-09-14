@@ -1,13 +1,13 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Create paperdev tables
+# Create paperdata tables
 
-import paperdev_dbi as pdbi
+import dbi as pdbi
 import add_files
 import os
 import socket
 
-### Script to reload paperdev database
+### Script to reload paperdata database
 ### Crawls all hosts for files
 
 ### Author: Immanuel Washington

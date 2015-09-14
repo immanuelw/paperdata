@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Add files to paperdev
+# Add files to paperdata
 
 import sys
 import time
@@ -10,9 +10,9 @@ import glob
 import socket
 import os
 import shutil
-import paperdev_dbi as pdbi
+import dbi as pdbi
 
-### Script to move files and update paperdev database
+### Script to move files and update paperdata database
 ### Move files and update db using dbi
 
 ### Author: Immanuel Washington

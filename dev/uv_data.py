@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Add files to paperdev
+# Add files to paperdata
 
 import sys
 import aipy as A

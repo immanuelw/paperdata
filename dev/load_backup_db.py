@@ -1,15 +1,15 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Create paperdev tables
+# Create paperdata tables
 
-import paperdev_dbi as pdbi
+import dbi as pdbi
 import sys
 import json
-import paperdev_db as pdb
+import paperdata_db as pdb
 import glob
 import sqlalchemy.exc
 
-### Script to create paperdev database
+### Script to create paperdata database
 ### Instantiates tables
 
 ### Author: Immanuel Washington
@@ -35,6 +35,8 @@ def load_backup(backup, table=None):
 						dbi.add_to_table('log', row)
 					#elif table == 'rtp_file':
 					#	dbi.add_to_table('rtp_file', row)
+				except KeyboardInterrupt:
+					raise
 				except:
 					print('Failed to load in entry')
 
@@ -45,15 +47,15 @@ if __name__ == '__main__':
 		backup_obs = sys.argv[1]
 		backup_file = sys.argv[2]
 	else:
-		backup_list = glob.glob('/data4/paper/paperdev_backup/[0-9]*')
+		backup_list = glob.glob('/data4/paper/paperdata_backup/[0-9]*')
 		backup_list.sort(reverse=True)
 		backup_dir = backup_list[0]
 		timestamp = int(backup_dir.split('/')[-1])
-		backup_obs = '/data4/paper/paperdev_backup/{timestamp}/obs_{timestamp}.json'.format(timestamp=timestamp)
-		backup_file = '/data4/paper/paperdev_backup/{timestamp}/file_{timestamp}.json'.format(timestamp=timestamp)
-		backup_feed = '/data4/paper/paperdev_backup/{timestamp}/feed_{timestamp}.json'.format(timestamp=timestamp)
-		backup_log = '/data4/paper/paperdev_backup/{timestamp}/log_{timestamp}.json'.format(timestamp=timestamp)
-		#backup_rtp_file = '/data4/paper/paperdev_backup/{timestamp}/rtp_file_{timestamp}.json'.format(timestamp=timestamp)
+		backup_obs = '/data4/paper/paperdata_backup/{timestamp}/obs_{timestamp}.json'.format(timestamp=timestamp)
+		backup_file = '/data4/paper/paperdata_backup/{timestamp}/file_{timestamp}.json'.format(timestamp=timestamp)
+		backup_feed = '/data4/paper/paperdata_backup/{timestamp}/feed_{timestamp}.json'.format(timestamp=timestamp)
+		backup_log = '/data4/paper/paperdata_backup/{timestamp}/log_{timestamp}.json'.format(timestamp=timestamp)
+		#backup_rtp_file = '/data4/paper/paperdata_backup/{timestamp}/rtp_file_{timestamp}.json'.format(timestamp=timestamp)
 		
 	
 	#load_backup(backup_obs, table='observation')

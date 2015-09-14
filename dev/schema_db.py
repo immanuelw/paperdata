@@ -1,10 +1,10 @@
 import sys
 import os
 import prettytable
-import paperdev_db as pdb
+import paperdata_db as pdb
 
 def main():
-	filename = os.path.expanduser('~/paperdev/paperdev_dbi/src/schema.txt')
+	filename = os.path.expanduser('~/paperdata/data/src/schema.txt')
 	with open(filename, 'wb') as df:
 		print 'Starting ..'
 	var_classes = pdb.all_classes
