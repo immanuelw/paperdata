@@ -300,7 +300,7 @@ if __name__ == '__main__':
 	else:
 		ssh = pdbi.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
-		stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
+		_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]
 		ssh.close()
 
