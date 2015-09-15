@@ -104,64 +104,6 @@ def get_uv_data(host, full_path, mode=None):
 		ssh.close()
 		return time_start, time_end, delta_time, length
 
-def get_lst(julian_date):
-	gmst = convert.juliandate_to_gmst(julian_date)
-	lst = convert.gmst_to_lst(gmst, longitude=25)
-	return lst
-
-def julian_era(julian_date):
-	#indicates julian day and set of data
-	if julian_date < 2456100:
-		era = 32
-	elif julian_date < 2456400:
-		era = 64
-	else:
-		era = 128
-
-	julian_day = int(str(julian_date)[3:7])
-
-	return era, julian_day
-
-def is_edge(prev_obs, next_obs):
-	if (prev_obs, next_obs) == (None, None):
-		edge = None
-	else:
-		edge = (None in (prev_obs, next_obs))
-	return edge
-
-def obs_pn(s, obsnum):
-	table = getattr(pdbi, 'Observation')
-	PREV_OBS = s.query(table).filter(getattr(table, 'obsnum') == obsnum - 1).one()
-	if PREV_OBS is not None:
-		prev_obs = getattr(PREV_OBS, 'obsnum')
-	else:
-		prev_obs = None
-	NEXT_OBS = s.query(table).filter(getattr(table, 'obsnum') == obsnum + 1).one()
-	if NEXT_OBS is not None:
-		next_obs = getattr(NEXT_OBS, 'obsnum')
-	else:
-		next_obs = None
-
-	return prev_obs, next_obs
-
-def obs_edge(obsnum, sess=None):
-	#unknown prev/next observation
-	if obsnum == None:
-		prev_obs = None
-		next_obs = None
-	else:
-		if sess is None:
-			dbi = pdbi.DataBaseInterface()
-			s = dbi.Session()
-			prev_obs, next_obs = obs_pn(s, obsnum)
-			s.close()
-		else:
-			prev_obs, next_obs = obs_pn(sess, obsnum)
-
-	edge = is_edge(prev_obs, next_obs)
-
-	return prev_obs, next_obs, edge
-
 def file_names(full_path):
 	path = os.path.dirname(full_path)
 	filename = os.path.basename(full_path)
@@ -208,13 +150,13 @@ def calc_obs_data(host, full_path):
 
 		s.close()
 
-	lst = round(get_lst(julian_date), 1)
-	era, julian_day = julian_era(julian_date)
+	lst = uv_data.get_lst(julian_date)
+	era, julian_day = uv_data.julian_era(julian_date)
 
 	#indicates type of file in era
 	era_type = None
 
-	prev_obs, next_obs, edge = obs_edge(obsnum)
+	prev_obs, next_obs, edge = uv_data.obs_edge(obsnum)
 
 	filesize = calc_size(host, path, filename)
 	md5 = calc_md5sum(host, path, filename)
@@ -311,7 +253,7 @@ def update_obsnums():
 		PREV_OBS = set_obs(s, OBS, 'prev_obs')
 		NEXT_OBS = set_obs(s, OBS, 'next_obs')
 		#sets edge 
-		edge = is_edge(PREV_OBS, NEXT_OBS)
+		edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
 		dbi.set_entry(OBS, 'edge', edge)
 
 	s.close()

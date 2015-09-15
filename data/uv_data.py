@@ -4,8 +4,9 @@
 
 from __future__ import print_function
 import sys
-import aipy as A
 import os
+import dbi as pdbi
+import aipy as A
 
 ### Script to calculate uv data on any/other hosts
 ### output uv_data in csv format: 
@@ -25,6 +26,64 @@ def jdpol2obsnum(jd,pol,djd):
 	polnum = A.miriad.str2pol[pol]+10
 	assert(obsint < 2**31)
 	return int(obsint + polnum*(2**32))
+
+def get_lst(julian_date):
+	gmst = convert.juliandate_to_gmst(julian_date)
+	lst = convert.gmst_to_lst(gmst, longitude=25)
+	return round(lst, 1)
+
+def julian_era(julian_date):
+	#indicates julian day and set of data
+	if julian_date < 2456100:
+		era = 32
+	elif julian_date < 2456400:
+		era = 64
+	else:
+		era = 128
+
+	julian_day = int(str(julian_date)[3:7])
+
+	return era, julian_day
+
+def is_edge(prev_obs, next_obs):
+	if (prev_obs, next_obs) == (None, None):
+		edge = None
+	else:
+		edge = (None in (prev_obs, next_obs))
+	return edge
+
+def obs_pn(s, obsnum):
+	table = getattr(pdbi, 'Observation')
+	PREV_OBS = s.query(table).filter(getattr(table, 'obsnum') == obsnum - 1).one()
+	if PREV_OBS is not None:
+		prev_obs = getattr(PREV_OBS, 'obsnum')
+	else:
+		prev_obs = None
+	NEXT_OBS = s.query(table).filter(getattr(table, 'obsnum') == obsnum + 1).one()
+	if NEXT_OBS is not None:
+		next_obs = getattr(NEXT_OBS, 'obsnum')
+	else:
+		next_obs = None
+
+	return prev_obs, next_obs
+
+def obs_edge(obsnum, sess=None):
+	#unknown prev/next observation
+	if obsnum == None:
+		prev_obs = None
+		next_obs = None
+	else:
+		if sess is None:
+			dbi = pdbi.DataBaseInterface()
+			s = dbi.Session()
+			prev_obs, next_obs = obs_pn(s, obsnum)
+			s.close()
+		else:
+			prev_obs, next_obs = obs_pn(sess, obsnum)
+
+	edge = is_edge(prev_obs, next_obs)
+
+	return prev_obs, next_obs, edge
 
 def calc_times(uv):
 	#takes in uv file and calculates time based information

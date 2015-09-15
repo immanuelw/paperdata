@@ -93,13 +93,14 @@ def add_data():
 
 		else:
 			time_start, time_end, delta_time, _ = add_files.get_uv_data(host, full_path, mode='time')
-		
-		era, julian_day = add_files.julian_era(julian_date)
+
+		lst = uv_data.get_lst(julian_date)		
+		era, julian_day = uv_data.julian_era(julian_date)
 
 		#indicates type of file in era
 		era_type = None
 
-		prev_obs, next_obs, edge = add_files.obs_edge(obsnum, sess=sp)
+		prev_obs, next_obs, edge = uv_data.obs_edge(obsnum, sess=sp)
 
 		filesize = add_files.calc_size(host, path, filename)
 		md5 = getattr(FILE, 'md5sum')
@@ -117,6 +118,7 @@ def add_data():
 					'julian_date':julian_date,
 					'polarization':polarization,
 					'julian_day':julian_day,
+					'lst':lst,
 					'era':era,
 					'era_type':era_type,
 					'length':length,
