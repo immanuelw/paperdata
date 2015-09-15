@@ -4,7 +4,6 @@
 
 from __future__ import print_function
 import sys
-import aipy as A
 import glob
 import socket
 import os
@@ -66,7 +65,8 @@ def calc_md5sum(host, path, filename):
 			md5 = remote_path.check('md5', block_size=65536)
 			sftp.close()
 		except(IOError):
-			stdin, md5_out, stderr = ssh.exec_command('md5sum {full_path}/visdata'.format(full_path=full_path))		
+			vis_path = os.path.join(full_path, 'visdata')
+			stdin, md5_out, stderr = ssh.exec_command('md5sum {vis_path}'.format(vis_path=vis_path))
 			md5 = md5_out.read().split(' ')[0]
 		ssh.close()
 
@@ -74,7 +74,7 @@ def calc_md5sum(host, path, filename):
 
 def get_uv_data(host, full_path, mode=None):
 	ssh = pdbi.login_ssh(host)
-	uv_data_script = os.path.expanduser('~/paperdata/dbi/scripts/uv_data.py')
+	uv_data_script = os.path.expanduser('~/paperdata/data/uv_data.py')
 	sftp = ssh.open_sftp()
 	moved_script = './uv_data.py'
 	try:
@@ -168,7 +168,7 @@ def calc_obs_data(host, full_path):
 	path, filename, filetype = file_names(full_path)
 
 	#Dictionary of polarizations
-	pol_dict = {-5:'xx',-6:'yy',-7:'xy',-8:'yx'}
+	pol_dict = pdbi.str2pol
 
 	#allows uv access
 	named_host = socket.gethostname()
