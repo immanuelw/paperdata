@@ -6,6 +6,7 @@ from __future__ import print_function
 import sys
 import os
 import dbi as pdbi
+import paperdata.convert as convert
 import aipy as A
 
 ### Script to calculate uv data on any/other hosts
