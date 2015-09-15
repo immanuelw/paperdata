@@ -4,10 +4,10 @@
 
 import sys
 import os
-import paramiko
-import dbi as pyg
 import psutil
 import time
+import dbi as pyg
+import paperdata as ppdata
 
 ### Script to add info to pyganglia database
 ### Adds information using dbi
@@ -214,7 +214,7 @@ def cpu_perc(ssh, host):
 	return cpu_data
 
 def add_data(ssh, host):
-	ssh = pyg.login_ssh(host)
+	ssh = ppdata.login_ssh(host)
 	dbi = pyg.DataBaseInterface()
 
 	iostat_all_data = iostat(ssh, host)

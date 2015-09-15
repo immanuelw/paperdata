@@ -10,6 +10,7 @@ import glob
 import socket
 import aipy as A
 import dbi as pdbi
+import paperdata as ppdata
 
 ### Script to load data from anywhere into paperfeed database
 ### Crawls folio or elsewhere and reads through .uv files to generate all field information
@@ -100,7 +101,7 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(input_paths)
 	else:
-		ssh = pdbi.login_ssh(input_host)
+		ssh = ppdata.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
 		_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]

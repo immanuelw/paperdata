@@ -12,6 +12,7 @@ import os
 import shutil
 import psutil
 import dbi as pdbi
+import paperdata as ppdata
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
@@ -101,7 +102,7 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			shutil.rmtree(source)
 		s.close()
 	else:
-		ssh = pdbi.login_ssh(output_host)
+		ssh = ppdata.login_ssh(output_host)
 		for source in input_paths:
 			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 			rsync_del_command = '''rm -r {source}'''.format(source=source)
@@ -120,7 +121,7 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(raw_input('Source directory path: '))
 	else:
-		ssh = pdbi.login_ssh(input_host)
+		ssh = ppdata.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
 		stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]

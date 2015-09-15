@@ -3,10 +3,6 @@
 # Load data into MySQL table 
 
 from __future__ import print_function
-import dbi as pdbi
-from sqlalchemy import func
-from sqlalchemy.sql import label
-import move_files
 import sys
 import os
 import time
@@ -14,6 +10,11 @@ import shutil
 import socket
 import subprocess
 import smtplib
+import move_files
+import dbi as pdbi
+import paperdata as ppdata
+from sqlalchemy import func
+from sqlalchemy.sql import label
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
@@ -42,7 +43,7 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 			set_feed(source, output_host, output_dir)
 			shutil.rmtree(source)
 	else:
-		ssh = pdbi.login_ssh(output_host)
+		ssh = ppdata.login_ssh(output_host)
 		for source in input_paths:
 			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 			rsync_del_command = '''rm -r {source}'''.format(source=source)

@@ -10,6 +10,7 @@ import time
 import socket
 import dbi as pdbi
 import uv_data
+import paperdata as ppdata
 import paperdata.convert as convert
 
 ### Script to add files to paperdata database
@@ -42,7 +43,7 @@ def calc_size(host, path, filename):
 	if named_host == host:
 		size = sizeof_fmt(get_size(full_path))
 	else:
-		ssh = pdbi.login_ssh(host)
+		ssh = ppdata.login_ssh(host)
 		sftp = ssh.open_sftp()
 		size_bytes = sftp.stat(full_path).st_size
 		size = sizeof_fmt(size_bytes)
@@ -59,7 +60,7 @@ def calc_md5sum(host, path, filename):
 	if named_host == host:
 		md5 = pdbi.get_md5sum(full_path)
 	else:
-		ssh = pdbi.login_ssh(host)
+		ssh = ppdata.login_ssh(host)
 		try:
 			sftp = ssh.open_sftp()
 			remote_path = sftp.file(full_path, mode='r')
@@ -74,7 +75,7 @@ def calc_md5sum(host, path, filename):
 	return md5
 
 def get_uv_data(host, full_path, mode=None):
-	ssh = pdbi.login_ssh(host)
+	ssh = ppdata.login_ssh(host)
 	uv_data_script = os.path.expanduser('~/paperdata/data/uv_data.py')
 	sftp = ssh.open_sftp()
 	moved_script = './uv_data.py'
@@ -298,7 +299,7 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(input_paths)
 	else:
-		ssh = pdbi.login_ssh(input_host)
+		ssh = ppdata.login_ssh(input_host)
 		input_paths = raw_input('Source directory path: ')
 		_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 		input_paths = path_out.read().split('\n')[:-1]

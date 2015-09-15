@@ -11,6 +11,7 @@ import socket
 import os
 import shutil
 import dbi as pdbi
+import paperdata as ppdata
 
 ### Script to move files and update paperdata database
 ### Move files and update db using dbi
@@ -62,7 +63,7 @@ def delete_files(input_host, input_paths, output_host, output_dir):
 			set_delete_table(input_host, source, output_host, output_dir)
 			shutil.rmtree(source)
 	else:
-		ssh = pdbi.login_ssh(host)
+		ssh = ppdata.login_ssh(host)
 		for source in input_paths:
 			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 			rsync_del_command = '''rm -r {source}'''.format(source=source)

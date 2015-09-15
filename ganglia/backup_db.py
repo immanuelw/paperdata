@@ -4,17 +4,16 @@
 
 # import the MySQLdb and sys modules
 from __future__ import print_function
+import os
 import sys
 import time
-import os
+import json
 import subprocess
 import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
 import dbi as pyg
-import json
-import time
 
 ### Script to Backup pyganglia database
 ### Finds time and date and writes table into .csv file
