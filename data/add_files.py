@@ -7,6 +7,7 @@ import os
 import sys
 import glob
 import time
+import hashlib
 import socket
 import dbi as pdbi
 import uv_data
@@ -52,13 +53,31 @@ def calc_size(host, path, filename):
 
 	return size
 
+def get_md5sum(fname):
+	"""
+	calculate the md5 checksum of a file whose filename entry is fname.
+	"""
+	fname = fname.split(':')[-1]
+	BLOCKSIZE = 65536
+	hasher = hashlib.md5()
+	try:
+		afile = open(fname, 'rb')
+	except(IOError):
+		fname = os.path.join(fname, 'visdata')
+		afile = open(fname, 'rb')
+	buf = afile.read(BLOCKSIZE)
+	while len(buf) >0:
+		hasher.update(buf)
+		buf = afile.read(BLOCKSIZE)
+	return hasher.hexdigest()
+
 def calc_md5sum(host, path, filename):
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
 	#DEFAULT VALUE
 	md5 = None
 	if named_host == host:
-		md5 = pdbi.get_md5sum(full_path)
+		md5 = get_md5sum(full_path)
 	else:
 		ssh = ppdata.login_ssh(host)
 		try:

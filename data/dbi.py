@@ -34,47 +34,6 @@ str2pol = {	'I' :  1,   # Stokes Paremeters
 			'xy': -7,
 			'yx': -8}
 
-def jdpol2obsnum(jd,pol,djd):
-	"""
-	input: julian date float, pol string. and length of obs in fraction of julian date
-	output: a unique index
-	"""
-	dublinjd = jd - 2415020  #use Dublin Julian Date
-	obsint = int(dublinjd / djd)  #divide up by length of obs
-	try:
-		import aipy as a
-		polnum = a.miriad.str2pol[pol] + 10
-	except:
-		polnum = str2pol[pol]+10
-	assert(obsint < 2 ** 31)
-	return int(obsint + polnum * (2 ** 32))
-
-def updateobsnum(context):
-	"""
-	helper function for Observation sqlalchemy object.
-	used to calculate the obsnum on creation of the record
-	"""
-	return jdpol2obsnum(context.current_parameters['julian_date'],
-						context.current_parameters['polarization'],
-						context.current_parameters['length'])
-
-def get_md5sum(fname):
-	"""
-	calculate the md5 checksum of a file whose filename entry is fname.
-	"""
-	fname = fname.split(':')[-1]
-	BLOCKSIZE = 65536
-	hasher = hashlib.md5()
-	try:
-		afile = open(fname, 'rb')
-	except(IOError):
-		afile = open('{fname}/visdata'.format(fname=fname), 'rb')
-	buf = afile.read(BLOCKSIZE)
-	while len(buf) >0:
-		hasher.update(buf)
-		buf = afile.read(BLOCKSIZE)
-	return hasher.hexdigest()
-
 #############
 #
 #   The basic definition of our database
@@ -83,7 +42,7 @@ def get_md5sum(fname):
 
 class Observation(Base):
 	__tablename__ = 'observation'
-	obsnum = Column(BigInteger, default=updateobsnum, primary_key=True)
+	obsnum = Column(BigInteger, primary_key=True)
 	julian_date = Column(Numeric(12,5))
 	polarization = Column(String(4))
 	julian_day = Column(Integer)
