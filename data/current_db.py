@@ -12,8 +12,8 @@ def main():
 	s = dbi.Session()
 	current_FILEs = s.query(pdbi.File).all()
 	s.close()
-	current = tuple(((getattr(FILE, 'era'), getattr(FILE, 'julian_day'), getattr(FILE, 'host'),
-					getattr(FILE, 'path'), getattr(FILE, 'filetype'), getattr(FILE, 'source_host')) for FILE in FILEs))
+	out_vars = ('era', 'julian_day', 'host', 'path', 'filetype', 'source_host')
+	current = tuple((getattr(FILE, out_var) for out_var in out_vars) for FILE in FILEs)
 
 	count = {}
 	for entry in current:
