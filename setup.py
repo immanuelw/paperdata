@@ -5,6 +5,7 @@ setup_args = {
 	'author': 'Immanuel Washington',
 	'author_email': 'immwa at sas.upenn.edu',
 	'description': 'package for maintaining the PAPER project',
+	'url': 'https://github.com/immanuelw/paperdata',
 	'license': '?',
 	'package_dir' : {'paperdata': ''},
 	'packages' : ['paperdata', 'paperdata.data', 'paperdata.ganglia', 'paperdata.dev', 'paperdata.convert'],
