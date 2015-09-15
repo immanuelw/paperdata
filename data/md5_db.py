@@ -5,7 +5,7 @@
 import time
 import ddr_compress.dbi as ddbi
 import dbi as pdbi
-import add_files
+import file_data
 
 ### Script to load md5sums into paperdata database
 ### Loads md5sums
@@ -20,7 +20,7 @@ def md5_db():
 	FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
 	s.close()
 	for FILE in FILEs:
-		md5 = add_files.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
+		md5 = file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
 		timestamp = int(time.time())
 		data_dbi.set_entry(FILE, 'md5sum', md5)
 		data_dbi.set_entry(FILE, 'timestamp', timestamp)
@@ -46,7 +46,7 @@ def md5_distiller():
 		full_path = getattr(FILE, 'path')
 		path = os.path.dirname(full_path)
 		filename = os.path.basename(full_path)
-		md5 = add_files.calc_md5sum(getattr(FILE, 'host'), path, filename)
+		md5 = file_data.calc_md5sum(getattr(FILE, 'host'), path, filename)
 		setattr(FILE, 'md5sum', md5)
 		s = dbi.Session()
 		s.add(FILE)

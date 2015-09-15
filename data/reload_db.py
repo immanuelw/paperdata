@@ -2,10 +2,10 @@
 # -*- coding: utf-8 -*-
 # Create paperdata tables
 
-import dbi as pdbi
-import add_files
 import os
 import socket
+import dbi as pdbi
+import add_files
 
 ### Script to reload paperdata database
 ### Crawls all hosts for files

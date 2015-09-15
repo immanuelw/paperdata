@@ -12,8 +12,9 @@ import ddr_compress.dbi as ddbi
 from sqlalchemy import func
 import dbi as pdbi
 import add_files
-import uv_data
 import move_files
+import uv_data
+import file_data
 
 ### Script to load infromation quickly from paperdistiller database into paperdata
 ### Queries paperdistiller for relevant information, loads paperdata with complete info
@@ -54,7 +55,7 @@ def add_data():
 
 		host = getattr(FILE, 'host')
 		full_path = getattr(FILE, 'filename')
-		path, filename, filetype = add_files.file_names(full_path)
+		path, filename, filetype = file_data.file_names(full_path)
 
 		obsnum = getattr(OBS, 'obsnum')
 		julian_date = getattr(OBS, 'julian_date')
@@ -83,10 +84,10 @@ def add_data():
 
 		prev_obs, next_obs, edge = uv_data.obs_edge(obsnum, sess=sp)
 
-		filesize = add_files.calc_size(host, path, filename)
+		filesize = file_data.calc_size(host, path, filename)
 		md5 = getattr(FILE, 'md5sum')
 		if md5 is None:
-			md5 = add_files.calc_md5sum(host, path, filename)
+			md5 = file_data.calc_md5sum(host, path, filename)
 		tape_index = None
 
 		source_host = host
@@ -137,8 +138,8 @@ def add_data():
 
 		compr_filename = ''.join((filename, 'cRRE'))
 		compr_filetype = 'uvcRRE'
-		compr_filesize = add_files.calc_size(host, path, compr_filename)
-		compr_md5 = add_files.calc_md5sum(host, path, compr_filename)
+		compr_filesize = file_data.calc_size(host, path, compr_filename)
+		compr_md5 = file_data.calc_md5sum(host, path, compr_filename)
 		compr_write_to_tape = False
 		if os.path.isdir(os.path.join(path, compr_filename)):
 			compr_data = raw_data
@@ -152,8 +153,8 @@ def add_data():
 
 		npz_filename = ''.join((filename, 'cRE.npz'))
 		npz_filetype = 'npz'
-		npz_filesize = add_files.calc_size(host, path, npz_filename)
-		npz_md5 = add_files.calc_md5sum(host, path, npz_filename)
+		npz_filesize = file_data.calc_size(host, path, npz_filename)
+		npz_md5 = file_data.calc_md5sum(host, path, npz_filename)
 		npz_write_to_tape = False
 		if os.path.isfile(os.path.join(path, npz_filename)):
 			npz_data = raw_data
