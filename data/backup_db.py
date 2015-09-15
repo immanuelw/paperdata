@@ -7,14 +7,12 @@ from __future__ import print_function
 import sys
 import time
 import os
-import subprocess
+import json
+import dbi as pdbi
 import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
-import dbi as pdbi
-import json
-import time
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
