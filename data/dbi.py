@@ -6,10 +6,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool, QueuePool
 import os, sys, logging
-try:
-	import configparser
-except:
-	import ConfigParser as configparser
+import paperdata.configparser as configparser
 
 Base = declarative_base()
 logger = logging.getLogger('data')

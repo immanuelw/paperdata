@@ -1,5 +1,9 @@
 import os
 import paramiko
+try:
+	import configparser
+except:
+	import ConfigParser as configparser
 
 #SSH/SFTP Function
 #Need private key so don't need username/password
