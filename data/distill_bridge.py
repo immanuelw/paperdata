@@ -20,25 +20,6 @@ import move_files
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
-def calc_time_data(host):
-	ssh = pdbi.login_ssh(host)
-	time_data_script = os.path.expanduser('~/paperdata/dbi/scripts/time_data.py')
-	sftp = ssh.open_sftp()
-	moved_script = './time_data.py'
-	try:
-		filestat = sftp.stat(time_data_script)
-	except(IOError):
-		try:
-			filestat = sftp.stat(moved_script)
-		except(IOError):
-			sftp.put(time_data_script, moved_script)
-	sftp.close()
-	stdin, time_data, stderr = ssh.exec_command('python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path))
-	time_start, time_end, delta_time = [float(info) for info in time_data.read().split(',')]
-	ssh.close()
-
-	return time_start, time_end, delta_time
-
 def add_data():
 	dbi = ddbi.DataBaseInterface()
 	s = dbi.Session()
