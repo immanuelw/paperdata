@@ -3,13 +3,14 @@
 # Add files to paperdata
 
 from __future__ import print_function
+import os
 import sys
 import glob
-import socket
-import os
-import dbi as pdbi
 import time
+import socket
+import dbi as pdbi
 import uv_data
+import paperdata.convert as convert
 
 ### Script to add files to paperdata database
 ### Adds files using dbi
@@ -102,6 +103,11 @@ def get_uv_data(host, full_path, mode=None):
 		time_start, time_end, delta_time, length = [round(float(info), 5) for info in uv_dat.read().split(',')]
 		ssh.close()
 		return time_start, time_end, delta_time, length
+
+def get_lst(julian_date):
+	gmst = convert.juliandate_to_gmst(julian_date)
+	lst = convert.gmst_to_lst(gmst, longitude=25)
+	return lst
 
 def julian_era(julian_date):
 	#indicates julian day and set of data
@@ -202,6 +208,7 @@ def calc_obs_data(host, full_path):
 
 		s.close()
 
+	lst = round(get_lst(julian_date), 1)
 	era, julian_day = julian_era(julian_date)
 
 	#indicates type of file in era
@@ -223,6 +230,7 @@ def calc_obs_data(host, full_path):
 				'julian_date':julian_date,
 				'polarization':polarization,
 				'julian_day':julian_day,
+				'lst':lst,
 				'era':era,
 				'era_type':era_type,
 				'length':length,

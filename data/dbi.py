@@ -104,7 +104,7 @@ class Observation(Base):
 	julian_date = Column(Numeric(12,5))
 	polarization = Column(String(4))
 	julian_day = Column(Integer)
-	#lst = Column(Numeric(3,1))
+	lst = Column(Numeric(3,1))
 	era = Column(Integer)
 	era_type = Column(String(20))
 	length = Column(Numeric(6,5)) #length of observation in fraction of a day
@@ -122,7 +122,7 @@ class Observation(Base):
 						'julian_date':self.julian_date,
 						'polarization':self.polarization,
 						'julian_day':self.julian_day,
-	#					'lst':self.lst,
+						'lst':self.lst,
 						'era':self.era,
 						'era_type':self.era_type,
 						'length':self.length,
