@@ -7,91 +7,17 @@ import os
 import sys
 import glob
 import time
-import hashlib
 import socket
 import dbi as pdbi
-import uv_data
 import paperdata as ppdata
-import paperdata.convert as convert
+import uv_data
+import file_data
 
 ### Script to add files to paperdata database
 ### Adds files using dbi
 
 ### Author: Immanuel Washington
 ### Date: 5-06-15
-
-#Functions which simply find the file size
-def get_size(start_path):
-	total_size = 0
-	for dirpath, dirnames, filenames in os.walk(start_path):
-		for f in filenames:
-			fp = os.path.join(dirpath, f)
-			total_size += os.path.getsize(fp)
-	return total_size
-
-def sizeof_fmt(num):
-	#converts bytes to MB
-	for byte_size in ('KB', 'MB'):
-		num /= 1024.0
-	return round(num, 1)
-
-### other functions
-def calc_size(host, path, filename):
-	named_host = socket.gethostname()
-	full_path = os.path.join(path, filename)
-	#DEFAULT VALUE
-	size = 0
-	if named_host == host:
-		size = sizeof_fmt(get_size(full_path))
-	else:
-		ssh = ppdata.login_ssh(host)
-		sftp = ssh.open_sftp()
-		size_bytes = sftp.stat(full_path).st_size
-		size = sizeof_fmt(size_bytes)
-		sftp.close()
-		ssh.close()
-
-	return size
-
-def get_md5sum(fname):
-	"""
-	calculate the md5 checksum of a file whose filename entry is fname.
-	"""
-	fname = fname.split(':')[-1]
-	BLOCKSIZE = 65536
-	hasher = hashlib.md5()
-	try:
-		afile = open(fname, 'rb')
-	except(IOError):
-		fname = os.path.join(fname, 'visdata')
-		afile = open(fname, 'rb')
-	buf = afile.read(BLOCKSIZE)
-	while len(buf) >0:
-		hasher.update(buf)
-		buf = afile.read(BLOCKSIZE)
-	return hasher.hexdigest()
-
-def calc_md5sum(host, path, filename):
-	named_host = socket.gethostname()
-	full_path = os.path.join(path, filename)
-	#DEFAULT VALUE
-	md5 = None
-	if named_host == host:
-		md5 = get_md5sum(full_path)
-	else:
-		ssh = ppdata.login_ssh(host)
-		try:
-			sftp = ssh.open_sftp()
-			remote_path = sftp.file(full_path, mode='r')
-			md5 = remote_path.check('md5', block_size=65536)
-			sftp.close()
-		except(IOError):
-			vis_path = os.path.join(full_path, 'visdata')
-			stdin, md5_out, stderr = ssh.exec_command('md5sum {vis_path}'.format(vis_path=vis_path))
-			md5 = md5_out.read().split(' ')[0]
-		ssh.close()
-
-	return md5
 
 def get_uv_data(host, full_path, mode=None):
 	ssh = ppdata.login_ssh(host)
@@ -124,16 +50,10 @@ def get_uv_data(host, full_path, mode=None):
 		ssh.close()
 		return time_start, time_end, delta_time, length
 
-def file_names(full_path):
-	path = os.path.dirname(full_path)
-	filename = os.path.basename(full_path)
-	filetype = filename.split('.')[-1]
-	return path, filename, filetype
-
 def calc_obs_data(host, full_path):
 	#mostly file data
 	host = host
-	path, filename, filetype = file_names(full_path)
+	path, filename, filetype = file_data.file_names(full_path)
 
 	#Dictionary of polarizations
 	pol_dict = pdbi.str2pol
@@ -178,8 +98,8 @@ def calc_obs_data(host, full_path):
 
 	prev_obs, next_obs, edge = uv_data.obs_edge(obsnum)
 
-	filesize = calc_size(host, path, filename)
-	md5 = calc_md5sum(host, path, filename)
+	filesize = file_data.calc_size(host, path, filename)
+	md5 = file_data.calc_md5sum(host, path, filename)
 	tape_index = None
 
 	source_host = host
@@ -241,7 +161,7 @@ def dupe_check(input_host, input_paths):
 		
 	return unique_paths
 
-def set_obs(s, OBS, field):
+def set_obs(s, dbi, OBS, field):
 	if field == 'prev_obs':
 		edge_num = getattr(OBS, 'obsnum') - 1
 		edge_time = getattr(OBS, 'time_start') - getattr(OBS, 'delta_time')
@@ -270,8 +190,8 @@ def update_obsnums():
 	OBSs = s.query(table).all()
 
 	for OBS in OBSs:
-		PREV_OBS = set_obs(s, OBS, 'prev_obs')
-		NEXT_OBS = set_obs(s, OBS, 'next_obs')
+		PREV_OBS = set_obs(s, dbi, OBS, 'prev_obs')
+		NEXT_OBS = set_obs(s, dbi, OBS, 'next_obs')
 		#sets edge 
 		edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
 		dbi.set_entry(OBS, 'edge', edge)
