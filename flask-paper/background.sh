@@ -1,2 +1,2 @@
-cd papersite
+cd data
 python run_background.py

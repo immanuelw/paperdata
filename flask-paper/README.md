@@ -1,7 +1,7 @@
-flask-paper
+site
 ============
 
-A github repository for our papersite project--a web portal for the PAPER paperdata project. 
+A github repository for our data project--a web portal for the PAPER paperdata project. 
 
 ----
 + Immanuel Washington

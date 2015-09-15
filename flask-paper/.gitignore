@@ -109,10 +109,10 @@ sympy-plots-for-*.tex/
 *.xdy
 
 # prototype
-papersite/**/*~
-papersite/**/*.db
-papersite/flask/
-papersite/.vagrant/
-papersite/app/__pycache__/
-papersite/scripts/__pycache__/
+data/**/*~
+data/**/*.db
+data/flask/
+data/.vagrant/
+data/app/__pycache__/
+data/scripts/__pycache__/
 .DS_Store*
