@@ -3,11 +3,11 @@
 # Create paperdata tables
 
 from __future__ import print_function
-import dbi as pdbi
 import sys
 import json
-import data_db as pdb
 import glob
+import data_db as pdb
+import dbi as pdbi
 import sqlalchemy.exc
 
 ### Script to create paperdata database

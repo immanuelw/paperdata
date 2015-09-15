@@ -6,16 +6,15 @@ from __future__ import print_function
 import sys
 import time
 import subprocess
-import aipy as A
 import glob
 import socket
 import os
 import shutil
 import psutil
+import dbi as pdbi
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
-import dbi as pdbi
 
 ### Script to move files and update paperdata database
 ### Move files and update db using dbi

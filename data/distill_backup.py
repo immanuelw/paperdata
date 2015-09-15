@@ -6,9 +6,8 @@ from __future__ import print_function
 import sys
 import time
 import os
-import subprocess
-import ddr_compress.dbi as ddbi
 import json
+import ddr_compress.dbi as ddbi
 
 ### Script to Backup paperdata database
 ### Finds time and date and writes table into .csv file
