@@ -36,7 +36,7 @@ class DictFix(object):
 		try:
 			new_dict = {}
 			for column in self.__table__.columns:
-				new_dict[column.name] = str(getattr(self, column.name))
+				new_dict[column.name] = getattr(self, column.name)
 			return new_dict
 		except(exc.InvalidRequestError):
 			return None
