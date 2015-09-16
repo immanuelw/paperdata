@@ -5,7 +5,6 @@ import logging
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-from sqlalchemy.pool import StaticPool
 from sqlalchemy.ext.declarative import declarative_base
 try:
 	import configparser
@@ -43,7 +42,7 @@ class DictFix(object):
 			return None
 
 class DataBaseInterface(object):
-	def __init__(self, configfile='~/paperdata.cfg', test=False):
+	def __init__(self, configfile='~/paperdata.cfg'):
 		"""
 		Connect to the database and initiate a session creator.
 		 or
@@ -71,18 +70,12 @@ class DataBaseInterface(object):
 						self.dbinfo['password'] = self.dbinfo['password']
 			else:
 				logging.info(' '.join((configfile, 'Not Found')))
-		if test:
-			self.engine = create_engine('sqlite:///',
-										connect_args={'check_same_thread':False},
-										poolclass=StaticPool)
-			self.create_db()
-		else:
-			try:
-				connect_string = 'mysql://{username}:{password}@{hostip}:{port}/{dbname}'
-				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
-			except:
-				connect_string = 'mysql+mysqldb://{username}:{password}@{hostip}:{port}/{dbname}'
-				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
+		try:
+			connect_string = 'mysql://{username}:{password}@{hostip}:{port}/{dbname}'
+			self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
+		except:
+			connect_string = 'mysql+mysqldb://{username}:{password}@{hostip}:{port}/{dbname}'
+			self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
 
 		self.Session = sessionmaker(bind=self.engine)
 
