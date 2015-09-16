@@ -5,7 +5,7 @@ import prettytable
 import data_db as pdb
 
 def main():
-	filename = os.path.expanduser('~/paperdata/data/src/schema.txt')
+	filename = os.path.expanduser('~/paperdata/paper/data/src/schema.txt')
 	with open(filename, 'wb') as df:
 		print('Starting ..')
 	var_classes = pdb.all_classes

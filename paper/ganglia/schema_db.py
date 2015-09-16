@@ -5,7 +5,7 @@ import prettytable
 import ganglia_db as gdb
 
 def main():
-	filename = os.path.expanduser('~/paperdata/pyganglia_dbi/src/schema.txt')
+	filename = os.path.expanduser('~/paperdata/paper/data/src/schema.txt')
 	with open(filename, 'wb') as df:
 		print('Starting ..')
 	var_classes = gdb.all_classes
