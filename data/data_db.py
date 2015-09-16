@@ -7,19 +7,6 @@
 
 from __future__ import print_function
 
-NOSEARCH = 0
-SEARCH = 1
-
-MIN = 2
-MAX = 3
-EXACT = 4
-RANGE = 5
-LIST = 6
-NONE = 7
-
-options = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
-classes = ('File', 'Observation', 'Feed', 'Log', 'Rtp_File', 'Rtp_Observation', 'Rtp_Log')
-
 class File:
 	def __init__(self):
 		self.table = 'File'
@@ -186,9 +173,15 @@ class Rtp_Log:
 						'timestamp':('BIGINT', 'None', 'No', 'time action was taken')}
 
 #dictionary of instantiated classes
-instant_class = {'File':File(), 'Observation':Observation(), 'Feed':Feed(), 'Log':Log(),
-				'Rtp_File':Rtp_File(), 'Rtp_Observation':Rtp_Observation(), 'Rtp_Log':Rtp_Log()}
-all_classes = (File(), Observation(), Feed(), Log(), Rtp_File(), Rtp_Observation(), Rtp_Log())
+instant_class = {'File':File(),
+				'Observation':Observation(),
+				'Feed':Feed(),
+				'Log':Log(),
+				'Rtp_File':Rtp_File(),
+				'Rtp_Observation':Rtp_Observation(),
+				'Rtp_Log':Rtp_Log()}
+classes = instant_class.keys()
+all_classes = instant_class.values()
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':
