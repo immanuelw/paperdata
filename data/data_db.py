@@ -7,9 +7,9 @@
 
 from __future__ import print_function
 
-class File:
+class file:
 	def __init__(self):
-		self.table = 'File'
+		self.table = 'file'
 		self.db_list = ('host',
 						'path',
 						'filename',
@@ -38,9 +38,9 @@ class File:
 						'delete_file':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file needs to be deleted from its host'),
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was last updated')}
 
-class Observation:
+class observation:
 	def __init__(self):
-		self.table = 'Observation'
+		self.table = 'observation'
 		self.db_list = ('obsnum',
 						'julian_date',
 						'polarization',
@@ -73,9 +73,9 @@ class Observation:
 						'edge':('BOOLEAN', 'None', 'No', 'boolean value indicating if observation at beginning/end of night or not'),
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was last updated')}
 
-class Feed:
+class feed:
 	def __init__(self):
-		self.table = 'Feed'
+		self.table = 'feed'
 		self.db_list = ('host',
 						'path',
 						'filename',
@@ -95,9 +95,9 @@ class Feed:
 						'moved_to_distill':('BOOLEAN', 'None', 'No', 'boolean value indicated whether file has been moved to distill yet'),
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was last updated')}
 
-class Log:
+class log:
 	def __init__(self):
-		self.table = 'Log'
+		self.table = 'log'
 		self.db_list = ('action',
 						'table',
 						'identifier',
@@ -107,9 +107,9 @@ class Log:
 						'identifier':('VARCHAR(200)', 'None', 'No', 'primary key of item that was changed'),
 						'timestamp':('BIGINT', 'None', 'No', 'time action was taken')}
 
-class Rtp_File:
+class rtp_file:
 	def __init__(self):
-		self.table = 'Rtp_File'
+		self.table = 'rtp_file'
 		self.db_list = ('host',
 						'path',
 						'filename',
@@ -137,9 +137,9 @@ class Rtp_File:
 						'new_path':('VARCHAR(100)', 'None', 'No', 'new path of file of new host'),
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was last updated')}
 
-class Rtp_Observation:
+class rtp_observation:
 	def __init__(self):
-		self.table = 'Rtp_Observation'
+		self.table = 'rtp_observation'
 		self.db_list = ('obsnum',
 						'julian_date',
 						'polarization',
@@ -160,9 +160,9 @@ class Rtp_Observation:
 						'next_obs':('BIGINT', 'None', 'Unique', 'rtp_observation number of next rtp_observation'),
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was last updated')}
 
-class Rtp_Log:
+class rtp_log:
 	def __init__(self):
-		self.table = 'Rtp_Log'
+		self.table = 'rtp_log'
 		self.db_list = ('action',
 						'table',
 						'identifier',
@@ -173,13 +173,13 @@ class Rtp_Log:
 						'timestamp':('BIGINT', 'None', 'No', 'time action was taken')}
 
 #dictionary of instantiated classes
-instant_class = {'File':File(),
-				'Observation':Observation(),
-				'Feed':Feed(),
-				'Log':Log(),
-				'Rtp_File':Rtp_File(),
-				'Rtp_Observation':Rtp_Observation(),
-				'Rtp_Log':Rtp_Log()}
+instant_class = {'file':file(),
+				'observation':observation(),
+				'feed':feed(),
+				'log':log(),
+				'rtp_file':rtp_file(),
+				'rtp_observation':rtp_observation(),
+				'rtp_log':rtp_log()}
 classes = instant_class.keys()
 all_classes = instant_class.values()
 

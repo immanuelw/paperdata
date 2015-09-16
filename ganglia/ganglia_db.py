@@ -6,23 +6,6 @@
 ### Date: 05-17-15
 
 from __future__ import print_function
-import sys
-import os
-
-# Config variables
-
-NOSEARCH = 0
-SEARCH = 1
-
-MIN = 2
-MAX = 3
-EXACT = 4
-RANGE = 5
-LIST = 6
-NONE = 7
-
-options = {EXACT:'EXACT', MIN:'MIN', MAX:'MAX', RANGE:'RANGE', LIST:'LIST', NONE:'NONE'}
-classes = ('filesystem', 'monitor', 'ram', 'iostat', 'cpu')
 
 class filesystem:
 	def __init__(self):
@@ -138,8 +121,13 @@ class cpu:
 						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
 
 #dictionary of instantiated classes
-instant_class = {'filesystem':filesystem(), 'monitor':monitor(), 'ram':ram(), 'iostat':iostat(), 'cpu':cpu()}
-all_classes = (filesystem(), monitor(), ram(), iostat(), cpu())
+instant_class = {'filesystem':filesystem(),
+				'monitor':monitor(),
+				'ram':ram(),
+				'iostat':iostat(),
+				'cpu':cpu()}
+classes = instant_class.keys()
+all_classes = instant_class.values()
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':
