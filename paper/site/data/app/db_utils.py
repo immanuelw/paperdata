@@ -15,14 +15,14 @@ host = socket.gethostname()
 def get_dbi(database):
 	if database == 'paper':
 		module = pdbi
-		configfile = '/mnt/paper/paper.cfg'
+		configfile = '/mnt/paperdata/paperdata.cfg'
 		if host == 'seharu':
-			configfile = '~/paper/paper.cfg'
+			configfile = '~/paperdata/paperdata.cfg'
 	elif database == 'ganglia':
 		module = pyg
-		configfile = '/mnt/paper/ganglia.cfg'
+		configfile = '/mnt/paperdata/ganglia.cfg'
 		if host == 'seharu':
-			configfile = '~/paper/ganglia.cfg'
+			configfile = '~/paperdata/ganglia.cfg'
 	elif database == 'eorlive':
 		module = edbi
 		dbi = None

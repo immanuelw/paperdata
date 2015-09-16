@@ -1,2 +1,11 @@
-*.vagrant
+build
+dist
+output
+*pyc
+.*.swp
+.*.swo
+*.cfg
+*.ini
+eorlive
+*.egg-info
 ex.py
