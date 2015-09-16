@@ -347,8 +347,8 @@ def before_request():
 		paper_dbi = pdbi.DataBaseInterface()
 		pyg_dbi = pyg.DataBaseInterface()
 	except:
-		paper_dbi = pdbi.DataBaseInterface(configfile='/mnt/paper/paper.cfg')
-		pyg_dbi = pyg.DataBaseInterface(configfile='/mnt/paper/ganglia.cfg')
+		paper_dbi = pdbi.DataBaseInterface(configfile='/mnt/paperdata/paperdata.cfg')
+		pyg_dbi = pyg.DataBaseInterface(configfile='/mnt/paperdata/ganglia.cfg')
 	try :
 		g.paper_session = paper_dbi.Session()
 		g.pyg_session = pyg_dbi.Session()
