@@ -29,9 +29,9 @@ def login_ssh(host, username=None):
 	return ssh
 
 SQLA_Base = declarative_base()
-#class Base(SQLA_Base):
-#	def __init__(self):
-#		super(SQLA_Base, self).__init__()
+class Base(SQLA_Base):
+	def __init__(self):
+		super(SQLA_Base, self).__init__()
 
 #	def to_jsson(self):
 #	    new_dict = {}
