@@ -3,9 +3,9 @@ from datetime import datetime
 from requests_futures.sessions import FuturesSession
 from app.flask_app import db
 from app import models as edbi
-from paperdata.data import dbi as pdbi
-from paperdata.ganglia import dbi as pyg
-from paperdata.convert import gcal2jd
+from paper.data import dbi as pdbi
+from paper.ganglia import dbi as pyg
+from paper.convert import gcal2jd
 from sqlalchemy import or_
 from sqlalchemy.engine import reflection
 import socket
@@ -13,16 +13,16 @@ import socket
 host = socket.gethostname()
 
 def get_dbi(database):
-	if database == 'paperdata':
+	if database == 'paper':
 		module = pdbi
-		configfile = '/mnt/paperdata/paperdata.cfg'
+		configfile = '/mnt/paper/paper.cfg'
 		if host == 'seharu':
-			configfile = '~/paperdata/paperdata.cfg'
+			configfile = '~/paper/paper.cfg'
 	elif database == 'ganglia':
 		module = pyg
-		configfile = '/mnt/paperdata/ganglia.cfg'
+		configfile = '/mnt/paper/ganglia.cfg'
 		if host == 'seharu':
-			configfile = '~/paperdata/ganglia.cfg'
+			configfile = '~/paper/ganglia.cfg'
 	elif database == 'eorlive':
 		module = edbi
 		dbi = None

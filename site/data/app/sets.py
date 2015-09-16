@@ -48,7 +48,7 @@ def is_obs_flagged(obs_id, flagged_range_dicts):
 def get_data_hours_in_set(start, end, polarization, era_type, flagged_range_dicts):
 	total_data_hrs = flagged_data_hrs = 0
 
-	all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
+	all_obs_ids_tuples = db_utils.query(database='paper', table='observation',
 										field_tuples=(('time_start', '>=', start), ('time_end', '<=', end),
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),
@@ -152,7 +152,7 @@ def upload_set():
 		host = request.form['host']
 		filetype = request.form['filetype']
 
-		all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
+		all_obs_ids_tuples = db_utils.query(database='paper', table='observation',
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),
@@ -203,7 +203,7 @@ def download_set():
 		if arg_type == 'obs':
 			output_vars = ('obsnum', 'julian_date', 'polarization', 'era_type', 'length', 'time_start', 'time_end')
 
-			obs_objs = db_utils.query(database='paperdata', table='observation',
+			obs_objs = db_utils.query(database='paper', table='observation',
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),
@@ -212,7 +212,7 @@ def download_set():
 			info_dict = {getattr(obs_obj, 'obsnum'): {var: getattr(obs_obj, var) for var in output_vars} for obs_obj in obs_objs}
 
 		elif arg_type == 'file':
-			obs_objs = db_utils.query(database='paperdata', table='observation',
+			obs_objs = db_utils.query(database='paper', table='observation',
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),

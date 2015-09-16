@@ -29,7 +29,7 @@ def upgrade():
 	sa.Column('id', sa.Integer(), nullable=False),
 	sa.Column('created_on', sa.DateTime(), nullable=True),
 	sa.Column('hours_sadb', sa.Float(), nullable=True),
-	sa.Column('hours_paperdata', sa.Float(), nullable=True),
+	sa.Column('hours_paper', sa.Float(), nullable=True),
 	sa.Column('hours_with_data', sa.Float(), nullable=True),
 	sa.Column('data_transfer_rate', sa.Float(), nullable=True),
 	sa.PrimaryKeyConstraint('id')

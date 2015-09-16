@@ -12,7 +12,7 @@ def get_plot_bands(the_set):
 	return plot_bands
 
 def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
-	response = db_utils.query(database='paperdata', table='observation',
+	response = db_utils.query(database='paper', table='observation',
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if set_pol == 'all' else '==', set_pol),
 										('era_type', None if set_era_type == 'all' else '==', set_era_type)),
@@ -39,11 +39,11 @@ def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
 def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_host=None, set_filetype=None):
 	base_length = 0.00696
 	try:
-		rtp_obs_list = db_utils.query(database='paperdata', table='rtp_observation',
+		rtp_obs_list = db_utils.query(database='paper', table='rtp_observation',
 										field_tuples=(('julian_date', '>=', start_utc), ('julian_date', '<=', end_utc + base_length)),
 										output_vars=('obsnum', 'julian_date', 'polarization', 'length', 'files'))
 
-		paper_obs_list = db_utils.query(database='paperdata', table='observation',
+		paper_obs_list = db_utils.query(database='paper', table='observation',
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 										output_vars=('obsnum', 'julian_date', 'polarization', 'length', 'files'))
 
@@ -78,7 +78,7 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 
 def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 	try:
-		response = db_utils.query(database='paperdata', table='observation',
+		response = db_utils.query(database='paper', table='observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),),
 								output_vars=('julian_date', 'polarization', 'era_type', 'obsnum'))

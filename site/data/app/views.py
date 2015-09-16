@@ -4,8 +4,8 @@ from app.flask_app import app, db
 from app import models, db_utils, histogram_utils, data_sources
 from datetime import datetime
 import os
-from paperdata.data import dbi as pdbi
-from paperdata.ganglia import dbi as pyg
+from paper.data import dbi as pdbi
+from paper.ganglia import dbi as pyg
 import time
 import json
 
@@ -146,16 +146,16 @@ def data_amount():
 	except:
 		data = None
 
-	data_time = hours_sadb = hours_paperdata = hours_with_data = 'N/A'
+	data_time = hours_sadb = hours_paper = hours_with_data = 'N/A'
 
 	if data is not None:
 		data_time = getattr(data, 'created_on')
 		hours_sadb = getattr(data, 'hours_sadb')
-		hours_paperdata = getattr(data, 'hours_paperdata')
+		hours_paper = getattr(data, 'hours_paper')
 		hours_with_data = getattr(data, 'hours_with_data')
 
 	return render_template('data_amount_table.html', data_time=data_time,
-							hours_sadb=hours_sadb, hours_paperdata=hours_paperdata,	hours_with_data=hours_with_data)
+							hours_sadb=hours_sadb, hours_paper=hours_paper,	hours_with_data=hours_with_data)
 
 @app.route('/source_table', methods = ['GET'])
 def source_table():
@@ -163,13 +163,13 @@ def source_table():
 	output_vars = ('timestamp', 'julian_day')
 
 	try:	
-		corr_source = db_utils.query(database='paperdata', table='rtp_file', field_tuples=(('transferred', '==', None),),
+		corr_source = db_utils.query(database='paper', table='rtp_file', field_tuples=(('transferred', '==', None),),
 										sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
-		rtp_source = db_utils.query(database='paperdata', table='rtp_file',	field_tuples=(('transferred', '==', True),),
+		rtp_source = db_utils.query(database='paper', table='rtp_file',	field_tuples=(('transferred', '==', True),),
 									sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
-		paper_source = db_utils.query(database='paperdata', table='observation', sort_tuples=sort_tuples, output_vars=output_vars)[0]
+		paper_source = db_utils.query(database='paper', table='observation', sort_tuples=sort_tuples, output_vars=output_vars)[0]
 
 		source_tuples = (('Correlator', corr_source), ('RTP', rtp_source), ('Folio Scan', paper_source))
 	except:
@@ -238,7 +238,7 @@ def obs_table():
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 	try:
-		response = db_utils.query(database='paperdata', table='observation', 
+		response = db_utils.query(database='paper', table='observation', 
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),),
 								output_vars=output_vars)
@@ -260,7 +260,7 @@ def file_table():
 	output_vars=('host', 'full_path', 'obsnum', 'filesize')
 
 	try:
-		all_obs_list = db_utils.query(database='paperdata', table='observation', 
+		all_obs_list = db_utils.query(database='paper', table='observation', 
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 										sort_tuples=(('time_start', 'asc'),),
 										output_vars=('files',))
@@ -280,7 +280,7 @@ def rtp_summary_table():
 	file_vars = ('host', 'path', 'julian_day', 'transferred', 'new_host', 'new_path', 'timestamp')
 
 	try:
-		rtp_obs = db_utils.query(database='paperdata', table='rtp_observation', sort_tuples=(('julian_day', 'desc'),), output_vars=obs_vars)
+		rtp_obs = db_utils.query(database='paper', table='rtp_observation', sort_tuples=(('julian_day', 'desc'),), output_vars=obs_vars)
 		files_list = (getattr(obs, 'files') for obs in rtp_obs)
 		rtp_files = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
 		file_list = [{var: getattr(rtp_file, var) for var in file_vars} for rtp_file in rtp_files]
@@ -317,7 +317,7 @@ def rtp_summary_table():
 					'output_host', 'transfer_percent', 'activity', 'last_updated')
 	rtp_header = (('Date', 'Observation Date'), ('JD', 'Julian Day'), ('LST Range', 'Local Sidereal Time Range'),
 					('Count', 'File Count'), ('RTP status', 'Percent of Files transferred'),
-					('SA Location', 'Host and Path of files on SADB'), ('USA Location', 'Host and Path of files on paperdata'),
+					('SA Location', 'Host and Path of files on SADB'), ('USA Location', 'Host and Path of files on paper'),
 					('Output Host', 'Host raw files are backup up'), ('Last Activity', 'Last backend action taken'),
 					('Last Updated', 'Last time action was taken'))
 	summary_dict = {julian_day: {var: 0 for var in output_vars} for julian_day in julian_days}
@@ -347,8 +347,8 @@ def before_request():
 		paper_dbi = pdbi.DataBaseInterface()
 		pyg_dbi = pyg.DataBaseInterface()
 	except:
-		paper_dbi = pdbi.DataBaseInterface(configfile='/mnt/paperdata/paperdata.cfg')
-		pyg_dbi = pyg.DataBaseInterface(configfile='/mnt/paperdata/ganglia.cfg')
+		paper_dbi = pdbi.DataBaseInterface(configfile='/mnt/paper/paper.cfg')
+		pyg_dbi = pyg.DataBaseInterface(configfile='/mnt/paper/ganglia.cfg')
 	try :
 		g.paper_session = paper_dbi.Session()
 		g.pyg_session = pyg_dbi.Session()
@@ -408,12 +408,12 @@ def data_summary_table():
 	start_utc =  db_utils.get_jd_from_datetime(startdatetime)
 	end_utc =  db_utils.get_jd_from_datetime(enddatetime)
 
-	response = db_utils.query(database='paperdata', table='observation',
+	response = db_utils.query(database='paper', table='observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),),
 								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files'))
 	#try:
-	#	response = db_utils.query(database='paperdata', table='observation',
+	#	response = db_utils.query(database='paper', table='observation',
 	#								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 	#								sort_tuples=(('time_start', 'asc'),),
 	#								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files'))
