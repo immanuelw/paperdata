@@ -2,7 +2,7 @@ from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, 
 from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship, backref
 import os, sys, logging
-import paperdata as ppdata
+import paper as ppdata
 
 Base = ppdata.Base
 logger = logging.getLogger('data')
