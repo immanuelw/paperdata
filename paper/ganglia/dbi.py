@@ -14,7 +14,7 @@ logger = logging.getLogger('ganglia')
 #
 #############
 
-class Filesystem(Base):
+class Filesystem(Base, ppdata.DictFix):
 	__tablename__ = 'filesystem'
 	__table_args__ = (PrimaryKeyConstraint('host', 'system', 'timestamp', name='host_system_time'),)
 	host = Column(String(100)) #folio
@@ -25,17 +25,7 @@ class Filesystem(Base):
 	percent_space = Column(Numeric(4,1))
 	timestamp = Column(BigInteger) #seconds since 1970
 
-	def to_json(self):
-		self.data_dict = {'host':self.host,
-						'system':self.system,
-						'total_space':self.total_space,
-						'used_space':self.used_space,
-						'free_space':self.free_space,
-						'percent_space':self.percent_space,
-						'timestamp':self.timestamp}
-		return self.data_dict
-
-class Monitor(Base):
+class Monitor(Base, ppdata.DictFix):
 	__tablename__ = 'monitor'
 	host = Column(String(100))
 	path = Column(String(100))
@@ -48,20 +38,7 @@ class Monitor(Base):
 	time_end = Column(BigInteger)
 	timestamp = Column(BigInteger)
 
-	def to_json(self):
-		self.data_dict = {'host':self.host,
-						'path':self.path,
-						'filename':self.filename,
-						'full_path':self.full_path,
-						'status':self.status,
-						'full_stats':self.full_stats,
-						'del_time':self.del_time,
-						'time_start':self.time_start,
-						'time_end':self.time_end,
-						'timestamp':self.timestamp}
-		return self.data_dict
-
-class Ram(Base):
+class Ram(Base, ppdata.DictFix):
 	__tablename__ = 'ram'
 	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
@@ -78,23 +55,7 @@ class Ram(Base):
 	swap_free = Column(BigInteger)
 	timestamp = Column(BigInteger)
 
-	def to_json(self):
-		self.data_dict = {'host':self.host,
-						'total':self.total,
-						'used':self.used,
-						'free':self.free,
-						'shared':self.shared,
-						'buffers':self.buffers,
-						'cached':self.cached,
-						'bc_used':self.bc_used,
-						'bc_free':self.bc_free,
-						'swap_total':self.swap_total,
-						'swap_used':self.swap_used,
-						'swap_free':self.swap_free,
-						'timestamp':self.timestamp}
-		return self.data_dict
-
-class Iostat(Base):
+class Iostat(Base, ppdata.DictFix):
 	__tablename__ = 'iostat'
 	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
@@ -106,18 +67,7 @@ class Iostat(Base):
 	bl_writes = Column(BigInteger)
 	timestamp = Column(BigInteger)
 
-	def to_json(self):
-		self.data_dict = {'host':self.host,
-						'device':self.device,
-						'tps':self.tps,
-						'read_s':self.read_s,
-						'write_s':self.write_s,
-						'bl_reads':self.bl_reads,
-						'bl_writes':self.bl_writes,
-						'timestamp':self.timestamp}
-		return self.data_dict
-
-class Cpu(Base):
+class Cpu(Base, ppdata.DictFix):
 	__tablename__ = 'cpu'
 	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
@@ -128,17 +78,6 @@ class Cpu(Base):
 	idle_perc = Column(Numeric(5,2))
 	intr_s = Column(Integer)
 	timestamp = Column(BigInteger)
-
-	def to_json(self):
-		self.data_dict = {'host':self.host,
-						'cpu':self.cpu,
-						'user_perc':self.user_perc,
-						'sys_perc':self.sys_perc,
-						'iowait_perc':self.iowait_perc,
-						'idle_perc':self.idle_perc,
-						'intr_s':self.intr_s,
-						'timestamp':self.timestamp}
-		return self.data_dict
 
 class DataBaseInterface(ppdata.DataBaseInterface):
 	def __init__(self):

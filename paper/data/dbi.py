@@ -32,7 +32,7 @@ str2pol = {	'I' :  1,   # Stokes Paremeters
 #
 #############
 
-class Observation(Base):
+class Observation(Base, ppdata.DictFix):
 	__tablename__ = 'observation'
 	obsnum = Column(BigInteger, primary_key=True)
 	julian_date = Column(Numeric(12,5))
@@ -51,13 +51,7 @@ class Observation(Base):
 	edge = Column(Boolean)
 	timestamp = Column(BigInteger)
 
-	def to_jsson(self):
-	    new_dict = {}
-	    for column in self.__table__.columns:
-	        new_dict[column.name] = str(getattr(self, column.name))
-	    return new_dict
-
-class File(Base):
+class File(Base, ppdata.DictFix):
 	__tablename__ = 'file'
 	host = Column(String(100))
 	path = Column(String(100)) #directory
@@ -78,23 +72,7 @@ class File(Base):
 	#  files associated with this observation
 	observation = relationship(Observation, backref=backref('files', uselist=True))
 
-	def to_json(self):
-		self.file_data = {'host':self.host,
-						'path':self.path,
-						'filename':self.filename,
-						'filetype':self.filetype,
-						'full_path':self.full_path,
-						'obsnum':self.obsnum,
-						'filesize':self.filesize,
-						'md5sum':self.md5sum,
-						'tape_index':self.tape_index,
-						'source_host':self.source_host,
-						'write_to_tape':self.write_to_tape,
-						'delete_file':self.delete_file,
-						'timestamp':self.timestamp}
-		return self.file_data
-
-class Feed(Base):
+class Feed(Base, ppdata.DictFix):
 	__tablename__ = 'feed'
 	host = Column(String(100))
 	path = Column(String(100)) #directory
@@ -105,18 +83,7 @@ class Feed(Base):
 	moved_to_distill = Column(Boolean)
 	timestamp = Column(BigInteger)
 
-	def to_json(self):
-		self.feed_data = {'host':self.host,
-						'path':self.path,
-						'filename':self.filename,
-						'full_path':self.full_path,
-						'julian_day':self.julian_day,
-						'ready_to_move':self.ready_to_move,
-						'moved_to_distill':self.moved_to_distill,
-						'timestamp':self.timestamp}
-		return self.feed_data
-
-class Log(Base):
+class Log(Base, ppdata.DictFix):
 	__tablename__ = 'log'
 	#__table_args__ = (PrimaryKeyConstraint('action', 'identifier', 'timestamp', name='action_time'),)
 	action = Column(String(100), nullable=False)
@@ -125,15 +92,7 @@ class Log(Base):
 	action_time = Column(String(200), primary_key=True)
 	timestamp = Column(BigInteger)
 
-	def to_json(self):
-		self.log_data = {'action':self.action,
-						'table':self.table,
-						'identifier':self.identifier,
-						'action_time':self.action_time,
-						'timestamp':self.timestamp}
-		return log_data
-
-#def Rtp_File(Base):
+#def Rtp_File(Base, ppdata.DictFix):
 #	__tablename__ = 'rtp_file'
 #	host = Column(String(100), nullable=False)
 #	path = Column(String(100), nullable=False) #directory
@@ -150,23 +109,7 @@ class Log(Base):
 #	timestamp = Column(BigInteger)
 #	observation = relationship(Rtp_Observation, backref=backref('files', uselist=True))
 
-#	def to_json(self):
-#		self.rtp_file_data = {'host':self.host,
-#							'path':self.path,
-#							'filename':self.filename,
-#							'filetype':self.filetype,
-#							'full_path':self.full_path,
-#							'obsnum':self.obsnum,
-#							'filesize':self.filesize,
-#							'md5sum':self.md5sum,
-#							'transferred':self.transferred,
-#							'julian_day':self.julian_day,
-#							'new_host':self.new_host,
-#							'new_path':self.new_path,
-#							'timestamp':self.timestamp}
-#		return self.rtp_data
-
-#class Rtp_Observation(Base):
+#class Rtp_Observation(Base, ppdata.DictFix):
 #	__tablename__ = 'rtp_observation'
 #	obsnum = Column(BigInteger, primary_key=True)
 #	julian_date = Column(Numeric(12,5))
@@ -178,37 +121,17 @@ class Log(Base):
 #	next_obs = Column(BigInteger, unique=True)
 #	timestamp = Column(BigInteger)
 
-#	def to_json(self):
-#		self.rtp_obs_data = {'obsnum':self.obsnum,
-#							'julian_date':self.julian_date,
-#							'polarization':self.polarization,
-#							'julian_day':self.julian_day,
-#							'era':self.era,
-#							'length':self.length,
-#							'prev_obs':self.prev_obs, 
-#							'next_obs':self.next_obs,
-#							'timestamp':self.timestamp}
-#		return self.rtp_obs_data
-
-#class Rtp_Log(Base):
+#class Rtp_Log(Base, ppdata.DictFix):
 #	__tablename__ = 'rtp_log'
 #	__table_args__ = (PrimaryKeyConstraint('action', 'identifier', 'timestamp', name='action_time'),)
 #	action = Column(String(100), nullable=False)
 #	table = Column(String(100))
 #	identifier = Column(String(200)) #the primary key that is used in other tables of the object being acted on
 #	timestamp = Column(BigInteger)
-#
-#	def to_json(self):
-#		self.rtp_log_data = {'action':self.action,
-#							'table':self.table,
-#							'identifier':self.identifier,
-#							'timestamp':self.timestamp}
-#		return rtp_log_data
-
 
 class DataBaseInterface(ppdata.DataBaseInterface):
 	def __init__(self):
-		super(DataBaseInterface, self).__init__(configfile='~/paper.cfg', test=False)
+		super(DataBaseInterface, self).__init__(configfile='~/paperdata.cfg', test=False)
 
 	def create_db(self):
 		"""

@@ -1,6 +1,7 @@
 import os
 import sys
 import paramiko
+import logging
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -28,19 +29,21 @@ def login_ssh(host, username=None):
 
 	return ssh
 
-SQLA_Base = declarative_base()
-class Base(SQLA_Base):
-	def __init__(self):
-		super(SQLA_Base, self).__init__()
+logger = logging.getLogger('paper')
+Base = declarative_base()
 
-#	def to_jsson(self):
-#	    new_dict = {}
-#	    for column in self.__table__.columns:
-#	        new_dict[column.name] = str(getattr(self, column.name))
-#	    return new_dict
+class DictFix(object):
+	def to_json(self):
+		try:
+			new_dict = {}
+			for column in self.__table__.columns:
+				new_dict[column.name] = str(getattr(self, column.name))
+			return new_dict
+		except(exc.InvalidRequestError):
+			return None
 
 class DataBaseInterface(object):
-	def __init__(self, configfile='~/paper.cfg', test=False):
+	def __init__(self, configfile='~/paperdata.cfg', test=False):
 		"""
 		Connect to the database and initiate a session creator.
 		 or
