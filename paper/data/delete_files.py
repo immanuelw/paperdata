@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Add files to paperdata
+# Add files to paper
 
 from __future__ import print_function
 import sys
@@ -11,9 +11,9 @@ import socket
 import os
 import shutil
 import dbi as pdbi
-import paperdata as ppdata
+import paper as ppdata
 
-### Script to move files and update paperdata database
+### Script to move files and update paper database
 ### Move files and update db using dbi
 
 ### Author: Immanuel Washington

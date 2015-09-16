@@ -10,7 +10,7 @@ import glob
 import socket
 import aipy as A
 import dbi as pdbi
-import paperdata as ppdata
+import paper as ppdata
 
 ### Script to load data from anywhere into paperfeed database
 ### Crawls folio or elsewhere and reads through .uv files to generate all field information

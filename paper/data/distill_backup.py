@@ -9,7 +9,7 @@ import os
 import json
 import ddr_compress.dbi as ddbi
 
-### Script to Backup paperdata database
+### Script to Backup paper database
 ### Finds time and date and writes table into .csv file
 
 ### Author: Immanuel Washington

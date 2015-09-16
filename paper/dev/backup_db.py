@@ -16,7 +16,7 @@ import dbi as dev
 import json
 import time
 
-### Script to Backup paperdata database
+### Script to Backup paper database
 ### Finds time and date and writes table into .csv file
 
 ### Author: Immanuel Washington
@@ -37,7 +37,7 @@ def json_data(dbo, dump_objects):
 
 def paperbackup(timestamp):
 
-	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(timestamp))
+	backup_dir = os.path.join('/data4/paper/paper_backup', str(timestamp))
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 
@@ -89,12 +89,12 @@ def email_backup(backup_file):
 	server.starttls()
 
 	#Next, log in to the server
-	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+	server.login('paperfeed.paper@gmail.com', 'papercomesfrom1tree')
 
 	msg = MIMEMultipart()
 	msg['Subject'] = 'PAPERDATA TABLE BACKUP'
-	msg['From'] = 'paperfeed.paperdata@gmail.com'
-	msg['To'] = 'paperfeed.paperdata@gmail.com'
+	msg['From'] = 'paperfeed.paper@gmail.com'
+	msg['To'] = 'paperfeed.paper@gmail.com'
 
 	part = MIMEBase('application', 'octet-stream')
 	part.set_payload(open(backup_file, 'rb').read())
@@ -103,7 +103,7 @@ def email_backup(backup_file):
 	msg.attach(part)
 
 	#Send the mail
-	server.sendmail('paperfeed.paperdata@gmail.com', 'paperfeed.paperdata@gmail.com', msg.as_string())
+	server.sendmail('paperfeed.paper@gmail.com', 'paperfeed.paper@gmail.com', msg.as_string())
 
 	server.quit()
 
@@ -113,5 +113,5 @@ if __name__ == '__main__':
 	timestamp = int(time.time())
 
 	paperbackup(timestamp)
-	#backup_file = '/data4/paper/paperdata_backup/{timestamp}/paperdata_backup.psv'.format(timestamp=timestamp)
+	#backup_file = '/data4/paper/paper_backup/{timestamp}/paper_backup.psv'.format(timestamp=timestamp)
 	#email_backup(backup_file)

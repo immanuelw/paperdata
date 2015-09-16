@@ -5,7 +5,7 @@ import dbi as dev
 from sqlalchemy import func
 from sqlalchemy.sql import label
 
-#script to show state of paperdata
+#script to show state of paper
 
 def main():
 	dbi = dev.DataBaseInterface()

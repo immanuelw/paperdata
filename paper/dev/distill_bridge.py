@@ -15,14 +15,14 @@ import add_files
 import uv_data
 import move_files
 
-### Script to load infromation quickly from paperdistiller database into paperdata
-### Queries paperdistiller for relevant information, loads paperdata with complete info
+### Script to load infromation quickly from paperdistiller database into paper
+### Queries paperdistiller for relevant information, loads paper with complete info
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 def calc_time_data(host):
 	ssh = dev.login_ssh(host)
-	time_data_script = os.path.expanduser('~/paperdata/dbi/scripts/time_data.py')
+	time_data_script = os.path.expanduser('~/paper/dbi/scripts/time_data.py')
 	sftp = ssh.open_sftp()
 	moved_script = './time_data.py'
 	try:

@@ -1,12 +1,12 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Add files to paperdata
+# Add files to paper
 
 from __future__ import print_function
 import sys
 import os
 import dbi as pdbi
-import paperdata.convert as convert
+import paper.convert as convert
 import aipy as A
 
 ### Script to calculate uv data on any/other hosts

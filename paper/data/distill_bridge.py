@@ -16,8 +16,8 @@ import move_files
 import uv_data
 import file_data
 
-### Script to load infromation quickly from paperdistiller database into paperdata
-### Queries paperdistiller for relevant information, loads paperdata with complete info
+### Script to load infromation quickly from paperdistiller database into paper
+### Queries paperdistiller for relevant information, loads paper with complete info
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14

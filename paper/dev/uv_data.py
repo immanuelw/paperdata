@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Add files to paperdata
+# Add files to paper
 
 from __future__ import print_function
 import sys

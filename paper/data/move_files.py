@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Add files to paperdata
+# Add files to paper
 
 from __future__ import print_function
 import sys
@@ -12,12 +12,12 @@ import os
 import shutil
 import psutil
 import dbi as pdbi
-import paperdata as ppdata
+import paper as ppdata
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
 
-### Script to move files and update paperdata database
+### Script to move files and update paper database
 ### Move files and update db using dbi
 
 ### Author: Immanuel Washington
@@ -37,16 +37,16 @@ def email_space(table):
 	server.starttls()
 
 	#Next, log in to the server
-	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+	server.login('paperfeed.paper@gmail.com', 'papercomesfrom1tree')
 
 	#Send the mail
-	header = 'From: PAPERBridge <paperfeed.paperdata@gmail.com>\nSubject: NOT ENOUGH SPACE ON FOLIO\n'
+	header = 'From: PAPERBridge <paperfeed.paper@gmail.com>\nSubject: NOT ENOUGH SPACE ON FOLIO\n'
 	msgs = ''.join((header, '\nNot enough space for ', table, ' on folio'))
 
-	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
-	server.sendmail('paperfeed.paperdata@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paper@gmail.com', 'immwa@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paper@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paper@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+	server.sendmail('paperfeed.paper@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
 
 	server.quit()
 

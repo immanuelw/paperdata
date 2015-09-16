@@ -3,7 +3,7 @@ from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
 import os, sys, logging
-import paperdata as ppdata
+import paper as ppdata
 
 Base = declarative_base()
 logger = logging.getLogger('ganglia')

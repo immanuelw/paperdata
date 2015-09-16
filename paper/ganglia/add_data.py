@@ -7,7 +7,7 @@ import os
 import psutil
 import time
 import dbi as pyg
-import paperdata as ppdata
+import paper as ppdata
 
 ### Script to add info to pyganglia database
 ### Adds information using dbi

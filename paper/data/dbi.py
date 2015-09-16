@@ -208,7 +208,7 @@ class Log(Base):
 
 class DataBaseInterface(ppdata.DataBaseInterface):
 	def __init__(self):
-		super(DataBaseInterface, self).__init__(configfile='~/paperdata.cfg', test=False)
+		super(DataBaseInterface, self).__init__(configfile='~/paper.cfg', test=False)
 
 	def create_db(self):
 		"""

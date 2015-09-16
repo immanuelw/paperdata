@@ -40,7 +40,7 @@ SQLA_Base = declarative_base()
 #	    return new_dict
 
 class DataBaseInterface(object):
-	def __init__(self, configfile='~/paperdata.cfg', test=False):
+	def __init__(self, configfile='~/paper.cfg', test=False):
 		"""
 		Connect to the database and initiate a session creator.
 		 or

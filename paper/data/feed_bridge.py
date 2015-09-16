@@ -12,7 +12,7 @@ import subprocess
 import smtplib
 import move_files
 import dbi as pdbi
-import paperdata as ppdata
+import paper as ppdata
 from sqlalchemy import func
 from sqlalchemy.sql import label
 from email.MIMEMultipart import MIMEMultipart
@@ -94,18 +94,18 @@ def email_paperfeed(files):
 	server.starttls()
 
 	#Next, log in to the server
-	server.login('paperfeed.paperdata@gmail.com', 'papercomesfrom1tree')
+	server.login('paperfeed.paper@gmail.com', 'papercomesfrom1tree')
 
-	header = 'From: PAPERFeed <paperfeed.paperdata@gmail.com>\nSubject: FILES ARE BEING MOVED\n'
+	header = 'From: PAPERFeed <paperfeed.paper@gmail.com>\nSubject: FILES ARE BEING MOVED\n'
 	msgs = header
 	#Send the mail
 	for filename in files:
 		msgs = ''.join(msgs, '\n', filename, ' is being moved.\n')
 
-	server.sendmail('paperfeed.paperdata@gmail.com', 'immwa@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paperdata@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paperdata@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
-	server.sendmail('paperfeed.paperdata@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paper@gmail.com', 'immwa@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paper@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
+	server.sendmail('paperfeed.paper@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
+	server.sendmail('paperfeed.paper@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
 
 	server.quit()
 

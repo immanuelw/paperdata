@@ -1,14 +1,14 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Add files to paperdata
+# Add files to paper
 
 from __future__ import print_function
 import os
 import hashlib
 import socket
-import paperdata as ppdata
+import paper as ppdata
 
-### Module to add files to paperdata database
+### Module to add files to paper database
 ### Adds files using dbi
 
 ### Author: Immanuel Washington

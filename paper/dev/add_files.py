@@ -1,6 +1,6 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
-# Add files to paperdata
+# Add files to paper
 
 from __future__ import print_function
 import sys
@@ -12,7 +12,7 @@ import dbi as dev
 import time
 import uv_data
 
-### Script to add files to paperdata database
+### Script to add files to paper database
 ### Adds files using dbi
 
 ### Author: Immanuel Washington
@@ -74,7 +74,7 @@ def calc_md5sum(host, path, filename):
 
 def get_uv_data(host, full_path, mode=None):
 	ssh = dev.login_ssh(host)
-	uv_data_script = os.path.expanduser('~/paperdata/dbi/scripts/uv_data.py')
+	uv_data_script = os.path.expanduser('~/paper/dbi/scripts/uv_data.py')
 	sftp = ssh.open_sftp()
 	moved_script = './uv_data.py'
 	try:
