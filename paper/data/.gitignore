@@ -5,3 +5,4 @@ output
 .*.swo
 *.cfg
 *.sh
+*__pycache__*
