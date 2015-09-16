@@ -5,6 +5,7 @@ from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
 from sqlalchemy.pool import StaticPool
+from sqlalchemy.ext.declarative import declarative_base
 try:
 	import configparser
 except:
@@ -26,6 +27,17 @@ def login_ssh(host, username=None):
 			return None
 
 	return ssh
+
+SQLA_Base = declarative_base()
+#class Base(SQLA_Base):
+#	def __init__(self):
+#		super(SQLA_Base, self).__init__()
+
+#	def to_jsson(self):
+#	    new_dict = {}
+#	    for column in self.__table__.columns:
+#	        new_dict[column.name] = str(getattr(self, column.name))
+#	    return new_dict
 
 class DataBaseInterface(object):
 	def __init__(self, configfile='~/paperdata.cfg', test=False):

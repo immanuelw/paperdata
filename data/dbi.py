@@ -1,11 +1,10 @@
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
 from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship, backref
-from sqlalchemy.ext.declarative import declarative_base
 import os, sys, logging
 import paperdata as ppdata
 
-Base = declarative_base()
+Base = ppdata.Base
 logger = logging.getLogger('data')
 
 #########
@@ -52,23 +51,11 @@ class Observation(Base):
 	edge = Column(Boolean)
 	timestamp = Column(BigInteger)
 
-	def to_json(self):
-		self.obs_data = {'obsnum':self.obsnum,
-						'julian_date':self.julian_date,
-						'polarization':self.polarization,
-						'julian_day':self.julian_day,
-						'lst':self.lst,
-						'era':self.era,
-						'era_type':self.era_type,
-						'length':self.length,
-						'time_start':self.time_start,
-						'time_end':self.time_end,
-						'delta_time':self.delta_time,
-						'prev_obs':self.prev_obs, 
-						'next_obs':self.next_obs,
-						'edge':self.edge,
-						'timestamp':self.timestamp}
-		return self.obs_data
+	def to_jsson(self):
+	    new_dict = {}
+	    for column in self.__table__.columns:
+	        new_dict[column.name] = str(getattr(self, column.name))
+	    return new_dict
 
 class File(Base):
 	__tablename__ = 'file'

@@ -8,3 +8,4 @@ output
 *.ini
 eorlive
 *.egg-info
+ex.py
