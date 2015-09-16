@@ -16,7 +16,6 @@ setup_args = {
 							'SQLAlchemy>=1.0.8', 'Werkzeug>=0.10.4', 'wheel>=0.24.0', 'paramiko', 'prettytable'],
 	'version': __version__,
 }
-print(setup_args['packages'])
 
 if __name__ == '__main__':
 	try:
