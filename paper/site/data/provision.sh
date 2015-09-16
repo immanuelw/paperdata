@@ -19,13 +19,13 @@ source flask/bin/activate
 pip install flask requests Flask-SQLAlchemy Flask-Migrate Flask-Login requests-futures psycopg2 mysqlclient
 
 cd /mnt/paper/
-python3.4 setup.py install
+python setup.py install
 
 cd /mnt/paper/site/data
 
 sudo -u postgres createuser vagrant
 
-python3.4 -m app.manage db upgrade
+python -m app.manage db upgrade
 
 chmod +x run_app.py
 ./run_app.py
