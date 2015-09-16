@@ -80,8 +80,8 @@ class Cpu(Base, ppdata.DictFix):
 	timestamp = Column(BigInteger)
 
 class DataBaseInterface(ppdata.DataBaseInterface):
-	def __init__(self):
-		super(DataBaseInterface, self).__init__(configfile='~/ganglia.cfg', test=False)
+	def __init__(self, configfile='~/ganglia.cfg', test=False):
+		super(DataBaseInterface, self).__init__(configfile=configfile, test=test)
 
 	def create_db(self):
 		"""

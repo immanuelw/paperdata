@@ -130,8 +130,8 @@ class Log(Base, ppdata.DictFix):
 #	timestamp = Column(BigInteger)
 
 class DataBaseInterface(ppdata.DataBaseInterface):
-	def __init__(self):
-		super(DataBaseInterface, self).__init__(configfile='~/paperdata.cfg', test=False)
+	def __init__(self, configfile='~/paperdata.cfg', test=False):
+		super(DataBaseInterface, self).__init__(configfile=configfile, test=test)
 
 	def create_db(self):
 		"""
