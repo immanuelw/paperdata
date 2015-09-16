@@ -1,12 +1,9 @@
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
 from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
-from sqlalchemy.orm import relationship, backref, sessionmaker
-from sqlalchemy import exc
+from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import create_engine
-from sqlalchemy.pool import StaticPool, QueuePool
 import os, sys, logging
-import paperdata.configparser as configparser
+import paperdata as ppdata
 
 Base = declarative_base()
 logger = logging.getLogger('ganglia')
@@ -143,49 +140,9 @@ class Cpu(Base):
 						'timestamp':self.timestamp}
 		return self.data_dict
 
-class DataBaseInterface(object):
-	def __init__(self,configfile='~/ganglia.cfg',test=False):
-		"""
-		Connect to the database and initiate a session creator.
-		 or
-		create a FALSE database
-
-		db.cfg is the default setup. Config files live in ddr_compress/configs
-		To use a config file, copy the desired file ~/.paperstill/db.cfg
-		"""
-		if not configfile is None:
-			config = configparser.ConfigParser()
-			configfile = os.path.expanduser(configfile)
-			if os.path.exists(configfile):
-				logger.info(' '.join(('loading file', configfile)))
-				config.read(configfile)
-				try:
-					self.dbinfo = config['dbinfo']
-				except:
-					self.dbinfo = config._sections['dbinfo']
-				try:
-					self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
-				except:
-					try:
-						self.dbinfo['password'] = bytes(self.dbinfo['password'], 'ascii').decode('unicode_escape')
-					except:
-						self.dbinfo['password'] = self.dbinfo['password']
-			else:
-				logging.info(' '.join((configfile, 'Not Found')))
-		if test:
-			self.engine = create_engine('sqlite:///',
-										connect_args={'check_same_thread':False},
-										poolclass=StaticPool)
-			self.create_db()
-		else:
-			try:
-				connect_string = 'mysql://{username}:{password}@{hostip}:{port}/{dbname}'
-				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
-			except:
-				connect_string = 'mysql+mysqldb://{username}:{password}@{hostip}:{port}/{dbname}'
-				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
-
-		self.Session = sessionmaker(bind=self.engine)
+class DataBaseInterface(ppdata.DataBaseInterface):
+	def __init__(self):
+		super(DataBaseInterface, self).__init__(configfile='~/ganglia.cfg', test=False)
 
 	def create_db(self):
 		"""
@@ -212,45 +169,6 @@ class DataBaseInterface(object):
 		"""
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
-
-	def get_entry(self, TABLE, unique_value):
-		"""
-		retrieves any object.
-		Errors if there are more than one of the same object in the db. This is bad and should
-		never happen
-
-		todo:test
-		"""
-		s = self.Session()
-		table = getattr(sys.modules[__name__], TABLE.title())
-		try:
-			ENTRY = s.query(table).get(unique_value)
-		except:
-			return None
-		s.close()
-		return ENTRY
-
-	def set_entry(self, ENTRY, field, new_value):
-		"""
-		sets the value of any entry
-		input: ENTRY object, field to be changed, new value
-		"""
-		setattr(ENTRY, field, new_value)
-		yay = self.update_entry(ENTRY)
-		return yay
-
-	def add_entry(self, ENTRY):
-		s = self.Session()
-		try:
-			s.add(ENTRY)
-			s.commit()
-		except (exc.IntegrityError):
-			s.rollback()
-			s.close()
-			print('Duplicate entry found ... skipping entry')
-			return None
-		s.close()
-		return None
 
 	def add_to_table(self, TABLE, entry_dict):
 		"""

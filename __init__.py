@@ -1,5 +1,10 @@
 import os
+import sys
 import paramiko
+from sqlalchemy import exc
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
+from sqlalchemy.pool import StaticPool
 try:
 	import configparser
 except:
@@ -21,3 +26,103 @@ def login_ssh(host, username=None):
 			return None
 
 	return ssh
+
+class DataBaseInterface(object):
+	def __init__(self, configfile='~/paperdata.cfg', test=False):
+		"""
+		Connect to the database and initiate a session creator.
+		 or
+		create a FALSE database
+
+		db.cfg is the default setup. Config files live in ddr_compress/configs
+		To use a config file, copy the desired file ~/.paperstill/db.cfg
+		"""
+		if not configfile is None:
+			config = configparser.ConfigParser()
+			configfile = os.path.expanduser(configfile)
+			if os.path.exists(configfile):
+				logger.info(' '.join(('loading file', configfile)))
+				config.read(configfile)
+				try:
+					self.dbinfo = config._sections['dbinfo']
+				except:
+					self.dbinfo = config['dbinfo']
+				try:
+					self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
+				except:
+					try:
+						self.dbinfo['password'] = bytes(self.dbinfo['password'], 'ascii').decode('unicode_escape')
+					except:
+						self.dbinfo['password'] = self.dbinfo['password']
+			else:
+				logging.info(' '.join((configfile, 'Not Found')))
+		if test:
+			self.engine = create_engine('sqlite:///',
+										connect_args={'check_same_thread':False},
+										poolclass=StaticPool)
+			self.create_db()
+		else:
+			try:
+				connect_string = 'mysql://{username}:{password}@{hostip}:{port}/{dbname}'
+				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
+			except:
+				connect_string = 'mysql+mysqldb://{username}:{password}@{hostip}:{port}/{dbname}'
+				self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20,	max_overflow=40)
+
+		self.Session = sessionmaker(bind=self.engine)
+
+	def create_table(Table):
+		"""
+		creates a table in the database.
+		"""
+		Table.__table__.create(bind=self.engine)
+
+	def get_entry(self, TABLE, unique_value):
+		"""
+		retrieves any object.
+		Errors if there are more than one of the same object in the db. This is bad and should
+		never happen
+
+		todo:test
+		"""
+		s = self.Session()
+		table = getattr(sys.modules[__name__], TABLE.title())
+		try:
+			ENTRY = s.query(table).get(unique_value)
+		except:
+			return None
+		s.close()
+		return ENTRY
+
+	def update_entry(self, ENTRY):
+		"""
+		updates any object field
+		***NEED TO TEST
+		"""
+		s = self.Session()
+		s.add(ENTRY)
+		s.commit()
+		s.close()
+		return True
+
+	def set_entry(self, ENTRY, field, new_value):
+		"""
+		sets the value of any entry
+		input: ENTRY object, field to be changed, new value
+		"""
+		setattr(ENTRY, field, new_value)
+		yay = self.update_entry(ENTRY)
+		return yay
+
+	def add_entry(self, ENTRY):
+		s = self.Session()
+		try:
+			s.add(ENTRY)
+			s.commit()
+		except (exc.IntegrityError):
+			s.rollback()
+			s.close()
+			print('Duplicate entry found ... skipping entry')
+			return None
+		s.close()
+		return None
