@@ -55,7 +55,7 @@ def julian_era(julian_date):
 	else:
 		era = 128
 
-	julian_day = int(str(julian_date)[3:7])
+	julian_day = int(julian_date)
 
 	return era, julian_day
 

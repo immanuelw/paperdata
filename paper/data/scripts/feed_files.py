@@ -39,7 +39,7 @@ def gen_feed_data(host, full_path):
 
 	#indicates julian date
 	julian_date = round(uv['time'], 5)
-	julian_day = int(str(julian_date)[3:7])
+	julian_day = int(julian_date)
 
 	ready_to_move = False
 	moved_to_distill = False
