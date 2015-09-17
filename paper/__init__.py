@@ -116,13 +116,19 @@ class DataBaseInterface(object):
 			s.close()
 		return ENTRY
 
-	def set_entry(self, ENTRY, field, new_value):
+	def set_entry(self, s=None, ENTRY, field, new_value):
 		'''
 		sets the value of any entry
 		input: ENTRY object, field to be changed, new value
 		'''
+		open_sess = False
+		if s is None:
+			s = self.Session()
+			open_sess = True
 		setattr(ENTRY, field, new_value)
-		yay = self.add_entry(ENTRY)
+		yay = self.add_entry(s, ENTRY)
+		if open_sess:
+			s.close()
 		return yay
 
 	def add_entry(self, s=None, ENTRY):
