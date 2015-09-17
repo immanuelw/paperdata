@@ -123,6 +123,8 @@ def rsync_copy(source, destination):
 def move_files(input_host, input_paths, output_host, output_dir):
 	'''
 	move files
+
+	input: file host, list of file paths, output host, output directory
 	'''
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))

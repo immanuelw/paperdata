@@ -26,6 +26,11 @@ from email import Encoders
 ### Date: 11-23-14
 
 def set_feed(source, output_host, output_dir, moved_to_distill=True):
+	'''
+	updates table for feed file
+
+	input: source file, output host, output directory, moved to distill or not boolean value
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	FEED = dbi.get_entry(s, 'feed', source)
@@ -36,6 +41,11 @@ def set_feed(source, output_host, output_dir, moved_to_distill=True):
 	return None
 
 def move_feed_files(input_host, input_paths, output_host, output_dir):
+	'''
+	moves files and adds to feed directory and table
+
+	input: file host, list of file paths, output host, output directory
+	'''
 	#different from move_files, adds to feed
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))
@@ -58,6 +68,9 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 	return None
 
 def count_days():
+	'''
+	checks amount of days in feed table and sets to move if reach requirement
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	table = getattr(pdbi, 'Feed')
@@ -75,6 +88,11 @@ def count_days():
 	return None
 
 def find_data():
+	'''
+	finds data to move from feed table
+
+	output: list of file paths to move, file host, list of filenames to be moved
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	table = getattr(pdbi, 'Feed')
@@ -91,6 +109,11 @@ def find_data():
 	return feed_paths, feed_host, feed_filenames
 
 def email_paperfeed(files):
+	'''
+	emails people that files are being moved to feed
+
+	input: list of files being moved
+	'''
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
 	server.starttls()

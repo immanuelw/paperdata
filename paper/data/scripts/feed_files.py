@@ -20,6 +20,12 @@ from paper.data import dbi as pdbi
 ### Date: 05-18-14
 
 def gen_feed_data(host, full_path):
+	'''
+	generates data for feed table
+
+	input: system host, full path of uv* file
+	output: dict of feed table fields, log dict
+	'''
 	#mostly file data
 	host = host
 	path = os.path.dirname(full_path)
@@ -60,7 +66,12 @@ def gen_feed_data(host, full_path):
 	return feed_data, log_data
 
 def dupe_check(input_host, input_paths):
-	#checks for files already in feed table
+	'''
+	checks for files already in feed table
+
+	input: file host, list of file paths
+	output: list of files not in feed table
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	table = getattr(pdbi, 'Feed')
