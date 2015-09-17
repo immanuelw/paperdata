@@ -103,6 +103,7 @@ class DataBaseInterface(object):
 		input: session object(optional), table name, primary key value of row
 		output: table object
 		'''
+		open_sess = False
 		if s is None:
 			s = self.Session()
 			open_sess = True
@@ -131,6 +132,7 @@ class DataBaseInterface(object):
 
 		input: session object(optional), table object
 		'''
+		open_sess = False
 		if s is None:
 			s = self.Session()
 			open_sess = True

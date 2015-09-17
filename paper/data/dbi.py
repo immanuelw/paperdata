@@ -131,12 +131,17 @@ class Log(Base, ppdata.DictFix):
 
 class DataBaseInterface(ppdata.DataBaseInterface):
 	def __init__(self, configfile='~/paperdata.cfg'):
+		'''
+		Unique Interface for the paperdata database
+
+		input: paperdata database configuration file
+		'''
 		super(DataBaseInterface, self).__init__(configfile=configfile)
 
 	def create_db(self):
-		"""
+		'''
 		creates the tables in the database.
-		"""
+		'''
 		Base.metadata.bind = self.engine
 		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
 										after INSERT or UPDATE on file \
@@ -146,16 +151,19 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Base.metadata.create_all()
 
 	def drop_db(self):
-		"""
+		'''
 		drops the tables in the database.
-		"""
+		'''
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
-	def add_to_table(self, TABLE, entry_dict):
-		"""
+	def add_to_table(self, s=None, TABLE, entry_dict):
+		'''
 		create a new entry.
-		"""
+
+		input: session object(optional), tablename, dict of attributes for object
+		'''
+		open_sess = False
 		table = getattr(sys.modules[__name__], TABLE.title())
 		if TABLE in ('observation', 'feed', 'log', 'rtp_file', 'rtp_observation', 'rtp_log'):
 			ENTRY = table(**entry_dict)
@@ -164,9 +172,12 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 			obs_table = getattr(sys.modules[__name__], 'Observation')
 			ENTRY = table(**entry_dict)
 			#get the observation corresponding to this file
-			s = self.Session()
+			if s is None:
+				s = self.Session()
+				open_sess = True
 			OBS = s.query(obs_table).get(entry_dict['obsnum'])
 			setattr(ENTRY, 'observation', OBS)  #associate the file with an observation
+		self.add_entry(s, ENTRY)
+		if open_sess:
 			s.close()
-		self.add_entry(ENTRY)
 		return None

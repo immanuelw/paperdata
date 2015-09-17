@@ -114,12 +114,20 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
-	def add_to_table(self, TABLE, entry_dict):
+	def add_to_table(self, s=None, TABLE, entry_dict):
 		'''
 		create a new entry.
+
+		input: session object(optional), tablename, dict of attributes for object
 		'''
+		open_sess = False
+		if s is None:
+			s = self.Session()
+			open_sess = True
 		table = getattr(sys.modules[__name__], TABLE.title())
 		if TABLE in ('filesystem', 'monitor', 'ram', 'iostat', 'cpu'):
 			ENTRY = table(**entry_dict)
-		self.add_entry(ENTRY)
+		self.add_entry(s, ENTRY)
+		if open_sess:
+			s.close()
 		return None
