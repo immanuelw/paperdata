@@ -47,7 +47,7 @@ def paperbackup(timestamp):
 
 	input: time script was run
 	'''
-	backup_dir = os.path.join('/data4/paper/paper_backup', str(timestamp))
+	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(timestamp))
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 

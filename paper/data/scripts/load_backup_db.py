@@ -58,11 +58,11 @@ if __name__ == '__main__':
 		backup_list.sort(reverse=True)
 		backup_dir = backup_list[0]
 		timestamp = int(backup_dir.split('/')[-1])
-		backup_obs = '/data4/paper/paper_backup/{timestamp}/obs_{timestamp}.json'.format(timestamp=timestamp)
-		backup_file = '/data4/paper/paper_backup/{timestamp}/file_{timestamp}.json'.format(timestamp=timestamp)
-		backup_feed = '/data4/paper/paper_backup/{timestamp}/feed_{timestamp}.json'.format(timestamp=timestamp)
-		backup_log = '/data4/paper/paper_backup/{timestamp}/log_{timestamp}.json'.format(timestamp=timestamp)
-		#backup_rtp_file = '/data4/paper/paper_backup/{timestamp}/rtp_file_{timestamp}.json'.format(timestamp=timestamp)
+		backup_obs = '/data4/paper/paperdata_backup/{timestamp}/obs_{timestamp}.json'.format(timestamp=timestamp)
+		backup_file = '/data4/paper/paperdata_backup/{timestamp}/file_{timestamp}.json'.format(timestamp=timestamp)
+		backup_feed = '/data4/paper/paperdata_backup/{timestamp}/feed_{timestamp}.json'.format(timestamp=timestamp)
+		backup_log = '/data4/paper/paperdata_backup/{timestamp}/log_{timestamp}.json'.format(timestamp=timestamp)
+		#backup_rtp_file = '/data4/paper/paperdata_backup/{timestamp}/rtp_file_{timestamp}.json'.format(timestamp=timestamp)
 		
 	
 	#load_backup(backup_obs, table='observation')
