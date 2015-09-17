@@ -94,7 +94,7 @@ class DataBaseInterface(object):
 		'''
 		Table.__table__.create(bind=self.engine)
 
-	def get_entry(self, s=None, TABLE, unique_value):
+	def get_entry(self, s=None, TABLE=None, unique_value=None):
 		'''
 		retrieves any object.
 		Errors if there are more than one of the same object in the db. This is bad and should
@@ -116,7 +116,7 @@ class DataBaseInterface(object):
 			s.close()
 		return ENTRY
 
-	def set_entry(self, s=None, ENTRY, field, new_value):
+	def set_entry(self, s=None, ENTRY=None, field=None, new_value=None):
 		'''
 		sets the value of any entry
 		input: ENTRY object, field to be changed, new value
@@ -131,7 +131,7 @@ class DataBaseInterface(object):
 			s.close()
 		return yay
 
-	def add_entry(self, s=None, ENTRY):
+	def add_entry(self, s=None, ENTRY=None):
 		'''
 		adds entry to database and commits
 		does not add if duplicate found

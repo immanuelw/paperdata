@@ -114,7 +114,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
-	def add_to_table(self, s=None, TABLE, entry_dict):
+	def add_to_table(self, s=None, TABLE=None, entry_dict=None):
 		'''
 		create a new entry.
 
