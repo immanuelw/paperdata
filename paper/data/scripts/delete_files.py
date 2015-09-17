@@ -20,6 +20,12 @@ from paper.data import dbi as pdbi
 ### Date: 5-06-15
 
 def delete_check(input_host):
+	'''
+	checks for which files can be deleted
+
+	input: host of system
+	output: list of uv* file paths of files to be deleted
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	table = getattr(pdbi, 'File')
@@ -31,7 +37,11 @@ def delete_check(input_host):
 	return full_paths
 
 def set_delete_table(input_host, source, output_host, output_dir):
-	#change in database
+	'''
+	updates table for deleted file
+
+	input: user host, source file, output host, output directory
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	action = 'delete'
@@ -53,10 +63,20 @@ def set_delete_table(input_host, source, output_host, output_dir):
 	return None
 
 def rsync_copy(source, destination):
+	'''
+	uses rsync to copy files and make sure they have not changed
+
+	input: source file path, destination path
+	'''
 	subprocess.check_output(['rsync', '-ac', source, destination])
 	return None
 
 def delete_files(input_host, input_paths, output_host, output_dir):
+	'''
+	delete files
+
+	input: file host, list of file paths, output host, output directory
+	'''
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
