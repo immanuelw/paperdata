@@ -187,6 +187,10 @@ def bridge_move(input_host, movable_paths, raw_host, raw_dir, compr_host, compr_
 	return None
 
 def paperbridge():
+	'''
+	bridges paperdistiller and paperdata
+	moves files and pulls relevant data to add to paperdata from paperdistiller
+	'''
 	#Calculate amount of space needed to move a day ~1.1TB
 	required_space = 1112661213184
 	space_path = '/data4/paper/raw_to_tape/'

@@ -137,6 +137,10 @@ def email_paperfeed(files):
 	return None
 
 def feed_bridge():
+	'''
+	bridges feed and paperdistiller
+	moves files and pulls relevant data to add to paperdistiller from feed
+	'''
 	#Minimum amount of space to move a day ~3.1TiB
 	required_space = 1112373311360
 	output_dir = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED

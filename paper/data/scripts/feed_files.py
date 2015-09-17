@@ -86,6 +86,11 @@ def dupe_check(input_host, input_paths):
 	return unique_paths
 
 def add_feeds_to_db(input_host, input_paths):
+	'''
+	adds feed file data to table
+
+	input: file host, list of file paths
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	for source in input_paths:
