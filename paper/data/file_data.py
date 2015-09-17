@@ -14,8 +14,13 @@ import paper as ppdata
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-#Functions which simply find the file size
 def get_size(start_path):
+	'''
+	output byte size of directory or file
+
+	input: path of directory or file
+	output: amount of bytes
+	'''
 	total_size = 0
 	for dirpath, dirnames, filenames in os.walk(start_path):
 		for f in filenames:
@@ -24,17 +29,26 @@ def get_size(start_path):
 	return total_size
 
 def sizeof_fmt(num):
-	#converts bytes to MB
+	'''
+	converts bytes to MB
+
+	input: amount of bytes
+	output: amount of MB to 1 decimal place
+	'''
 	for byte_size in ('KB', 'MB'):
 		num /= 1024.0
 	return round(num, 1)
 
-### other functions
 def calc_size(host, path, filename):
+	'''
+	calculates size of directory or file on any host
+	logins into host if necessary
+
+	input: host, path, and unique name of directory or file
+	output: size of directory or file in MB
+	'''
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
-	#DEFAULT VALUE
-	size = 0
 	if named_host == host:
 		size = sizeof_fmt(get_size(full_path))
 	else:
@@ -48,9 +62,12 @@ def calc_size(host, path, filename):
 	return size
 
 def get_md5sum(fname):
-	"""
+	'''
 	calculate the md5 checksum of a file whose filename entry is fname.
-	"""
+
+	input: path of directory or file
+	output: 32-bit hex integer md5 checksum
+	'''
 	fname = fname.split(':')[-1]
 	BLOCKSIZE = 65536
 	hasher = hashlib.md5()
@@ -66,10 +83,15 @@ def get_md5sum(fname):
 	return hasher.hexdigest()
 
 def calc_md5sum(host, path, filename):
+	'''
+	calculates md5 checksum of directory or file on any host
+	logins into host if necessary
+
+	input: host, path, and unique name of directory or file
+	output: md5 checksum
+	'''
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
-	#DEFAULT VALUE
-	md5 = None
 	if named_host == host:
 		md5 = get_md5sum(full_path)
 	else:
@@ -88,6 +110,12 @@ def calc_md5sum(host, path, filename):
 	return md5
 
 def file_names(full_path):
+	'''
+	separates full path of directory or file into parts
+
+	input: full path of directory or file
+	output: partial path, directory/file name, extension/filetype
+	'''
 	path = os.path.dirname(full_path)
 	filename = os.path.basename(full_path)
 	filetype = filename.split('.')[-1]
