@@ -17,10 +17,19 @@ import ddr_compress.dbi as ddbi
 
 import decimal
 def decimal_default(obj):
+	'''
+	fixes decimal issue with json module
+	'''
 	if isinstance(obj, decimal.Decimal):
 		return float(obj)
 
 def to_dict(ser_data):
+	'''
+	creates a dict of database object's attributes
+
+	input: database object
+	output: dictionary of object's attributes
+	'''
 	json_dict = ser_data.__dict__
 	try:
 		del json_dict['_sa_instance_state']
@@ -30,6 +39,11 @@ def to_dict(ser_data):
 	return json_dict
 
 def json_data(dbo, dump_objects):
+	'''
+	dumps list of objects into a json file
+
+	input: filename, list of database objects
+	'''
 	data = []
 	with open(dbo, 'w') as f:
 		for ser_data in dump_objects.all():
@@ -38,7 +52,11 @@ def json_data(dbo, dump_objects):
 	return None
 
 def paperbackup(timestamp):
+	'''
+	backups database by loading into json files, named by timestamp
 
+	input: time script was run
+	'''
 	backup_dir = os.path.join('/data4/paper/paperdistiller_backup', str(timestamp))
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
