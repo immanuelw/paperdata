@@ -22,10 +22,18 @@ from email import Encoders
 
 import decimal
 def decimal_default(obj):
+	'''
+	fixes decimal issue with json module
+	'''
 	if isinstance(obj, decimal.Decimal):
 		return float(obj)
 
 def json_data(dbo, dump_objects):
+	'''
+	dumps list of objects into a json file
+
+	input: filename, list of database objects
+	'''
 	data = []
 	with open(dbo, 'w') as f:
 		for ser_data in dump_objects.all():
@@ -34,7 +42,11 @@ def json_data(dbo, dump_objects):
 	return None
 
 def paperbackup(timestamp):
+	'''
+	backups database by loading into json files, named by timestamp
 
+	input: time script was run
+	'''
 	backup_dir = os.path.join('/data4/paper/paper_backup', str(timestamp))
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
@@ -82,6 +94,11 @@ def paperbackup(timestamp):
 	return None
 
 def email_backup(backup_file):
+	'''
+	emails backup file(s) to gmail address
+
+	input: name of backup file
+	'''
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
 	server.starttls()
