@@ -18,6 +18,14 @@ from paper.data import dbi as pdbi, uv_data, file_data
 ### Date: 5-06-15
 
 def get_uv_data(host, full_path, mode=None):
+	'''
+	pulls relevant observation data from uv* file
+	pulls from remote systems if necessary
+
+	input: host of system, full path of uv* file, mode to indicate how much info to output
+	output(mode='time'):  time start, time end, delta time, julian date, polarization, length, and obsnum of uv* file
+	output: time start, time end, delta time, length of uv* file
+	'''
 	ssh = ppdata.login_ssh(host)
 	uv_data_script = os.path.expanduser('~/paper/data/uv_data.py')
 	sftp = ssh.open_sftp()
@@ -49,11 +57,15 @@ def get_uv_data(host, full_path, mode=None):
 		return time_start, time_end, delta_time, length
 
 def calc_obs_data(host, full_path):
-	#mostly file data
+	'''
+	generates all relevant data from uv* file
+
+	input: host of system, full path of uv* file
+	output: observation value dict, file value dict, and a log dict
+	'''
 	host = host
 	path, filename, filetype = file_data.file_names(full_path)
 
-	#Dictionary of polarizations
 	pol_dict = pdbi.str2pol
 
 	#allows uv access
@@ -146,6 +158,12 @@ def calc_obs_data(host, full_path):
 	return obs_data, file_data, log_data
 
 def dupe_check(input_host, input_paths):
+	'''
+	checks for duplicate paths and removes to not waste time if possible
+
+	input: host of uv* files, list of paths for uv* files
+	output: list of paths that are not already in database
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	#all files on same host
@@ -160,6 +178,12 @@ def dupe_check(input_host, input_paths):
 	return unique_paths
 
 def set_obs(s, dbi, OBS, field):
+	'''
+	finds edge observation for each observation by finding previous and next
+
+	input: session object, dbi, observation object, field to update
+	output: edge observation object
+	'''
 	if field == 'prev_obs':
 		edge_num = getattr(OBS, 'obsnum') - 1
 		edge_time = getattr(OBS, 'time_start') - getattr(OBS, 'delta_time')
@@ -182,6 +206,9 @@ def set_obs(s, dbi, OBS, field):
 	return EDGE_OBS
 
 def update_obsnums():
+	'''
+	updates edge attribute of all obsnums
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	table = getattr(pdbi, 'Observation')
@@ -198,6 +225,11 @@ def update_obsnums():
 	return None
 
 def add_files(input_host, input_paths):
+	'''
+	adds files to the database
+
+	input: host of files, list of uv* file paths
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	for input_path in input_paths:
