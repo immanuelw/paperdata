@@ -7,14 +7,11 @@ import os
 import time
 import socket
 from collections import Counter
+from sqlalchemy import func
 import aipy as A
 import ddr_compress.dbi as ddbi
-from sqlalchemy import func
-import dbi as pdbi
-import add_files
-import move_files
-import uv_data
-import file_data
+from paper.data import dbi as pdbi, uv_data, file_data
+import add_files, move_files
 
 ### Script to load infromation quickly from paperdistiller database into paper
 ### Queries paperdistiller for relevant information, loads paper with complete info

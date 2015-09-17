@@ -6,8 +6,7 @@ from __future__ import print_function
 import sys
 import json
 import glob
-import data_db as pdb
-import dbi as pdbi
+from paper.data import dbi as pdbi, data_db as pdb
 import sqlalchemy.exc
 
 ### Script to create paper database

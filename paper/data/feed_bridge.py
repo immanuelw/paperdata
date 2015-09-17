@@ -10,9 +10,9 @@ import shutil
 import socket
 import subprocess
 import smtplib
-import move_files
-import dbi as pdbi
 import paper as ppdata
+from paper.data import dbi as pdbi
+import move_files
 from sqlalchemy import func
 from sqlalchemy.sql import label
 from email.MIMEMultipart import MIMEMultipart

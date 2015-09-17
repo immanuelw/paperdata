@@ -5,7 +5,7 @@
 from __future__ import print_function
 import sys
 import os
-import dbi as pdbi
+from paper.data import dbi as pdbi
 import paper.convert as convert
 import aipy as A
 

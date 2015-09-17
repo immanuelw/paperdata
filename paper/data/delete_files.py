@@ -10,8 +10,8 @@ import glob
 import socket
 import os
 import shutil
-import dbi as pdbi
 import paper as ppdata
+from paper.data import dbi as pdbi
 
 ### Script to move files and update paper database
 ### Move files and update db using dbi

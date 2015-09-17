@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 import os
 import prettytable
-import dbi as pdbi
+from paper.data import dbi as pdbi
 
 #script to show state of paper
 

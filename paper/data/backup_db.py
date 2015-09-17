@@ -8,7 +8,7 @@ import sys
 import time
 import os
 import json
-import dbi as pdbi
+from paper.data import dbi as pdbi
 import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase

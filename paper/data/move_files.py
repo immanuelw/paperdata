@@ -11,8 +11,8 @@ import socket
 import os
 import shutil
 import psutil
-import dbi as pdbi
 import paper as ppdata
+from paper.data import dbi as pdbi
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders

@@ -8,10 +8,8 @@ import sys
 import glob
 import time
 import socket
-import dbi as pdbi
 import paper as ppdata
-import uv_data
-import file_data
+from paper.data import dbi as pdbi, uv_data, file_data
 
 ### Script to add files to paper database
 ### Adds files using dbi

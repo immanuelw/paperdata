@@ -2,7 +2,7 @@ from __future__ import print_function
 import sys
 import os
 import prettytable
-import data_db as pdb
+from paper.data import data_db as pdb
 
 def main():
 	filename = os.path.expanduser('~/paper/paper/data/src/schema.txt')

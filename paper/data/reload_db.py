@@ -4,7 +4,7 @@
 
 import os
 import socket
-import dbi as pdbi
+from paper.data import dbi as pdbi
 import add_files
 
 ### Script to reload paper database
