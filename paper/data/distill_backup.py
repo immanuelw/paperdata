@@ -20,7 +20,7 @@ def decimal_default(obj):
 	if isinstance(obj, decimal.Decimal):
 		return float(obj)
 
-def to_json(ser_data):
+def to_dict(ser_data):
 	json_dict = ser_data.__dict__
 	try:
 		del json_dict['_sa_instance_state']
@@ -33,7 +33,7 @@ def json_data(dbo, dump_objects):
 	data = []
 	with open(dbo, 'w') as f:
 		for ser_data in dump_objects.all():
-			data.append(to_json(ser_data))
+			data.append(to_dict(ser_data))
 		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
 	return None
 

@@ -32,7 +32,7 @@ logger = logging.getLogger('paper')
 Base = declarative_base()
 
 class DictFix(object):
-	def to_json(self):
+	def to_dict(self):
 		try:
 			new_dict = {}
 			for column in self.__table__.columns:
