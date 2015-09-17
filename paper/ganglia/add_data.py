@@ -16,9 +16,21 @@ import paper as ppdata
 ### Date: 5-06-15
 
 def two_round(num):
+	'''
+	rounds value to two decimal places
+
+	input: int/float/string of number
+	output: sigfig2 float
+	'''
 	return round(float(num), 2)
 
 def filesystem(ssh, host, path):
+	'''
+	generates table information for filesystem table
+
+	input: ssh object, host of filesystem, path to search
+	output: table information
+	'''
 	timestamp = int(time.time())
 	system_data = {}
 	system_data['host'] = host
@@ -48,6 +60,12 @@ def filesystem(ssh, host, path):
 	return system_data
 
 def iostat(ssh, host):
+	'''
+	generates table information for iostat table
+
+	input: ssh object, host of system
+	output: table information
+	'''
 	timestamp = int(time.time())
 	iostat_data = {}
 	if ssh is None:
@@ -101,6 +119,12 @@ def iostat(ssh, host):
 	return iostat_data
 
 def ram_free(ssh, host):
+	'''
+	generates table information for ram table
+
+	input: ssh object, host of system
+	output: table information
+	'''
 	#Calculates ram usage on folio
 	timestamp = int(time.time())
 	ram_data = {}
@@ -161,6 +185,12 @@ def ram_free(ssh, host):
 	return ram_data
 
 def cpu_perc(ssh, host):
+	'''
+	generates table information for cpu table
+
+	input: ssh object, host of system
+	output: table information
+	'''
 	#Calculates cpu usage on folio
 	timestamp = int(time.time())
 	cpu_data = {}
@@ -214,6 +244,11 @@ def cpu_perc(ssh, host):
 	return cpu_data
 
 def add_data(ssh, host):
+	'''
+	generates table information for all tables
+
+	input: ssh object, host of system
+	'''
 	ssh = ppdata.login_ssh(host)
 	dbi = pyg.DataBaseInterface()
 

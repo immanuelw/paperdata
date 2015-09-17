@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 import os, sys, logging
 import paper as ppdata
 
-Base = declarative_base()
+Base = ppdata.Base
 logger = logging.getLogger('ganglia')
 
 #############
@@ -81,12 +81,17 @@ class Cpu(Base, ppdata.DictFix):
 
 class DataBaseInterface(ppdata.DataBaseInterface):
 	def __init__(self, configfile='~/ganglia.cfg'):
+		'''
+		Unique Interface for the ganglia database
+
+		input: ganglia database configuration file
+		'''
 		super(DataBaseInterface, self).__init__(configfile=configfile)
 
 	def create_db(self):
-		"""
+		'''
 		creates the tables in the database.
-		"""
+		'''
 		Base.metadata.bind = self.engine
 		table_name = getattr(sys.modules[__name__], 'Monitor')
 		table = getattr(table_name, '__table__')
@@ -103,16 +108,16 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Base.metadata.create_all()
 
 	def drop_db(self):
-		"""
+		'''
 		drops the tables in the database.
-		"""
+		'''
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
 	def add_to_table(self, TABLE, entry_dict):
-		"""
+		'''
 		create a new entry.
-		"""
+		'''
 		table = getattr(sys.modules[__name__], TABLE.title())
 		if TABLE in ('filesystem', 'monitor', 'ram', 'iostat', 'cpu'):
 			ENTRY = table(**entry_dict)
