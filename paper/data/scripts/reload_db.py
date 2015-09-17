@@ -14,6 +14,12 @@ import add_files
 ### Date: 5-06-15
 
 def find_paths(input_host):
+	'''
+	finds all uv* files on a host
+
+	input: system host of files
+	output: list of uv* files, list of .npz files
+	'''
 	named_host = socket.gethostname()
 	input_paths = []
 	npz_paths = []
