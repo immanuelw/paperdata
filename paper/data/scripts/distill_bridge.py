@@ -19,6 +19,11 @@ import add_files, move_files
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 def add_data():
+	'''
+	transfer data from paperdistiller database to create data for paperdata tables
+
+	output: dict of movable paths for each filetype
+	'''
 	dbi = ddbi.DataBaseInterface()
 	s = dbi.Session()
 	#do stuff
@@ -166,6 +171,11 @@ def add_data():
 	return movable_paths
 
 def bridge_move(input_host, movable_paths, raw_host, raw_dir, compr_host, compr_dir, npz_host, npz_dir):
+	'''
+	move files to new directories
+
+	input: system host, dict of lists of files to be moved, host and directory location for raw, compressed, and flag files
+	'''
 	raw_paths = movable_paths['uv']
 	compr_paths = movable_paths['uvcRRE']
 	npz_paths = movable_paths['npz']
