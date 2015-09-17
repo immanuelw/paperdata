@@ -16,6 +16,11 @@ import sqlalchemy.exc
 ### Date: 5-06-15
 
 def load_backup(backup, table=None):
+	'''
+	loads backups from json into database
+
+	input: name of backup file, table name
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	with open(backup, 'r') as backup_db:
