@@ -24,6 +24,12 @@ from email import Encoders
 ### Date: 5-06-15
 
 def enough_space(required_space, space_path):
+	'''
+	checks path for enough space
+
+	input: amount of space needed in bytes, path to check for spacce
+	output: boolean value if there is enough space
+	'''
 	free_space = psutil.disk_usage(space_path).free
 
 	if required_space < free_space:
@@ -32,6 +38,11 @@ def enough_space(required_space, space_path):
 	return False
 
 def email_space(table):
+	'''
+	emails people if there is not enough space on folio
+
+	input: table name
+	'''
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
 	server.starttls()
@@ -53,6 +64,12 @@ def email_space(table):
 	return None
 
 def null_check(input_host, input_paths):
+	'''
+	checks if file(s) is(are) in database
+
+	input: host of files, list of uv* file paths
+	output: boolean value if there are any files not in database -- True if there are None
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	table = getattr(pdbi, 'File')
@@ -70,7 +87,11 @@ def null_check(input_host, input_paths):
 	return True
 
 def set_move_table(input_host, source, output_host, output_dir):
-	#change in database
+	'''
+	updates table for moved file
+
+	input: user host, source file, output host, output directory
+	'''
 	dbi = pdbi.DataBaseInterface()
 	s = dbi.Session()
 	action = 'move'
@@ -91,10 +112,18 @@ def set_move_table(input_host, source, output_host, output_dir):
 	return None
 
 def rsync_copy(source, destination):
+	'''
+	uses rsync to copy files and make sure they have not changed
+
+	input: source file path, destination path
+	'''
 	subprocess.check_output(['rsync', '-ac', source, destination])
 	return None
 
 def move_files(input_host, input_paths, output_host, output_dir):
+	'''
+	move files
+	'''
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
