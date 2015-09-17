@@ -3,7 +3,7 @@ from __future__ import print_function
 import ddr_compress.dbi as ddbi
 from sqlalchemy import func
 import curses,time,os
-import dbi as pyg
+from paper.ganglia import dbi as pyg
 
 #setup my output file
 file_log = []

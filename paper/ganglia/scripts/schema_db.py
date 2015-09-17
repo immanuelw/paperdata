@@ -2,7 +2,7 @@ from __future__ import print_function
 import sys
 import os
 import prettytable
-import ganglia_db as gdb
+from paper.ganglia import ganglia_db as gdb
 
 def main():
 	filename = os.path.expanduser('~/paper/paper/data/src/schema.txt')

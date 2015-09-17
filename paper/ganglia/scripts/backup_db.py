@@ -13,7 +13,7 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
-import dbi as pyg
+from paper.ganglia import dbi as pyg
 
 ### Script to Backup pyganglia database
 ### Finds time and date and writes table into .csv file
