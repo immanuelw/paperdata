@@ -72,20 +72,22 @@ def null_check(input_host, input_paths):
 def set_move_table(input_host, source, output_host, output_dir):
 	#change in database
 	dbi = pdbi.DataBaseInterface()
+	s = dbi.Session()
 	action = 'move'
 	table = 'file'
 	full_path = ''.join((input_host, ':', source))
 	timestamp = int(time.time())
-	FILE = dbi.get_entry('file', full_path)
-	dbi.set_entry(FILE, 'host', output_host)
-	dbi.set_entry(FILE, 'path', output_dir)
-	dbi.set_entry(FILE, 'timestamp', timestamp)
+	FILE = dbi.get_entry(s, 'file', full_path)
+	dbi.set_entry(s, FILE, 'host', output_host)
+	dbi.set_entry(s, FILE, 'path', output_dir)
+	dbi.set_entry(s, FILE, 'timestamp', timestamp)
 	identifier = getattr(FILE, 'full_path')
 	log_data = {'action':action,
 				'table':table,
 				'identifier':identifier,
 				'timestamp':timestamp}
-	dbi.add_to_table('log', log_data)
+	dbi.add_to_table(s, 'log', log_data)
+	s.close()
 	return None
 
 def rsync_copy(source, destination):

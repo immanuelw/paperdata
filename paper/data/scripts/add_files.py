@@ -171,13 +171,13 @@ def set_obs(s, dbi, OBS, field):
 	EDGE_OBS = s.query(table).filter(getattr(table, 'julian_date') == edge_time).one()
 	if EDGE_OBS is not None:
 		edge_obs = getattr(EDGE_OBS, 'obsnum')
-		dbi.set_entry(OBS, field, edge_obs)
+		dbi.set_entry(s, OBS, field, edge_obs)
 	else:
 		pol = OBS.polarization
 		EDGE_OBS = s.query(table).filter(getattr(table, 'julian_date') == edge_time).filter(getattr(table, 'polarization') == pol).one()
 		if EDGE_OBS is not None:
 			edge_obs = EDGE_OBS.obsnum
-			dbi.set_entry(OBS, field, edge_obs)
+			dbi.set_entry(s, OBS, field, edge_obs)
 
 	return EDGE_OBS
 
@@ -192,29 +192,31 @@ def update_obsnums():
 		NEXT_OBS = set_obs(s, dbi, OBS, 'next_obs')
 		#sets edge 
 		edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
-		dbi.set_entry(OBS, 'edge', edge)
+		dbi.set_entry(s, OBS, 'edge', edge)
 
 	s.close()
 	return None
 
 def add_files(input_host, input_paths):
 	dbi = pdbi.DataBaseInterface()
+	s = dbi.Session()
 	for input_path in input_paths:
 		path = os.path.dirname(input_path)
 		filename = os.path.basename(input_path)
 		obs_data, file_data, log_data = calc_obs_data(input_host, input_path)
 		try:
-			dbi.add_to_table('observation', obs_data)
+			dbi.add_to_table(s, 'observation', obs_data)
 		except:
 			print('Failed to load in obs ', path, filename)
 		try:
-			dbi.add_to_table('file', file_data)
+			dbi.add_to_table(s, 'file', file_data)
 		except:
 			print('Failed to load in file ', path, filename)
 		try:
-			dbi.add_to_table('log', log_data)
+			dbi.add_to_table(s, 'log', log_data)
 		except:
 			print('Failed to load in log ', path, filename)
+	s.close()
 
 	return None
 

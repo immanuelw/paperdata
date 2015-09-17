@@ -27,10 +27,12 @@ from email import Encoders
 
 def set_feed(source, output_host, output_dir, moved_to_distill=True):
 	dbi = pdbi.DataBaseInterface()
-	FEED = dbi.get_entry('feed', source)
-	dbi.set_entry(FEED, 'host', output_host)
-	dbi.set_entry(FEED, 'path', output_dir)
-	dbi.set_entry(FEED, 'moved_to_distill', moved_to_distill)
+	s = dbi.Session()
+	FEED = dbi.get_entry(s, 'feed', source)
+	dbi.set_entry(s, FEED, 'host', output_host)
+	dbi.set_entry(s, FEED, 'path', output_dir)
+	dbi.set_entry(s, FEED, 'moved_to_distill', moved_to_distill)
+	s.close()
 	return None
 
 def move_feed_files(input_host, input_paths, output_host, output_dir):
@@ -64,12 +66,12 @@ def count_days():
 	all_FEEDs = s.query(table).all()
 	good_days = tuple(getattr(FEED, 'julian_day') for FEED in count_FEEDs if getattr(FEED, 'count') == 288 or getattr(FEED, 'count') == 72)
 	to_move = tuple(getattr(FEED, 'full_path') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
-	s.close()
 
 	for full_path in to_move:
-		FEED = dbi.get_entry('feed', source)
-		dbi.set_entry(FEED, 'ready_to_move', True)
+		FEED = dbi.get_entry(s, 'feed', source)
+		dbi.set_entry(s, FEED, 'ready_to_move', True)
 
+	s.close()
 	return None
 
 def find_data():

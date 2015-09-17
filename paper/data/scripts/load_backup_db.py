@@ -17,6 +17,7 @@ import sqlalchemy.exc
 
 def load_backup(backup, table=None):
 	dbi = pdbi.DataBaseInterface()
+	s = dbi.Session()
 	with open(backup, 'r') as backup_db:
 		read = json.load(backup_db)
 		if table is None:
@@ -26,19 +27,20 @@ def load_backup(backup, table=None):
 				print(row.items())
 				try:
 					if table == 'observation':
-						dbi.add_to_table('observation', row)
+						dbi.add_to_table(s, 'observation', row)
 					elif table == 'file':
-						dbi.add_to_table('file', row)
+						dbi.add_to_table(s, 'file', row)
 					#elif table == 'feed':
-					#	dbi.add_to_table('feed', row)
+					#	dbi.add_to_table(s, 'feed', row)
 					elif table == 'log':
-						dbi.add_to_table('log', row)
+						dbi.add_to_table(s, 'log', row)
 					#elif table == 'rtp_file':
-					#	dbi.add_to_table('rtp_file', row)
+					#	dbi.add_to_table(s, 'rtp_file', row)
 				except KeyboardInterrupt:
 					raise
 				except:
 					print('Failed to load in entry')
+	s.close()
 
 	return None
 

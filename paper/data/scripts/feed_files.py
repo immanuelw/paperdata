@@ -76,10 +76,12 @@ def dupe_check(input_host, input_paths):
 
 def add_feeds_to_db(input_host, input_paths):
 	dbi = pdbi.DataBaseInterface()
+	s = dbi.Session()
 	for source in input_paths:
 		feed_data, log_data = gen_feed_data(input_host, source)
-		dbi.add_to_table('feed', feed_data)
-		dbi.add_to_table('log', log_data)
+		dbi.add_to_table(s, 'feed', feed_data)
+		dbi.add_to_table(s, 'log', log_data)
+	s.close()
 
 	return None
 
