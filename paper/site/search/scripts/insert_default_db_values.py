@@ -1,5 +1,5 @@
-from app import models
-from app.flask_app import db
+from site.search import models
+from site.search.flask_app import db
 
 # Insert the necessary default values into the database.
 

@@ -2,13 +2,12 @@
 
 import psycopg2
 import os
+import time
 import glob
 import requests
 from datetime import datetime
-from app import models
-from app.flask_app import db
-from app import db_utils
-import time
+from site.search import models, db_utils
+from site.search.flask_app import db
 
 profiling_mark = None
 
