@@ -1,8 +1,8 @@
 from flask.ext.script import Command, Manager, Option
 import hashlib
 from sqlalchemy.exc import IntegrityError
-from paper.site.search.flask_app import db
-from paper.site.search import models
+from paper.site.admin.flask_app import db
+from paper.site.admin import models
 
 UserCommand = Manager(usage = 'Perform user creation')
 

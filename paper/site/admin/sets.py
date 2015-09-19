@@ -1,5 +1,5 @@
-from paper.site.search.flask_app import app, db
-from paper.site.search import models
+from paper.site.admin.flask_app import app, db
+from paper.site.admin import models
 from paper.site import db_utils, misc_utils
 from flask import request, g, make_response, jsonify, render_template
 from datetime import datetime
