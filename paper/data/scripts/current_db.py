@@ -19,10 +19,7 @@ def main():
 			count[entry] += 1
 		else:
 			count[entry] = 1
-	out = []
-	for key, value in count.items():
-		out.append(key + (value,))
-		
+	out = [key + (value,) for key, value in count.items()]
 
 	x = PrettyTable(['Era', 'Julian Day', 'Host', 'Path', 'Type', 'Source Host', 'Amount'])
 	for line in out:
