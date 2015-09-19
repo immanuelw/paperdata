@@ -1,6 +1,4 @@
-from flask import g
 from datetime import datetime
-from requests_futures.sessions import FuturesSession
 from app.flask_app import db
 from app import models as edbi
 from paper.data import dbi as pdbi
