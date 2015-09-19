@@ -1,5 +1,6 @@
 from paper.site.search.flask_app import app, db
-from paper.site.search import db_utils, models
+from paper.site.search import models
+from paper.site import db_utils, misc_utils
 from flask import request, g, make_response, jsonify, render_template
 from datetime import datetime
 
@@ -84,7 +85,7 @@ def save_new_set():
 
 		flagged_range_dicts = []
 
-		GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = db_utils.get_utc_utc_constants()
+		GPS_LEAP_SECONDS_OFFSET, GPS_UTC_DELTA = misc_utils.get_utc_utc_constants()
 
 		for flagged_range_dict in request_content['flaggedRanges']:
 			flagged_utc_dict = {}
@@ -254,7 +255,7 @@ def get_sets():
 			end_utc = request_content['endtime']
 			start_datetime = datetime.strptime(start_utc, '%Y-%m-%dT%H:%M:%SZ')
 			end_datetime = datetime.strptime(end_utc, '%Y-%m-%dT%H:%M:%SZ')
-			start_utc, end_utc = db_utils.get_utc_from_datetime(start_datetime, end_datetime)
+			start_utc, end_utc = misc_utils.get_utc_from_datetime(start_datetime, end_datetime)
 
 		field_tuples = (('username', '==' if username else None, username),
 							('polarization', '==' if polarization else None, polarization),
