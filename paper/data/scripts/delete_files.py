@@ -33,7 +33,7 @@ def delete_check(input_host):
 							.filter(getattr(table, 'host') == input_host).all()
 	s.close()
 	#all files on same host
-	full_paths = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
+	full_paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
 	return full_paths
 
 def set_delete_table(input_host, source, output_host, output_dir):
