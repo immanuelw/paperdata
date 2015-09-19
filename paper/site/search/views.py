@@ -31,7 +31,7 @@ def index(setName = None):
 		active_data_sources = g.user.active_data_sources
 
 	if setName is not None:
-		the_set = db_utils.query(database='eorlive', table='set', field_tuples=(('name', '==', setName),))[0]
+		the_set = db_utils.query(database='search', table='set', field_tuples=(('name', '==', setName),))[0]
 
 		if the_set is not None:
 			start_datetime, end_datetime = db_utils.get_datetime_from_utc(the_set.start, the_set.end)
@@ -61,7 +61,7 @@ def get_graph():
 	if data_source_str is None:
 		return make_response('No data source', 500)
 	try:
-		data_source = db_utils.query(database='eorlive', table='graph_data_source', field_tuples=(('name', '==', data_source_str),))[0]
+		data_source = db_utils.query(database='search', table='graph_data_source', field_tuples=(('name', '==', data_source_str),))[0]
 	except IndexError:
 		data_source = None
 		#return make_response('Source not found', 500)
@@ -97,7 +97,7 @@ def get_graph():
 			#						width_slider=data_source.width_slider)
 	else:
 		try:
-			the_set = db_utils.query(database='eorlive', table='set', field_tuples=(('name', '==', set_str),))[0]
+			the_set = db_utils.query(database='search', table='set', field_tuples=(('name', '==', set_str),))[0]
 		except:
 			the_set = None
 
@@ -142,7 +142,7 @@ def get_graph():
 @app.route('/data_amount', methods = ['GET'])
 def data_amount():
 	try:
-		data = db_utils.query(database='eorlive', table='data_amount', sort_tuples=(('created_on', 'desc'),))[0]
+		data = db_utils.query(database='search', table='data_amount', sort_tuples=(('created_on', 'desc'),))[0]
 	except:
 		data = None
 
@@ -352,7 +352,7 @@ def before_request():
 	try :
 		g.paper_session = paper_dbi.Session()
 		g.pyg_session = pyg_dbi.Session()
-		g.eorlive_session = db.session
+		g.search_session = db.session
 	except Exception as e:
 		print('Cannot connect to database - {e}'.format(e))
 
@@ -360,8 +360,8 @@ def before_request():
 def teardown_request(exception):
 	paper_db = getattr(g, 'paper_session', None)
 	pyg_db = getattr(g, 'pyg_session', None)
-	eorlive_db = getattr(g, 'eorlive_session', None)
-	db_list = (paper_db, pyg_db, eorlive_db)
+	search_db = getattr(g, 'search_session', None)
+	db_list = (paper_db, pyg_db, search_db)
 	for open_db in db_list:
 		if open_db is not None:
 			open_db.close()
@@ -370,8 +370,8 @@ def teardown_request(exception):
 def profile():
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
-			user = db_utils.query(database='eorlive', table='user',	field_tuples=(('username', '==', g.user.username),),)[0]
-			setList = db_utils.query(database='eorlive', table='set', field_tuples=(('username', '==', g.user.username),))[0]
+			user = db_utils.query(database='search', table='user',	field_tuples=(('username', '==', g.user.username),),)[0]
+			setList = db_utils.query(database='search', table='set', field_tuples=(('username', '==', g.user.username),))[0]
 		except:
 			user = (None,)
 			setList = (None,)
@@ -384,9 +384,9 @@ def profile():
 def user_page():
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
-			user = db_utils.query(database='eorlive', table='user',	field_tuples=(('username', '==', g.user.username),))[0]
-			userList = db_utils.query(database='eorlive', table='user')[0]
-			setList = db_utils.query(database='eorlive', table='set')[0]
+			user = db_utils.query(database='search', table='user',	field_tuples=(('username', '==', g.user.username),))[0]
+			userList = db_utils.query(database='search', table='user')[0]
+			setList = db_utils.query(database='search', table='set')[0]
 		except:
 			user = (None,)
 			userList = (None,)

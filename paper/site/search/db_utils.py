@@ -21,7 +21,7 @@ def get_dbi(database):
 		configfile = '/mnt/paperdata/ganglia.cfg'
 		if host == 'seharu':
 			configfile = '~/paperdata/ganglia.cfg'
-	elif database == 'eorlive':
+	elif database == 'search':
 		module = edbi
 		dbi = None
 		return dbi, module
@@ -116,7 +116,7 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 		dbi, module = get_dbi(getattr(data_source, 'database'))
 		table = getattr(data_source, 'table')
 
-	if database == 'eorlive' or not data_source is None:
+	if database == 'search' or not data_source is None:
 		s = db.session
 	else:
 		s = dbi.Session()
