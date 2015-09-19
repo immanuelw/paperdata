@@ -1,24 +1,6 @@
 from paper.site.admin.flask_app import app, db
 from datetime import datetime
 
-class Set_Subscriptions(db.Model):
-	__tablename__ = 'set_subscriptions'
-	username =  db.Column(db.String(32), db.ForeignKey('user.username'))
-	set_id = db.Column(db.Integer, db.ForeignKey('set.id'))
-	id = db.Column(db.Integer, primary_key=True)
-
-class Data_Source_Subscriptions(db.Model):
-	__tablename__ = 'data_source_subscriptions'
-	username =  db.Column(db.String(32), db.ForeignKey('user.username'))
-	data_source = db.Column(db.String(100), db.ForeignKey('graph_data_source.name'))
-	id = db.Column(db.Integer, primary_key=True)
-
-class Active_Data_Sources(db.Model):
-	__tablename__ = 'active_data_sources'
-	username =  db.Column(db.String(32), db.ForeignKey('user.username'))
-	data_source = db.Column(db.String(100), db.ForeignKey('graph_data_source.name'))
-	id = db.Column(db.Integer, primary_key=True)
-
 class User(db.Model):
 	__tablename__ = 'user'
 	username = db.Column(db.String(32), primary_key=True)
@@ -28,10 +10,6 @@ class User(db.Model):
 	email = db.Column(db.String(254), nullable=False)
 	first_name = db.Column(db.String(50), nullable=False)
 	last_name = db.Column(db.String(50), nullable=False)
-	owned_sets = db.relationship('Set', backref='user')
-	subscribed_sets = db.relationship('Set', secondary=Set_Subscriptions.__table__)
-	subscribed_data_sources = db.relationship('Graph_Data_Source', secondary=Data_Source_Subscriptions.__table__)
-	active_data_sources = db.relationship('Graph_Data_Source', secondary=Active_Data_Sources.__table__)
 	admin = db.Column(db.Boolean, default=False)
 
 	def __init__(self, username, password, email, first_name, last_name):
@@ -55,34 +33,6 @@ class User(db.Model):
 
 	def get_id(self):
 		return self.username
-
-class Set(db.Model):
-	__tablename__ = 'set'
-	id = db.Column(db.Integer, primary_key=True)
-	username = db.Column(db.String(32), db.ForeignKey('user.username'))
-	name = db.Column(db.String(50))
-	start = db.Column(db.Integer)
-	end = db.Column(db.Integer)
-	polarization = db.Column(db.String(4)) #'all', 'xy', 'yy', etc.
-	era_type = db.Column(db.String(10))
-	host = db.Column(db.String(100))
-	filetype = db.Column(db.String(100))
-	total_data_hrs = db.Column(db.Float)
-	flagged_data_hrs = db.Column(db.Float)
-	created_on = db.Column(db.DateTime, default=datetime.utcnow)
-
-class Flagged_Subset(db.Model):
-	__tablename__ = 'flagged_subset'
-	id = db.Column(db.Integer, primary_key=True)
-	set_id = db.Column(db.Integer, db.ForeignKey('set.id', ondelete='CASCADE'))
-	start = db.Column(db.Integer)
-	end = db.Column(db.Integer)
-
-class Flagged_Obs_Ids(db.Model):
-	__tablename__ = 'flagged_obs_ids'
-	id = db.Column(db.Integer, primary_key=True)
-	obs_id = db.Column(db.Integer)
-	flagged_subset_id = db.Column(db.Integer, db.ForeignKey('flagged_subset.id', ondelete='CASCADE'))
 
 class Data_Amount(db.Model):
 	__tablename__ = 'data_amount'
@@ -120,23 +70,3 @@ class Comment(db.Model):
 	text = db.Column(db.String(1000), nullable=False)
 	username = db.Column(db.String(32))
 	created_on = db.Column(db.DateTime, default=datetime.utcnow)
-
-class Graph_Type(db.Model):
-	__tablename__ = 'graph_type'
-	name = db.Column(db.String(100), primary_key=True)
-
-class Graph_Data_Source(db.Model):
-	__tablename__ = 'graph_data_source'
-	name = db.Column(db.String(100), primary_key=True)
-	graph_type = db.Column(db.String(100), db.ForeignKey('graph_type.name'))
-	host = db.Column(db.String(100))
-	database = db.Column(db.String(100))
-	table = db.Column(db.String(100))
-	obs_column = db.Column(db.String(100)) # Which column has the observation ids.
-	width_slider = db.Column(db.Boolean) # Whether the graph should come with a column width slider.
-
-class Graph_Data_Source_Column(db.Model):
-	__tablename__ = 'graph_data_source_column'
-	id = db.Column(db.Integer, primary_key=True)
-	graph_data_source = db.Column(db.String(100), db.ForeignKey('graph_data_source.name'))
-	name = db.Column(db.String(100))
