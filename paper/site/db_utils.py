@@ -1,16 +1,15 @@
-from datetime import datetime
-from paper.site.search.flask_app import db
-from paper.site.search import models as edbi
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
-from paper.convert import gcal2jd
+from paper.site.search import models as sdbi
+from paper.site.admin import models as adbi
+from paper.site.search.flask_app import db
+from paper.site.admin.flask_app import db
 from sqlalchemy import or_
 from sqlalchemy.engine import reflection
 import socket
 
-host = socket.gethostname()
-
 def get_dbi(database):
+	host = socket.gethostname()
 	if database == 'paper':
 		module = pdbi
 		configfile = '/mnt/paperdata/paperdata.cfg'
@@ -22,7 +21,11 @@ def get_dbi(database):
 		if host == 'seharu':
 			configfile = '~/paperdata/ganglia.cfg'
 	elif database == 'search':
-		module = edbi
+		module = sdbi
+		dbi = None
+		return dbi, module
+	elif database == 'admin':
+		module = adbi
 		dbi = None
 		return dbi, module
 	dbi = getattr(module, 'DataBaseInterface')(configfile=configfile)
@@ -116,37 +119,13 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 		dbi, module = get_dbi(getattr(data_source, 'database'))
 		table = getattr(data_source, 'table')
 
-	if database == 'search' or not data_source is None:
-		s = db.session
+	if database == 'search':
+		s = sdb.session
+	elif database == 'admin':
+		s = adb.session
 	else:
 		s = dbi.Session()
 	results = get_results(s=s, table=table, field_tuples=field_tuples, sort_tuples=sort_tuples, group_tuples=group_tuples,
 							output_vars=output_vars)
 	s.close()
 	return results
-
-def get_set_strings():
-	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
-	era_type_strs = ('all',)
-	host_strs = ('all', 'pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1')
-	filetype_strs = ('all', 'uv', 'uvcRRE', 'npz')
-	return (pol_strs, era_type_strs, host_strs, filetype_strs)
-
-def get_jd_from_datetime(start_time=None, end_time=None):
-	time_start = None
-	time_end = None
-	if isinstance(start_time, str):
-		start_time = datetime.strptime(start_time, '%Y-%m-%dT%H:%M:%S')
-	if isinstance(end_time, str):
-		end_time = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
-	if start_time is not None:
-		time_start = gcal2jd(start_time.year, start_time.month, start_time.day, start_time.hour, start_time.minute, start_time.second)
-	if end_time is not None:
-		time_end = gcal2jd(end_time.year, end_time.month, end_time.day, end_time.hour, end_time.minute, end_time.second)
-	if time_end is None:
-		return time_start
-	return time_start, time_end
-
-def get_utc_from_datetime(date_time):
-	utc = (date_time - datetime(1970, 1, 1)).total_seconds()
-	return utc
