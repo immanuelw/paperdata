@@ -11,7 +11,7 @@ export DATABASE_URL=postgres:///postgres
 sudo apt-get update
 sudo apt-get install -y python-virtualenv python3-dev libpq-dev postgresql libmysqlclient-dev mysql-client
 
-cd /mnt/paperdata/paper/site/data
+cd /mnt/paperdata/paper/site/search
 
 sudo pip install --upgrade virtualenv
 virtualenv --python=/usr/bin/python3.4 flask
@@ -21,7 +21,7 @@ pip install flask requests Flask-SQLAlchemy Flask-Migrate Flask-Login requests-f
 cd /mnt/paperdata/
 python setup.py install
 
-cd /mnt/paperdata/paper/site/data
+cd /mnt/paperdata/paper/site/search
 
 sudo -u postgres createuser vagrant
 
