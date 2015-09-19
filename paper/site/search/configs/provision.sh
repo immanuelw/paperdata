@@ -25,7 +25,7 @@ cd /mnt/paperdata/paper/site/search
 
 sudo -u postgres createuser vagrant
 
-python -m app.manage db upgrade
+python -m search.manage db upgrade
 
-chmod +x run_app.py
-./run_app.py
+chmod +x ../scripts/run_app.py
+../scripts/run_app.py
