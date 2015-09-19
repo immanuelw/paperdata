@@ -21,7 +21,7 @@ def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
 										sort_tuples=(('time_start', 'asc'),),
 										output_vars=('time_start', 'time_end', 'polarization', 'era', 'era_type'))
 
-	pol_strs, era_type_strs = db_utils.set_strings()
+	pol_strs, era_type_strs, _, _ = misc_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
 	obs_count = {pol_str: {era_type_str: 0 for era_type_str in era_type_strs} for pol_str in pol_strs}
 
