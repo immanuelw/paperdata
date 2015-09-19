@@ -3,9 +3,10 @@ from flask.ext.login import current_user
 import os
 import time
 import json
-from paper.site.search.flask_app import app, db
-from paper.site.search import models, db_utils, histogram_utils, data_sources
 from datetime import datetime
+from paper.site.search.flask_app import app, db
+from paper.site.search import models, histogram_utils, data_sources
+from paper.site import db_utils, misc_utils
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 
@@ -79,8 +80,8 @@ def get_graph():
 		start_datetime = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%SZ')
 		end_datetime = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M:%SZ')
 
-		start_utc = db_utils.get_jd_from_datetime(start_datetime)
-		end_utc = db_utils.get_jd_from_datetime(start_datetime)
+		start_utc = misc_utils.get_jd_from_datetime(start_datetime)
+		end_utc = misc_utils.get_jd_from_datetime(start_datetime)
 
 		if graph_type_str == 'Obs_File':
 			return histogram_utils.get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str)
@@ -233,8 +234,8 @@ def obs_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
-	start_utc = db_utils.get_jd_from_datetime(starttime)
-	end_utc = db_utils.get_jd_from_datetime(endtime)
+	start_utc = misc_utils.get_jd_from_datetime(starttime)
+	end_utc = misc_utils.get_jd_from_datetime(endtime)
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 	try:
@@ -254,8 +255,8 @@ def file_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
-	start_utc = db_utils.get_jd_from_datetime(starttime)
-	end_utc = db_utils.get_jd_from_datetime(endtime)
+	start_utc = misc_utils.get_jd_from_datetime(starttime)
+	end_utc = misc_utils.get_jd_from_datetime(endtime)
 
 	output_vars=('host', 'full_path', 'obsnum', 'filesize')
 
@@ -405,8 +406,8 @@ def data_summary_table():
 	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
 	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
 
-	start_utc =  db_utils.get_jd_from_datetime(startdatetime)
-	end_utc =  db_utils.get_jd_from_datetime(enddatetime)
+	start_utc =  misc_utils.get_jd_from_datetime(startdatetime)
+	end_utc =  misc_utils.get_jd_from_datetime(enddatetime)
 
 	response = db_utils.query(database='paper', table='observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
@@ -420,7 +421,7 @@ def data_summary_table():
 	#except:
 	#	response = (None,)
 
-	pol_strs, era_type_strs, host_strs, filetype_strs = db_utils.get_set_strings()
+	pol_strs, era_type_strs, host_strs, filetype_strs = misc_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
 	file_map = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
 

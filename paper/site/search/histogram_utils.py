@@ -1,5 +1,6 @@
-from site.search.flask_app import app, db
-from site.search import db_utils, models
+from paper.site.search.flask_app import app, db
+from paper.site.search import models
+from paper.site import db_utils, misc_utils
 from flask import g, render_template
 import math
 import json
@@ -55,7 +56,7 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 		response = (None,)
 
 	if (host_strs is None) or (filetype_strs is None):
-		_, _, host_strs, filetype_strs = db_utils.get_set_strings()
+		_, _, host_strs, filetype_strs = misc_utils.get_set_strings()
 
 	file_map = {host_str: {filetype_str: [] for filetype_str in filetype_strs} for host_str in host_strs}
 	file_count = {host_str: {filetype_str: 0 for filetype_str in filetype_strs} for host_str in host_strs}
@@ -86,7 +87,7 @@ def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 	except:
 		response = (None,)
 
-	pol_strs, era_type_strs, host_strs, filetype_strs = db_utils.get_set_strings()
+	pol_strs, era_type_strs, host_strs, filetype_strs = misc_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
 	obs_count = {pol_str: {era_type_str: 0 for era_type_str in era_type_strs} for pol_str in pol_strs}
 

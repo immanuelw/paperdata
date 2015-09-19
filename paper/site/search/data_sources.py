@@ -2,7 +2,8 @@ from flask import render_template, request, g, make_response, jsonify
 import os
 import re
 from paper.site.search.flask_app import app, db
-from paper.site.search import db_utils, models
+from paper.site.search import models
+from paper.site import db_utils
 
 @app.route('/get_tables', methods = ['POST'])
 def get_tables():
