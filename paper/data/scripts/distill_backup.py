@@ -7,6 +7,7 @@ import sys
 import time
 import os
 import json
+import decimal
 import ddr_compress.dbi as ddbi
 
 ### Script to Backup paper database
@@ -15,7 +16,6 @@ import ddr_compress.dbi as ddbi
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-import decimal
 def decimal_default(obj):
 	'''
 	fixes decimal issue with json module
@@ -44,10 +44,8 @@ def json_data(dbo, dump_objects):
 
 	input: filename, list of database objects
 	'''
-	data = []
 	with open(dbo, 'w') as f:
-		for ser_data in dump_objects.all():
-			data.append(to_dict(ser_data))
+		data = [to_dict(ser_data) for ser_data in dump_objects.all()]
 		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
 	return None
 
@@ -61,38 +59,27 @@ def paperbackup(timestamp):
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 
-	#Create separate files for each directory
-
-	db1 = 'obs_{timestamp}.json'.format(timestamp=timestamp)
-	dbo1 = os.path.join(backup_dir, db1)
-
-	db2 = 'file_{timestamp}.json'.format(timestamp=timestamp)
-	dbo2 = os.path.join(backup_dir, db2)
-
-	db3 = 'log_{timestamp}.json'.format(timestamp=timestamp)
-	dbo3 = os.path.join(backup_dir, db3)
-
+	tables = ('observation', 'file', 'log')
+	table_sorts = {'observation': {'first': 'julian_date', 'second': 'pol'},
+					'file': {'first': 'obsnum', 'second': 'filename'},
+					'log': {'first': 'obsnum', 'second': 'timestamp'}}
 	dbi = ddbi.DataBaseInterface()
 	s = dbi.Session()
-
-	OBS_table = getattr(ddbi, 'Observation')
-	OBS_dump = s.query(OBS_table).order_by(getattr(OBS_table, 'julian_date').asc(), getattr(OBS_table, 'pol').asc())
-	json_data(dbo1, OBS_dump)
-
-	FILE_table = getattr(ddbi, 'File')
-	FILE_dump = s.query(FILE_table).order_by(getattr(FILE_table, 'obsnum').asc(), getattr(FILE_table, 'filename').asc())
-	json_data(dbo2, FILE_dump)
-
-	LOG_table = getattr(ddbi, 'Log')
-	LOG_dump = s.query(LOG_table).order_by(getattr(LOG_table, 'obsnum').asc(), getattr(LOG_table, 'timestamp').asc())
-	json_data(dbo3, LOG_dump)
-
-	s.close()
 	print(timestamp)
-	print('Table data backup saved')
+	for table in tables:
+		db_file = '{table}_{timestamp}.json'.format(timestamp=timestamp)
+		dbo = os.path.join(backup_dir, db_file)
+		print(db_file)
+
+		DB_table = getattr(ddbi, table.title())
+		DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
+												getattr(DB_table, table_sorts[table]['second']).asc())
+		json_data(dbo, DB_dump)
+		print('Table data backup saved')
+	s.close()
 
 	return None
 
 if __name__ == '__main__':
-	timestamp = time.strftime("%d-%m-%Y_%H:%M:%S")
+	timestamp = int(time.time())
 	paperbackup(timestamp)
