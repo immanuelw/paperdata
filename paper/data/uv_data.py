@@ -145,7 +145,7 @@ def calc_times(uv):
 	else:
 		delta_time = -(time_start - time_end)/(n_times)
 
-		length = round(n_times * delta_time, 5)
+		length = five_round(n_times * delta_time)
 		time_start = five_round(time_start)
 		time_end = five_round(time_end)
 		delta_time = five_round(delta_time)
@@ -186,8 +186,7 @@ def calc_uv_data(host, full_path, mode=None):
 		else:
 			obsnum = None
 
-		uv_info = (time_start, time_end, delta_time, julian_date, polarization, length, obsnum)
-		return uv_info
+		return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 	else:
 		return None
 

@@ -103,7 +103,7 @@ def calc_md5sum(host, path, filename):
 			sftp.close()
 		except(IOError):
 			vis_path = os.path.join(full_path, 'visdata')
-			stdin, md5_out, stderr = ssh.exec_command('md5sum {vis_path}'.format(vis_path=vis_path))
+			_, md5_out, _ = ssh.exec_command('md5sum {vis_path}'.format(vis_path=vis_path))
 			md5 = md5_out.read().split(' ')[0]
 		ssh.close()
 
