@@ -26,41 +26,26 @@ def gen_feed_data(host, full_path):
 	input: system host, full path of uv* file
 	output: dict of feed table fields, log dict
 	'''
-	#mostly file data
-	host = host
-	path = os.path.dirname(full_path)
-	filename = os.path.basename(full_path)
-
 	#allows uv access
 	try:
 		uv = A.miriad.UV(full_path)
 	except:
 		return None
 
-	#indicates julian date
-	julian_date = round(uv['time'], 5)
-	julian_day = int(julian_date)
-
-	ready_to_move = False
-	moved_to_distill = False
-
 	timestamp = int(time.time())
 
 	feed_data = {'host':host,
-				'path':path,
-				'filename':filename,
+				'path':os.path.dirname(full_path)
+				'filename':os.path.basename(full_path)
 				'full_path':full_path,
-				'julian_day':julian_day,
-				'ready_to_move':ready_to_move,
-				'moved_to_distill':moved_to_distill,
+				'julian_day':int(uv['time']),
+				'ready_to_move':False,
+				'moved_to_distill':False,
 				'timestamp':timestamp}
 
-	action = 'add by feed'
-	table = 'feed'
-	identifier = full_path
-	log_data = {'action':action,
-				'table':table,
-				'identifier':identifier,
+	log_data = {'action':'add by feed',
+				'table':'feed',
+				'identifier':full_path,
 				'timestamp':timestamp}
 
 	return feed_data, log_data
