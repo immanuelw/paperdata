@@ -26,9 +26,7 @@ def find_paths(input_host):
 	if input_host == named_host:
 		for root, dirs, files in os.walk('/'):
 			for direc in dirs:
-				if direc.endswith('uv'):
-					input_paths.append(os.path.join(root, direc))
-				elif direc.endswith('uvcRRE'):
+				if direc.endswith('uv') or direc.endswith('uvcRRE'):
 					input_paths.append(os.path.join(root, direc))
 			for file_path in files:
 				if file_path.endswith('npz'):
@@ -38,16 +36,14 @@ def find_paths(input_host):
 		find = '''find / -name '*.uv' -o -name '*.uvcRRE' -o -name '*.npz' 2>/dev/null'''
 		_, all_paths, _ = ssh.exec_command(find)
 		for path in all_paths.split('\n'):
-			if direc.endswith('uv'):
-				 input_paths.append(path)
-			elif direc.endswith('uvcRRE'):
+			if direc.endswith('uv') or direc.endswith('uvcRRE'):
 				 input_paths.append(path)
 			elif file_path.endswith('npz'):
 				 npz_paths.append(path)
 			
 		ssh.close()			
 
-	return (input_paths, npz_paths)
+	return input_paths, npz_paths
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2:
@@ -55,10 +51,7 @@ if __name__ == '__main__':
 	else:
 		input_host = raw_input('Source directory host: ')
 
-	input_paths, npz_paths = find_paths(input_host)
-	input_paths = add_files.dupe_check(input_host, input_paths)
-	input_paths.sort()
-	npz_paths = add_files.dupe_check(input_host, npz_paths)
-	npz_paths.sort()
-	add_files.add_files(input_host, input_paths)
-	add_files.add_files(input_host, npz_paths)
+	for all_paths in find_paths(input_host):
+		paths = add_files.dupe_check(input_host, all_paths)
+		paths.sort()
+		add_files.add_files(input_host, paths)
