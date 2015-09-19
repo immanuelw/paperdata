@@ -2,4 +2,4 @@ web: gunicorn --pythonpath search run_app:app --log-file=- & sh background.sh
 init: cd search;python -m app.manage db init
 migrate: cd search;python -m app.manage db migrate
 upgrade: cd search;python -m app.manage db upgrade
-default_values: cd data;python -m scripts.insert_default_db_values
+default_values: cd search;python -m scripts.insert_default_db_values
