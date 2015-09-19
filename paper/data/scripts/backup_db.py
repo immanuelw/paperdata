@@ -35,12 +35,13 @@ def json_data(dbo, dump_objects):
 		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
 	return None
 
-def paperbackup(timestamp):
+def paperbackup():
 	'''
 	backups database by loading into json files, named by timestamp
 
 	input: time script was run
 	'''
+	timestamp = int(time.time())
 	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(timestamp))
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
@@ -69,5 +70,4 @@ def paperbackup(timestamp):
 	return None
 
 if __name__ == '__main__':
-	timestamp = int(time.time())
-	paperbackup(timestamp)
+	paperbackup()
