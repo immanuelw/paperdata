@@ -1,7 +1,8 @@
 from flask import render_template, flash, redirect, url_for, request, g
 from flask.ext.login import login_user, logout_user
 from paper.site.search.flask_app import app, lm, db
-from paper.site.search import models, db_utils
+from paper.site.search import models
+from paper.site import db_utils
 import hashlib
 import re
 
