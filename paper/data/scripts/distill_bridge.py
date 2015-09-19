@@ -7,7 +7,6 @@ import os
 import time
 import socket
 from collections import Counter
-from sqlalchemy import func
 import aipy as A
 import ddr_compress.dbi as ddbi
 from paper.data import dbi as pdbi, uv_data, file_data
@@ -31,20 +30,20 @@ def add_data():
 	OBSs_all = s.query(table).all()
 	OBSs_complete = s.query(table).filter(getattr(table, 'status') == 'COMPLETE').all()
 
-	julian_obs = {OBS: int(str(getattr(OBS, 'julian_date'))[3:7]) for OBS in OBSs_complete}
+	julian_obs = {OBS: int(getattr(OBS, 'julian_date')) for OBS in OBSs_complete}
 	julian_days = tuple(jday for jday in julian_obs.values())
 	#dict of julian day as key, amount as value
 	count_jdays = Counter(julian_days)
 
-	all_days = tuple(int(str(getattr(OBS, 'julian_date'))[3:7]) for OBS in OBSs_all)
+	all_days = tuple(int(getattr(OBS, 'julian_date')) for OBS in OBSs_all)
 	count_all_days = Counter(all_days)
 
 	#tuple list of all complete days
 	complete_jdays = tuple(day for day, amount in count_jdays.items() if amount == count_all_days[day])
 	raw_OBSs = tuple(OBS for OBS, jday in julian_obs.items() if jday in complete_jdays)
 
-	#check for duplicates
 	data_dbi = pdbi.DataBaseInterface()
+	sess = data_dbi.Session()
 
 	#need to keep dict of list of files to move of each type -- (host, path, filename, filetype)
 	movable_paths = {'uv':[], 'uvcRRE':[], 'npz':[]}
@@ -83,7 +82,7 @@ def add_data():
 		#indicates type of file in era
 		era_type = None
 
-		prev_obs, next_obs, edge = uv_data.obs_edge(obsnum, sess=sp)
+		prev_obs, next_obs, edge = uv_data.obs_edge(obsnum, sess=sess)
 
 		filesize = file_data.calc_size(host, path, filename)
 		md5 = getattr(FILE, 'md5sum')
@@ -132,64 +131,47 @@ def add_data():
 					'table':table,
 					'identifier':identifier,
 					'timestamp':timestamp}
-		data_dbi.add_to_table(s, 'observation', obs_data)
-		data_dbi.add_to_table(s, 'file', raw_data)
-		data_dbi.add_to_table(s, 'log', log_data)
-		movable_paths[filetype].append(os.path.join(path, filename))
+		data_dbi.add_to_table(sess, 'observation', obs_data)
+		data_dbi.add_to_table(sess, 'file', raw_data)
+		data_dbi.add_to_table(sess, 'log', log_data)
+		movable_paths[filetype].append(full_path)
 
 		compr_filename = ''.join((filename, 'cRRE'))
-		compr_filetype = 'uvcRRE'
-		compr_filesize = file_data.calc_size(host, path, compr_filename)
-		compr_md5 = file_data.calc_md5sum(host, path, compr_filename)
-		compr_write_to_tape = False
-		if os.path.isdir(os.path.join(path, compr_filename)):
+		compr_path = os.path.join(path, compr_filename)
+		if os.path.isdir(compr_path):
+			compr_filetype = 'uvcRRE'
 			compr_data = raw_data
 			compr_data['filename'] = compr_filename
 			compr_data['filetype'] = compr_filetype
-			compr_data['filesize'] = compr_filesize
-			compr_data['md5sum'] = compr_md5
-			compr_data['write_to_tape'] = compr_write_to_tape
-			data_dbi.add_to_table(s, 'file', compr_data)
-			movable_paths[compr_filetype].append(os.path.join(path, compr_filename))
+			compr_data['filesize'] = file_data.calc_size(host, path, compr_filename)
+			compr_data['md5sum'] = file_data.calc_md5sum(host, path, compr_filename)
+			compr_data['write_to_tape'] = False
+			data_dbi.add_to_table(sess, 'file', compr_data)
+			movable_paths[compr_filetype].append(compr_path)
 
 		npz_filename = ''.join((filename, 'cRE.npz'))
-		npz_filetype = 'npz'
-		npz_filesize = file_data.calc_size(host, path, npz_filename)
-		npz_md5 = file_data.calc_md5sum(host, path, npz_filename)
-		npz_write_to_tape = False
-		if os.path.isfile(os.path.join(path, npz_filename)):
+		npz_path = os.path.join(path, npz_filename)
+		if os.path.isdir(npz_path):
+			npz_filetype = 'npz'
 			npz_data = raw_data
 			npz_data['filename'] = npz_filename
 			npz_data['filetype'] = npz_filetype
-			npz_data['filesize'] = npz_filesize
-			npz_data['md5sum'] = npz_md5
-			npz_data['write_to_tape'] = npz_write_to_tape
-			data_dbi.add_to_table(s, 'file', npz_data)
-			movable_paths[npz_filetype].append(os.path.join(path, npz_filename))
+			npz_data['filesize'] = file_data.calc_size(host, path, npz_filename)
+			npz_data['md5sum'] = file_data.calc_md5sum(host, path, npz_filename)
+			npz_data['write_to_tape'] = False
+			data_dbi.add_to_table(sess, 'file', npz_data)
+			movable_paths[npz_filetype].append(npz_path)
+
 	s.close()
 
 	return movable_paths
 
-def bridge_move(input_host, movable_paths, raw_host, raw_dir, compr_host, compr_dir, npz_host, npz_dir):
-	'''
-	move files to new directories
-
-	input: system host, dict of lists of files to be moved, host and directory location for raw, compressed, and flag files
-	'''
-	raw_paths = movable_paths['uv']
-	compr_paths = movable_paths['uvcRRE']
-	npz_paths = movable_paths['npz']
-
-	move_files.move_files(input_host, raw_paths, raw_host, raw_dir)
-	move_files.move_files(input_host, compr_paths, compr_host, compr_dir)
-	move_files.move_files(input_host, npz_paths, npz_host, npz_dir)
-
-	return None
-
-def paperbridge():
+def paperbridge(auto=False):
 	'''
 	bridges paperdistiller and paperdata
 	moves files and pulls relevant data to add to paperdata from paperdistiller
+
+	input: boolean variable to track whether to wait
 	'''
 	#Calculate amount of space needed to move a day ~1.1TB
 	required_space = 1112661213184
@@ -199,24 +181,23 @@ def paperbridge():
 		input_host = raw_input('Source directory host: ')
 		#Add observations and paths from paperdistiller
 		movable_paths = add_data()
-		raw_host = raw_input('Raw destination directory host: ')
-		raw_dir = raw_input('Raw destination directory: ')
-		compr_host = raw_input('Compressed destination directory host: ')
-		compr_dir = raw_input('Compressed destination directory: ')
-		npz_host = raw_input('Npz destination directory host: ')
-		npz_dir = raw_input('Npz destination directory: ')
+		filetypes = movable_paths.keys()
+		host_dirs = {filetype: {'host': None, 'dir': None} for filetype in filetypes}
+		for filetype in filetypes:
+			host_dirs[filetype]['host'] = raw_input('{filetype} destination directory host: '.format(filetype=filetype))
+			host_dirs[filetype]['dir'] = raw_input('{filetype} destination directory: '.format(filetype=filetype))
 
-		bridge_move(input_host, movable_paths, raw_host, raw_dir, compr_host, compr_dir, npz_host, npz_dir)
+		for filetype, paths in movable_paths:
+			move_files.move_files(input_host, paths, host_dirs[filetype]['host'], host_dirs[filetype]['dir'])
 
 	else:
 		table = 'paperdistiller'
 		move_files.email_space(table)
-		if auto == 'y':
+		if auto:
 			time.sleep(14400)
 
 	return None
 
 if __name__ == '__main__':
-	auto = 'n'
-	paperbridge(auto)
+	paperbridge()
 	add_files.update_obsnums()
