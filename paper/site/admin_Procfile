@@ -1,0 +1,5 @@
+web: gunicorn --pythonpath admin run_app:app --log-file=- & sh background.sh
+init: cd admin;python -m app.manage db init
+migrate: cd admin;python -m app.manage db migrate
+upgrade: cd admin;python -m app.manage db upgrade
+default_values: cd admin;python -m scripts.insert_default_db_values
