@@ -1,6 +1,6 @@
 from datetime import datetime
-from site.search.flask_app import db
-from site.search import models as edbi
+from paper.site.search.flask_app import db
+from paper.site.search import models as edbi
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 from paper.convert import gcal2jd

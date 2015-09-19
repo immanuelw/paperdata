@@ -6,8 +6,8 @@ import time
 import glob
 import requests
 from datetime import datetime
-from site.search import models, db_utils
-from site.search.flask_app import db
+from paper.site.search import models, db_utils
+from paper.site.search.flask_app import db
 
 profiling_mark = None
 

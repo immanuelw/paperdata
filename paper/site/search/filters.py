@@ -1,4 +1,4 @@
-from site.search.flask_app import app
+from paper.site.search.flask_app import app
 import re, urllib.parse
 
 # Sets should be inserted into comments using the special syntax

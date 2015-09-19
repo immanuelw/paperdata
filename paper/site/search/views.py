@@ -3,8 +3,8 @@ from flask.ext.login import current_user
 import os
 import time
 import json
-from site.search.flask_app import app, db
-from site.search import models, db_utils, histogram_utils, data_sources
+from paper.site.search.flask_app import app, db
+from paper.site.search import models, db_utils, histogram_utils, data_sources
 from datetime import datetime
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg

@@ -1,5 +1,5 @@
-from site.search import models
-from site.search.flask_app import db
+from paper.site.search import models
+from paper.site.search.flask_app import db
 
 # Insert the necessary default values into the database.
 

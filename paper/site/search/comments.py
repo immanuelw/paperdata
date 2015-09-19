@@ -1,6 +1,6 @@
 from flask import render_template, g, make_response, request
-from site.search.flask_app import app, db
-from site.search import models, db_utils
+from paper.site.search.flask_app import app, db
+from paper.site.search import models, db_utils
 from datetime import datetime
 
 @app.route('/get_all_comments')
