@@ -1,4 +1,4 @@
-from app.flask_app import db
+from site.search.flask_app import app, db
 from datetime import datetime
 
 class Set_Subscriptions(db.Model):

@@ -1,4 +1,5 @@
-from app import db_utils, models
+from site.search.flask_app import app, db
+from site.search import db_utils, models
 from flask import g, render_template
 import math
 import json

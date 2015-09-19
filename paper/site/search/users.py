@@ -1,7 +1,7 @@
 from flask import render_template, flash, redirect, url_for, request, g
 from flask.ext.login import login_user, logout_user
-from app.flask_app import app, lm, db
-from app import models, db_utils
+from site.search.flask_app import app, lm, db
+from site.search import models, db_utils
 import hashlib
 import re
 

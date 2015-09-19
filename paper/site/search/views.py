@@ -1,13 +1,13 @@
 from flask import render_template, flash, redirect, url_for, request, g, make_response
 from flask.ext.login import current_user
-from app.flask_app import app, db
-from app import models, db_utils, histogram_utils, data_sources
-from datetime import datetime
 import os
-from paper.data import dbi as pdbi
-from paper.ganglia import dbi as pyg
 import time
 import json
+from site.search.flask_app import app, db
+from site.search import models, db_utils, histogram_utils, data_sources
+from datetime import datetime
+from paper.data import dbi as pdbi
+from paper.ganglia import dbi as pyg
 
 def time_val(value):
 	#determines how much time to divide by
