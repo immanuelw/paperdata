@@ -1,6 +1,7 @@
 build
 dist
 output
+flask
 *pyc
 .*.swp
 .*.swo
