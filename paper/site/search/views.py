@@ -152,7 +152,7 @@ def data_amount():
 	if data is not None:
 		data_time = getattr(data, 'created_on')
 		hours_sadb = getattr(data, 'hours_sadb')
-		hours_paper = getattr(data, 'hours_paper')
+		hours_paper = getattr(data, 'hours_paperdata')
 		hours_with_data = getattr(data, 'hours_with_data')
 
 	return render_template('data_amount_table.html', data_time=data_time,
@@ -164,13 +164,13 @@ def source_table():
 	output_vars = ('timestamp', 'julian_day')
 
 	try:	
-		corr_source = db_utils.query(database='paper', table='rtp_file', field_tuples=(('transferred', '==', None),),
-										sort_tuples=sort_tuples, output_vars=output_vars)[0]
+		corr_source = db_utils.query(database='paperdata', table='rtp_file', field_tuples=(('transferred', '==', None),),
+										sort_tuples=sort_tuples)[0]
 
-		rtp_source = db_utils.query(database='paper', table='rtp_file',	field_tuples=(('transferred', '==', True),),
-									sort_tuples=sort_tuples, output_vars=output_vars)[0]
+		rtp_source = db_utils.query(database='paperdata', table='rtp_file',	field_tuples=(('transferred', '==', True),),
+									sort_tuples=sort_tuples)[0]
 
-		paper_source = db_utils.query(database='paper', table='observation', sort_tuples=sort_tuples, output_vars=output_vars)[0]
+		paper_source = db_utils.query(database='paperdata', table='observation', sort_tuples=sort_tuples)[0]
 
 		source_tuples = (('Correlator', corr_source), ('RTP', rtp_source), ('Folio Scan', paper_source))
 	except:
@@ -196,8 +196,7 @@ def filesystem():
 	system_header = (('File Host', None), ('Last Report', None) , ('Usage Percent', None))
 	try:
 		systems = db_utils.query(database='ganglia', table='filesystem',
-									sort_tuples=(('timestamp', 'desc'), ('host', 'asc')),
-									group_tuples=('host',), output_vars=('host', 'timestamp', 'percent_space', 'used_space'))
+									sort_tuples=(('timestamp', 'desc'), ('host', 'asc')), group_tuples=('host',))
 
 		system_names = (getattr(system, 'host') for system in systems)
 	except:
@@ -239,10 +238,9 @@ def obs_table():
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 	try:
-		response = db_utils.query(database='paper', table='observation', 
+		response = db_utils.query(database='paperdata', table='observation', 
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-								sort_tuples=(('time_start', 'asc'),),
-								output_vars=output_vars)
+								sort_tuples=(('time_start', 'asc'),))
 		log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response]
 	except:
 		log_list = []
@@ -261,10 +259,9 @@ def file_table():
 	output_vars=('host', 'full_path', 'obsnum', 'filesize')
 
 	try:
-		all_obs_list = db_utils.query(database='paper', table='observation', 
+		all_obs_list = db_utils.query(database='paperdata', table='observation', 
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-										sort_tuples=(('time_start', 'asc'),),
-										output_vars=('files',))
+										sort_tuples=(('time_start', 'asc'),))
 		files_list = (getattr(obs, 'files') for obs in all_obs_list)
 		file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
 
@@ -281,7 +278,7 @@ def rtp_summary_table():
 	file_vars = ('host', 'path', 'julian_day', 'transferred', 'new_host', 'new_path', 'timestamp')
 
 	try:
-		rtp_obs = db_utils.query(database='paper', table='rtp_observation', sort_tuples=(('julian_day', 'desc'),), output_vars=obs_vars)
+		rtp_obs = db_utils.query(database='paperdata', table='rtp_observation', sort_tuples=(('julian_day', 'desc'),))
 		files_list = (getattr(obs, 'files') for obs in rtp_obs)
 		rtp_files = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
 		file_list = [{var: getattr(rtp_file, var) for var in file_vars} for rtp_file in rtp_files]
@@ -318,7 +315,7 @@ def rtp_summary_table():
 					'output_host', 'transfer_percent', 'activity', 'last_updated')
 	rtp_header = (('Date', 'Observation Date'), ('JD', 'Julian Day'), ('LST Range', 'Local Sidereal Time Range'),
 					('Count', 'File Count'), ('RTP status', 'Percent of Files transferred'),
-					('SA Location', 'Host and Path of files on SADB'), ('USA Location', 'Host and Path of files on paper'),
+					('SA Location', 'Host and Path of files on SADB'), ('USA Location', 'Host and Path of files on paperdata'),
 					('Output Host', 'Host raw files are backup up'), ('Last Activity', 'Last backend action taken'),
 					('Last Updated', 'Last time action was taken'))
 	summary_dict = {julian_day: {var: 0 for var in output_vars} for julian_day in julian_days}
@@ -409,15 +406,13 @@ def data_summary_table():
 	start_utc =  misc_utils.get_jd_from_datetime(startdatetime)
 	end_utc =  misc_utils.get_jd_from_datetime(enddatetime)
 
-	response = db_utils.query(database='paper', table='observation',
+	response = db_utils.query(database='paperdata', table='observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-								sort_tuples=(('time_start', 'asc'),),
-								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files'))
+								sort_tuples=(('time_start', 'asc'),))
 	#try:
-	#	response = db_utils.query(database='paper', table='observation',
+	#	response = db_utils.query(database='paperdata', table='observation',
 	#								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-	#								sort_tuples=(('time_start', 'asc'),),
-	#								output_vars=('time_start', 'time_end', 'polarization', 'era_type', 'files'))
+	#								sort_tuples=(('time_start', 'asc'),))
 	#except:
 	#	response = (None,)
 

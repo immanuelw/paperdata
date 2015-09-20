@@ -6,7 +6,7 @@ import math
 import json
 
 def get_plot_bands(the_set):
-	flagged_subsets = db_utils.query(database='eorlive', table='flagged_subset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),))
+	flagged_subsets = db_utils.query(database='search', table='flagged_subset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),))
 
 	plot_bands = [{'from': int(getattr(flagged_subset, 'start')), 'to': int(getattr(flagged_subset, 'end')), 'color': 'yellow'}
 					for flagged_subset in flagged_subsets]
@@ -14,12 +14,11 @@ def get_plot_bands(the_set):
 	return plot_bands
 
 def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
-	response = db_utils.query(database='paper', table='observation',
+	response = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if set_pol == 'all' else '==', set_pol),
 										('era_type', None if set_era_type == 'all' else '==', set_era_type)),
-										sort_tuples=(('time_start', 'asc'),),
-										output_vars=('time_start', 'time_end', 'polarization', 'era', 'era_type'))
+										sort_tuples=(('time_start', 'asc'),))
 
 	pol_strs, era_type_strs, _, _ = misc_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: [] for era_type_str in era_type_strs} for pol_str in pol_strs}
@@ -41,13 +40,11 @@ def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
 def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_host=None, set_filetype=None):
 	base_length = 0.00696
 	try:
-		rtp_obs_list = db_utils.query(database='paper', table='rtp_observation',
-										field_tuples=(('julian_date', '>=', start_utc), ('julian_date', '<=', end_utc + base_length)),
-										output_vars=('obsnum', 'julian_date', 'polarization', 'length', 'files'))
+		rtp_obs_list = db_utils.query(database='paperdata', table='rtp_observation',
+										field_tuples=(('julian_date', '>=', start_utc), ('julian_date', '<=', end_utc + base_length)))
 
-		paper_obs_list = db_utils.query(database='paper', table='observation',
-										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-										output_vars=('obsnum', 'julian_date', 'polarization', 'length', 'files'))
+		paper_obs_list = db_utils.query(database='paperdata', table='observation',
+										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)))
 
 		all_obs_list = rtp_obs_list + paper_obs_list
 		files_list = (getattr(obs, 'files') for obs in all_obs_list)
@@ -80,10 +77,9 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 
 def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 	try:
-		response = db_utils.query(database='paper', table='observation',
+		response = db_utils.query(database='paperdata', table='observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-								sort_tuples=(('time_start', 'asc'),),
-								output_vars=('julian_date', 'polarization', 'era_type', 'obsnum'))
+								sort_tuples=(('time_start', 'asc'),))
 	except:
 		response = (None,)
 
