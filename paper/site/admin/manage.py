@@ -8,7 +8,7 @@ manager = Manager(app)
 
 manager.add_command('db', MigrateCommand)
 
-from paper.site.admin.user_command import UserCommand
+from paper.site.user_command import UserCommand
 manager.add_command('user', UserCommand)
 
 if __name__ == '__main__':
