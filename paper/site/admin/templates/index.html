@@ -1,0 +1,32 @@
+{% extends 'layout.html' %}
+{% block body %}
+<table style='width:100%' class='tableClass'>
+	<div id='main_content_div'>
+		<tr class='rowClass'>
+			<td class='cellClass cellTop'>
+				<span style='font-size:25px;'>Comments</span>
+				{% if g.user and g.user.is_authenticated() %}
+				<button type='button' onclick='newThread()' class='replyButton' style='margin-top:12px;'>New thread</button>
+				{% endif %}
+				<div id='comments_div'></div>
+				{% include 'comment_reply.html' %}
+				<br>
+				<div id='data_amount_table'></div>
+				<div id='source_table'></div>
+				<div id='filesystem_table'></div>
+			</td>
+			<td class='right_cell cellClass cellTop'>
+			</td>
+		</tr>
+	</div>
+</table>
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js'></script>
+<script src='../static/js/setsAndComments.js'></script>
+<script src='../static/js/jquery.datetimepicker.js'></script>
+<script src='../static/js/collapsible.min.js'></script>
+<script src='../static/js/index.js'></script>
+<script src='http://code.highcharts.com/stock/highstock.js'></script>
+<script src='http://code.highcharts.com/stock/highcharts-more.js'></script>
+<script src='http://code.highcharts.com/modules/no-data-to-display.js'></script>
+{% endblock %}

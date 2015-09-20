@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+{% block body %}
+<table class='tableClass profile'>
+	<tr class='rowClass'>
+		<td class='cellClass profileCell'>
+			<h3>Your Profile</h3>
+			Username: {{user.username}}
+			<br>
+			Name: {{user.first_name}} {{user.last_name}}
+			<br>
+			Email: {{user.email}}
+		</td>
+		<td class='cellClass profileCell' rowspan='3'>
+			<h3>Your Sets</h3>
+			<div id='set_list_div' class='set_list'></div>
+		</td>
+		<td class='cellClass profileCell' rowspan='3'>
+			<h3>Your Data Sources</h3>
+			<button type='button' id='change_active_data_sources'
+				onclick='changeActiveDataSources()'>Update active</button>
+			<div id='data_source_list' class='set_list'></div>
+		</td>
+		<td class='cellClass profileCell' rowspan='3'>
+			<h3>Available Data Sources</h3>
+			<div id='unsubscribed_data_source_list' class='set_list'></div>
+		</td>
+	</tr>
+</table>
+<script src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+<script src='../static/js/setsAndComments.js'></script>

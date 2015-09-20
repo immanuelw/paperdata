@@ -1,0 +1,23 @@
+{% block content %}
+<table class='table table-striped table-bordered'>
+	<thead>
+		<tr>
+			<th colspan='3'>Sources of Data Files</th>
+		</tr>
+		<tr>
+			<th>File Source</th>
+			<th>Last Report</th>
+			<th>Most Recent JD</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for source_name in source_names %}
+			<tr>
+				<td>{{ source_name }}</td>
+				<td>{{ source_dict[source_name]['time'] | round(1) }} ({{ source_dict[source_name]['time_segment'] }})</td>
+				<td style='color:red;vertical-align:middle;'>{{ source_dict[source_name]['day'] }}</td>
+			</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,92 @@
+{% extends 'layout.html' %}
+{% block body %}
+
+<script>
+	function deleteHelper(action, username) {
+		var str = '#delete_user_button_' + username;
+		$(str).html('Working');
+
+
+		$.ajax({
+			type: 'POST',
+			url: '/delete_user',
+			data: {'username': username, 'action': action},
+			success: function(data) {
+				location.reload();
+			},
+			dataType: 'html'
+		});
+	}
+
+	function deleteUser(username) {
+
+	   $('#dialog-confirm').html('Are you sure you wish to delete this user? If you do so, the user's sets will be deleted, or you can transfer the user's sets to your account.'); //http://jsfiddle.net/taditdash/vvjj8/
+
+		// Define the Dialog and its properties.
+		$('#dialog-confirm').dialog({
+			resizable: false,
+			modal: true,
+			title: 'Delete User',
+			height: 400,
+			width: 400,
+			buttons: {
+				'Delete user and transfer sets': function () {
+					$(this).dialog('close');
+					deleteHelper('transfer', username);
+				},
+				'Delete user and destroy sets forever': function () {
+					$(this).dialog('close');
+					deleteHelper('destroy', username);
+				},
+				'Don't delete': function () {
+					$(this).dialog('close');
+				}
+			}
+		});
+	}
+</script>
+<h2>Users</h2>
+<br>
+<div id='full_page_div'>
+<table class='table table-striped table-bordered'>
+	<tr class='rowClass userRow'>
+		<td class='cellClass userCell'>Username</td>
+		<td class='cellClass userCell'>Sets</td>
+		{% if theUser.admin %}
+			<td class='cellClass userCell'>Delete</td>
+		{% endif %}
+	</tr>
+	{% for user in userList %}
+		{% if user %}
+			<tr class='rowClass userRow'>
+				<td class='cellClass userCell'> {{ user.username }} <br> {{ user.first_name }} {{ user.last_name }}
+					<br> {{ user.email }} </td>
+				<td class='cellClass userCell'>
+					{% for set in setList %}
+						{% if set %}
+							{% if set.username == user.username %} <!--gotta be a better way than this...-->
+								<a href='/set/{{ set.name }}'>{{ set.name }}</a>
+								<br>
+							{% endif %}
+						{% endif %}
+					{% endfor %}
+				</td>
+				{% if theUser.admin %}
+					{% if theUser.username != user.username %}
+						<td class='cellClass userCell'> <button type='button' id='delete_user_button_{{ user.username }}' onclick='deleteUser('{{ user.username }}')'>Delete User</button></td>
+					{% else %}
+						<td class='cellClass userCell'> </td>
+					{% endif %}
+				{% endif %}
+			</tr>
+		{% endif %}
+	{% endfor %}
+	<div id='dialog-confirm'></div>
+</table>
+</div>
+
+
+<script src='http://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js'></script>
+
+{% endblock %}
