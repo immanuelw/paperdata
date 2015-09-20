@@ -38,39 +38,6 @@ $(function() {
 	window.filesystemRequest = null;
 	window.dataSummaryTableRequest = null;
 
-	$('#data_amount_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
-
-	window.dataAmountRequest = $.ajax({
-		type: 'GET',
-		url: '/data_amount',
-		success: function(data) {
-			$('#data_amount_table').html(data);
-		},
-		dataType: 'html'
-	});
-
-	$('#source_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
-
-	window.sourceRequest = $.ajax({
-		type: 'GET',
-		url: '/source_table',
-		success: function(data) {
-			$('#source_table').html(data);
-		},
-		dataType: 'html'
-	});
-
-	$('#filesystem_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
-
-	window.filesystemRequest = $.ajax({
-		type: 'GET',
-		url: '/filesystem',
-		success: function(data) {
-			$('#filesystem_table').html(data);
-		},
-		dataType: 'html'
-	});
-
 	// Set up the tabs.
 	$('#tabs').tabs({
 		beforeLoad: function(event, ui) {

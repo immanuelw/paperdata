@@ -13,12 +13,11 @@
 	word-wrap: break-word;
 }
 
-#summary_table th, #summary_table td, #filesystem_table th, #filesystem_table td,
-#source_table th, #source_table td, #data_amount_table th, #data_amount_table td {
+#summary_table th, #summary_table td {
 	text-align: center;
 }
 
-#summary_table, #filesystem_table table {
+#summary_table table {
 	width: 100%;
 }
 
