@@ -1,5 +1,3 @@
-from paper.site.flask_app import search_app as app, search_db as db
-from paper.site.search import models
 from paper.site import db_utils, misc_utils
 from flask import g, render_template
 import math
