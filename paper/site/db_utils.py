@@ -84,7 +84,7 @@ def group_clause(table, group_tuples):
 	clause_list = [getattr(table, field_name) for field_name in field_group_tuples]
 	return clause_list
 
-def get_results(s, table, field_tuples, sort_tuples, group_tuples, output_vars):
+def get_results(s, table, field_tuples, sort_tuples, group_tuples):
 	results = s.query(table)
 	if field_tuples is not None:
 		clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
@@ -102,11 +102,9 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples, output_vars):
 
 	results = results.all()
 
-	#if output_vars is not None:
-		#results = tuple((getattr(entry, output_var) for output_var in output_vars) for entry in results)
 	return results
 
-def query(data_source=None, database=None, table=None, field_tuples=None, sort_tuples=None, group_tuples=None, output_vars=None):
+def query(data_source=None, database=None, table=None, field_tuples=None, sort_tuples=None, group_tuples=None):
 	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
 	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
 	if data_source is not None:
@@ -125,7 +123,6 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 		s = adb.session
 	else:
 		s = dbi.Session()
-	results = get_results(s=s, table=table, field_tuples=field_tuples, sort_tuples=sort_tuples, group_tuples=group_tuples,
-							output_vars=output_vars)
+	results = get_results(s=s, table=table, field_tuples=field_tuples, sort_tuples=sort_tuples, group_tuples=group_tuples)
 	s.close()
 	return results
