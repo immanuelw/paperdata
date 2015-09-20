@@ -4,13 +4,13 @@ from sqlalchemy.exc import IntegrityError
 from paper.site.flask_app import admin_db as db
 from paper.site.admin import models
 
-UserCommand = Manager(usage = 'Perform user creation')
+UserCommand = Manager(usage='Perform user creation')
 
-@UserCommand.option('-fn', '--firstname', dest = 'first_name', default = None, help = 'User\'s first name')
-@UserCommand.option('-ln', '--lastname', dest = 'last_name', default = None, help = 'User\'s last name')
-@UserCommand.option('-e', '--email', dest = 'email', default = None, help = 'User\'s email address')
-@UserCommand.option('-u', '--username', dest = 'username', default = None, help = 'User\'s username. Used for logging in.')
-@UserCommand.option('-p', '--password', dest = 'password', default = None, help = 'User\'s password. Used for logging in.')
+@UserCommand.option('-fn', '--firstname', dest='first_name', default=None, help='User\'s first name')
+@UserCommand.option('-ln', '--lastname', dest='last_name', default=None, help='User\'s last name')
+@UserCommand.option('-e', '--email', dest='email', default=None, help='User\'s email address')
+@UserCommand.option('-u', '--username', dest='username', default=None, help='User\'s username. Used for logging in.')
+@UserCommand.option('-p', '--password', dest='password', default=None, help='User\'s password. Used for logging in.')
 def create_user(first_name, last_name, email, username, password):
 	if not first_name or not last_name or not email or not username or not password:
 		print('Please pass all required parameters.\n Usage: flask/bin/python3.4 -m admin.manage user create_user -fn <first name> -ln <last name> -e <email> -u <username> -p <password>')
