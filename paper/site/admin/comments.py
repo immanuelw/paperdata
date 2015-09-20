@@ -10,7 +10,7 @@ def get_all_comments():
 		threads = db_utils.query(database='admin', table='thread', sort_tuples=(('last_updated', 'desc'),))
 		for thread in threads:
 			setattr(thread, 'comments',
-					db_utils.query(database='admin', table='comment',	field_tuples=(('thread_id', '==', getattr(thread, 'id')),)))
+					db_utils.query(database='admin', table='comment', field_tuples=(('thread_id', '==', getattr(thread, 'id')),)))
 	except:
 		return make_response('Threads not found', 500)
 
@@ -29,7 +29,7 @@ def thread_reply():
 
 		db.session.add(new_comment)
 
-		thread = db_utils.query(database='admin', table='thread',	field_tuples=(('id', '==', thread_id),))
+		thread = db_utils.query(database='admin', table='thread', field_tuples=(('id', '==', thread_id),))
 		setattr(thread, 'last_updated', datetime.utcnow())
 
 		db.session.add(thread)

@@ -8,7 +8,7 @@ import re
 
 @lm.user_loader
 def load_user(id):
-	user = db_utils.query(database='admin', table='user',	field_tuples=(('username', '==', id),))[0]
+	user = db_utils.query(database='admin', table='user', field_tuples=(('username', '==', id),))[0]
 	return user
 
 @app.route('/login', methods = ['GET', 'POST'])
