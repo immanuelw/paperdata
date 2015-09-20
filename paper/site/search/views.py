@@ -25,7 +25,7 @@ def str_val(value):
 @app.route('/index')
 @app.route('/index/set/<setName>')
 @app.route('/set/<setName>')
-def index(setName = None):
+def index(setName=None):
 	active_data_sources = []
 
 	if g.user is not None and g.user.is_authenticated():
