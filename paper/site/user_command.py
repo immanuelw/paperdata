@@ -11,6 +11,11 @@ UserCommand = Manager(usage='Perform user creation')
 @UserCommand.option('-u', '--username', dest='username', default=None, help='User\'s username. Used for logging in.')
 @UserCommand.option('-p', '--password', dest='password', default=None, help='User\'s password. Used for logging in.')
 def create_user(database, first_name, last_name, email, username, password):
+	'''
+	creates user when called through command
+
+	input: database name, first name of user, last name, email address, username, password
+	'''
 	if not database or not first_name or not last_name or not email or not username or not password:
 		print('Please pass all required parameters.\n Usage: flask/bin/python3.4 -m search.manage user create_user -db <database> fn <first name> -ln <last name> -e <email> -u <username> -p <password>')
 	else:
