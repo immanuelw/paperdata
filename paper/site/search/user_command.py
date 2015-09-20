@@ -13,7 +13,7 @@ UserCommand = Manager(usage = 'Perform user creation')
 @UserCommand.option('-p', '--password', dest = 'password', default = None, help = 'User\'s password. Used for logging in.')
 def create_user(first_name, last_name, email, username, password):
 	if not first_name or not last_name or not email or not username or not password:
-		print('Please pass all required parameters.\n Usage: flask/bin/python3.4 -m app.manage user create_user -fn <first name> -ln <last name> -e <email> -u <username> -p <password>')
+		print('Please pass all required parameters.\n Usage: flask/bin/python3.4 -m search.manage user create_user -fn <first name> -ln <last name> -e <email> -u <username> -p <password>')
 	else:
 		password = password.encode('UTF-8')
 		user = getattr(models, 'User')(username=username, password=hashlib.sha512(password).hexdigest(), email=email,
