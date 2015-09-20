@@ -1,4 +1,4 @@
-from paper.site.admin.flask_app import db
+from paper.site.flask_app import admin_db as db
 from datetime import datetime
 
 class User(db.Model):

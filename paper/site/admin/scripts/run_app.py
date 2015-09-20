@@ -1,6 +1,6 @@
 #!flask/bin/python
 
-from paper.site.admin.flask_app import app
+from paper.site.flask_app import admin_app as app
 from paper.site.admin import views, models, comments, users
 
 if __name__ == "__main__":
