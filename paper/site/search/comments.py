@@ -1,5 +1,5 @@
 from flask import render_template, g, make_response, request
-from paper.site.search.flask_app import app, db
+from paper.site.flask_app import search_app as app, search_db as db
 from paper.site.search import models
 from paper.site import db_utils
 from datetime import datetime

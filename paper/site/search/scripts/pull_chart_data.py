@@ -8,7 +8,7 @@ import requests
 from datetime import datetime
 from paper.site.search import models
 from paper.site import db_utils
-from paper.site.search.flask_app import db
+from paper.site.flask_app import search_db as db
 
 profiling_mark = None
 

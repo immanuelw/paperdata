@@ -1,7 +1,7 @@
 from flask.ext.script import Manager
 from flask.ext.migrate import Migrate, MigrateCommand
 
-from paper.site.search.flask_app import app, db
+from paper.site.flask_app import search_app as app, search_db as db
 
 migrate = Migrate(app, db)
 manager = Manager(app)

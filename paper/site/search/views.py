@@ -4,7 +4,7 @@ import os
 import time
 import json
 from datetime import datetime
-from paper.site.search.flask_app import app, db
+from paper.site.flask_app import search_app as app, search_db as db
 from paper.site.search import models, histogram_utils, data_sources
 from paper.site import db_utils, misc_utils
 from paper.data import dbi as pdbi
