@@ -9,6 +9,12 @@ from sqlalchemy.engine import reflection
 import socket
 
 def get_dbi(database):
+	'''
+	selects interface and module for input database
+
+	input: database name
+	output: database interface object, module object
+	'''
 	host = socket.gethostname()
 	if database == 'paper':
 		module = pdbi
@@ -32,16 +38,34 @@ def get_dbi(database):
 	return dbi, module
 
 def inspector(database):
+	'''
+	access into database metadata
+
+	input: database name
+	output: inspector object
+	'''
 	dbi, _ = get_dbi(database)
 	insp = reflection.Inspector.from_engine(dbi.engine)
 	return insp
 
 def get_table_names(database):
+	'''
+	gets all table names in database
+
+	input: database name
+	output: list of table names
+	'''
 	insp = inspector(database)
 	table_names = insp.get_table_names()
 	return table_names
 
 def get_column_names(database, table):
+	'''
+	gets all column names in table
+
+	input: database name, table name
+	output: tuple of column names
+	'''
 	insp = inspector(database)
 	#it's a list of dicts
 	column_list = insp.get_column_names(table)
@@ -49,6 +73,12 @@ def get_column_names(database, table):
 	return column_names
 
 def make_clause(table, field_name, equivalency, value):
+	'''
+	generates a clause for sqlalchemy filters
+
+	input: table name, field name, type of equivalency, value to compare against
+	output: sqlalchemy clause
+	'''
 	field = getattr(table, field_name)
 	if equivalency is None:
 		return None
@@ -75,16 +105,32 @@ def make_clause(table, field_name, equivalency, value):
 	return clause
 
 def sort_clause(table, sort_tuples):
-	#grab the sort clause of the query
+	'''
+	generates a sorting clause for sqlalchemy filter
+
+	input: table, tuple of tuples indicating field to sort and sort order
+	output: list of clauses
+	'''
 	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in sort_tuples]
 	return clause_list
 
 def group_clause(table, group_tuples):
-	#grab the group clause of the query
+	'''
+	generates a grouping clause for sqlalchemy filter
+
+	input: table, tuple of tuples indicating fields to group
+	output: list of clauses
+	'''
 	clause_list = [getattr(table, field_name) for field_name in field_group_tuples]
 	return clause_list
 
 def get_results(s, table, field_tuples, sort_tuples, group_tuples):
+	'''
+	outputs results from a query after filtering
+
+	input: session object, table name, tuple of field names, equivalency values, and values to limit query, sort tuples and group tuples
+	output: list of objects corresponding to filtered query made
+	'''
 	results = s.query(table)
 	if field_tuples is not None:
 		clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
@@ -105,8 +151,12 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples):
 	return results
 
 def query(data_source=None, database=None, table=None, field_tuples=None, sort_tuples=None, group_tuples=None):
-	#field tuples is list of field tuples containting field_name, equivalency, value and in that order
-	#ex: [('obs_column', '<=', 23232), ('projectid', '==', 'G0009')]
+	'''
+	pulls list of object from database after filtering query
+
+	input: (all optional) -- data source object, database name, table name , field tuples, sort tuples, group tuples
+	output: list of objects corresponding to filtered query
+	'''
 	if data_source is not None:
 		dbi, module = get_dbi(data_source.database)
 		table = getattr(module, data_source.table.title())

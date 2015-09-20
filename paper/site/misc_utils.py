@@ -2,6 +2,11 @@ from datetime import datetime
 from paper.convert import gcal2jd
 
 def get_set_strings():
+	'''
+	output a list of set strings for main filterable fields
+
+	output: list of set strings for polarization, era_type, host, and filetype
+	'''
 	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
 	era_type_strs = ('all',)
 	host_strs = ('all', 'pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1')
@@ -9,6 +14,12 @@ def get_set_strings():
 	return pol_strs, era_type_strs, host_strs, filetype_strs
 
 def get_jd_from_datetime(start_time=None, end_time=None):
+	'''
+	generates julian date from datetime -- either object or string
+
+	input: start time, end time as objects or strings
+	output: time start, time end as julian dates
+	'''
 	time_start = None
 	time_end = None
 	if isinstance(start_time, str):
@@ -24,5 +35,11 @@ def get_jd_from_datetime(start_time=None, end_time=None):
 	return time_start, time_end
 
 def get_utc_from_datetime(date_time):
+	'''
+	generates utc in seconds from datetime object
+
+	input: datetime object
+	output: utc in seconds
+	'''
 	utc = (date_time - datetime(1970, 1, 1)).total_seconds()
 	return utc
