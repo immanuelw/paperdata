@@ -5,6 +5,12 @@ import re, urllib.parse
 # @set(set name). This string will be replaced by a hyperlink to the
 # set.
 def set_hyperlink_filter(comment):
+	'''
+	sets hyperlinks for comments
+
+	input: comment
+	output: comment with all hyperlinks converted
+	'''
 	comment_copy = str(comment)
 
 	EXPR_START_TEXT = '@set('

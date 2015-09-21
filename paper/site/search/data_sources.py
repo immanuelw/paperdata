@@ -7,6 +7,9 @@ from paper.site import db_utils
 
 @app.route('/get_tables', methods = ['POST'])
 def get_tables():
+	'''
+	get all tables
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		hostname = request.form['hostname']
 		database = request.form['database']
@@ -19,6 +22,9 @@ def get_tables():
 
 @app.route('/get_columns', methods = ['POST'])
 def get_columns():
+	'''
+	get all columns
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		hostname = request.form['hostname']
 		database = request.form['database']
@@ -32,6 +38,11 @@ def get_columns():
 
 @app.route('/get_users_data_sources')
 def get_users_data_sources():
+	'''
+	get all of current user's data sources
+
+	output: data source html
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		active_data_sources = g.user.active_data_sources
 		subscribed_but_inactive_data_sources =\
@@ -45,6 +56,11 @@ def get_users_data_sources():
 
 @app.route('/get_unsubscribed_data_sources')
 def get_unsubscribed_data_sources():
+	'''
+	get all data sources user is not subscribed to
+
+	output: unsubscribed data source html
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		all_data_sources = db_utils.query(database='search', table='graph_data_source')
 
@@ -60,6 +76,9 @@ def get_unsubscribed_data_sources():
 
 @app.route('/update_active_data_sources', methods = ['POST'])
 def update_active_data_sources():
+	'''
+	update user by adding/removing data sources
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		request_content = request.get_json()
 		new_active_data_sources_names = request_content['activeDataSources']
@@ -87,6 +106,9 @@ def update_active_data_sources():
 
 @app.route('/subscribe_to_data_source', methods = ['POST'])
 def subscribe_to_data_source():
+	'''
+	add data source to user
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
@@ -101,6 +123,9 @@ def subscribe_to_data_source():
 
 @app.route('/unsubscribe_from_data_source', methods = ['POST'])
 def unsubscribe_from_data_source():
+	'''
+	remove data source from user
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
@@ -120,12 +145,18 @@ def unsubscribe_from_data_source():
 
 @app.route('/get_graph_types')
 def get_graph_types():
+	'''
+	get all graph types
+	'''
 	graph_types = db_utils.query(database='search', table='graph_type', field_tuples=(('name', '!=', 'Obs_File'),))
 
 	return render_template('graph_type_list.html', graph_types=graph_types)
 
 @app.route('/create_data_source', methods = ['POST'])
 def create_data_source():
+	'''
+	create new data source and add to user
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		request_content = request.get_json()
 
@@ -204,7 +235,13 @@ def create_data_source():
 		return make_response('You must be logged in to use this feature.', 401)
 
 def get_graph_data(data_source_str, start_utc, end_utc, the_set):
-	data_source = db_utils.query(database='search', table='graph_data_source',	field_tuples=(('name', '==', data_source_str),))[0]
+	'''
+	get graph data from data source sets
+
+	input: data source string, start time in utc, end time in utc, set object
+	output: dictionary of lists of times, count, and obsnums for graph
+	'''
+	data_source = db_utils.query(database='search', table='graph_data_source', field_tuples=(('name', '==', data_source_str),))[0]
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = db.utils.get_set_strings()
 	data = {pol_str: {era_type: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
@@ -234,6 +271,12 @@ def get_graph_data(data_source_str, start_utc, end_utc, the_set):
 	return data
 
 def which_data_set(the_set):
+	'''
+	selects filters from set object
+
+	input: set object
+	output: list of filter values
+	'''
 	polarization = getattr(the_set, 'polarization')
 	era =  getattr(the_set, 'era')
 	era_type = getattr(the_set, 'era_type')
@@ -244,6 +287,12 @@ def which_data_set(the_set):
 	return which_data
 
 def separate_data_into_sets(data, data_source, start_utc, end_utc):
+	'''
+	get graph data from data source sets
+
+	input: data dictionary, data source object, start time in utc, end time in utc, set object
+	output: dictionary of lists of times, count, and obsnums for graph
+	'''
 	obsid_results = db_utils.query(data_source=data_source,
 									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 									sort_tuples=(('time_start', 'asc'),))

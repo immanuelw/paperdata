@@ -6,6 +6,11 @@ from datetime import datetime
 
 @app.route('/get_all_comments')
 def get_all_comments():
+	'''
+	get all comments
+
+	output: comments html
+	'''
 	try:
 		threads = db_utils.query(database='search', table='thread', sort_tuples=(('last_updated', 'desc'),))
 		for thread in threads:
@@ -18,6 +23,9 @@ def get_all_comments():
 
 @app.route('/thread_reply', methods = ['POST'])
 def thread_reply():
+	'''
+	add thread reply
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		thread_id = request.form['thread_id']
 		text = request.form['text']
@@ -40,6 +48,9 @@ def thread_reply():
 
 @app.route('/new_thread', methods = ['POST'])
 def new_thread():
+	'''
+	add new comment thread
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		title = request.form['title']
 		text = request.form['text']
