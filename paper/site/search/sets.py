@@ -4,7 +4,12 @@ from paper.site import db_utils, misc_utils
 from flask import request, g, make_response, jsonify, render_template
 from datetime import datetime
 
-def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era, era_type, total_data_hrs, flagged_data_hrs):
+def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era_type, total_data_hrs, flagged_data_hrs):
+	'''
+	insert set into database
+
+	input: set name, start time, end time, dict of flagged range, polarization, era type, total data hours, flagged data hours
+	'''
 	new_set = getattr(models, 'Set')()
 	setattr(new_set, 'username', g.user.username)
 	setattr(new_set, 'name', name)
@@ -41,12 +46,24 @@ def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era,
 	db.session.commit()
 
 def is_obs_flagged(obs_id, flagged_range_dicts):
+	'''
+	boolean check for if observation is flagged
+
+	input: observation id, list of flagged range dicts
+	output: boolean value if flagged
+	'''
 	for flagged_range_dict in flagged_range_dicts:
 		if obs_id >= flagged_range_dict['start_utc'] and obs_id <= flagged_range_dict['end_utc']:
 			return True
 	return False
 
 def get_data_hours_in_set(start, end, polarization, era_type, flagged_range_dicts):
+	'''
+	finds total amount of hours total, and total flagged
+
+	input: start time, end time, polarization, era type, list of flagged range dicts
+	output: total amount of data hours, total amount of flagged data hours
+	'''
 	total_data_hrs = flagged_data_hrs = 0
 
 	all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
@@ -66,6 +83,9 @@ def get_data_hours_in_set(start, end, polarization, era_type, flagged_range_dict
 
 @app.route('/save_new_set', methods=['POST'])
 def save_new_set():
+	'''
+	output set as json to be saved
+	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		request_content = request.get_json()
 
@@ -114,6 +134,9 @@ def save_new_set():
 
 @app.route('/upload_set', methods=['POST'])
 def upload_set():
+	'''
+	upload set to database
+	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		set_name = request.form['set_name']
 
@@ -192,6 +215,9 @@ def upload_set():
 
 @app.route('/download_set')
 def download_set():
+	'''
+	download set as json
+	'''
 	set_id = request.args['set_id']
 	arg_type = request.args['arg_type']
 
@@ -234,11 +260,21 @@ def download_set():
 
 @app.route('/get_filters')
 def get_filters():
+	'''
+	get filters for database
+
+	output: filters html
+	'''
 	users = db_utils.query(database='search', table='user')
 	return render_template('filters.html', users=users)
 
 @app.route('/get_sets', methods = ['POST'])
 def get_sets():
+	'''
+	get all sets
+
+	output: set list html
+	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		request_content = request.get_json()
 		set_controls = request_content['set_controls']
@@ -282,6 +318,9 @@ def get_sets():
 
 @app.route('/delete_set', methods = ['POST'])
 def delete_set():
+	'''
+	delete set from database
+	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		set_id = request.form['set_id']
 
