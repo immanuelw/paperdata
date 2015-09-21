@@ -4,6 +4,12 @@ import math
 import json
 
 def get_plot_bands(the_set):
+	'''
+	get plot bands for a set
+
+	input: set object
+	output: dict of start, end, and color of flagged subset of set object
+	'''
 	flagged_subsets = db_utils.query(database='search', table='flagged_subset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),))
 
 	plot_bands = [{'from': int(getattr(flagged_subset, 'start')), 'to': int(getattr(flagged_subset, 'end')), 'color': 'yellow'}
@@ -12,6 +18,12 @@ def get_plot_bands(the_set):
 	return plot_bands
 
 def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
+	'''
+	get all observations to plot
+
+	input: start time in utc, end time in utc, set polarization, set era type
+	output: 2D dict of count by polarization and era type, and 2D dict of lists of dicts of time and obsnum by polarization and era type
+	'''
 	response = db_utils.query(database='paperdata', table='observation',
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if set_pol == 'all' else '==', set_pol),
@@ -36,6 +48,12 @@ def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
 	return (obs_count, obs_map)
 
 def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_host=None, set_filetype=None):
+	'''
+	get all files to plot
+
+	input: start time in utc, end time in utc, and (optional) -- host tuple, filetype tuple, set host, set filetype
+	output: 2D dict of count by host and filetype, and 2D dict of lists of dicts of time and obsnum by host and filetype
+	'''
 	base_length = 0.00696
 	try:
 		rtp_obs_list = db_utils.query(database='paperdata', table='rtp_observation',
@@ -74,6 +92,12 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 	return (file_count, file_map)
 
 def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
+	'''
+	generate histogram after limiting time
+
+	input: start time in utc, end time in utc, start time string, end time string
+	output: histogram html
+	'''
 	try:
 		response = db_utils.query(database='paperdata', table='observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
