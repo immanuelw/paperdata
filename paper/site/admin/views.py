@@ -10,12 +10,22 @@ from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 
 def time_val(value):
-	#determines how much time to divide by
+	'''
+	determines how much time to divide by and divides time by that to make human readable
+
+	input: numerical time value
+	output: numerical time value divided
+	'''
 	time_val = 1 if value < 500 else 60 if value < 3600 else 3600 if value < 86400 else 86400
 	return value / time_val
 
 def str_val(value):
-	#determines which time segment to use
+	'''
+	determines which time unit to use
+
+	input: numerical time value
+	output: time unit string
+	'''
 	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
 	str_val = ' '.join(str_val, 'ago')
 	return str_val
@@ -25,6 +35,11 @@ def str_val(value):
 @app.route('/index/set/<setName>')
 @app.route('/set/<setName>')
 def index():
+	'''
+	start page of the website
+
+	output: index html
+	'''
 	return render_template('index.html')
 
 @app.route('/data_amount', methods = ['GET'])
@@ -183,6 +198,9 @@ def rtp_summary_table():
 
 @app.before_request
 def before_request():
+	'''
+	access database as user before request
+	'''
 	g.user = current_user
 	try:
 		paper_dbi = pdbi.DataBaseInterface()
@@ -199,6 +217,11 @@ def before_request():
 
 @app.teardown_request
 def teardown_request(exception):
+	'''
+	exit database after request
+
+	input: exception
+	'''
 	paper_db = getattr(g, 'paper_session', None)
 	pyg_db = getattr(g, 'pyg_session', None)
 	admin_db = getattr(g, 'admin_session', None)
@@ -209,6 +232,11 @@ def teardown_request(exception):
 
 @app.route('/profile')
 def profile():
+	'''
+	access user profile
+
+	output: profile html or redirect for login
+	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
 			user = db_utils.query(database='admin', table='user',	field_tuples=(('username', '==', g.user.username),),)[0]
@@ -223,6 +251,11 @@ def profile():
 
 @app.route('/user_page')
 def user_page():
+	'''
+	access user page
+
+	output: user page html or redirect for login
+	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
 			user = db_utils.query(database='admin', table='user',	field_tuples=(('username', '==', g.user.username),))[0]

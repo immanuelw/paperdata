@@ -8,11 +8,22 @@ import re
 
 @lm.user_loader
 def load_user(id):
+	'''
+	load user
+
+	input: user id
+	output: user object
+	'''
 	user = db_utils.query(database='admin', table='user', field_tuples=(('username', '==', id),))[0]
 	return user
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
+	'''
+	login
+
+	output: login html
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		return redirect(url_for('index'))
 	error = None
@@ -35,6 +46,11 @@ def login():
 
 @app.route('/signup', methods= ['GET', 'POST'])
 def signup():
+	'''
+	signup
+
+	output: signup html
+	'''
 	if g.user is not None and g.user.is_authenticated():
 		return redirect(url_for('index'))
 	error = None
@@ -74,12 +90,22 @@ def signup():
 
 @app.route('/logout')
 def logout():
+	'''
+	logout
+
+	output: redirect to index
+	'''
 	logout_user()
 	flash('You were logged out', 'flash')
 	return redirect(url_for('index'))
 
 @app.route('/delete_user', methods=['POST'])
 def delete_user():
+	'''
+	delete user from database and delete all sets associated to user
+
+	output: redirect to user page
+	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		username = request.form['username']
 		action = request.form['action']

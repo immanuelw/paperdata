@@ -17,7 +17,6 @@ def time_val(value):
 	input: numerical time value
 	output: numerical time value divided
 	'''
-	
 	time_val = 1 if value < 500 else 60 if value < 3600 else 3600 if value < 86400 else 86400
 	return value / time_val
 
