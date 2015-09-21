@@ -11,12 +11,23 @@ from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 
 def time_val(value):
-	#determines how much time to divide by
+	'''
+	determines how much time to divide by and divides time by that to make human readable
+
+	input: numerical time value
+	output: numerical time value divided
+	'''
+	
 	time_val = 1 if value < 500 else 60 if value < 3600 else 3600 if value < 86400 else 86400
 	return value / time_val
 
 def str_val(value):
-	#determines which time segment to use
+	'''
+	determines which time unit to use
+
+	input: numerical time value
+	output: time unit string
+	'''
 	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
 	str_val = ' '.join(str_val, 'ago')
 	return str_val
@@ -26,6 +37,13 @@ def str_val(value):
 @app.route('/index/set/<setName>')
 @app.route('/set/<setName>')
 def index(setName=None):
+	'''
+	start page of the website
+	pull in set name if possible to pregenerate set information
+
+	input: set name
+	output: index html
+	'''
 	active_data_sources = []
 
 	if g.user is not None and g.user.is_authenticated():
@@ -54,6 +72,11 @@ def index(setName=None):
 
 @app.route('/get_graph')
 def get_graph():
+	'''
+	get graph information or set view
+
+	output: graph html or set view html
+	'''
 	graph_type_str = request.args.get('graphType')
 	if graph_type_str is None:
 		return make_response('No graph type', 500)
@@ -142,6 +165,11 @@ def get_graph():
 
 @app.route('/obs_table', methods = ['POST'])
 def obs_table():
+	'''
+	generate observation table for histogram bar
+
+	output: observation table html
+	'''
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
@@ -162,6 +190,11 @@ def obs_table():
 
 @app.route('/file_table', methods = ['POST'])
 def file_table():
+	'''
+	generate file table for histogram bar
+
+	output: file table html
+	'''
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
@@ -186,6 +219,9 @@ def file_table():
 
 @app.before_request
 def before_request():
+	'''
+	access database as user before request
+	'''
 	g.user = current_user
 	try:
 		paper_dbi = pdbi.DataBaseInterface()
@@ -202,6 +238,11 @@ def before_request():
 
 @app.teardown_request
 def teardown_request(exception):
+	'''
+	exit database after request
+
+	input: exception
+	'''
 	paper_db = getattr(g, 'paper_session', None)
 	pyg_db = getattr(g, 'pyg_session', None)
 	search_db = getattr(g, 'search_session', None)
@@ -212,6 +253,11 @@ def teardown_request(exception):
 
 @app.route('/profile')
 def profile():
+	'''
+	access user profile
+
+	output: profile html or redirect for login
+	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
 			user = db_utils.query(database='search', table='user',	field_tuples=(('username', '==', g.user.username),),)[0]
@@ -226,6 +272,11 @@ def profile():
 
 @app.route('/user_page')
 def user_page():
+	'''
+	access user page
+
+	output: user page html or redirect for login
+	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
 			user = db_utils.query(database='search', table='user',	field_tuples=(('username', '==', g.user.username),))[0]
@@ -242,6 +293,11 @@ def user_page():
 
 @app.route('/data_summary_table', methods=['POST'])
 def data_summary_table():
+	'''
+	summary of data in main databases
+
+	output: summary table html
+	'''
 	#table that shows on side of website under login
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
