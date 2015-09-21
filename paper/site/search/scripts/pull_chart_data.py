@@ -13,19 +13,37 @@ from paper.site.flask_app import search_db as db
 profiling_mark = None
 
 def write_to_log(msg):
+	'''
+	write message to log
+
+	input: message
+	'''
 	print(msg)
 
 def profile():
+	'''
+	profile the time to run certain functions
+
+	output: time taken by function in seconds
+	'''
 	global profiling_mark
 	result = datetime.now() - profiling_mark
 	profiling_mark = datetime.now()
 	return result.total_seconds()
 
 def log_query_time(var_name):
+	'''
+	write time taken to query database to log
+
+	input: variable name
+	'''
 	write_to_log('{var_name} query ran in {profile_time} seconds'.format(var_name=var_name, profile_time=profile())
 	return None
 
 def update():
+	'''
+	pull data and update database
+	'''
 	utc_now = datetime.utcnow().isoformat()
 
 	baseUTCToGPSURL = 'http://ngas01.ivec.org/metadata/tconv/?utciso='
