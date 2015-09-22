@@ -32,10 +32,11 @@ def bandpass_normalize(bandpass_table, bandpass_table_inv):
 
 	return None
 
-def clean2fits(infile, outfile):
-	ia.open(infile)
-	ia.tofits(outfile, overwrite=True)
-	ia.close()
+def clean2fits(infile_dict, outfile_dict):
+	for in_name in outfile_dict.keys()
+		ia.open(infile_dict[in_name])
+		ia.tofits(outfile_dict[in_name], overwrite=True)
+		ia.close()
 
 	return True
 
@@ -74,8 +75,7 @@ if __name__ == '__main__':
 				cell=['3arcmin', '3arcmin'], imsize=[1024, 1024], gridmode='widefield', wprojplanes=32, gain=0.2, stokes='I', usescratch=True)
 
 		#Use scratch puts the model back into the MS
-		for in_name in lst_outfile.keys():
-			clean2fits(lst_infile[in_name], lst_outfile[in_name])
+		clean2fits(lst_infile, lst_outfile)
 
 		#calibrate the gain frequency dependence
 		bandpass_table = ''.join(lst, '_bandpass.cal')
@@ -95,5 +95,4 @@ if __name__ == '__main__':
 				weighting='uniform', cell=['3arcmin', '3arcmin'], imsize=[1024, 1024], gridmode='widefield', wprojplanes=32, gain=0.2,
 				stokes='I')
 
-		for in_name in bp_outfile.keys():
-			clean2fits(bp_infile[in_name], bp_outfile[in_name])
+		clean2fits(bp_infile, bp_outfile)
