@@ -15,9 +15,9 @@ def bandpass_normalize(bandpass_table, bandpass_table_inv):
 	gain_norm = gain
 
 	#for each antenna and for each channel of the bandpass I divide out by the modulo of the complex number
-	for i in range(0,gain.shape[2]):
-		for j in range(0,gain.shape[1]):
-			a = gain[0,j,i]
+	for i in range(0, gain.shape[2]):
+		for j in range(0, gain.shape[1]):
+			a = gain[0, j, i]
 
 			#if the real part of the antenna gain is set to 1 it means that that antenna a/o channel is flag, so don't bother looking at it
 			if a.real != 1:
@@ -62,8 +62,8 @@ if __name__ == '__main__':
 						'residual': '_residual',
 						'psf': '_psf'}
 
-		lst_infile = {in_name: '.'.join(lst, in_name) for in_name in lst_filetypes}
-		lst_outfile = {in_name: ''.join(lst, out_name, '.fits') for in_name, out_name in lst_names.items()}
+		lst_infile = {in_name: '.'.join((lst, in_name)) for in_name in lst_filetypes}
+		lst_outfile = {in_name: ''.join((lst, out_name, '.fits')) for in_name, out_name in lst_names.items()}
 		for in_file in lst_infile.values():
 			shutil.rmtree(in_file)
 
@@ -78,15 +78,15 @@ if __name__ == '__main__':
 		clean2fits(lst_infile, lst_outfile)
 
 		#calibrate the gain frequency dependence
-		bandpass_table = ''.join(lst, '_bandpass.cal')
-		normalized_bandpass = ''.join(lst, '_normbandpass.cal')
+		bandpass_table = ''.join((lst, '_bandpass.cal'))
+		normalized_bandpass = ''.join((lst, '_normbandpass.cal'))
 		bandpass(vis=filename, solint='inf', combine='scan', caltable=bandpass_table, field='')
 		bandpass_normalize(bandpass_table, normalized_bandpass)
 		applycal(vis=filename, gaintable=normalized_bandpass)
 
-		bp_image = ''.join(lst, '_bandpass')
-		bp_infile = {in_name: '.'.join(bp_image, in_name) for in_name in lst_filetypes}
-		bp_outfile = {in_name: ''.join(bp_image, out_name, '.fits') for in_name, out_name in lst_names.items()}
+		bp_image = ''.join((lst, '_bandpass'))
+		bp_infile = {in_name: '.'.join((bp_image, in_name)) for in_name in lst_filetypes}
+		bp_outfile = {in_name: ''.join((bp_image, out_name, '.fits')) for in_name, out_name in lst_names.items()}
 		for in_file in bp_infile.values():
 			shutil.rmtree(in_file)
 		
