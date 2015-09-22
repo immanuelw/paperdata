@@ -176,24 +176,32 @@ def get_aa(freqs):
 	for i in prms['antpos'].keys():
 		beam = bm.prms['beam'](freqs, nside=32, lmax=20, mmax=20, deg=7)
 		
-		try: beam.set_params(bm.prms['bm_prms'])
-		except(AttributeError): pass
+		try:
+			beam.set_params(bm.prms['bm_prms'])
+		except(AttributeError):
+			pass
 		
 		pos = prms['antpos'][i]
 		
-		try: dly = prms['delays'][i]
-		except(KeyError): dly = {'x':0., 'y':0.}
+		try:
+			delay = prms['delays'][i]
+		except(KeyError):
+			delay = {'x':0., 'y':0.}
 		
-		try: off = prms['off'][i]
-		except(KeyError): off = {'x':0., 'y':0.}
+		try:
+			off = prms['off'][i]
+		except(KeyError):
+				off = {'x':0., 'y':0.}
 		
 		bp_r = {'x':prms['bp_r'], 'y':prms['bp_r']}
 		bp_i = {'x':[0.], 'y':[0.]}
 		
-		try: amp=prms['amps'][i]
-		except(KeyError): amp = {'x':20., 'y':20.}
+		try:
+			amp = prms['amps'][i]
+		except(KeyError):
+			amp = {'x':20., 'y':20.}
 	   
-		phsoff = {'x':[dly['x'], off['x']], 'y':[dly['y'], off['y']]}
+		phsoff = {'x': [delay['x'], off['x']], 'y': [delay['y'], off['y']]}
 		
 		antennas.append(
 				a.pol.Antenna(pos[0], pos[1], pos[2], beam, phsoff=phsoff, amp=amp, bp_r = bp_r, bp_i=bp_i, lat=prms['loc'][0])
@@ -222,13 +230,13 @@ def get_catalog(srcs=None, cutoff=None, catalogs=['helm','misc']):
 					cat[src] = a.fit.RadioFixedBody(**src_prms[src])
 	return cat
 
-if __name__=='__main__':
+if __name__ == '__main__':
 	import sys, numpy as n
-	if len(sys.argv)>1:
+	if len(sys.argv) > 1:
 		print 'loading catalog: ', sys.argv[1]
 		cat = get_catalog(catalogs=[sys.argv[1]])
 		names = [cat[src].src_name for src in cat]
-		print 'loaded',len(names),' sources'
+		print 'loaded', len(names), ' sources'
 		flx = [cat[src]._jys for src in cat]
 		print names
 		print 'brightest source in catalog'
