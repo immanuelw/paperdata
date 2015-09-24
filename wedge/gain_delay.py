@@ -29,7 +29,7 @@ def gen_gain(file_path):
 	gain = {ant_num: {'x': 0, 'y': 0} for ant_num in range(32)}
 	for pol_num, polarization in enumerate(('x', 'y')):
 		for ant_num in range(32):
-			gain[ant_num][polarization] = np.polyfit(?, gain_data[pol_num, :, ant_num]), 1)
+			gain[ant_num][polarization] = np.polyfit(np.linspace(0.1, 0.2, 203), gain_data[pol_num, :, ant_num]), 1)
 	return gain
 
 def gen_delay(file_path):
@@ -37,7 +37,8 @@ def gen_delay(file_path):
 	delay = {ant_num: {'x': 0, 'y': 0} for ant_num in range(32)}
 	for pol_num, polarization in enumerate(('x', 'y')):
 		for ant_num in range(32):
-			delay[ant_num][polarization] = np.polyfit(?, delay_data[pol_num, :, ant_num]), 1)
+			#delay is output in ns
+			delay[ant_num][polarization] = np.polyfit(np.linspace(0.1, 0.2, 203), delay_data[pol_num, :, ant_num]), 1)
 	return delay
 
 if __name__ == '__main__':
