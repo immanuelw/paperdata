@@ -6,6 +6,16 @@ import bm_prms as bm
 import generic_catalog
 import logging
 
+def load_delays(file_path):
+	import json
+	delays = json.load(file_path)['delays']
+	return delays
+
+def load_amps(file_path_base):
+	import json
+	amps = json.load(file_path)['amps']
+	return amps
+
 prms = {
 	'loc': ('-30:43:17.5', '21:25:41.9'), # KAT, SA (GPS)
 	'antpos':{
