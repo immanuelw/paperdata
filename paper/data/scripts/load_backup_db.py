@@ -24,8 +24,7 @@ def load_backup(dbi, backup_file=None, table=None):
 	if table is None:
 		return None
 	if backup_file is None:
-		backup_list = glob.glob('/data4/paper/paperdata_backup/[0-9]*')
-		backup_list.sort(reverse=True)
+		backup_list = sorted(glob.glob('/data4/paper/paperdata_backup/[0-9]*'), reverse=True)
 		timestamp = int(backup_list[0].split('/')[-1])
 		backup_file = '/data4/paper/paperdata_backup/{timestamp}/{table}_{timestamp}.json'.format(table=table, timestamp=timestamp)
 
