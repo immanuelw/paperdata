@@ -25,18 +25,16 @@ from email import Encoders
 ### Author: Immanuel Washington
 ### Date: 11-23-14
 
-def set_feed(source, output_host, output_dir, moved_to_distill=True):
+def set_feed(s, dbi, source, output_host, output_dir, moved_to_distill=True):
 	'''
 	updates table for feed file
 
-	input: source file, output host, output directory, moved to distill or not boolean value
+	input: session object, database interface object, source file, output host, output directory, moved to distill or not boolean value
 	'''
-	dbi = pdbi.DataBaseInterface()
-	with dbi.session_scope() as s:
-		FEED = dbi.get_entry(s, 'feed', source)
-		dbi.set_entry(s, FEED, 'host', output_host)
-		dbi.set_entry(s, FEED, 'path', output_dir)
-		dbi.set_entry(s, FEED, 'moved_to_distill', moved_to_distill)
+	FEED = dbi.get_entry(s, 'feed', source)
+	dbi.set_entry(s, FEED, 'host', output_host)
+	dbi.set_entry(s, FEED, 'path', output_dir)
+	dbi.set_entry(s, FEED, 'moved_to_distill', moved_to_distill)
 	return None
 
 def move_feed_files(input_host, input_paths, output_host, output_dir):
@@ -49,12 +47,14 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
-		for source in input_paths:
-			move_files.rsync_copy(source, destination)
-			set_feed(source, output_host, output_dir)
-			shutil.rmtree(source)
+		dbi = pdbi.DataBaseInterface()
+		with dbi.session_scope() as s:
+			for source in input_paths:
+				move_files.rsync_copy(source, destination)
+				set_feed(s, dbi, source, output_host, output_dir)
+				shutil.rmtree(source)
 	else:
-		with ppdata.ssh_scope(host) as ssh:
+		with ppdata.ssh_scope(input_host) as ssh:
 			for source in input_paths:
 				rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 				rsync_del_command = '''rm -r {source}'''.format(source=source)

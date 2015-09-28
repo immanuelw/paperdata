@@ -85,28 +85,26 @@ def null_check(input_host, input_paths):
 
 	return True
 
-def set_move_table(input_host, source, output_host, output_dir):
+def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 	'''
 	updates table for moved file
 
-	input: user host, source file, output host, output directory
+	input: session object, database interface object, user host, source file, output host, output directory
 	'''
-	dbi = pdbi.DataBaseInterface()
-	with dbi.session_scope() as s:
-		action = 'move'
-		table = 'file'
-		full_path = ''.join((input_host, ':', source))
-		timestamp = int(time.time())
-		FILE = dbi.get_entry(s, 'file', full_path)
-		dbi.set_entry(s, FILE, 'host', output_host)
-		dbi.set_entry(s, FILE, 'path', output_dir)
-		dbi.set_entry(s, FILE, 'timestamp', timestamp)
-		identifier = getattr(FILE, 'full_path')
-		log_data = {'action':action,
-					'table':table,
-					'identifier':identifier,
-					'timestamp':timestamp}
-		dbi.add_to_table(s, 'log', log_data)
+	action = 'move'
+	table = 'file'
+	full_path = ''.join((input_host, ':', source))
+	timestamp = int(time.time())
+	FILE = dbi.get_entry(s, 'file', full_path)
+	dbi.set_entry(s, FILE, 'host', output_host)
+	dbi.set_entry(s, FILE, 'path', output_dir)
+	dbi.set_entry(s, FILE, 'timestamp', timestamp)
+	identifier = getattr(FILE, 'full_path')
+	log_data = {'action':action,
+				'table':table,
+				'identifier':identifier,
+				'timestamp':timestamp}
+	dbi.add_to_table(s, 'log', log_data)
 	return None
 
 def rsync_copy(source, destination):
@@ -127,12 +125,14 @@ def move_files(input_host, input_paths, output_host, output_dir):
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
-		for source in input_paths:
-			rsync_copy(source, destination)
-			set_move_table(input_host, source, output_host, output_dir)
-			shutil.rmtree(source)
+		dbi = ppdata.DataBaseInterface()
+		with dbi.session_scope() as s:
+			for source in input_paths:
+				rsync_copy(source, destination)
+				set_move_table(s, dbi, input_host, source, output_host, output_dir)
+				shutil.rmtree(source)
 	else:
-		with ppdata.ssh_scope(host) as ssh:
+		with ppdata.ssh_scope(input_host) as ssh:
 			for source in input_paths:
 				rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 				rsync_del_command = '''rm -r {source}'''.format(source=source)
