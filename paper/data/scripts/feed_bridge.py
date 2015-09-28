@@ -54,14 +54,13 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 			set_feed(source, output_host, output_dir)
 			shutil.rmtree(source)
 	else:
-		ssh = ppdata.login_ssh(output_host)
-		for source in input_paths:
-			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
-			rsync_del_command = '''rm -r {source}'''.format(source=source)
-			ssh.exec_command(rsync_copy_command)
-			set_feed(source, output_host, output_dir)
-			ssh.exec_command(rsync_del_command)
-		ssh.close()
+		with ppdata.ssh_scope(host) as ssh:
+			for source in input_paths:
+				rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
+				rsync_del_command = '''rm -r {source}'''.format(source=source)
+				ssh.exec_command(rsync_copy_command)
+				set_feed(source, output_host, output_dir)
+				ssh.exec_command(rsync_del_command)
 
 	print('Completed transfer')
 	return None

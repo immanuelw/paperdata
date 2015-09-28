@@ -26,34 +26,32 @@ def get_uv_data(host, full_path, mode=None):
 	output(mode='time'):  time start, time end, delta time, julian date, polarization, length, and obsnum of uv* file
 	output: time start, time end, delta time, length of uv* file
 	'''
-	ssh = ppdata.login_ssh(host)
-	uv_data_script = os.path.expanduser('~/paper/data/uv_data.py')
-	sftp = ssh.open_sftp()
-	moved_script = './uv_data.py'
-	try:
-		filestat = sftp.stat(uv_data_script)
-	except(IOError):
+	with ppdata.ssh_scope(host) as ssh:
+		uv_data_script = os.path.expanduser('~/paper/data/uv_data.py')
+		sftp = ssh.open_sftp()
+		moved_script = './uv_data.py'
 		try:
-			filestat = sftp.stat(moved_script)
+			filestat = sftp.stat(uv_data_script)
 		except(IOError):
-			sftp.put(uv_data_script, moved_script)
-	sftp.close()
+			try:
+				filestat = sftp.stat(moved_script)
+			except(IOError):
+				sftp.put(uv_data_script, moved_script)
+		sftp.close()
 
-	if mode is None:
-		uv_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path)
-		_, uv_dat, _ = ssh.exec_command(uv_comm)
-		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [round(float(info), 5) if key in (0, 1, 2, 3, 5)
-																						else int(info) if key in (6,)
-																						else info
-																						for key, info in enumerate(uv_dat.read().split(','))]
-		ssh.close()
-		return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
+		if mode is None:
+			uv_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path)
+			_, uv_dat, _ = ssh.exec_command(uv_comm)
+			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [round(float(info), 5) if key in (0, 1, 2, 3, 5)
+																							else int(info) if key in (6,)
+																							else info
+																							for key, info in enumerate(uv_dat.read().split(','))]
+			return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
-	elif mode == 'time':
-		uv_comm = 'python {moved_script} {host} {full_path} time'.format(moved_script=moved_script, host=host, full_path=full_path)
-		_, uv_dat, _ = ssh.exec_command(uv_comm)
-		time_start, time_end, delta_time, length = [round(float(info), 5) for info in uv_dat.read().split(',')]
-		ssh.close()
+		elif mode == 'time':
+			uv_comm = 'python {moved_script} {host} {full_path} time'.format(moved_script=moved_script, host=host, full_path=full_path)
+			_, uv_dat, _ = ssh.exec_command(uv_comm)
+			time_start, time_end, delta_time, length = [round(float(info), 5) for info in uv_dat.read().split(',')]
 		return time_start, time_end, delta_time, length
 
 def calc_obs_data(host, full_path):
@@ -265,11 +263,10 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(input_paths)
 	else:
-		ssh = ppdata.login_ssh(input_host)
-		input_paths = raw_input('Source directory path: ')
-		_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
-		input_paths = path_out.read().split('\n')[:-1]
-		ssh.close()
+		with ppdata.ssh_scope(host) as ssh:
+			input_paths = raw_input('Source directory path: ')
+			_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
+			input_paths = path_out.read().split('\n')[:-1]
 
 	input_paths = dupe_check(input_host, input_paths)
 	input_paths.sort()

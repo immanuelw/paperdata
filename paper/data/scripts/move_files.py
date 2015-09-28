@@ -131,17 +131,14 @@ def move_files(input_host, input_paths, output_host, output_dir):
 			rsync_copy(source, destination)
 			set_move_table(input_host, source, output_host, output_dir)
 			shutil.rmtree(source)
-		s.close()
 	else:
-		ssh = ppdata.login_ssh(output_host)
-		for source in input_paths:
-			rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
-			rsync_del_command = '''rm -r {source}'''.format(source=source)
-			ssh.exec_command(rsync_copy_command)
-			set_move_table(input_host, source, output_host, output_dir)
-			ssh.exec_command(rsync_del_command)
-		ssh.close()
-		s.close()
+		with ppdata.ssh_scope(host) as ssh:
+			for source in input_paths:
+				rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
+				rsync_del_command = '''rm -r {source}'''.format(source=source)
+				ssh.exec_command(rsync_copy_command)
+				set_move_table(input_host, source, output_host, output_dir)
+				ssh.exec_command(rsync_del_command)
 
 	print('Completed transfer')
 	return None
@@ -152,11 +149,10 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(raw_input('Source directory path: '))
 	else:
-		ssh = ppdata.login_ssh(input_host)
-		input_paths = raw_input('Source directory path: ')
-		stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
-		input_paths = path_out.read().split('\n')[:-1]
-		ssh.close()
+		with ppdata.ssh_scope(host) as ssh:
+			input_paths = raw_input('Source directory path: ')
+			stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
+			input_paths = path_out.read().split('\n')[:-1]
 		
 	input_paths.sort()
 	output_host = raw_input('Destination directory host: ')

@@ -102,11 +102,10 @@ if __name__ == '__main__':
 	if named_host == input_host:
 		input_paths = glob.glob(input_paths)
 	else:
-		ssh = ppdata.login_ssh(input_host)
-		input_paths = raw_input('Source directory path: ')
-		_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
-		input_paths = path_out.read().split('\n')[:-1]
-		ssh.close()
+		with ppdata.ssh_scope(host) as ssh:
+			input_paths = raw_input('Source directory path: ')
+			_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
+			input_paths = path_out.read().split('\n')[:-1]
 
 	output_host = 'folio'
 	feed_output = '/data4/paper/feed/'
