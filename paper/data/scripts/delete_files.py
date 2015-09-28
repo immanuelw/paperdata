@@ -19,14 +19,13 @@ from paper.data import dbi as pdbi
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def delete_check(input_host):
+def delete_check(dbi, input_host):
 	'''
 	checks for which files can be deleted
 
-	input: host of system
+	input: database interface object, host of system
 	output: list of uv* file paths of files to be deleted
 	'''
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'File')
 		FILEs = s.query(table).filter(getattr(table, 'delete_file') == True).filter(getattr(table, 'tape_index') != None)\
@@ -60,16 +59,15 @@ def set_delete_table(s, dbi, input_host, source, output_host, output_dir):
 
 	return None
 
-def delete_files(input_host, input_paths, output_host, output_dir):
+def delete_files(dbi, input_host, input_paths, output_host, output_dir):
 	'''
 	delete files
 
-	input: file host, list of file paths, output host, output directory
+	input: database interface object, file host, list of file paths, output host, output directory
 	'''
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
-		dbi = pdbi.DataBaseInterface()
 		with dbi.session_scope() as s:
 			for source in input_paths:
 				ppdata.rsync_copy(source, destination)
@@ -92,4 +90,5 @@ if __name__ == '__main__':
 	output_host = raw_input('Destination directory host: ')
 	output_dir = raw_input('Destination directory: ')
 	input_paths = delete_check(input_host)
-	delete_files(input_host, input_paths, output_host, output_dir)
+	dbi = pdbi.DataBaseInterface()
+	delete_files(dbi, input_host, input_paths, output_host, output_dir)

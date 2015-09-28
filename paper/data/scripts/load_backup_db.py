@@ -15,11 +15,11 @@ import sqlalchemy.exc
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def load_backup(backup_file=None, table=None):
+def load_backup(dbi, backup_file=None, table=None):
 	'''
 	loads backups from json into database
 
-	input: name of backup file, table name
+	input: database interface object, name of backup file, table name
 	'''
 	if table is None:
 		return None
@@ -29,7 +29,6 @@ def load_backup(backup_file=None, table=None):
 		timestamp = int(backup_list[0].split('/')[-1])
 		backup_file = '/data4/paper/paperdata_backup/{timestamp}/{table}_{timestamp}.json'.format(table=table, timestamp=timestamp)
 
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s, open(backup, 'r') as backup_db:
 		read = json.load(backup_db)
 		for row in read:
@@ -44,13 +43,14 @@ def load_backup(backup_file=None, table=None):
 	return None
 
 if __name__ == '__main__':
+	dbi = pdbi.DataBaseInterface()
 	if len(sys.argv) == 3:
 		backup_table = sys.argv[1]
 		backup_file = sys.argv[2]
-		load_backup(backup_file, table=backup_table)
+		load_backup(dbi, backup_file, table=backup_table)
 	else:
-		#load_backup(table='observation')
-		load_backup(table='file')
-		#load_backup(table='feed')
-		#load_backup(table='log')
-		#load_backup(table='rtp_file')
+		#load_backup(dbi, table='observation')
+		load_backup(dbi, table='file')
+		#load_backup(dbi, table='feed')
+		#load_backup(dbi, table='log')
+		#load_backup(dbi, table='rtp_file')

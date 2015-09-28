@@ -54,7 +54,7 @@ def get_uv_data(host, full_path, mode=None):
 			time_start, time_end, delta_time, length = [round(float(info), 5) for info in uv_dat.read().split(',')]
 		return time_start, time_end, delta_time, length
 
-def calc_obs_data(host, full_path):
+def calc_obs_data(dbi, host, full_path):
 	'''
 	generates all relevant data from uv* file
 
@@ -79,7 +79,6 @@ def calc_obs_data(host, full_path):
 		jdate = ''.join(filename.split('.')[1], '.', filename.split('.')[2])
 		julian_date = round(float(jdate, 5))
 
-		dbi = pdbi.DataBaseInterface()
 		with dbi.session_scope() as s:
 			if len(filename.split('.')) == 5:
 				polarization = 'all'
@@ -153,14 +152,13 @@ def calc_obs_data(host, full_path):
 
 	return obs_data, file_data, log_data
 
-def dupe_check(input_host, input_paths):
+def dupe_check(dbi, input_host, input_paths):
 	'''
 	checks for duplicate paths and removes to not waste time if possible
 
-	input: host of uv* files, list of paths for uv* files
+	input: database interface object, host of uv* files, list of paths for uv* files
 	output: list of paths that are not already in database
 	'''
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		#all files on same host
 		table = getattr(pdbi, 'File')
@@ -176,7 +174,7 @@ def set_obs(s, dbi, OBS, field):
 	'''
 	finds edge observation for each observation by finding previous and next
 
-	input: session object, dbi, observation object, field to update
+	input: session object, database interface object, observation object, field to update
 	output: edge observation object
 	'''
 	if field == 'prev_obs':
@@ -200,11 +198,12 @@ def set_obs(s, dbi, OBS, field):
 
 	return EDGE_OBS
 
-def update_obsnums():
+def update_obsnums(dbi):
 	'''
 	updates edge attribute of all obsnums
+
+	input: database interface object
 	'''
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Observation')
 		OBSs = s.query(table).all()
@@ -218,13 +217,12 @@ def update_obsnums():
 
 	return None
 
-def add_files_to_db(input_host, input_paths):
+def add_files_to_db(dbi, input_host, input_paths):
 	'''
 	adds files to the database
 
-	input: host of files, list of uv* file paths
+	input: database interface object, host of files, list of uv* file paths
 	'''
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		for input_path in input_paths:
 			path = os.path.dirname(input_path)
@@ -245,11 +243,11 @@ def add_files_to_db(input_host, input_paths):
 
 	return None
 
-def add_files(input_host, input_paths):
+def add_files(dbi, input_host, input_paths):
 	'''
 	generates list of input files, check for duplicates, add information to database
 
-	input: input host, input paths string
+	input: database interface object, input host, input paths string
 	'''
 	named_host = socket.gethostname()
 	if named_host == input_host:
@@ -260,13 +258,12 @@ def add_files(input_host, input_paths):
 			_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
 			input_paths = path_out.read().split('\n')[:-1]
 
-	input_paths = dupe_check(input_host, input_paths)
-	input_paths.sort()
+	input_paths = sorted(dupe_check(dbi, input_host, input_paths))
 	npz_paths = [npz_path for npz_path in input_paths if npz_path.endswith('.npz')]
 	input_paths = [input_path for input_path in input_paths if not input_path.endswith('.npz')]
-	add_files_to_db(input_host, input_paths)
-	add_files_to_db(input_host, npz_paths)
-	update_obsnums()
+	add_files_to_db(dbi, input_host, input_paths)
+	add_files_to_db(dbi, input_host, npz_paths)
+	update_obsnums(dbi)
 
 	return None
 
@@ -284,4 +281,5 @@ if __name__ == '__main__':
 		input_host = raw_input('Source directory host: ')
 		input_paths = raw_input('Source directory path: ')
 
-	add_files(input_host, input_paths)
+	dbi = pdbi.DataBaseInterface()
+	add_files(dbi, input_host, input_paths)

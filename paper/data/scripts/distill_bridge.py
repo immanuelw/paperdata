@@ -17,34 +17,32 @@ import add_files, move_files
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
-def add_data():
+def add_data(dbi, data_dbi):
 	'''
 	transfer data from paperdistiller database to create data for paperdata tables
 
+	input: distiller database interface object, data database interface object
 	output: dict of movable paths for each filetype
 	'''
-	dbi = ddbi.DataBaseInterface()
-	with dbi.session_scope() as s:
-		#do stuff
-		table = getattr(ddbi, 'Observation')
-		OBSs_all = s.query(table).all()
-		OBSs_complete = s.query(table).filter(getattr(table, 'status') == 'COMPLETE').all()
+	s = dbi.Session()
+	#do stuff
+	table = getattr(ddbi, 'Observation')
+	OBSs_all = s.query(table).all()
+	OBSs_complete = s.query(table).filter(getattr(table, 'status') == 'COMPLETE').all()
 
-		julian_obs = {OBS: int(getattr(OBS, 'julian_date')) for OBS in OBSs_complete}
-		julian_days = tuple(jday for jday in julian_obs.values())
-		#dict of julian day as key, amount as value
-		count_jdays = Counter(julian_days)
+	julian_obs = {OBS: int(getattr(OBS, 'julian_date')) for OBS in OBSs_complete}
+	julian_days = tuple(jday for jday in julian_obs.values())
+	#dict of julian day as key, amount as value
+	count_jdays = Counter(julian_days)
 
-		all_days = tuple(int(getattr(OBS, 'julian_date')) for OBS in OBSs_all)
-		count_all_days = Counter(all_days)
+	all_days = tuple(int(getattr(OBS, 'julian_date')) for OBS in OBSs_all)
+	count_all_days = Counter(all_days)
 
-		#tuple list of all complete days
-		complete_jdays = tuple(day for day, amount in count_jdays.items() if amount == count_all_days[day])
-		raw_OBSs = tuple(OBS for OBS, jday in julian_obs.items() if jday in complete_jdays)
+	#tuple list of all complete days
+	complete_jdays = tuple(day for day, amount in count_jdays.items() if amount == count_all_days[day])
+	raw_OBSs = tuple(OBS for OBS, jday in julian_obs.items() if jday in complete_jdays)
 
-		data_dbi = pdbi.DataBaseInterface()
-		sess = data_dbi.Session()
-
+	with data_dbi.session_scope():
 		#need to keep dict of list of files to move of each type -- (host, path, filename, filetype)
 		movable_paths = {'uv':[], 'uvcRRE':[], 'npz':[]}
 
@@ -161,15 +159,16 @@ def add_data():
 				npz_data['write_to_tape'] = False
 				data_dbi.add_to_table(sess, 'file', npz_data)
 				movable_paths[npz_filetype].append(npz_path)
+	s.close()
 
 	return movable_paths
 
-def paperbridge(auto=False):
+def paperbridge(dbi, data_dbi, auto=False):
 	'''
 	bridges paperdistiller and paperdata
 	moves files and pulls relevant data to add to paperdata from paperdistiller
 
-	input: boolean variable to track whether to wait
+	input: distiller database interface object, data database interface object, boolean variable to track whether to wait
 	'''
 	#Calculate amount of space needed to move a day ~1.1TB
 	required_space = 1112661213184
@@ -178,7 +177,7 @@ def paperbridge(auto=False):
 	if move_files.enough_space(required_space, space_path):
 		input_host = raw_input('Source directory host: ')
 		#Add observations and paths from paperdistiller
-		movable_paths = add_data()
+		movable_paths = add_data(dbi, data_dbi)
 		filetypes = movable_paths.keys()
 		host_dirs = {filetype: {'host': None, 'dir': None} for filetype in filetypes}
 		for filetype in filetypes:
@@ -186,7 +185,7 @@ def paperbridge(auto=False):
 			host_dirs[filetype]['dir'] = raw_input('{filetype} destination directory: '.format(filetype=filetype))
 
 		for filetype, paths in movable_paths:
-			move_files.move_files(input_host, paths, host_dirs[filetype]['host'], host_dirs[filetype]['dir'])
+			move_files.move_files(dbi, input_host, paths, host_dirs[filetype]['host'], host_dirs[filetype]['dir'])
 
 	else:
 		table = 'paperdistiller'
@@ -197,5 +196,7 @@ def paperbridge(auto=False):
 	return None
 
 if __name__ == '__main__':
-	paperbridge()
-	add_files.update_obsnums()
+	dbi = ddbi.DataBaseInterface()
+	data_dbi = pdbi.DataBaseInterface()
+	paperbridge(dbi, data_dbi)
+	add_files.update_obsnums(data_dbi)

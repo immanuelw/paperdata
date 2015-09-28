@@ -50,11 +50,11 @@ def json_data(dbo, dump_objects):
 
 	return None
 
-def paperbackup():
+def paperbackup(dbi):
 	'''
 	backups database by loading into json files, named by timestamp
 
-	input: time script was run
+	input: database interface object
 	'''
 	timestamp = int(time.time())
 	backup_dir = os.path.join('/data4/paper/paperdistiller_backup', str(timestamp))
@@ -65,21 +65,21 @@ def paperbackup():
 	table_sorts = {'observation': {'first': 'julian_date', 'second': 'pol'},
 					'file': {'first': 'obsnum', 'second': 'filename'},
 					'log': {'first': 'obsnum', 'second': 'timestamp'}}
-	dbi = ddbi.DataBaseInterface()
-	with dbi.session_scope() as s:
-		print(timestamp)
-		for table in tables:
-			db_file = '{table}_{timestamp}.json'.format(timestamp=timestamp)
-			dbo = os.path.join(backup_dir, db_file)
-			print(db_file)
-
+	s = dbi.Session()
+	print(timestamp)
+	for table in tables:
+		db_file = '{table}_{timestamp}.json'.format(timestamp=timestamp)
+		dbo = os.path.join(backup_dir, db_file)
+		print(db_file)
 			DB_table = getattr(ddbi, table.title())
 			DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
-												getattr(DB_table, table_sorts[table]['second']).asc())
-			json_data(dbo, DB_dump)
-			print('Table data backup saved')
+											getattr(DB_table, table_sorts[table]['second']).asc())
+		json_data(dbo, DB_dump)
+		print('Table data backup saved')
+	s.close()
 
 	return None
 
 if __name__ == '__main__':
-	paperbackup()
+	dbi = ddbi.DataBaseInterface()
+	paperbackup(dbi)

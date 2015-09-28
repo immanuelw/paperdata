@@ -36,11 +36,11 @@ def json_data(dbo, dump_objects):
 
 	return None
 
-def paperbackup():
+def paperbackup(dbi):
 	'''
 	backups database by loading into json files, named by timestamp
 
-	input: time script was run
+	input: database interface object
 	'''
 	timestamp = int(time.time())
 	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(timestamp))
@@ -53,7 +53,6 @@ def paperbackup():
 					'file': {'first': 'obsnum', 'second': 'filename'},
 					'feed': {'first': 'julian_day', 'second': 'filename'},
 					'log': {'first': 'timestamp', 'second': 'action'}}
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		print(timestamp)
 		for table in tables:
@@ -70,4 +69,5 @@ def paperbackup():
 	return None
 
 if __name__ == '__main__':
-	paperbackup()
+	dbi = pdbi.DataBaseInterface()
+	paperbackup(dbi)

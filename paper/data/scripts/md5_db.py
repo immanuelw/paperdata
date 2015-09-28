@@ -12,11 +12,12 @@ from paper.data import dbi as pdbi, file_data
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def md5_db():
+def md5_db(data_dbi):
 	'''
 	updates md5sums for all files without in database
+
+	input: data database interface object
 	'''
-	data_dbi = pdbi.DataBaseInterface()
 	with data_dbi.session_scope() as s:
 		table = getattr(pdbi, 'File')
 		FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
@@ -34,11 +35,12 @@ def md5_db():
 
 	return None
 
-def md5_distiller():
+def md5_distiller(dbi):
 	'''
 	updates md5sums for all files without in database
+
+	input: distiller database interface object
 	'''
-	dbi = ddbi.DataBaseInterface()
 	s = dbi.Session()
 	table = getattr(ddbi, 'File')
 	FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
@@ -55,8 +57,10 @@ if __name__ == '__main__':
 	if len(sys.argv) != 2:
 		print('Input argument -- [paperdata/paperdistiller] to select which database to update md5sums')
 	elif sys.argv[1] == 'paperdata':
-		md5_db()
+		data_dbi = pdbi.DataBaseInterface()
+		md5_db(data_dbi)
 	elif sys.argv[1] == 'paperdistiller':
-		md5_distiller()
+		dbi = ddbi.DataBaseInterface()
+		md5_distiller(dbi)
 	else:
 		print('Unallowed argument(s)')

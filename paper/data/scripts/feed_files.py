@@ -50,14 +50,13 @@ def gen_feed_data(host, full_path):
 
 	return feed_data, log_data
 
-def dupe_check(input_host, input_paths):
+def dupe_check(dbi, input_host, input_paths):
 	'''
 	checks for files already in feed table
 
-	input: file host, list of file paths
+	input: database interface object, file host, list of file paths
 	output: list of files not in feed table
 	'''
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
 		FEEDs = s.query(table).all()
@@ -73,9 +72,8 @@ def add_feeds_to_db(input_host, input_paths):
 	'''
 	adds feed file data to table
 
-	input: file host, list of file paths
+	input: database interface object, file host, list of file paths
 	'''
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		for source in input_paths:
 			feed_data, log_data = gen_feed_data(input_host, source)
@@ -84,11 +82,11 @@ def add_feeds_to_db(input_host, input_paths):
 
 	return None
 
-def add_feeds(input_host, input_paths):
+def add_feeds(dbi, input_host, input_paths):
 	'''
 	generates list of input files, check for duplicates, add information to database
 
-	input: input host, input paths string
+	input: database interface object, input host, input paths string
 	'''
 	named_host = socket.gethostname()
 	if named_host == input_host:
@@ -101,8 +99,8 @@ def add_feeds(input_host, input_paths):
 
 	output_host = 'folio'
 	feed_output = '/data4/paper/feed/'
-	input_paths = dupe_check(input_host, input_paths)
-	add_feeds_to_db(input_host, input_paths)
+	input_paths = dupe_check(dbi, input_host, input_paths)
+	add_feeds_to_db(dbi, input_host, input_paths)
 
 	return None
 
@@ -120,4 +118,5 @@ if __name__ == '__main__':
 		input_host = raw_input('Source directory host: ')
 		input_paths = raw_input('Source directory path: ')
 
-	add_feeds(input_host, input_paths)
+	dbi = pdbi.DataBaseInterface()
+	add_feeds(dbi, input_host, input_paths)

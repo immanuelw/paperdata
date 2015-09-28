@@ -37,17 +37,16 @@ def set_feed(s, dbi, source, output_host, output_dir, moved_to_distill=True):
 	dbi.set_entry(s, FEED, 'moved_to_distill', moved_to_distill)
 	return None
 
-def move_feed_files(input_host, input_paths, output_host, output_dir):
+def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
 	'''
 	moves files and adds to feed directory and table
 
-	input: file host, list of file paths, output host, output directory
+	input: database interface object, file host, list of file paths, output host, output directory
 	'''
 	#different from move_files, adds to feed
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
-		dbi = pdbi.DataBaseInterface()
 		with dbi.session_scope() as s:
 			for source in input_paths:
 				ppdata.rsync_copy(source, destination)
@@ -65,11 +64,12 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 	print('Completed transfer')
 	return None
 
-def count_days():
+def count_days(dbi):
 	'''
 	checks amount of days in feed table and sets to move if reach requirement
+
+	input: database interface object
 	'''
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
 		count_FEEDs = s.query(getattr(table, 'julian_day'), label('count', func.count(getattr(table, 'julian_day'))))\
@@ -83,13 +83,13 @@ def count_days():
 			dbi.set_entry(s, FEED, 'ready_to_move', True)
 	return None
 
-def find_data():
+def find_data(dbi):
 	'''
 	finds data to move from feed table
 
+	input: database interface object
 	output: list of file paths to move, file host, list of filenames to be moved
 	'''
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
 		FEEDs = s.query(table).filter(getattr(table, 'moved_to_distill') == False).filter(getattr(table, 'ready_to_move') == True).all()
@@ -131,10 +131,12 @@ def email_paperfeed(files):
 
 	return None
 
-def feed_bridge():
+def feed_bridge(dbi):
 	'''
 	bridges feed and paperdistiller
 	moves files and pulls relevant data to add to paperdistiller from feed
+
+	input: database interface object
 	'''
 	#Minimum amount of space to move a day ~3.1TiB
 	required_space = 1112373311360
@@ -143,13 +145,13 @@ def feed_bridge():
 	#Move if there is enough free space
 	if move_files.enough_space(required_space, output_dir):
 		#check how many days are in each
-		count_days()
+		count_days(dbi)
 		#FIND DATA
-		input_paths, input_host, input_filenames = find_data()
+		input_paths, input_host, input_filenames = find_data(dbi)
 		#pick directory to output to
 		output_host = 'folio'
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
-		move_feed_files(input_host, input_paths, output_host, output_dir)
+		move_feed_files(dbi, input_host, input_paths, output_host, output_dir)
 		#EMAIL PEOPLE THAT DATA IS BEING MOVED AND LOADED
 		email_paperfeed(input_paths)
 		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
@@ -165,4 +167,5 @@ def feed_bridge():
 	return None
 
 if __name__ == '__main__':
-	feed_bridge()
+	dbi = pdbi.DataBaseInterface()
+	feed_bridge(dbi)

@@ -63,14 +63,13 @@ def email_space(table):
 
 	return None
 
-def null_check(input_host, input_paths):
+def null_check(dbi, input_host, input_paths):
 	'''
 	checks if file(s) is(are) in database
 
-	input: host of files, list of uv* file paths
+	input: database interface object, host of files, list of uv* file paths
 	output: boolean value if there are any files not in database -- True if there are None
 	'''
-	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'File')
 		FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
@@ -108,11 +107,11 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 
 	return None
 
-def move_files(input_host=None, input_paths=None, output_host=None, output_dir=None):
+def move_files(dbi, input_host=None, input_paths=None, output_host=None, output_dir=None):
 	'''
 	move files
 
-	input: file host, list of file paths, output host, output directory
+	input: database interface object, file host, list of file paths, output host, output directory
 	'''
 	named_host = socket.gethostname()
 	input_host = raw_input('Source directory host: ') if input_host is None else input_host
@@ -136,7 +135,6 @@ def move_files(input_host=None, input_paths=None, output_host=None, output_dir=N
 
 	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
-		dbi = ppdata.DataBaseInterface()
 		with dbi.session_scope() as s:
 			for source in input_paths:
 				ppdata.rsync_copy(source, destination)
@@ -155,4 +153,5 @@ def move_files(input_host=None, input_paths=None, output_host=None, output_dir=N
 	return None
 
 if __name__ == '__main__':
-	move_files()
+	dbi = pdbi.DataBaseInterface()
+	move_files(dbi)
