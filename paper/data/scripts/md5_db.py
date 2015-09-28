@@ -53,8 +53,8 @@ def md5_distiller():
 
 if __name__ == '__main__':
 	if len(sys.argv) != 2:
-		print('Input argument -- [paper/paperdistiller] to select which database to update md5sums')
-	elif sys.argv[1] == 'paper':
+		print('Input argument -- [paperdata/paperdistiller] to select which database to update md5sums')
+	elif sys.argv[1] == 'paperdata':
 		md5_db()
 	elif sys.argv[1] == 'paperdistiller':
 		md5_distiller()
