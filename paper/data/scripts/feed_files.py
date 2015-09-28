@@ -84,8 +84,29 @@ def add_feeds_to_db(input_host, input_paths):
 
 	return None
 
-if __name__ == '__main__':
+def add_feeds(input_host, input_paths):
+	'''
+	generates list of input files, check for duplicates, add information to database
+
+	input: input host, input paths string
+	'''
 	named_host = socket.gethostname()
+	if named_host == input_host:
+		input_paths = glob.glob(input_paths)
+	else:
+		with ppdata.ssh_scope(input_host) as ssh:
+			input_paths = raw_input('Source directory path: ')
+			_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
+			input_paths = path_out.read().split('\n')[:-1]
+
+	output_host = 'folio'
+	feed_output = '/data4/paper/feed/'
+	input_paths = dupe_check(input_host, input_paths)
+	add_feeds_to_db(input_host, input_paths)
+
+	return None
+
+if __name__ == '__main__':
 	if len(sys.argv) == 2:
 		input_host = sys.argv[1].split(':')[0]
 		if input_host == sys.argv[1]:
@@ -99,15 +120,4 @@ if __name__ == '__main__':
 		input_host = raw_input('Source directory host: ')
 		input_paths = raw_input('Source directory path: ')
 
-	if named_host == input_host:
-		input_paths = glob.glob(input_paths)
-	else:
-		with ppdata.ssh_scope(input_host) as ssh:
-			input_paths = raw_input('Source directory path: ')
-			_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
-			input_paths = path_out.read().split('\n')[:-1]
-
-	output_host = 'folio'
-	feed_output = '/data4/paper/feed/'
-	input_paths = dupe_check(input_host, input_paths)
-	add_feeds_to_db(input_host, input_paths)
+	add_feeds(input_host, input_paths)

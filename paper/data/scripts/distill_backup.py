@@ -47,6 +47,7 @@ def json_data(dbo, dump_objects):
 	with open(dbo, 'w') as f:
 		data = [to_dict(ser_data) for ser_data in dump_objects.all()]
 		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
+
 	return None
 
 def paperbackup():

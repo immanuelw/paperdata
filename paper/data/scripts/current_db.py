@@ -10,7 +10,7 @@ def main():
 	with dbi.session_scope() as s:
 		FILEs = s.query(pdbi.File).all()
 	out_vars = ('era', 'julian_day', 'host', 'path', 'filetype', 'source_host')
-	current = tuple((getattr(FILE, out_var) for out_var in out_vars) for FILE in FILEs)
+	current = ((getattr(FILE, out_var) for out_var in out_vars) for FILE in FILEs)
 
 	count = {}
 	for entry in current:

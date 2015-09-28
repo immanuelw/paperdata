@@ -218,7 +218,7 @@ def update_obsnums():
 
 	return None
 
-def add_files(input_host, input_paths):
+def add_files_to_db(input_host, input_paths):
 	'''
 	adds files to the database
 
@@ -245,8 +245,32 @@ def add_files(input_host, input_paths):
 
 	return None
 
-if __name__ == '__main__':
+def add_files(input_host, input_paths):
+	'''
+	generates list of input files, check for duplicates, add information to database
+
+	input: input host, input paths string
+	'''
 	named_host = socket.gethostname()
+	if named_host == input_host:
+		input_paths = glob.glob(input_paths)
+	else:
+		with ppdata.ssh_scope(input_host) as ssh:
+			input_paths = raw_input('Source directory path: ')
+			_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
+			input_paths = path_out.read().split('\n')[:-1]
+
+	input_paths = dupe_check(input_host, input_paths)
+	input_paths.sort()
+	npz_paths = [npz_path for npz_path in input_paths if npz_path.endswith('.npz')]
+	input_paths = [input_path for input_path in input_paths if not input_path.endswith('.npz')]
+	add_files_to_db(input_host, input_paths)
+	add_files_to_db(input_host, npz_paths)
+	update_obsnums()
+
+	return None
+
+if __name__ == '__main__':
 	if len(sys.argv) == 2:
 		input_host = sys.argv[1].split(':')[0]
 		if input_host == sys.argv[1]:
@@ -260,20 +284,4 @@ if __name__ == '__main__':
 		input_host = raw_input('Source directory host: ')
 		input_paths = raw_input('Source directory path: ')
 
-	if named_host == input_host:
-		input_paths = glob.glob(input_paths)
-	else:
-		with ppdata.ssh_scope(input_host) as ssh:
-			input_paths = raw_input('Source directory path: ')
-			_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
-			input_paths = path_out.read().split('\n')[:-1]
-
-	input_paths = dupe_check(input_host, input_paths)
-	input_paths.sort()
-	npz_paths = [npz_path for npz_path in input_paths if '.npz' in npz_path]
-	npz_paths.sort()
-	input_paths = [input_path for input_path in input_paths if '.npz' not in input_path]
-	input_paths.sort()
 	add_files(input_host, input_paths)
-	add_files(input_host, npz_paths)
-	update_obsnums()

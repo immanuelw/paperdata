@@ -105,6 +105,7 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 				'identifier':identifier,
 				'timestamp':timestamp}
 	dbi.add_to_table(s, 'log', log_data)
+
 	return None
 
 def rsync_copy(source, destination):
@@ -114,15 +115,35 @@ def rsync_copy(source, destination):
 	input: source file path, destination path
 	'''
 	subprocess.check_output(['rsync', '-ac', source, destination])
+
 	return None
 
-def move_files(input_host, input_paths, output_host, output_dir):
+def move_files(input_host=None, input_paths=None, output_host=None, output_dir=None):
 	'''
 	move files
 
 	input: file host, list of file paths, output host, output directory
 	'''
 	named_host = socket.gethostname()
+	input_host = raw_input('Source directory host: ') if input_host is None else input_host
+	output_host = raw_input('Destination directory host: ') if output_host is None else output_host
+	output_dir = raw_input('Destination directory: ') if output_dir is None else output_dir
+
+	if input_paths is None:
+		if named_host == input_host:
+			input_paths = sorted(glob.glob(raw_input('Source directory path: ')))
+		else:
+			with ppdata.ssh_scope(host) as ssh:
+				input_paths = raw_input('Source directory path: ')
+				_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
+				input_paths = sorted(path_out.read().split('\n')[:-1])
+	
+	nulls = null_check(input_host, input_paths)
+	if not nulls:
+		#if any file not in db -- don't move anything
+		print('File(s) not in database')
+		return None
+
 	destination = ''.join((output_host, ':', output_dir))
 	if named_host == input_host:
 		dbi = ppdata.DataBaseInterface()
@@ -139,27 +160,9 @@ def move_files(input_host, input_paths, output_host, output_dir):
 				ssh.exec_command(rsync_copy_command)
 				set_move_table(input_host, source, output_host, output_dir)
 				ssh.exec_command(rsync_del_command)
-
 	print('Completed transfer')
+
 	return None
 
 if __name__ == '__main__':
-	named_host = socket.gethostname()
-	input_host = raw_input('Source directory host: ')
-	if named_host == input_host:
-		input_paths = glob.glob(raw_input('Source directory path: '))
-	else:
-		with ppdata.ssh_scope(host) as ssh:
-			input_paths = raw_input('Source directory path: ')
-			stdin, path_out, stderr = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
-			input_paths = path_out.read().split('\n')[:-1]
-		
-	input_paths.sort()
-	output_host = raw_input('Destination directory host: ')
-	output_dir = raw_input('Destination directory: ')
-	nulls = null_check(input_host, input_paths)
-	if not nulls:
-		#if any file not in db -- don't move anything
-		print('File(s) not in database')
-		sys.exit()
-	move_files(input_host, input_paths, output_host, output_dir)
+	move_files()
