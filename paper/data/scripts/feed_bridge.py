@@ -3,7 +3,6 @@
 # Load data into MySQL table 
 
 from __future__ import print_function
-import sys
 import os
 import time
 import shutil
