@@ -71,10 +71,9 @@ def null_check(input_host, input_paths):
 	output: boolean value if there are any files not in database -- True if there are None
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	table = getattr(pdbi, 'File')
-	FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
-	s.close()
+	with dbi.session_scope() as s:
+		table = getattr(pdbi, 'File')
+		FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
 	#all files on same host
 	filenames = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
 
@@ -93,22 +92,21 @@ def set_move_table(input_host, source, output_host, output_dir):
 	input: user host, source file, output host, output directory
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	action = 'move'
-	table = 'file'
-	full_path = ''.join((input_host, ':', source))
-	timestamp = int(time.time())
-	FILE = dbi.get_entry(s, 'file', full_path)
-	dbi.set_entry(s, FILE, 'host', output_host)
-	dbi.set_entry(s, FILE, 'path', output_dir)
-	dbi.set_entry(s, FILE, 'timestamp', timestamp)
-	identifier = getattr(FILE, 'full_path')
-	log_data = {'action':action,
-				'table':table,
-				'identifier':identifier,
-				'timestamp':timestamp}
-	dbi.add_to_table(s, 'log', log_data)
-	s.close()
+	with dbi.session_scope() as s:
+		action = 'move'
+		table = 'file'
+		full_path = ''.join((input_host, ':', source))
+		timestamp = int(time.time())
+		FILE = dbi.get_entry(s, 'file', full_path)
+		dbi.set_entry(s, FILE, 'host', output_host)
+		dbi.set_entry(s, FILE, 'path', output_dir)
+		dbi.set_entry(s, FILE, 'timestamp', timestamp)
+		identifier = getattr(FILE, 'full_path')
+		log_data = {'action':action,
+					'table':table,
+					'identifier':identifier,
+					'timestamp':timestamp}
+		dbi.add_to_table(s, 'log', log_data)
 	return None
 
 def rsync_copy(source, destination):

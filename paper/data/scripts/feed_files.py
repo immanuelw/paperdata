@@ -58,10 +58,9 @@ def dupe_check(input_host, input_paths):
 	output: list of files not in feed table
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	table = getattr(pdbi, 'Feed')
-	FEEDs = s.query(table).all()
-	s.close()
+	with dbi.session_scope() as s:
+		table = getattr(pdbi, 'Feed')
+		FEEDs = s.query(table).all()
 	#all files on same host
 	filenames = tuple(os.path.join(getattr(FEED, 'path'), getattr(FEED, 'filename')) for FEED in FEEDs if getattr(FEED, 'host') == input_host)
 
@@ -77,12 +76,11 @@ def add_feeds_to_db(input_host, input_paths):
 	input: file host, list of file paths
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	for source in input_paths:
-		feed_data, log_data = gen_feed_data(input_host, source)
-		dbi.add_to_table(s, 'feed', feed_data)
-		dbi.add_to_table(s, 'log', log_data)
-	s.close()
+	with dbi.session_scope() as s:
+		for source in input_paths:
+			feed_data, log_data = gen_feed_data(input_host, source)
+			dbi.add_to_table(s, 'feed', feed_data)
+			dbi.add_to_table(s, 'log', log_data)
 
 	return None
 

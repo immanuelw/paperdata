@@ -58,20 +58,19 @@ def paperbackup():
 					'ram': {'first': 'timestamp', 'second': 'host', 'third': 'total'},
 					'cpu': {'first': 'timestamp', 'second': 'host', 'third': 'cpu'}}
 	dbi = pyg.DataBaseInterface()
-	s = dbi.Session()
-	print(timestamp)
-	for table in tables:
-		db_file = '{table}_{timestamp}.json'.format(timestamp=timestamp)
-		dbo = os.path.join(backup_dir, db_file)
-		print(db_file)
+	with dbi.session_scope as s:
+		print(timestamp)
+		for table in tables:
+			db_file = '{table}_{timestamp}.json'.format(timestamp=timestamp)
+			dbo = os.path.join(backup_dir, db_file)
+			print(db_file)
 
-		DB_table = getattr(pdbi, table.title())
-		DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
+			DB_table = getattr(pdbi, table.title())
+			DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
 												getattr(DB_table, table_sorts[table]['second']).asc(),
 												getattr(DB_table, table_sorts[table]['third']).asc())
-		json_data(dbo, DB_dump)
-		print('Table data backup saved')
-	s.close()
+			json_data(dbo, DB_dump)
+			print('Table data backup saved')
 
 	return None
 

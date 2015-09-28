@@ -7,9 +7,8 @@ from paper.data import dbi as pdbi
 
 def main():
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	FILEs = s.query(pdbi.File).all()
-	s.close()
+	with dbi.session_scope() as s:
+		FILEs = s.query(pdbi.File).all()
 	out_vars = ('era', 'julian_day', 'host', 'path', 'filetype', 'source_host')
 	current = tuple((getattr(FILE, out_var) for out_var in out_vars) for FILE in FILEs)
 

@@ -24,145 +24,143 @@ def add_data():
 	output: dict of movable paths for each filetype
 	'''
 	dbi = ddbi.DataBaseInterface()
-	s = dbi.Session()
-	#do stuff
-	table = getattr(ddbi, 'Observation')
-	OBSs_all = s.query(table).all()
-	OBSs_complete = s.query(table).filter(getattr(table, 'status') == 'COMPLETE').all()
+	with dbi.session_scope() as s:
+		#do stuff
+		table = getattr(ddbi, 'Observation')
+		OBSs_all = s.query(table).all()
+		OBSs_complete = s.query(table).filter(getattr(table, 'status') == 'COMPLETE').all()
 
-	julian_obs = {OBS: int(getattr(OBS, 'julian_date')) for OBS in OBSs_complete}
-	julian_days = tuple(jday for jday in julian_obs.values())
-	#dict of julian day as key, amount as value
-	count_jdays = Counter(julian_days)
+		julian_obs = {OBS: int(getattr(OBS, 'julian_date')) for OBS in OBSs_complete}
+		julian_days = tuple(jday for jday in julian_obs.values())
+		#dict of julian day as key, amount as value
+		count_jdays = Counter(julian_days)
 
-	all_days = tuple(int(getattr(OBS, 'julian_date')) for OBS in OBSs_all)
-	count_all_days = Counter(all_days)
+		all_days = tuple(int(getattr(OBS, 'julian_date')) for OBS in OBSs_all)
+		count_all_days = Counter(all_days)
 
-	#tuple list of all complete days
-	complete_jdays = tuple(day for day, amount in count_jdays.items() if amount == count_all_days[day])
-	raw_OBSs = tuple(OBS for OBS, jday in julian_obs.items() if jday in complete_jdays)
+		#tuple list of all complete days
+		complete_jdays = tuple(day for day, amount in count_jdays.items() if amount == count_all_days[day])
+		raw_OBSs = tuple(OBS for OBS, jday in julian_obs.items() if jday in complete_jdays)
 
-	data_dbi = pdbi.DataBaseInterface()
-	sess = data_dbi.Session()
+		data_dbi = pdbi.DataBaseInterface()
+		sess = data_dbi.Session()
 
-	#need to keep dict of list of files to move of each type -- (host, path, filename, filetype)
-	movable_paths = {'uv':[], 'uvcRRE':[], 'npz':[]}
+		#need to keep dict of list of files to move of each type -- (host, path, filename, filetype)
+		movable_paths = {'uv':[], 'uvcRRE':[], 'npz':[]}
 
-	named_host = socket.gethostname()
-	for OBS in raw_OBSs:
-		table = getattr(ddbi, 'File')
-		FILE = s.query(table).filter(getattr(table, 'obsnum') == getattr(OBS, 'obsnum')).one()
+		named_host = socket.gethostname()
+		for OBS in raw_OBSs:
+			table = getattr(ddbi, 'File')
+			FILE = s.query(table).filter(getattr(table, 'obsnum') == getattr(OBS, 'obsnum')).one()
 
-		host = getattr(FILE, 'host')
-		full_path = getattr(FILE, 'filename')
-		path, filename, filetype = file_data.file_names(full_path)
+			host = getattr(FILE, 'host')
+			full_path = getattr(FILE, 'filename')
+			path, filename, filetype = file_data.file_names(full_path)
 
-		obsnum = getattr(OBS, 'obsnum')
-		julian_date = getattr(OBS, 'julian_date')
-		if julian_date < 2456400:
-			polarization = 'all'
-		else:
-			polarization = getattr(OBS, 'pol')
-		length = getattr(OBS, 'length')
-	
-		if named_host == host:
-			try:
-				uv = A.miriad.UV(full_path)
-			except:
-				continue
+			obsnum = getattr(OBS, 'obsnum')
+			julian_date = getattr(OBS, 'julian_date')
+			if julian_date < 2456400:
+				polarization = 'all'
+			else:
+				polarization = getattr(OBS, 'pol')
+			length = getattr(OBS, 'length')
+		
+			if named_host == host:
+				try:
+					uv = A.miriad.UV(full_path)
+				except:
+					continue
 
-			time_start, time_end, delta_time, _  = uv_data.calc_times(uv)
+				time_start, time_end, delta_time, _  = uv_data.calc_times(uv)
 
-		else:
-			time_start, time_end, delta_time, _ = add_files.get_uv_data(host, full_path, mode='time')
+			else:
+				time_start, time_end, delta_time, _ = add_files.get_uv_data(host, full_path, mode='time')
 
-		lst = uv_data.get_lst(julian_date)		
-		era, julian_day = uv_data.julian_era(julian_date)
+			lst = uv_data.get_lst(julian_date)		
+			era, julian_day = uv_data.julian_era(julian_date)
 
-		#indicates type of file in era
-		era_type = None
+			#indicates type of file in era
+			era_type = None
 
-		prev_obs, next_obs, edge = uv_data.obs_edge(obsnum, sess=sess)
+			prev_obs, next_obs, edge = uv_data.obs_edge(obsnum, sess=sess)
 
-		filesize = file_data.calc_size(host, path, filename)
-		md5 = getattr(FILE, 'md5sum')
-		if md5 is None:
-			md5 = file_data.calc_md5sum(host, path, filename)
-		tape_index = None
+			filesize = file_data.calc_size(host, path, filename)
+			md5 = getattr(FILE, 'md5sum')
+			if md5 is None:
+				md5 = file_data.calc_md5sum(host, path, filename)
+			tape_index = None
 
-		source_host = host
-		write_to_tape = True
-		delete_file = False
+			source_host = host
+			write_to_tape = True
+			delete_file = False
 
-		timestamp = int(time.time())
+			timestamp = int(time.time())
 
-		obs_data = {'obsnum':obsnum,
-					'julian_date':julian_date,
-					'polarization':polarization,
-					'julian_day':julian_day,
-					'lst':lst,
-					'era':era,
-					'era_type':era_type,
-					'length':length,
-					'time_start':time_start,
-					'time_end':time_end,
-					'delta_time':delta_time,
-					'prev_obs':prev_obs, 
-					'next_obs':next_obs,
-					'edge':edge,
-					'timestamp':timestamp}
-		raw_data = {'host':host,
-					'path':path,
-					'filename':filename,
-					'filetype':filetype,
-					'full_path':full_path,
-					'obsnum':obsnum,
-					'filesize':filesize,
-					'md5sum':md5,
-					'tape_index':tape_index,
-					'source_host':source_host,
-					'write_to_tape':write_to_tape,
-					'delete_file':delete_file,
-					'timestamp':timestamp}
-		action = 'add by bridge'
-		table = None
-		identifier = full_path
-		log_data = {'action':action,
-					'table':table,
-					'identifier':identifier,
-					'timestamp':timestamp}
-		data_dbi.add_to_table(sess, 'observation', obs_data)
-		data_dbi.add_to_table(sess, 'file', raw_data)
-		data_dbi.add_to_table(sess, 'log', log_data)
-		movable_paths[filetype].append(full_path)
+			obs_data = {'obsnum':obsnum,
+						'julian_date':julian_date,
+						'polarization':polarization,
+						'julian_day':julian_day,
+						'lst':lst,
+						'era':era,
+						'era_type':era_type,
+						'length':length,
+						'time_start':time_start,
+						'time_end':time_end,
+						'delta_time':delta_time,
+						'prev_obs':prev_obs, 
+						'next_obs':next_obs,
+						'edge':edge,
+						'timestamp':timestamp}
+			raw_data = {'host':host,
+						'path':path,
+						'filename':filename,
+						'filetype':filetype,
+						'full_path':full_path,
+						'obsnum':obsnum,
+						'filesize':filesize,
+						'md5sum':md5,
+						'tape_index':tape_index,
+						'source_host':source_host,
+						'write_to_tape':write_to_tape,
+						'delete_file':delete_file,
+						'timestamp':timestamp}
+			action = 'add by bridge'
+			table = None
+			identifier = full_path
+			log_data = {'action':action,
+						'table':table,
+						'identifier':identifier,
+						'timestamp':timestamp}
+			data_dbi.add_to_table(sess, 'observation', obs_data)
+			data_dbi.add_to_table(sess, 'file', raw_data)
+			data_dbi.add_to_table(sess, 'log', log_data)
+			movable_paths[filetype].append(full_path)
 
-		compr_filename = ''.join((filename, 'cRRE'))
-		compr_path = os.path.join(path, compr_filename)
-		if os.path.isdir(compr_path):
-			compr_filetype = 'uvcRRE'
-			compr_data = raw_data
-			compr_data['filename'] = compr_filename
-			compr_data['filetype'] = compr_filetype
-			compr_data['filesize'] = file_data.calc_size(host, path, compr_filename)
-			compr_data['md5sum'] = file_data.calc_md5sum(host, path, compr_filename)
-			compr_data['write_to_tape'] = False
-			data_dbi.add_to_table(sess, 'file', compr_data)
-			movable_paths[compr_filetype].append(compr_path)
+			compr_filename = ''.join((filename, 'cRRE'))
+			compr_path = os.path.join(path, compr_filename)
+			if os.path.isdir(compr_path):
+				compr_filetype = 'uvcRRE'
+				compr_data = raw_data
+				compr_data['filename'] = compr_filename
+				compr_data['filetype'] = compr_filetype
+				compr_data['filesize'] = file_data.calc_size(host, path, compr_filename)
+				compr_data['md5sum'] = file_data.calc_md5sum(host, path, compr_filename)
+				compr_data['write_to_tape'] = False
+				data_dbi.add_to_table(sess, 'file', compr_data)
+				movable_paths[compr_filetype].append(compr_path)
 
-		npz_filename = ''.join((filename, 'cRE.npz'))
-		npz_path = os.path.join(path, npz_filename)
-		if os.path.isdir(npz_path):
-			npz_filetype = 'npz'
-			npz_data = raw_data
-			npz_data['filename'] = npz_filename
-			npz_data['filetype'] = npz_filetype
-			npz_data['filesize'] = file_data.calc_size(host, path, npz_filename)
-			npz_data['md5sum'] = file_data.calc_md5sum(host, path, npz_filename)
-			npz_data['write_to_tape'] = False
-			data_dbi.add_to_table(sess, 'file', npz_data)
-			movable_paths[npz_filetype].append(npz_path)
-
-	s.close()
+			npz_filename = ''.join((filename, 'cRE.npz'))
+			npz_path = os.path.join(path, npz_filename)
+			if os.path.isdir(npz_path):
+				npz_filetype = 'npz'
+				npz_data = raw_data
+				npz_data['filename'] = npz_filename
+				npz_data['filetype'] = npz_filetype
+				npz_data['filesize'] = file_data.calc_size(host, path, npz_filename)
+				npz_data['md5sum'] = file_data.calc_md5sum(host, path, npz_filename)
+				npz_data['write_to_tape'] = False
+				data_dbi.add_to_table(sess, 'file', npz_data)
+				movable_paths[npz_filetype].append(npz_path)
 
 	return movable_paths
 

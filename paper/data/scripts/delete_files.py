@@ -27,11 +27,10 @@ def delete_check(input_host):
 	output: list of uv* file paths of files to be deleted
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	table = getattr(pdbi, 'File')
-	FILEs = s.query(table).filter(getattr(table, 'delete_file') == True).filter(getattr(table, 'tape_index') != None)\
-							.filter(getattr(table, 'host') == input_host).all()
-	s.close()
+	with dbi.session_scope() as s:
+		table = getattr(pdbi, 'File')
+		FILEs = s.query(table).filter(getattr(table, 'delete_file') == True).filter(getattr(table, 'tape_index') != None)\
+								.filter(getattr(table, 'host') == input_host).all()
 	#all files on same host
 	full_paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
 	return full_paths
@@ -43,23 +42,22 @@ def set_delete_table(input_host, source, output_host, output_dir):
 	input: user host, source file, output host, output directory
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	action = 'delete'
-	table = 'file'
-	full_path = ''.join((input_host, ':', source))
-	timestamp = int(time.time())
-	FILE = dbi.get_entry(s, 'file', full_path)
-	dbi.set_entry(s, FILE, 'host', output_host)
-	dbi.set_entry(s, FILE, 'path', output_dir)
-	dbi.set_entry(s, FILE, 'delete_file', False)
-	dbi.set_entry(s, FILE, 'timestamp', timestamp)
-	identifier = full_path
-	log_data = {'action':action,
-				'table':table,
-				'identifier':identifier,
-				'timestamp':timestamp}
-	dbi.add_to_table(s, 'log', log_data)
-	s.close()
+	with dbi.session_scope() as s:
+		action = 'delete'
+		table = 'file'
+		full_path = ''.join((input_host, ':', source))
+		timestamp = int(time.time())
+		FILE = dbi.get_entry(s, 'file', full_path)
+		dbi.set_entry(s, FILE, 'host', output_host)
+		dbi.set_entry(s, FILE, 'path', output_dir)
+		dbi.set_entry(s, FILE, 'delete_file', False)
+		dbi.set_entry(s, FILE, 'timestamp', timestamp)
+		identifier = full_path
+		log_data = {'action':action,
+					'table':table,
+					'identifier':identifier,
+					'timestamp':timestamp}
+		dbi.add_to_table(s, 'log', log_data)
 	return None
 
 def rsync_copy(source, destination):

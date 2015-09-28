@@ -17,21 +17,20 @@ def md5_db():
 	updates md5sums for all files without in database
 	'''
 	data_dbi = pdbi.DataBaseInterface()
-	s = data_dbi.Session()
-	table = getattr(pdbi, 'File')
-	FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
-	for FILE in FILEs:
-		md5 = file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
-		timestamp = int(time.time())
-		data_dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
-		data_dbi.set_entry(s, FILE, 'timestamp', timestamp)
-		log_data = {'action':'update md5sum',
-					'table':'file',
-					'obsnum':getattr(FILE, 'full_path'),
-					'timestamp':timestamp}
+	with data_dbi.session_scope() as s:
+		table = getattr(pdbi, 'File')
+		FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
+		for FILE in FILEs:
+			md5 = file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
+			timestamp = int(time.time())
+			data_dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
+			data_dbi.set_entry(s, FILE, 'timestamp', timestamp)
+			log_data = {'action':'update md5sum',
+						'table':'file',
+						'obsnum':getattr(FILE, 'full_path'),
+						'timestamp':timestamp}
 
-		data_dbi.add_entry(s, 'log', log_data)
-	s.close()
+			data_dbi.add_entry(s, 'log', log_data)
 
 	return None
 

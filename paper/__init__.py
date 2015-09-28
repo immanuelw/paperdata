@@ -88,6 +88,7 @@ class DataBaseInterface(object):
 
 		self.Session = sessionmaker(bind=self.engine)
 
+	@contextmanager
 	def session_scope(self):
 		'''
 		creates a session scope

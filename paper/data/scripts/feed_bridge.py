@@ -32,12 +32,11 @@ def set_feed(source, output_host, output_dir, moved_to_distill=True):
 	input: source file, output host, output directory, moved to distill or not boolean value
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	FEED = dbi.get_entry(s, 'feed', source)
-	dbi.set_entry(s, FEED, 'host', output_host)
-	dbi.set_entry(s, FEED, 'path', output_dir)
-	dbi.set_entry(s, FEED, 'moved_to_distill', moved_to_distill)
-	s.close()
+	with dbi.session_scope() as s:
+		FEED = dbi.get_entry(s, 'feed', source)
+		dbi.set_entry(s, FEED, 'host', output_host)
+		dbi.set_entry(s, FEED, 'path', output_dir)
+		dbi.set_entry(s, FEED, 'moved_to_distill', moved_to_distill)
 	return None
 
 def move_feed_files(input_host, input_paths, output_host, output_dir):
@@ -72,19 +71,17 @@ def count_days():
 	checks amount of days in feed table and sets to move if reach requirement
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	table = getattr(pdbi, 'Feed')
-	count_FEEDs = s.query(getattr(table, 'julian_day'), label('count', func.count(getattr(table, 'julian_day'))))\
-							.group_by(getattr(table, 'julian_day')).all()
-	all_FEEDs = s.query(table).all()
-	good_days = tuple(getattr(FEED, 'julian_day') for FEED in count_FEEDs if getattr(FEED, 'count') == 288 or getattr(FEED, 'count') == 72)
-	to_move = tuple(getattr(FEED, 'full_path') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
+	with dbi.session_scope() as s:
+		table = getattr(pdbi, 'Feed')
+		count_FEEDs = s.query(getattr(table, 'julian_day'), label('count', func.count(getattr(table, 'julian_day'))))\
+								.group_by(getattr(table, 'julian_day')).all()
+		all_FEEDs = s.query(table).all()
+		good_days = tuple(getattr(FEED, 'julian_day') for FEED in count_FEEDs if getattr(FEED, 'count') == 288 or getattr(FEED, 'count') == 72)
+		to_move = tuple(getattr(FEED, 'full_path') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
 
-	for full_path in to_move:
-		FEED = dbi.get_entry(s, 'feed', source)
-		dbi.set_entry(s, FEED, 'ready_to_move', True)
-
-	s.close()
+		for full_path in to_move:
+			FEED = dbi.get_entry(s, 'feed', source)
+			dbi.set_entry(s, FEED, 'ready_to_move', True)
 	return None
 
 def find_data():
@@ -94,10 +91,9 @@ def find_data():
 	output: list of file paths to move, file host, list of filenames to be moved
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	table = getattr(pdbi, 'Feed')
-	FEEDs = s.query(table).filter(getattr(table, 'moved_to_distill') == False).filter(getattr(table, 'ready_to_move') == True).all()
-	s.close()
+	with dbi.session_scope() as s:
+		table = getattr(pdbi, 'Feed')
+		FEEDs = s.query(table).filter(getattr(table, 'moved_to_distill') == False).filter(getattr(table, 'ready_to_move') == True).all()
 
 	#only move one day at a time
 	feed_host = FEEDs[0].host

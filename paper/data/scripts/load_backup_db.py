@@ -30,8 +30,7 @@ def load_backup(backup_file=None, table=None):
 		backup_file = '/data4/paper/paperdata_backup/{timestamp}/{table}_{timestamp}.json'.format(table=table, timestamp=timestamp)
 
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	with open(backup, 'r') as backup_db:
+	with dbi.session_scope() as s, open(backup, 'r') as backup_db:
 		read = json.load(backup_db)
 		for row in read:
 			print(row.items())
@@ -41,7 +40,6 @@ def load_backup(backup_file=None, table=None):
 				raise
 			except:
 				print('Failed to load in entry')
-	s.close()
 
 	return None
 

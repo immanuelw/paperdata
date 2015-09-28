@@ -82,23 +82,21 @@ def calc_obs_data(host, full_path):
 		julian_date = round(float(jdate, 5))
 
 		dbi = pdbi.DataBaseInterface()
-		s = dbi.Session()
-		if len(filename.split('.')) == 5:
-			polarization = 'all'
-			pol = polarization
-		elif len(filename.split('.')) == 6:
-			polarization = filename.split('.')[3]
-			pol = polarization
-		table = getattr(pdbi, 'Observation')
-		OBS = s.query(table).filter(getattr(table, 'julian_date') == julian_date).filter(getattr(table, 'polarization') == pol).one()
+		with dbi.session_scope() as s:
+			if len(filename.split('.')) == 5:
+				polarization = 'all'
+				pol = polarization
+			elif len(filename.split('.')) == 6:
+				polarization = filename.split('.')[3]
+				pol = polarization
+			table = getattr(pdbi, 'Observation')
+			OBS = s.query(table).filter(getattr(table, 'julian_date') == julian_date).filter(getattr(table, 'polarization') == pol).one()
 
-		time_start = getattr(OBS, 'time_start')
-		time_end = getattr(OBS, 'time_end')
-		delta_time = getattr(OBS, 'delta_time')
-		length = getattr(OBS, 'length')
-		obsnum = getattr(OBS, 'obsnum')
-
-		s.close()
+			time_start = getattr(OBS, 'time_start')
+			time_end = getattr(OBS, 'time_end')
+			delta_time = getattr(OBS, 'delta_time')
+			length = getattr(OBS, 'length')
+			obsnum = getattr(OBS, 'obsnum')
 
 	lst = uv_data.get_lst(julian_date)
 	era, julian_day = uv_data.julian_era(julian_date)
@@ -165,12 +163,11 @@ def dupe_check(input_host, input_paths):
 	output: list of paths that are not already in database
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	#all files on same host
-	table = getattr(pdbi, 'File')
-	FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
-	full_paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
-	s.close()
+	with dbi.session_scope() as s:
+		#all files on same host
+		table = getattr(pdbi, 'File')
+		FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
+		full_paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
 
 	#for each input file, check if in full_paths
 	unique_paths = tuple(input_path for input_path in input_paths if input_path not in full_paths)
@@ -210,18 +207,17 @@ def update_obsnums():
 	updates edge attribute of all obsnums
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	table = getattr(pdbi, 'Observation')
-	OBSs = s.query(table).all()
+	with dbi.session_scope() as s:
+		table = getattr(pdbi, 'Observation')
+		OBSs = s.query(table).all()
 
-	for OBS in OBSs:
-		PREV_OBS = set_obs(s, dbi, OBS, 'prev_obs')
-		NEXT_OBS = set_obs(s, dbi, OBS, 'next_obs')
-		#sets edge 
-		edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
-		dbi.set_entry(s, OBS, 'edge', edge)
+		for OBS in OBSs:
+			PREV_OBS = set_obs(s, dbi, OBS, 'prev_obs')
+			NEXT_OBS = set_obs(s, dbi, OBS, 'next_obs')
+			#sets edge 
+			edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
+			dbi.set_entry(s, OBS, 'edge', edge)
 
-	s.close()
 	return None
 
 def add_files(input_host, input_paths):
@@ -231,24 +227,23 @@ def add_files(input_host, input_paths):
 	input: host of files, list of uv* file paths
 	'''
 	dbi = pdbi.DataBaseInterface()
-	s = dbi.Session()
-	for input_path in input_paths:
-		path = os.path.dirname(input_path)
-		filename = os.path.basename(input_path)
-		obs_data, file_data, log_data = calc_obs_data(input_host, input_path)
-		try:
-			dbi.add_to_table(s, 'observation', obs_data)
-		except:
-			print('Failed to load in obs ', path, filename)
-		try:
-			dbi.add_to_table(s, 'file', file_data)
-		except:
-			print('Failed to load in file ', path, filename)
-		try:
-			dbi.add_to_table(s, 'log', log_data)
-		except:
-			print('Failed to load in log ', path, filename)
-	s.close()
+	with dbi.session_scope() as s:
+		for input_path in input_paths:
+			path = os.path.dirname(input_path)
+			filename = os.path.basename(input_path)
+			obs_data, file_data, log_data = calc_obs_data(input_host, input_path)
+			try:
+				dbi.add_to_table(s, 'observation', obs_data)
+			except:
+				print('Failed to load in obs ', path, filename)
+			try:
+				dbi.add_to_table(s, 'file', file_data)
+			except:
+				print('Failed to load in file ', path, filename)
+			try:
+				dbi.add_to_table(s, 'log', log_data)
+			except:
+				print('Failed to load in log ', path, filename)
 
 	return None
 
