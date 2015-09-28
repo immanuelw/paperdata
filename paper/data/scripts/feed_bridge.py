@@ -50,7 +50,7 @@ def move_feed_files(input_host, input_paths, output_host, output_dir):
 		dbi = pdbi.DataBaseInterface()
 		with dbi.session_scope() as s:
 			for source in input_paths:
-				move_files.rsync_copy(source, destination)
+				ppdata.rsync_copy(source, destination)
 				set_feed(s, dbi, source, output_host, output_dir)
 				shutil.rmtree(source)
 	else:
