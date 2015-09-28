@@ -4,7 +4,7 @@
 
 import os
 import socket
-from paper.data import dbi as pdbi
+import paper as ppdata
 import add_files
 
 ### Script to reload paper database
@@ -32,16 +32,14 @@ def find_paths(input_host):
 				if file_path.endswith('npz'):
 					npz_paths.append(os.path.join(root, file_path))
 	else:
-		ssh = pdbi.login_ssh(input_host)
-		find = '''find / -name '*.uv' -o -name '*.uvcRRE' -o -name '*.npz' 2>/dev/null'''
-		_, all_paths, _ = ssh.exec_command(find)
+		with ppdata.login_ssh(input_host) as ssh:
+			find = '''find / -name '*.uv' -o -name '*.uvcRRE' -o -name '*.npz' 2>/dev/null'''
+			_, all_paths, _ = ssh.exec_command(find)
 		for path in all_paths.split('\n'):
 			if direc.endswith('uv') or direc.endswith('uvcRRE'):
 				 input_paths.append(path)
 			elif file_path.endswith('npz'):
 				 npz_paths.append(path)
-			
-		ssh.close()			
 
 	return input_paths, npz_paths
 
@@ -52,6 +50,5 @@ if __name__ == '__main__':
 		input_host = raw_input('Source directory host: ')
 
 	for all_paths in find_paths(input_host):
-		paths = add_files.dupe_check(input_host, all_paths)
-		paths.sort()
+		paths = sorted(add_files.dupe_check(input_host, all_paths))
 		add_files.add_files(input_host, paths)
