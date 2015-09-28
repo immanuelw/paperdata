@@ -41,7 +41,7 @@ def find_paths(input_host):
 			elif file_path.endswith('npz'):
 				 npz_paths.append(path)
 
-	return input_paths, npz_paths
+	return sorted(input_paths), sorted(npz_paths)
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2:
@@ -49,6 +49,6 @@ if __name__ == '__main__':
 	else:
 		input_host = raw_input('Source directory host: ')
 
-	for all_paths in find_paths(input_host):
+	for paths in find_paths(input_host):
 		paths = sorted(add_files.dupe_check(input_host, all_paths))
 		add_files.add_files(input_host, paths)
