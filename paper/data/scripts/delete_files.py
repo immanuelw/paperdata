@@ -33,6 +33,7 @@ def delete_check(input_host):
 								.filter(getattr(table, 'host') == input_host).all()
 	#all files on same host
 	full_paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
+
 	return full_paths
 
 def set_delete_table(s, dbi, input_host, source, output_host, output_dir):
@@ -56,15 +57,7 @@ def set_delete_table(s, dbi, input_host, source, output_host, output_dir):
 				'identifier':identifier,
 				'timestamp':timestamp}
 	dbi.add_to_table(s, 'log', log_data)
-	return None
 
-def rsync_copy(source, destination):
-	'''
-	uses rsync to copy files and make sure they have not changed
-
-	input: source file path, destination path
-	'''
-	subprocess.check_output(['rsync', '-ac', source, destination])
 	return None
 
 def delete_files(input_host, input_paths, output_host, output_dir):
@@ -79,7 +72,7 @@ def delete_files(input_host, input_paths, output_host, output_dir):
 		dbi = pdbi.DataBaseInterface()
 		with dbi.session_scope() as s:
 			for source in input_paths:
-				rsync_copy(source, destination)
+				ppdata.rsync_copy(source, destination)
 				set_delete_table(s, dbi, input_host, source, output_host, output_dir)
 				shutil.rmtree(source)
 	else:
@@ -90,8 +83,8 @@ def delete_files(input_host, input_paths, output_host, output_dir):
 				ssh.exec_command(rsync_copy_command)
 				set_delete_table(input_host, source, output_host, output_dir)
 				ssh.exec_command(rsync_del_command)
-
 	print('Completed transfer')
+
 	return None
 
 if __name__ == '__main__':

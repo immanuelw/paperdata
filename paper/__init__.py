@@ -2,6 +2,7 @@ import os
 import sys
 import paramiko
 import logging
+import subprocess
 from contextlib import contextmanager
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker
@@ -11,6 +12,16 @@ try:
 	import configparser
 except:
 	import ConfigParser as configparser
+
+def rsync_copy(source, destination):
+	'''
+	uses rsync to copy files and make sure they have not changed by using md5 (c option)
+
+	input: source file path, destination path
+	'''
+	subprocess.check_output(['rsync', '-ac', source, destination])
+
+	return None
 
 @contextmanager
 def ssh_scope(host, username=None):

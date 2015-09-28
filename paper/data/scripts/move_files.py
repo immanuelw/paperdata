@@ -108,16 +108,6 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 
 	return None
 
-def rsync_copy(source, destination):
-	'''
-	uses rsync to copy files and make sure they have not changed
-
-	input: source file path, destination path
-	'''
-	subprocess.check_output(['rsync', '-ac', source, destination])
-
-	return None
-
 def move_files(input_host=None, input_paths=None, output_host=None, output_dir=None):
 	'''
 	move files
@@ -149,7 +139,7 @@ def move_files(input_host=None, input_paths=None, output_host=None, output_dir=N
 		dbi = ppdata.DataBaseInterface()
 		with dbi.session_scope() as s:
 			for source in input_paths:
-				rsync_copy(source, destination)
+				ppdata.rsync_copy(source, destination)
 				set_move_table(s, dbi, input_host, source, output_host, output_dir)
 				shutil.rmtree(source)
 	else:
