@@ -2,6 +2,7 @@ import os
 import sys
 import paramiko
 import logging
+from contextlib import contextmanager
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
@@ -86,6 +87,21 @@ class DataBaseInterface(object):
 			self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
 
 		self.Session = sessionmaker(bind=self.engine)
+
+	def session_scope(self):
+		'''
+		creates a session scope
+		can use 'with'
+		'''
+		session = self.Session()
+		try:
+			yield session
+			session.commit()
+		except:
+			session.rollback()
+			raise
+		finally:
+			session.close()
 
 	def create_table(Table):
 		'''
