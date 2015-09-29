@@ -28,7 +28,7 @@ def str_val(value):
 	output: time unit string
 	'''
 	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
-	str_val = ' '.join(str_val, 'ago')
+	str_val = ' '.join((str_val, 'ago'))
 	return str_val
 
 @app.route('/')

@@ -164,7 +164,7 @@ def upload_set():
 				obs_id = int(line)
 				good_obs_ids.append(obs_id)
 			except ValueError as ve:
-				return jsonify(error=True, message=''.join('Invalid content in file: ', line))
+				return jsonify(error=True, message=''.join(('Invalid content in file: ', line)))
 
 		good_obs_ids.sort()
 
@@ -192,10 +192,10 @@ def upload_set():
 			try:
 				next_index = all_obs_ids.index(good_obs_id)
 			except ValueError as e:
-				return jsonify(error=True, message=''.join('''Obs ID {obsnum}
+				return jsonify(error=True, message='''Obs ID {obsnum}
 						not found in the set of observations corresponding
 						to Polarization: {polarization} and ERA_TYPE: {era_type}'''\
-						.format(obsnum=good_obs_id, polarization=polarization, era_type=era_type)))
+						.format(obsnum=good_obs_id, polarization=polarization, era_type=era_type))
 			if next_index > last_index:
 				bad_range_dict = {}
 				bad_range_dict['start_utc'] = all_obs_ids[last_index]
