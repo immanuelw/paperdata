@@ -112,7 +112,7 @@ def subscribe_to_data_source():
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
-		data_source = db_utils.query(database='search', table='graph_data_source',	field_tuples=(('name', '==', data_source_name),))[0]
+		data_source = db_utils.query(database='search', table='graph_data_source', field_tuples=(('name', '==', data_source_name),))[0]
 
 		g.user.subscribed_data_sources.append(data_source)
 		db.session.add(g.user)
@@ -129,7 +129,7 @@ def unsubscribe_from_data_source():
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
-		data_source = db_utils.query(database='search', table='graph_data_source',	field_tuples=(('name', '==', data_source_name),))[0]
+		data_source = db_utils.query(database='search', table='graph_data_source', field_tuples=(('name', '==', data_source_name),))[0]
 
 		g.user.subscribed_data_sources.remove(data_source)
 		try:
@@ -188,7 +188,7 @@ def create_data_source():
 				letters, _, or spaces.''')
 
 		#Is the data source name unique?
-		data_source = db_utils.query(database='search', table='graph_data_source',	field_tuples=(('name', '==', data_source_name),))[0]
+		data_source = db_utils.query(database='search', table='graph_data_source', field_tuples=(('name', '==', data_source_name),))[0]
 		if data_source is not None:
 			return jsonify(error=True, message='The data source name must be unique.')
 
