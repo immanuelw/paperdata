@@ -114,13 +114,12 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
-	def add_to_table(self, s=None, TABLE=None, entry_dict=None):
+	def add_to_table(self, s=None, TABLE=None, entry_dict=None, open_sess=False):
 		'''
 		create a new entry.
 
 		input: session object(optional), tablename, dict of attributes for object
 		'''
-		open_sess = False
 		if s is None:
 			s = self.Session()
 			open_sess = True

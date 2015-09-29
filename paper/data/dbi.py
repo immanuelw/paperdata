@@ -157,13 +157,12 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
-	def add_to_table(self, s=None, TABLE=None, entry_dict=None):
+	def add_to_table(self, s=None, TABLE=None, entry_dict=None, open_sess=False):
 		'''
 		create a new entry.
 
 		input: session object(optional), tablename, dict of attributes for object
 		'''
-		open_sess = False
 		table = getattr(sys.modules[__name__], TABLE.title())
 		if TABLE in ('observation', 'feed', 'log', 'rtp_file', 'rtp_observation', 'rtp_log'):
 			ENTRY = table(**entry_dict)
