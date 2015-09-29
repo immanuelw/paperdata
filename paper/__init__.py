@@ -129,7 +129,7 @@ class DataBaseInterface(object):
 		'''
 		Table.__table__.create(bind=self.engine)
 
-	def get_entry(self, s=None, TABLE=None, unique_value=None):
+	def get_entry(self, s=None, TABLE=None, unique_value=None, open_sess=False):
 		'''
 		retrieves any object.
 		Errors if there are more than one of the same object in the db. This is bad and should
@@ -138,7 +138,6 @@ class DataBaseInterface(object):
 		input: session object(optional), table name, primary key value of row
 		output: table object
 		'''
-		open_sess = False
 		if s is None:
 			s = self.Session()
 			open_sess = True
@@ -151,12 +150,11 @@ class DataBaseInterface(object):
 			s.close()
 		return ENTRY
 
-	def set_entry(self, s=None, ENTRY=None, field=None, new_value=None):
+	def set_entry(self, s=None, ENTRY=None, field=None, new_value=None, open_sess=False):
 		'''
 		sets the value of any entry
 		input: ENTRY object, field to be changed, new value
 		'''
-		open_sess = False
 		if s is None:
 			s = self.Session()
 			open_sess = True
@@ -166,14 +164,13 @@ class DataBaseInterface(object):
 			s.close()
 		return yay
 
-	def add_entry(self, s=None, ENTRY=None):
+	def add_entry(self, s=None, ENTRY=None, open_sess=False):
 		'''
 		adds entry to database and commits
 		does not add if duplicate found
 
 		input: session object(optional), table object
 		'''
-		open_sess = False
 		if s is None:
 			s = self.Session()
 			open_sess = True
