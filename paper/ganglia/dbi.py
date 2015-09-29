@@ -118,7 +118,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		'''
 		create a new entry.
 
-		input: session object(optional), tablename, dict of attributes for object
+		input: session object(optional), tablename, dict of attributes for object, open session boolean variable
 		'''
 		if s is None:
 			s = self.Session()

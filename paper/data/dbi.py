@@ -161,7 +161,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		'''
 		create a new entry.
 
-		input: session object(optional), tablename, dict of attributes for object
+		input: session object(optional), tablename, dict of attributes for object, open session boolean variable
 		'''
 		table = getattr(sys.modules[__name__], TABLE.title())
 		if TABLE in ('observation', 'feed', 'log', 'rtp_file', 'rtp_observation', 'rtp_log'):

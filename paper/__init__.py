@@ -135,7 +135,7 @@ class DataBaseInterface(object):
 		Errors if there are more than one of the same object in the db. This is bad and should
 		never happen
 
-		input: session object(optional), table name, primary key value of row
+		input: session object(optional), table name, primary key value of row, open session boolean variable
 		output: table object
 		'''
 		if s is None:
@@ -153,7 +153,7 @@ class DataBaseInterface(object):
 	def set_entry(self, s=None, ENTRY=None, field=None, new_value=None, open_sess=False):
 		'''
 		sets the value of any entry
-		input: ENTRY object, field to be changed, new value
+		input: ENTRY object, field to be changed, new value, open session boolean variable
 		'''
 		if s is None:
 			s = self.Session()
@@ -169,7 +169,7 @@ class DataBaseInterface(object):
 		adds entry to database and commits
 		does not add if duplicate found
 
-		input: session object(optional), table object
+		input: session object(optional), table object, open session boolean variable
 		'''
 		if s is None:
 			s = self.Session()
