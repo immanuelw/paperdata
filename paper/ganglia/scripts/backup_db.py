@@ -14,6 +14,7 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEBase import MIMEBase
 from email import Encoders
+import paper as ppdata
 from paper.ganglia import dbi as pyg
 
 ### Script to Backup pyganglia database
@@ -21,19 +22,6 @@ from paper.ganglia import dbi as pyg
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
-
-def decimal_default(obj):
-	'''
-	fixes decimal issue with json module
-
-	Args:
-		obj (object)
-
-	Returns:
-		object: float version of decimal object
-	'''
-	if isinstance(obj, decimal.Decimal):
-		return float(obj)
 
 def json_data(dbo, dump_objects):
 	'''
@@ -45,13 +33,16 @@ def json_data(dbo, dump_objects):
 	'''
 	with open(dbo, 'w') as f:
 		data = [ser_data.to_dict() for ser_data in dump_objects.all()]
-		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
+		json.dump(data, f, sort_keys=True, indent=1, default=ppdata.decimal_default)
 
 	return None
 
-def paperbackup():
+def paperbackup(dbi):
 	'''
 	backups database by loading into json files, named by timestamp
+
+	Args:
+		dbi (object): database interface object
 	'''
 	timestamp = int(time.time())
 	backup_dir = os.path.join('/data4/paper/pyganglia_backup', str(timestamp))
@@ -64,7 +55,6 @@ def paperbackup():
 					'iostat': {'first': 'timestamp', 'second': 'host', 'third': 'device'},
 					'ram': {'first': 'timestamp', 'second': 'host', 'third': 'total'},
 					'cpu': {'first': 'timestamp', 'second': 'host', 'third': 'cpu'}}
-	dbi = pyg.DataBaseInterface()
 	with dbi.session_scope as s:
 		print(timestamp)
 		for table in tables:
@@ -82,4 +72,5 @@ def paperbackup():
 	return None
 
 if __name__ == '__main__':
-	paperbackup()
+	dbi = pyg.DataBaseInterface()
+	paperbackup(dbi)

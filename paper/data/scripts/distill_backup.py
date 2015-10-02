@@ -8,6 +8,7 @@ import time
 import os
 import json
 import decimal
+import paper as ppdata
 import ddr_compress.dbi as ddbi
 
 ### Script to Backup paper database
@@ -16,19 +17,15 @@ import ddr_compress.dbi as ddbi
 ### Author: Immanuel Washington
 ### Date: 8-20-14
 
-def decimal_default(obj):
-	'''
-	fixes decimal issue with json module
-	'''
-	if isinstance(obj, decimal.Decimal):
-		return float(obj)
-
 def to_dict(ser_data):
 	'''
 	creates a dict of database object's attributes
 
-	input: database object
-	output: dictionary of object's attributes
+	Args:
+		ser_data (object): database object
+
+	Returns:
+		dict: database object's attributes
 	'''
 	json_dict = ser_data.__dict__
 	try:
@@ -42,11 +39,13 @@ def json_data(dbo, dump_objects):
 	'''
 	dumps list of objects into a json file
 
-	input: filename, list of database objects
+	Args:
+		dbo (str): filename
+		dump_objects (list): database objects query
 	'''
 	with open(dbo, 'w') as f:
 		data = [to_dict(ser_data) for ser_data in dump_objects.all()]
-		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
+		json.dump(data, f, sort_keys=True, indent=1, default=ppdata.decimal_default)
 
 	return None
 
@@ -54,7 +53,8 @@ def paperbackup(dbi):
 	'''
 	backups database by loading into json files, named by timestamp
 
-	input: database interface object
+	Args:
+		dbi (object): database interface object
 	'''
 	timestamp = int(time.time())
 	backup_dir = os.path.join('/data4/paper/paperdistiller_backup', str(timestamp))

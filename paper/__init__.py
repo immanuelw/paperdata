@@ -3,6 +3,7 @@ import sys
 import paramiko
 import logging
 import subprocess
+import decimal
 from contextlib import contextmanager
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker
@@ -12,6 +13,19 @@ try:
 	import configparser
 except:
 	import ConfigParser as configparser
+
+def decimal_default(obj):
+	'''
+	fixes decimal issue with json module
+
+	Args:
+		obj (object)
+
+	Returns:
+		object: float version of decimal object
+	'''
+	if isinstance(obj, decimal.Decimal):
+		return float(obj)
 
 def rsync_copy(source, destination):
 	'''

@@ -23,8 +23,12 @@ def delete_check(dbi, input_host):
 	'''
 	checks for which files can be deleted
 
-	input: database interface object, host of system
-	output: list of uv* file paths of files to be deleted
+	Args:
+		dbi (object): database interface object
+		host (str): host of system
+
+	Returns:
+		list: uv* file paths of files to be deleted
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'File')
@@ -39,7 +43,13 @@ def set_delete_table(s, dbi, input_host, source, output_host, output_dir):
 	'''
 	updates table for deleted file
 
-	input: session object, database interface object, user host, source file, output host, output directory
+	Args:
+		s (object): session object
+		dbi (object): database interface object
+		input_host (str): user host
+		source (str): source file
+		output_host (str): output host
+		output_dir (str): output directory
 	'''
 	action = 'delete'
 	table = 'file'
@@ -63,7 +73,12 @@ def delete_files(dbi, input_host, input_paths, output_host, output_dir):
 	'''
 	delete files
 
-	input: database interface object, file host, list of file paths, output host, output directory
+	Args:
+		dbi (object): database interface object
+		input_host (str): user host
+		input_paths (list): file paths
+		output_host (str): output host
+		output_dir (str): output directory
 	'''
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))
