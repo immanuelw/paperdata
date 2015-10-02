@@ -25,6 +25,12 @@ from paper.ganglia import dbi as pyg
 def decimal_default(obj):
 	'''
 	fixes decimal issue with json module
+
+	Args:
+		obj (object)
+
+	Returns:
+		object: float version of decimal object
 	'''
 	if isinstance(obj, decimal.Decimal):
 		return float(obj)

@@ -20,6 +20,12 @@ from paper.data import dbi as pdbi
 def decimal_default(obj):
 	'''
 	fixes decimal issue with json module
+
+	Args:
+		obj (object)
+
+	Returns:
+		object: float version of decimal object
 	'''
 	if isinstance(obj, decimal.Decimal):
 		return float(obj)
@@ -28,7 +34,9 @@ def json_data(dbo, dump_objects):
 	'''
 	dumps list of objects into a json file
 
-	input: filename, list of database objects
+	Args:
+		dbo (str): filename
+		dump_objects (list): database objects query
 	'''
 	with open(dbo, 'w') as f:
 		data = [ser_data.to_dict() for ser_data in dump_objects.all()]
@@ -40,7 +48,8 @@ def paperbackup(dbi):
 	'''
 	backups database by loading into json files, named by timestamp
 
-	input: database interface object
+	Args:
+		database interface object
 	'''
 	timestamp = int(time.time())
 	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(timestamp))
