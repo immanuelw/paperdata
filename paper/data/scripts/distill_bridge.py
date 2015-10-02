@@ -84,7 +84,9 @@ def add_data(dbi, data_dbi):
 			#indicates type of file in era
 			era_type = None
 
-			prev_obs, next_obs, edge = uv_data.obs_edge(obsnum, sess=sess)
+			prev_obs = None
+			next_obs = None
+			edge = None
 
 			filesize = file_data.calc_size(host, path, filename)
 			md5 = getattr(FILE, 'md5sum')
