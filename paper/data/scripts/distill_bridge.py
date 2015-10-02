@@ -21,8 +21,12 @@ def add_data(dbi, data_dbi):
 	'''
 	transfer data from paperdistiller database to create data for paperdata tables
 
-	input: distiller database interface object, data database interface object
-	output: dict of movable paths for each filetype
+	Args:
+		dbi (object): distiller database interface object
+		data_dbi (object): data database interface object
+
+	Returns:
+		dict: movable paths for each filetype
 	'''
 	s = dbi.Session()
 	#do stuff
@@ -138,7 +142,7 @@ def add_data(dbi, data_dbi):
 			compr_path = os.path.join(path, compr_filename)
 			if os.path.isdir(compr_path):
 				compr_filetype = 'uvcRRE'
-				compr_data = raw_data
+				compr_data = raw_data.copy()
 				compr_data['filename'] = compr_filename
 				compr_data['filetype'] = compr_filetype
 				compr_data['filesize'] = file_data.calc_size(host, path, compr_filename)
@@ -151,7 +155,7 @@ def add_data(dbi, data_dbi):
 			npz_path = os.path.join(path, npz_filename)
 			if os.path.isdir(npz_path):
 				npz_filetype = 'npz'
-				npz_data = raw_data
+				npz_data = raw_data.copy()
 				npz_data['filename'] = npz_filename
 				npz_data['filetype'] = npz_filetype
 				npz_data['filesize'] = file_data.calc_size(host, path, npz_filename)
@@ -168,7 +172,10 @@ def paperbridge(dbi, data_dbi, auto=False):
 	bridges paperdistiller and paperdata
 	moves files and pulls relevant data to add to paperdata from paperdistiller
 
-	input: distiller database interface object, data database interface object, boolean variable to track whether to wait
+	Args:
+		dbi (object): distiller database interface object
+		data_dbi (object): data database interface object
+		auto (bool): track whether to wait -- defaults to False
 	'''
 	#Calculate amount of space needed to move a day ~1.1TB
 	required_space = 1112661213184
