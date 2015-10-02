@@ -167,6 +167,39 @@ class DataBaseInterface(object):
 		'''
 		Table.__table__.create(bind=self.engine)
 
+	def add_entry(self, s, ENTRY):
+		'''
+		adds entry to database and commits
+		does not add if duplicate found
+
+		Args:
+			s (object): session object
+			ENTRY (object): entry object
+		'''
+		try:
+			s.add(ENTRY)
+			s.commit()
+		except (exc.IntegrityError):
+			s.rollback()
+			print('Duplicate entry found ... skipping entry')
+
+		return None
+
+	def add_entry_dict(self, s, TABLE, entry_dict):
+		'''
+		create a new entry.
+
+		Args:
+			s (object): session object
+			TABLE (str): table name
+			entry_dict (dict): dict of attributes for object
+		'''
+		table = getattr(sys.modules[__name__], TABLE.title())
+		ENTRY = table(**entry_dict)
+		self.add_entry(s, ENTRY)
+
+		return None
+
 	def get_entry(self, s, TABLE, unique_value):
 		'''
 		retrieves any object.
@@ -201,23 +234,5 @@ class DataBaseInterface(object):
 		'''
 		setattr(ENTRY, field, new_value)
 		self.add_entry(s, ENTRY)
-
-		return None
-
-	def add_entry(self, s, ENTRY):
-		'''
-		adds entry to database and commits
-		does not add if duplicate found
-
-		Args:
-			s (object): session object
-			ENTRY (object): entry object
-		'''
-		try:
-			s.add(ENTRY)
-			s.commit()
-		except (exc.IntegrityError):
-			s.rollback()
-			print('Duplicate entry found ... skipping entry')
 
 		return None

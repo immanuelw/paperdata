@@ -154,19 +154,3 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 
 	def drop_db(self, Base):
 		super(DataBaseInterface, self).drop_db(Base)
-
-	def add_entry_dict(self, s, TABLE, entry_dict):
-		'''
-		create a new entry.
-
-		Args:
-			s (object): session object
-			TABLE (str): table name
-			entry_dict (dict): dict of attributes for object
-		'''
-		table = getattr(sys.modules[__name__], TABLE.title())
-		if TABLE in self.main_fields:
-			ENTRY = table(**entry_dict)
-		self.add_entry(s, ENTRY)
-
-		return None
