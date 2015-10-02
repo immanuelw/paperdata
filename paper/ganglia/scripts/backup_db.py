@@ -33,18 +33,19 @@ def json_data(dbo, dump_objects):
 	'''
 	dumps list of objects into a json file
 
-	input: filename, list of database objects
+	Args:
+		dbo (str): filename
+		dump_objects (list): database objects query
 	'''
 	with open(dbo, 'w') as f:
 		data = [ser_data.to_dict() for ser_data in dump_objects.all()]
 		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
+
 	return None
 
 def paperbackup():
 	'''
 	backups database by loading into json files, named by timestamp
-
-	input: time script was run
 	'''
 	timestamp = int(time.time())
 	backup_dir = os.path.join('/data4/paper/pyganglia_backup', str(timestamp))
@@ -65,7 +66,7 @@ def paperbackup():
 			dbo = os.path.join(backup_dir, db_file)
 			print(db_file)
 
-			DB_table = getattr(pdbi, table.title())
+			DB_table = getattr(pyg, table.title())
 			DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
 												getattr(DB_table, table_sorts[table]['second']).asc(),
 												getattr(DB_table, table_sorts[table]['third']).asc())
