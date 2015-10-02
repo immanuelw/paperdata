@@ -132,9 +132,9 @@ def calc_times(uv):
 		return None
 
 	if n_times > 1:
-		delta_time = -(time_start - time_end)/(n_times - 1)
+		delta_time = -(time_start - time_end) / (n_times - 1)
 	else:
-		delta_time = -(time_start - time_end)/(n_times)
+		delta_time = -(time_start - time_end) / (n_times)
 
 		length = five_round(n_times * delta_time)
 		time_start = five_round(time_start)
