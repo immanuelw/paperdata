@@ -31,7 +31,9 @@ def rsync_copy(source, destination):
 	'''
 	uses rsync to copy files and make sure they have not changed by using md5 (c option)
 
-	input: source file path, destination path
+	Args:
+		source (str): source file path
+		destination (str): destination path
 	'''
 	subprocess.check_output(['rsync', '-ac', source, destination])
 
@@ -44,8 +46,12 @@ def ssh_scope(host, username=None):
 	can use 'with'
 	SSH/SFTP connection to remote host
 
-	input: remote host and username
-	output: ssh connection to be used to run commands to remote host
+	Args:
+		host (str): remote host
+		username (str): username --defaults to None
+
+	Returns:
+		object: ssh object to be used to run commands to remote host
 	'''
 	ssh = paramiko.SSHClient()
 	ssh.load_system_host_keys()
@@ -72,10 +78,14 @@ class DictFix(object):
 	'''
 	superclass for all SQLAlchemy Table objects
 	allows access to object row dictionary
-
-	output: dict of table attributes
 	'''
 	def to_dict(self):
+		'''
+		convert object to dict
+
+		Returns:
+			dict: table attributes
+		'''
 		try:
 			new_dict = {}
 			for column in self.__table__.columns:
@@ -90,7 +100,8 @@ class DataBaseInterface(object):
 		Connect to the database and initiate a session creator.
 		superclass of DBI for paperdata, paperdev, and ganglia databases
 
-		input: configuration file -- defaults to paperdata.cfg, can be changed on initiation
+		Args:
+			configfile (Optional[str]): configuration file --defaults to ~/paperdata.cfg
 		'''
 		if not configfile is None:
 			config = configparser.ConfigParser()
@@ -125,6 +136,9 @@ class DataBaseInterface(object):
 		'''
 		creates a session scope
 		can use 'with'
+
+		Returns:
+			object: session scope to be used to access database with 'with'
 		'''
 		session = self.Session()
 		try:
@@ -139,6 +153,9 @@ class DataBaseInterface(object):
 	def drop_db(self, Base):
 		'''
 		drops the tables in the database.
+
+		Args:
+			Base (object): base object for database
 		'''
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
@@ -146,18 +163,26 @@ class DataBaseInterface(object):
 	def create_table(Table):
 		'''
 		creates a table in the database.
-		input: table object
+
+		Args:
+			Table (object): table object
 		'''
 		Table.__table__.create(bind=self.engine)
 
-	def get_entry(self, s=None, TABLE=None, unique_value=None, open_sess=False):
+	def get_entry(self, TABLE, unique_value, s=None, open_sess=False):
 		'''
 		retrieves any object.
 		Errors if there are more than one of the same object in the db. This is bad and should
 		never happen
 
-		input: session object(optional), table name, primary key value of row, open session boolean variable
-		output: table object
+		Args:
+			TABLE (str): table name
+			unique_value (int/float/str): primary key value of row
+			s (Optional[object]): session object --defaults to None
+			open_sess (Optional[bool]): is there a session open --defaults to False
+
+		Returns:
+			object: table object
 		'''
 		if s is None:
 			s = self.Session()
@@ -169,28 +194,40 @@ class DataBaseInterface(object):
 			return None
 		if open_sess:
 			s.close()
+
 		return ENTRY
 
-	def set_entry(self, s=None, ENTRY=None, field=None, new_value=None, open_sess=False):
+	def set_entry(self, ENTRY, field, new_value, s=None, open_sess=False):
 		'''
 		sets the value of any entry
-		input: ENTRY object, field to be changed, new value, open session boolean variable
+
+		Args:
+			ENTRY (object): entry object
+			field (str): field to be changed
+			new_value (int/float/str): value to change field in entry to
+			s (Optional[object]): session object --defaults to None
+			open_sess (Optional[bool]): is there a session open --defaults to False
 		'''
 		if s is None:
 			s = self.Session()
 			open_sess = True
 		setattr(ENTRY, field, new_value)
-		yay = self.add_entry(s, ENTRY)
+		self.add_entry(s, ENTRY)
 		if open_sess:
 			s.close()
-		return yay
 
-	def add_entry(self, s=None, ENTRY=None, open_sess=False):
+		return None
+
+	def add_entry(self, ENTRY, s=None, open_sess=False):
 		'''
 		adds entry to database and commits
 		does not add if duplicate found
 
-		input: session object(optional), table object, open session boolean variable
+		Args:
+		Args:
+			ENTRY (object): entry object
+			s (Optional[object]): session object --defaults to None
+			open_sess (Optional[bool]): is there a session open --defaults to False
 		'''
 		if s is None:
 			s = self.Session()
@@ -203,4 +240,5 @@ class DataBaseInterface(object):
 			print('Duplicate entry found ... skipping entry')
 		if open_sess:
 			s.close()
+
 		return None
