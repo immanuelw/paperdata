@@ -84,7 +84,8 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		'''
 		Unique Interface for the ganglia database
 
-		input: ganglia database configuration file
+		Args:
+			configfile (str): ganglia database configuration file
 		'''
 		super(DataBaseInterface, self).__init__(configfile=configfile)
 
@@ -114,11 +115,15 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
 
-	def add_to_table(self, s=None, TABLE=None, entry_dict=None, open_sess=False):
+	def add_to_table(self, TABLE, entry_dict, s=None, open_sess=False):
 		'''
 		create a new entry.
 
-		input: session object(optional), tablename, dict of attributes for object, open session boolean variable
+		Args:
+			TABLE (str): table name
+			entry_dict (dict): dict of attributes for object
+			s (Optional[session object]): session object -- defaults to None
+			open_sess (Optional[bool]): variable if session is already open -- defaults to False
 		'''
 		if s is None:
 			s = self.Session()
