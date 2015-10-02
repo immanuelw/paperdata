@@ -1,36 +1,46 @@
-"""Perform base conversions
-
+'''
+Perform base conversions
 Currently supports conversion between base 10 (decimal) and
 base 60 (sexagesimal).
-
-"""
+'''
 from numpy import modf
 
-
 def decimal_to_sexagesimal(decimal):
-	"""Convert decimal hours or degrees to sexagesimal.
+	'''
+	convert decimal hours or degrees to sexagesimal
 
-	:param decimal: decimal number to be converted to sexagismal.
-	:return: tuple of either (hours, minutes, seconds) or
-			 (degrees, arcminutes, arcseconds)
+	Args:
+		decimal (float): decimal number to be converted to sexagismal
 
-	"""
+	Returns:
+		tuple:
+			int: hours
+			int: minutes
+			float: seconds
+		OR
+		tuple:
+			int: degrees
+			int: arcminutes
+			float: arcseconds
+	'''
 	fractional, integral = modf(decimal)
 	min_fractional, minutes = modf(fractional * 60)
 	seconds = min_fractional * 60.
+
 	return integral.astype(int), minutes.astype(int), seconds
 
-
 def sexagesimal_to_decimal(hd, minutes, seconds):
-	"""Convert sexagesimal hours or degrees to decimal.
+	'''
+	convert sexagesimal hours or degrees to decimal
+	Warning! Ensure each part has the correct sign
+	e.g. -111d36m12s should be entered as (-111, -36, -12)
 
-	Warning! Ensure each part has the correct sign.
-	e.g. -111d36m12s should be entered as (-111, -36, -12).
+	Args:
+		 hd (float): hours or degrees.
+		 minutes (float): minutes or arcminutes
+		 seconds (float): seconds or arcseconds
 
-	:param hd: hours or degrees.
-	:param minutes: minutes or arcminutes.
-	:param seconds: seconds or arcseconds.
-	:return: decimal hours or degrees.
-
-	"""
+	Returns:
+		 float: decimal hours or degrees
+	'''
 	return hd + minutes / 60. + seconds / 3600.
