@@ -198,12 +198,12 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 	pulls list of object from database after filtering query
 
 	Args:
-		data_source (Optional[object]): data source object
-		database (Optional[str]): database name
-		table (Optional[str]): table name
-		field_tuples (Optional[list]): tuples of field names, equivalency values, and values to limit query
-		sort_tuples (Optional[list]): tuples indicating field to sort and sort order
-		group_tuples (Optional[list]): tuples indicating fields to group
+		data_source (Optional[object]): data source object --defaults to None
+		database (Optional[str]): database name --defaults to None
+		table (Optional[str]): table name --defaults to None
+		field_tuples (Optional[list]): tuples of field names, equivalency values, and values to limit query -- defaults to None
+		sort_tuples (Optional[list]): tuples indicating field to sort and sort order --defaults to None
+		group_tuples (Optional[list]): tuples indicating fields to group --defaults to None
 
 	Returns:
 		list: objects corresponding to filtered query
