@@ -40,6 +40,7 @@ def set_feed(s, dbi, source, output_host, output_dir, moved_to_distill=True):
 	dbi.set_entry(s, FEED, 'host', output_host)
 	dbi.set_entry(s, FEED, 'path', output_dir)
 	dbi.set_entry(s, FEED, 'moved_to_distill', moved_to_distill)
+
 	return None
 
 def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
@@ -73,6 +74,7 @@ def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
 				ssh.exec_command(rsync_del_command)
 
 	print('Completed transfer')
+
 	return None
 
 def count_days(dbi):
@@ -93,6 +95,7 @@ def count_days(dbi):
 		for full_path in to_move:
 			FEED = dbi.get_entry(s, 'feed', source)
 			dbi.set_entry(s, FEED, 'ready_to_move', True)
+
 	return None
 
 def find_data(dbi):
