@@ -6,8 +6,8 @@ import sys
 import os
 import psutil
 import time
-from paper.ganglia import dbi as pyg
 import paper as ppdata
+from paper.ganglia import dbi as pyg
 
 ### Script to add info to pyganglia database
 ### Adds information using dbi
@@ -19,8 +19,11 @@ def two_round(num):
 	'''
 	rounds value to two decimal places
 
-	input: int/float/string of number
-	output: sigfig2 float
+	Args:
+		num (int/float/string): number
+
+	Returns:
+		float: 2 sig figs number
 	'''
 	return round(float(num), 2)
 
@@ -28,8 +31,13 @@ def filesystem(ssh, host, path):
 	'''
 	generates table information for filesystem table
 
-	input: ssh object, host of filesystem, path to search
-	output: table information
+	Args:
+		ssh (ssh object): ssh object
+		host (str): host of filesystem
+		path (str): path to search
+
+	Returns:
+		dict: filesystem information
 	'''
 	timestamp = int(time.time())
 	system_data = {}
@@ -63,8 +71,12 @@ def iostat(ssh, host):
 	'''
 	generates table information for iostat table
 
-	input: ssh object, host of system
-	output: table information
+	Args:
+		ssh (ssh object): ssh object
+		host (str): host of filesystem
+
+	Returns:
+		dict: iostat information
 	'''
 	timestamp = int(time.time())
 	iostat_data = {}
@@ -122,8 +134,12 @@ def ram_free(ssh, host):
 	'''
 	generates table information for ram table
 
-	input: ssh object, host of system
-	output: table information
+	Args:
+		ssh (ssh object): ssh object
+		host (str): host of filesystem
+
+	Returns:
+		dict: ram information
 	'''
 	#Calculates ram usage on folio
 	timestamp = int(time.time())
@@ -188,8 +204,12 @@ def cpu_perc(ssh, host):
 	'''
 	generates table information for cpu table
 
-	input: ssh object, host of system
-	output: table information
+	Args:
+		ssh (ssh object): ssh object
+		host (str): host of filesystem
+
+	Returns:
+		dict: cpu usage information
 	'''
 	#Calculates cpu usage on folio
 	timestamp = int(time.time())
@@ -247,7 +267,9 @@ def add_data(ssh, host):
 	'''
 	generates table information for all tables
 
-	input: ssh object, host of system
+	Args:
+		ssh (ssh object): ssh object
+		host (str): host of filesystem
 	'''
 	with ppdata.ssh_scope(host) as ssh:
 		dbi = pyg.DataBaseInterface()
