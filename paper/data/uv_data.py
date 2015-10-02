@@ -148,9 +148,9 @@ def obs_edge(obsnum, sess=None):
 		if sess is None:
 			dbi = pdbi.DataBaseInterface()
 			with dbi.session_scope() as s:
-				prev_obs, next_obs = obs_pn(s, obsnum)
+				prev_obs, next_obs = obs_pn(obsnum, s)
 		else:
-			prev_obs, next_obs = obs_pn(sess, obsnum)
+			prev_obs, next_obs = obs_pn(obsnum, s)
 		edge = is_edge(prev_obs, next_obs)
 
 	return prev_obs, next_obs, edge
