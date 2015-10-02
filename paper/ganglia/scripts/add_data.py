@@ -23,7 +23,7 @@ def two_round(num):
 		num (int/float/string): number
 
 	Returns:
-		float: 2 sig figs number
+		float(2): number
 	'''
 	return round(float(num), 2)
 

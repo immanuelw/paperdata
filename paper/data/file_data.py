@@ -64,7 +64,7 @@ def calc_size(host, path, filename):
 	if named_host == host:
 		size = sizeof_fmt(get_size(full_path))
 	else:
-		with ppdata.ssh_scope() as ssh:
+		with ppdata.ssh_scope(host) as ssh:
 			sftp = ssh.open_sftp()
 			size_bytes = sftp.stat(full_path).st_size
 			size = sizeof_fmt(size_bytes)
@@ -115,7 +115,7 @@ def calc_md5sum(host, path, filename):
 	if named_host == host:
 		md5 = get_md5sum(full_path)
 	else:
-		with ppdata.ssh_scope() as ssh:
+		with ppdata.ssh_scope(host) as ssh:
 			try:
 				sftp = ssh.open_sftp()
 				remote_path = sftp.file(full_path, mode='r')
