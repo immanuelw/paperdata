@@ -141,8 +141,9 @@ try:
 				file_log.append(entry_dict)
 				file_status.update({filename:status})
 				file_time.update({filename:time.time()})
-		for monitor_data in file_log:
-			pyg_dbi.add_to_table('monitor', monitor_data)
+		with pyg_dbi.session_scope as s:
+			for monitor_data in file_log:
+				pyg_dbi.add_to_table('monitor', monitor_data, s)
 		file_log = []
 		s.close()
 		statusscr.refresh()
