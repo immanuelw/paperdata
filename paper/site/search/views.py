@@ -14,21 +14,28 @@ def time_val(value):
 	'''
 	determines how much time to divide by and divides time by that to make human readable
 
-	input: numerical time value
-	output: numerical time value divided
+	Args:
+		value (float): numerical time value
+
+	Returns:
+		float: numerical time value divided
 	'''
 	time_val = 1 if value < 500 else 60 if value < 3600 else 3600 if value < 86400 else 86400
+
 	return value / time_val
 
 def str_val(value):
 	'''
 	determines which time unit to use
 
-	input: numerical time value
-	output: time unit string
+	Args:
+		value (float): numerical time value
+	Returns:
+		str: time unit string
 	'''
 	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
 	str_val = ' '.join((str_val, 'ago'))
+
 	return str_val
 
 @app.route('/')
@@ -40,8 +47,11 @@ def index(setName=None):
 	start page of the website
 	pull in set name if possible to pregenerate set information
 
-	input: set name
-	output: index html
+	Args:
+		setName (str): set name --defaults to None
+
+	Returns:
+		html: index
 	'''
 	active_data_sources = []
 
@@ -74,7 +84,10 @@ def get_graph():
 	'''
 	get graph information or set view
 
-	output: graph html or set view html
+	Returns:
+		html: graph
+		OR
+		html: set view
 	'''
 	graph_type_str = request.args.get('graphType')
 	if graph_type_str is None:
@@ -167,7 +180,8 @@ def obs_table():
 	'''
 	generate observation table for histogram bar
 
-	output: observation table html
+	Returns:
+		html: observation table
 	'''
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
@@ -192,7 +206,8 @@ def file_table():
 	'''
 	generate file table for histogram bar
 
-	output: file table html
+	Returns:
+		html: file table
 	'''
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
@@ -240,7 +255,8 @@ def teardown_request(exception):
 	'''
 	exit database after request
 
-	input: exception
+	Args:
+		exception (exception): exception
 	'''
 	paper_db = getattr(g, 'paper_session', None)
 	pyg_db = getattr(g, 'pyg_session', None)
@@ -255,7 +271,10 @@ def profile():
 	'''
 	access user profile
 
-	output: profile html or redirect for login
+	Returns:
+		html: profile
+		OR
+		html: redirect for login
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
@@ -274,7 +293,10 @@ def user_page():
 	'''
 	access user page
 
-	output: user page html or redirect for login
+	Returns:
+		html: user page
+		OR
+		html: redirect for login
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
@@ -295,7 +317,8 @@ def data_summary_table():
 	'''
 	summary of data in main databases
 
-	output: summary table html
+	Returns:
+		html: summary table
 	'''
 	#table that shows on side of website under login
 	starttime = request.form['starttime']
