@@ -4,6 +4,7 @@
 
 import sys
 import os
+import copy
 import time
 import socket
 from collections import Counter
@@ -144,7 +145,7 @@ def add_data(dbi, data_dbi):
 			compr_path = os.path.join(path, compr_filename)
 			if os.path.isdir(compr_path):
 				compr_filetype = 'uvcRRE'
-				compr_data = raw_data.copy()
+				compr_data = copy.deepcopy(raw_data)
 				compr_data['filename'] = compr_filename
 				compr_data['filetype'] = compr_filetype
 				compr_data['filesize'] = file_data.calc_size(host, path, compr_filename)
@@ -157,7 +158,7 @@ def add_data(dbi, data_dbi):
 			npz_path = os.path.join(path, npz_filename)
 			if os.path.isdir(npz_path):
 				npz_filetype = 'npz'
-				npz_data = raw_data.copy()
+				npz_data = copy.deepcopy(raw_data)
 				npz_data['filename'] = npz_filename
 				npz_data['filetype'] = npz_filetype
 				npz_data['filesize'] = file_data.calc_size(host, path, npz_filename)
