@@ -16,7 +16,8 @@ def md5_db(data_dbi):
 	'''
 	updates md5sums for all files without in database
 
-	input: data database interface object
+	Args:
+		data_dbi (object): data database interface object
 	'''
 	with data_dbi.session_scope() as s:
 		table = getattr(pdbi, 'File')
@@ -39,7 +40,8 @@ def md5_distiller(dbi):
 	'''
 	updates md5sums for all files without in database
 
-	input: distiller database interface object
+	Args:
+		dbi (object): distiller database interface object
 	'''
 	s = dbi.Session()
 	table = getattr(ddbi, 'File')

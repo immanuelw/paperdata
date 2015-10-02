@@ -17,8 +17,13 @@ def find_paths(input_host):
 	'''
 	finds all uv* files on a host
 
-	input: system host of files
-	output: list of uv* files, list of .npz files
+	Args:
+		input_host (str): system host of files
+
+	Returns:
+		tuple:
+			list: uv* files
+			list: .npz files
 	'''
 	named_host = socket.gethostname()
 	input_paths = []

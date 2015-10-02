@@ -23,8 +23,14 @@ def gen_feed_data(host, full_path):
 	'''
 	generates data for feed table
 
-	input: system host, full path of uv* file
-	output: dict of feed table fields, log dict
+	Args:
+		host (str): system host
+		full_path (str): full path of uv* file
+
+	Returns:
+		tuple:
+			dict: feed values
+			dict: log values
 	'''
 	#allows uv access
 	try:
@@ -54,8 +60,13 @@ def dupe_check(dbi, input_host, input_paths):
 	'''
 	checks for files already in feed table
 
-	input: database interface object, file host, list of file paths
-	output: list of files not in feed table
+	Args:
+		dbi (object): database interface object
+		input_host (str): file host
+		input_paths (list): file paths
+
+	Returns:
+		list: files not in feed table
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
@@ -68,11 +79,14 @@ def dupe_check(dbi, input_host, input_paths):
 		
 	return unique_paths
 
-def add_feeds_to_db(input_host, input_paths):
+def add_feeds_to_db(dbi, input_host, input_paths):
 	'''
 	adds feed file data to table
 
-	input: database interface object, file host, list of file paths
+	Args:
+		dbi (object): database interface object
+		input_host (str): file host
+		input_paths (list): file paths
 	'''
 	with dbi.session_scope() as s:
 		for source in input_paths:
@@ -86,7 +100,10 @@ def add_feeds(dbi, input_host, input_paths):
 	'''
 	generates list of input files, check for duplicates, add information to database
 
-	input: database interface object, input host, input paths string
+	Args:
+		dbi (object): database interface object
+		input_host (str): file host
+		input_paths (str): file paths string
 	'''
 	named_host = socket.gethostname()
 	if named_host == input_host:

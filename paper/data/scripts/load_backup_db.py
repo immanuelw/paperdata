@@ -19,7 +19,10 @@ def load_backup(dbi, backup_file=None, table=None):
 	'''
 	loads backups from json into database
 
-	input: database interface object, name of backup file, table name
+	Args:
+		dbi (object): database interface object,
+		backup_file (str): name of backup file --defaults to None
+		table (str): table name --defaults to None
 	'''
 	if table is None:
 		return None
