@@ -10,6 +10,7 @@ import time
 import socket
 import paper as ppdata
 from paper.data import dbi as pdbi, uv_data, file_data
+from sqlalchemy import or_
 
 ### Script to add files to paper database
 ### Adds files using dbi
@@ -126,7 +127,9 @@ def calc_obs_data(dbi, host, full_path):
 	#indicates type of file in era
 	era_type = None
 
-	prev_obs, next_obs, edge = uv_data.obs_edge(obsnum)
+	prev_obs = None
+	next_obs = None
+	edge = None
 
 	filesize = file_data.calc_size(host, path, filename)
 	md5 = file_data.calc_md5sum(host, path, filename)
@@ -243,7 +246,8 @@ def update_obsnums(dbi):
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Observation')
-		OBSs = s.query(table).all()
+		#get everything with
+		OBSs = s.query(table).filter(or_(getattr(table, 'prev_obs') == None, getattr(table, 'next_obs') == None)).all()
 
 		for OBS in OBSs:
 			PREV_OBS = set_obs(s, dbi, OBS, 'prev_obs')
