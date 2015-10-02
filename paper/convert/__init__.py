@@ -53,7 +53,7 @@ def gcal2jd(year, month, day, hour=None, minute=None, second=None):
 	Returns:
 		tuple:
 			float: modified jd,
-			float: julian date as 5 sig fig float
+			float(5): julian date
 	'''
 	year = int(year)
 	month = int(month)
@@ -130,7 +130,7 @@ def time_to_decimal(time):
 	converts a time or datetime object into decimal time
 
 	Args:
-		time (datetime object): datetime.time or datetime.datetime object
+		time (object): datetime.time or datetime.datetime object
 
 	Returns:
 		float: input time
@@ -146,7 +146,7 @@ def decimal_to_time(hours):
 		hours (float): input time
 
 	Returns:
-		datetime object: datetime.time
+		object: datetime.time
 	'''
 	hours, minutes, seconds = base.decimal_to_sexagesimal(hours)
 	seconds_frac, seconds = math.modf(seconds)
@@ -199,7 +199,7 @@ def datetime_to_juliandate(dt):
 	convert a datetime object in UTC to a Julian Date
 
 	Args:
-		dt (datetime object): datetime object
+		dt (object): datetime object
 
 	Returns:
 		float: The Julian Date for the given datetime object
@@ -237,7 +237,7 @@ def datetime_to_modifiedjd(dt):
 	convert a datetime object in UTC to a Modified Julian Date
 
 	Args:
-		dt (datetime object): datetime object
+		dt (object): datetime object
 
 	Returns:
 		float: the Modified Julian Date
@@ -272,7 +272,7 @@ def utc_to_gmst(dt):
 	convert a datetime object in UTC time to Greenwich Mean Sidereal Time
 
 	Args:
-		dt (datetime object): datetime object in UTC time
+		dt (object): datetime object in UTC time
 
 	Returns:
 		float: decimal hours in GMST
@@ -288,7 +288,7 @@ def gmst_to_utc(dt):
 	Note: this requires a datetime object, not just the decimal hours.
 
 	Args:
-		dt (datetime object): datetime object in GMST time
+		dt (object): datetime object in GMST time
 
 	Returns:
 		datetime object: datetime object in UTC
@@ -316,7 +316,7 @@ def juliandate_to_utc(juliandate):
 		juliandate (float): a Julian Date
 
 	Returns:
-		datetime object: datetime object in UTC time
+		object: datetime object in UTC time
 	'''
 	juliandate += .5
 	jd_frac, jd_int = math.modf(juliandate)
@@ -364,7 +364,7 @@ def modifiedjd_to_utc(modifiedjd):
 		juliandate (float): a Modified Julian Date
 
 	Returns:
-		datetime object: datetime object in UTC time
+		object: datetime object in UTC time
 	'''
 	juliandate = modifiedjd_to_juliandate(modifiedjd)
 	return juliandate_to_utc(juliandate)
@@ -409,7 +409,7 @@ def utc_to_lst(dt, longitude):
 	convert UTC to Local Sidereal Time
 
 	Args:
-		dt (datetime object): datetime object in UTC
+		dt (object): datetime object in UTC
 		longitude (float): location in degrees, E positive
 
 	Returns:
@@ -496,7 +496,7 @@ def gps_to_datetime(timestamp):
 		timestamp (float): GPS timestamp in seconds.
 
 	Returns:
-		datetime object: datetime object
+		object: datetime object
 	'''
 	gps_dt = datetime.datetime.utcfromtimestamp(timestamp)
 	return gps_dt
@@ -506,7 +506,7 @@ def datetime_to_gps(dt):
 	convert a GPS datetime object to a timestamp
 
 	Args:
-		dt (datetime object): GPS datetime object
+		dt (object): GPS datetime object
 
 	Returns:
 		float: GPS timestamp in seconds
