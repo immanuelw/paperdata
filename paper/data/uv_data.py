@@ -100,62 +100,6 @@ def is_edge(prev_obs, next_obs):
 
 	return edge
 
-def obs_pn(s, obsnum):
-	'''
-	gets the previous and next observations for any obsnum
-
-	Args:
-		s (session object): session object
-		obsnum (int): observation number
-
-	Returns:
-		tuple:
-			object: previous observation object if available, None otherwise
-			object: next observation object if available, None otherwise
-	'''
-	table = getattr(pdbi, 'Observation')
-	PREV_OBS = s.query(table).filter(getattr(table, 'obsnum') == obsnum - 1).one()
-	if PREV_OBS is not None:
-		prev_obs = getattr(PREV_OBS, 'obsnum')
-	else:
-		prev_obs = None
-	NEXT_OBS = s.query(table).filter(getattr(table, 'obsnum') == obsnum + 1).one()
-	if NEXT_OBS is not None:
-		next_obs = getattr(NEXT_OBS, 'obsnum')
-	else:
-		next_obs = None
-
-	return prev_obs, next_obs
-
-def obs_edge(obsnum, sess=None):
-	'''
-	checks for previous and next observations, and if obsnum is on edge of julain day
-
-	Args:
-		obsnum (int): observation number
-		sess (session object): session object --defaults to None
-
-	Returns:
-		tuple:
-			object: previous observation object if available, None otherwise
-			object: next observation object if available, None otherwise
-			bool: on the edge of julian day
-	'''
-	if obsnum == None:
-		prev_obs = None
-		next_obs = None
-		edge = None
-	else:
-		if sess is None:
-			dbi = pdbi.DataBaseInterface()
-			with dbi.session_scope() as s:
-				prev_obs, next_obs = obs_pn(s, obsnum)
-		else:
-			prev_obs, next_obs = obs_pn(s, obsnum)
-		edge = is_edge(prev_obs, next_obs)
-
-	return prev_obs, next_obs, edge
-
 def calc_times(uv):
 	'''
 	takes in uv file and calculates time based information
