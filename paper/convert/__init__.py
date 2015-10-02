@@ -51,7 +51,9 @@ def gcal2jd(year, month, day, hour=None, minute=None, second=None):
 		second (Optional[float]): gregorian second
 
 	Returns:
-		tuple: modified jd, julian date as 5 sig fig float
+		tuple:
+			float: modified jd,
+			float: julian date as 5 sig fig float
 	'''
 	year = int(year)
 	month = int(month)
@@ -84,7 +86,11 @@ def jd2gcal(jd1, jd2):
 		jd2 (float): actual julian date
 
 	Returns:
-		tuple: integer values of year, month, and day, and fractional value of the gregorian day
+		tuple: 
+			int: year
+			int: month
+			int: day
+			float: fractional value of the gregorian day
 	'''
 	from math import modf
 
