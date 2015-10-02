@@ -22,9 +22,26 @@ def get_uv_data(host, full_path, mode=None):
 	pulls relevant observation data from uv* file
 	pulls from remote systems if necessary
 
-	input: host of system, full path of uv* file, mode to indicate how much info to output
-	output(mode='time'):  time start, time end, delta time, julian date, polarization, length, and obsnum of uv* file
-	output: time start, time end, delta time, length of uv* file
+	Args:
+		host (str): host of system
+		full_path (str): full_path of uv* file
+		mode (Optional[str]): mode of data to indicate which data to output --defaults to None
+
+	Returns:
+		tuple:
+			float(5): time start
+			float(5): time end
+			float(5): delta time
+			float(5): julian date
+			str: polarization
+			float(5): length
+			int: obsnum of uv file object
+		OR
+		tuple:
+			float(5): time start
+			float(5): time end
+			float(5): delta time
+			float(5): length
 	'''
 	with ppdata.ssh_scope(host) as ssh:
 		uv_data_script = os.path.expanduser('~/paper/data/uv_data.py')
@@ -52,14 +69,22 @@ def get_uv_data(host, full_path, mode=None):
 			uv_comm = 'python {moved_script} {host} {full_path} time'.format(moved_script=moved_script, host=host, full_path=full_path)
 			_, uv_dat, _ = ssh.exec_command(uv_comm)
 			time_start, time_end, delta_time, length = [round(float(info), 5) for info in uv_dat.read().split(',')]
+
 		return time_start, time_end, delta_time, length
 
 def calc_obs_data(dbi, host, full_path):
 	'''
 	generates all relevant data from uv* file
 
-	input: host of system, full path of uv* file
-	output: observation value dict, file value dict, and a log dict
+	Args:
+		host (str): host of system
+		full_path (str): full path of uv* file
+
+	Returns:
+		tuple:
+			dict: observation values
+			dict: file values
+			dict: log values
 	'''
 	host = host
 	path, filename, filetype = file_data.file_names(full_path)
@@ -156,8 +181,13 @@ def dupe_check(dbi, input_host, input_paths):
 	'''
 	checks for duplicate paths and removes to not waste time if possible
 
-	input: database interface object, host of uv* files, list of paths for uv* files
-	output: list of paths that are not already in database
+	Args:
+		dbi (object): database interface object
+		input_host (str): host of uv* files
+		input_paths (list): paths of uv* files
+
+	Returns:
+		list: paths that are not already in database
 	'''
 	with dbi.session_scope() as s:
 		#all files on same host
@@ -174,8 +204,14 @@ def set_obs(s, dbi, OBS, field):
 	'''
 	finds edge observation for each observation by finding previous and next
 
-	input: session object, database interface object, observation object, field to update
-	output: edge observation object
+	Args:
+		s (object): session object
+		dbi (object): database interface object
+		OBS (object): observation object
+		field (str): field to update
+
+	Returns:
+		object: edge observation object
 	'''
 	if field == 'prev_obs':
 		edge_num = getattr(OBS, 'obsnum') - 1
@@ -202,7 +238,8 @@ def update_obsnums(dbi):
 	'''
 	updates edge attribute of all obsnums
 
-	input: database interface object
+	Args:
+		dbi (object): database interface object
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Observation')
@@ -221,7 +258,10 @@ def add_files_to_db(dbi, input_host, input_paths):
 	'''
 	adds files to the database
 
-	input: database interface object, host of files, list of uv* file paths
+	Args:
+		dbi (object): database interface object
+		input_host (str): host of files, list of uv* file paths
+		input_paths (list): paths of uv* files
 	'''
 	with dbi.session_scope() as s:
 		for input_path in input_paths:
@@ -247,7 +287,10 @@ def add_files(dbi, input_host, input_paths):
 	'''
 	generates list of input files, check for duplicates, add information to database
 
-	input: database interface object, input host, input paths string
+	Args:
+		dbi (object): database interface object
+		input_host (str): host of files, list of uv* file paths
+		input_paths (str): string to indicate paths of uv* files
 	'''
 	named_host = socket.gethostname()
 	if named_host == input_host:
