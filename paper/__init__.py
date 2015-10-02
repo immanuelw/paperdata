@@ -95,7 +95,7 @@ class DictFix(object):
 class DataBaseInterface(object):
 	def __init__(self, configfile='~/paperdata.cfg'):
 		'''
-		Connect to the database and initiate a session creator.
+		Connect to the database and make a session creator
 		superclass of DBI for paperdata, paperdev, and ganglia databases
 
 		Args:
