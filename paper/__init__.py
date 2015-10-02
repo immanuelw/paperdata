@@ -185,28 +185,30 @@ class DataBaseInterface(object):
 
 		return None
 
-	def add_entry_dict(self, s, TABLE, entry_dict):
+	def add_entry_dict(self, mod_name, s, TABLE, entry_dict):
 		'''
 		create a new entry.
 
 		Args:
+			mod_name (str): name of module to access models
 			s (object): session object
 			TABLE (str): table name
 			entry_dict (dict): dict of attributes for object
 		'''
-		table = getattr(sys.modules[__name__], TABLE.title())
+		table = getattr(sys.modules[mod_name], TABLE.title())
 		ENTRY = table(**entry_dict)
 		self.add_entry(s, ENTRY)
 
 		return None
 
-	def get_entry(self, s, TABLE, unique_value):
+	def get_entry(self, mod_name, s, TABLE, unique_value):
 		'''
 		retrieves any object.
 		Errors if there are more than one of the same object in the db. This is bad and should
 		never happen
 
 		Args:
+			mod_name (str): name of module to access models
 			s (object): session object
 			TABLE (str): table name
 			unique_value (int/float/str): primary key value of row
@@ -214,7 +216,7 @@ class DataBaseInterface(object):
 		Returns:
 			object: table object
 		'''
-		table = getattr(sys.modules[__name__], TABLE.title())
+		table = getattr(sys.modules[mod_name], TABLE.title())
 		try:
 			ENTRY = s.query(table).get(unique_value)
 		except:

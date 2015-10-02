@@ -87,7 +87,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Args:
 			configfile (str): ganglia database configuration file --defaults to ~/ganglia.cfg
 		'''
-		super(DataBaseInterface, self).__init__(configfile=configfile)
+		super(ppdata.DataBaseInterface, self).__init__(configfile=configfile)
 		self.main_fields = ('filesystem', 'monitor', 'ram', 'iostat', 'cpu')
 
 	def create_db(self):
@@ -110,4 +110,37 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Base.metadata.create_all()
 
 	def drop_db(self, Base):
-		super(DataBaseInterface, self).drop_db(Base)
+		'''
+		drops tables in the database
+
+		Args:
+			object: Base database object
+		'''
+		super(ppdata.DataBaseInterface, self).drop_db(Base)
+
+	def add_entry_dict(self, s, TABLE, entry_dict):
+		'''
+		create a new entry.
+
+		Args:
+			s (object): session object
+			TABLE (str): table name
+			entry_dict (dict): dict of attributes for object
+		'''
+		super(ppdata.DataBaseInterface, self).add_entry_dict(__name__, s, TABLE, entry_dict)
+
+	def get_entry(self, s, TABLE, unique_value):
+		'''
+		retrieves any object.
+		Errors if there are more than one of the same object in the db. This is bad and should
+		never happen
+
+		Args:
+			s (object): session object
+			TABLE (str): table name
+			unique_value (int/float/str): primary key value of row
+
+		Returns:
+			object: table object
+		'''
+		super(ppdata.DataBaseInterface, self).get_entry(__name__, s, TABLE, unique_value)
