@@ -66,8 +66,6 @@ def ssh_scope(host, username=None):
 			yield ssh
 		except:
 			return None
-		finally:
-			ssh.close()
 	finally:
 		ssh.close()
 
@@ -169,7 +167,7 @@ class DataBaseInterface(object):
 		'''
 		Table.__table__.create(bind=self.engine)
 
-	def get_entry(self, TABLE, unique_value, s=None, open_sess=False):
+	def get_entry(self, TABLE, unique_value, s):
 		'''
 		retrieves any object.
 		Errors if there are more than one of the same object in the db. This is bad and should
@@ -178,26 +176,20 @@ class DataBaseInterface(object):
 		Args:
 			TABLE (str): table name
 			unique_value (int/float/str): primary key value of row
-			s (Optional[object]): session object --defaults to None
-			open_sess (Optional[bool]): is there a session open --defaults to False
+			s (object): session object
 
 		Returns:
 			object: table object
 		'''
-		if s is None:
-			s = self.Session()
-			open_sess = True
 		table = getattr(sys.modules[__name__], TABLE.title())
 		try:
 			ENTRY = s.query(table).get(unique_value)
 		except:
 			return None
-		if open_sess:
-			s.close()
 
 		return ENTRY
 
-	def set_entry(self, ENTRY, field, new_value, s=None, open_sess=False):
+	def set_entry(self, ENTRY, field, new_value, s):
 		'''
 		sets the value of any entry
 
@@ -205,20 +197,14 @@ class DataBaseInterface(object):
 			ENTRY (object): entry object
 			field (str): field to be changed
 			new_value (int/float/str): value to change field in entry to
-			s (Optional[object]): session object --defaults to None
-			open_sess (Optional[bool]): is there a session open --defaults to False
+			s (object): session object
 		'''
-		if s is None:
-			s = self.Session()
-			open_sess = True
 		setattr(ENTRY, field, new_value)
-		self.add_entry(s, ENTRY)
-		if open_sess:
-			s.close()
+		self.add_entry(ENTRY, s)
 
 		return None
 
-	def add_entry(self, ENTRY, s=None, open_sess=False):
+	def add_entry(self, ENTRY, s):
 		'''
 		adds entry to database and commits
 		does not add if duplicate found
@@ -226,19 +212,13 @@ class DataBaseInterface(object):
 		Args:
 		Args:
 			ENTRY (object): entry object
-			s (Optional[object]): session object --defaults to None
-			open_sess (Optional[bool]): is there a session open --defaults to False
+			s (object): session object
 		'''
-		if s is None:
-			s = self.Session()
-			open_sess = True
 		try:
 			s.add(ENTRY)
 			s.commit()
 		except (exc.IntegrityError):
 			s.rollback()
 			print('Duplicate entry found ... skipping entry')
-		if open_sess:
-			s.close()
 
 		return None
