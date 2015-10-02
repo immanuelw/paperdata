@@ -100,13 +100,13 @@ def is_edge(prev_obs, next_obs):
 
 	return edge
 
-def obs_pn(obsnum, s):
+def obs_pn(s, obsnum):
 	'''
 	gets the previous and next observations for any obsnum
 
 	Args:
-		obsnum (int): observation number
 		s (session object): session object
+		obsnum (int): observation number
 
 	Returns:
 		tuple:
@@ -133,7 +133,8 @@ def obs_edge(obsnum, sess=None):
 
 	Args:
 		obsnum (int): observation number
-		sess (session object): session object if available
+		sess (session object): session object --defaults to None
+
 	Returns:
 		tuple:
 			object: previous observation object if available, None otherwise
@@ -148,9 +149,9 @@ def obs_edge(obsnum, sess=None):
 		if sess is None:
 			dbi = pdbi.DataBaseInterface()
 			with dbi.session_scope() as s:
-				prev_obs, next_obs = obs_pn(obsnum, s)
+				prev_obs, next_obs = obs_pn(s, obsnum)
 		else:
-			prev_obs, next_obs = obs_pn(obsnum, s)
+			prev_obs, next_obs = obs_pn(s, obsnum)
 		edge = is_edge(prev_obs, next_obs)
 
 	return prev_obs, next_obs, edge
