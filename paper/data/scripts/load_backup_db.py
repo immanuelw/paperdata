@@ -36,7 +36,7 @@ def load_backup(dbi, backup_file=None, table=None):
 		for row in read:
 			print(row.items())
 			try:
-				dbi.add_to_table(s, table, row)
+				dbi.add_entry_dict(s, table, row)
 			except KeyboardInterrupt:
 				raise
 			except:

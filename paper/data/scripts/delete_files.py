@@ -65,7 +65,7 @@ def set_delete_table(s, dbi, input_host, source, output_host, output_dir):
 				'table':table,
 				'identifier':identifier,
 				'timestamp':timestamp}
-	dbi.add_to_table(s, 'log', log_data)
+	dbi.add_entry_dict(s, 'log', log_data)
 
 	return None
 

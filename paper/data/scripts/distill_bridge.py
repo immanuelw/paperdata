@@ -135,9 +135,9 @@ def add_data(dbi, data_dbi):
 						'table':table,
 						'identifier':identifier,
 						'timestamp':timestamp}
-			data_dbi.add_to_table(sess, 'observation', obs_data)
-			data_dbi.add_to_table(sess, 'file', raw_data)
-			data_dbi.add_to_table(sess, 'log', log_data)
+			data_dbi.add_entry_dict(sess, 'observation', obs_data)
+			data_dbi.add_entry_dict(sess, 'file', raw_data)
+			data_dbi.add_entry_dict(sess, 'log', log_data)
 			movable_paths[filetype].append(full_path)
 
 			compr_filename = ''.join((filename, 'cRRE'))
@@ -150,7 +150,7 @@ def add_data(dbi, data_dbi):
 				compr_data['filesize'] = file_data.calc_size(host, path, compr_filename)
 				compr_data['md5sum'] = file_data.calc_md5sum(host, path, compr_filename)
 				compr_data['write_to_tape'] = False
-				data_dbi.add_to_table(sess, 'file', compr_data)
+				data_dbi.add_entry_dict(sess, 'file', compr_data)
 				movable_paths[compr_filetype].append(compr_path)
 
 			npz_filename = ''.join((filename, 'cRE.npz'))
@@ -163,7 +163,7 @@ def add_data(dbi, data_dbi):
 				npz_data['filesize'] = file_data.calc_size(host, path, npz_filename)
 				npz_data['md5sum'] = file_data.calc_md5sum(host, path, npz_filename)
 				npz_data['write_to_tape'] = False
-				data_dbi.add_to_table(sess, 'file', npz_data)
+				data_dbi.add_entry_dict(sess, 'file', npz_data)
 				movable_paths[npz_filetype].append(npz_path)
 	s.close()
 

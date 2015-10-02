@@ -155,7 +155,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 	def drop_db(self, Base):
 		super(DataBaseInterface, self).drop_db(Base)
 
-	def add_to_table(self, s, TABLE, entry_dict):
+	def add_entry_dict(self, s, TABLE, entry_dict):
 		'''
 		create a new entry.
 
