@@ -7,6 +7,7 @@ import sys
 import json
 import glob
 from paper.data import dbi as pdbi, data_db as pdb
+import add_files
 import sqlalchemy.exc
 
 ### Script to create paper database
@@ -56,3 +57,5 @@ if __name__ == '__main__':
 		#load_backup(dbi, table='feed')
 		#load_backup(dbi, table='log')
 		#load_backup(dbi, table='rtp_file')
+	add_files.update_obsnums(dbi)
+	add_files.connect_observations(dbi)

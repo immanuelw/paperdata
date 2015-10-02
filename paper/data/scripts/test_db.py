@@ -35,6 +35,8 @@ if __name__ == '__main__':
 	input_paths = test_paths
 
 	add_files.add_files(dbi, input_host, input_paths)
+	add_files.update_obsnums(dbi)
+	add_files.connect_observations(dbi)
 
 	print('backing up db...')
 	backup_db.paperbackup(dbi)
@@ -48,6 +50,8 @@ if __name__ == '__main__':
 	print('loading db...')
 	load_backup(dbi, table='file')
 	load_backup(dbi, table='observation')
+	add_files.update_obsnums(dbi)
+	add_files.connect_observations(dbi)
 
 	print('moving files...')
 	#copy files first?

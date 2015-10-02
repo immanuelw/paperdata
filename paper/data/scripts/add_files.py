@@ -246,7 +246,6 @@ def update_obsnums(dbi):
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Observation')
-		#get everything with
 		OBSs = s.query(table).filter(or_(getattr(table, 'prev_obs') == None, getattr(table, 'next_obs') == None)).all()
 
 		for OBS in OBSs:
@@ -255,6 +254,25 @@ def update_obsnums(dbi):
 			#sets edge 
 			edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
 			dbi.set_entry(s, OBS, 'edge', edge)
+
+	return None
+
+def connect_observations(dbi):
+	'''
+	connects file with observation object
+
+	Args:
+		dbi (object): database interface object
+	'''
+	with dbi.session_scope() as s:
+		file_table = getattr(pdbi, 'File')
+		obs_table = getattr(pdbi, 'Observation')
+		FILEs = s.query(file_table).filter(getattr(file_table, 'observation') == None).all()
+
+		for FILE in FILEs:		
+			#get the observation corresponding to this file
+			OBS = s.query(obs_table).get(getattr(FILE, 'obsnum'))
+			dbi.set_entry(s, FILE, 'observation', OBS)  #associate the file with an observation
 
 	return None
 
@@ -311,6 +329,7 @@ def add_files(dbi, input_host, input_paths):
 	add_files_to_db(dbi, input_host, input_paths)
 	add_files_to_db(dbi, input_host, npz_paths)
 	update_obsnums(dbi)
+	connect_observations(dbi)
 
 	return None
 

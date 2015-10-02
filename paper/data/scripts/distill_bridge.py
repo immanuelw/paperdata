@@ -209,3 +209,4 @@ if __name__ == '__main__':
 	data_dbi = pdbi.DataBaseInterface()
 	paperbridge(dbi, data_dbi)
 	add_files.update_obsnums(data_dbi)
+	add_files.connect_observations(data_dbi)

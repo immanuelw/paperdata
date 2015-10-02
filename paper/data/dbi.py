@@ -167,13 +167,6 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		table = getattr(sys.modules[__name__], TABLE.title())
 		if TABLE in self.main_fields:
 			ENTRY = table(**entry_dict)
-		elif TABLE in ('file',):
-			#files linked to observations
-			obs_table = getattr(sys.modules[__name__], 'Observation')
-			ENTRY = table(**entry_dict)
-			#get the observation corresponding to this file
-			OBS = s.query(obs_table).get(entry_dict['obsnum'])
-			setattr(ENTRY, 'observation', OBS)  #associate the file with an observation
 		self.add_entry(s, ENTRY)
 
 		return None
