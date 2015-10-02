@@ -8,7 +8,15 @@ def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era_
 	'''
 	insert set into database
 
-	input: set name, start time, end time, dict of flagged range, polarization, era type, total data hours, flagged data hours
+	Args:
+		name (str): set name
+		start (str): start time
+		end (str): end time
+		flagged_range_dicts (dict): flagged range
+		polarization (str): polarization
+		era_type (str): era type
+		total_data_hrs (int): total data hours
+		flagged_data_hrs (int): flagged data hours
 	'''
 	new_set = getattr(models, 'Set')()
 	setattr(new_set, 'username', g.user.username)
@@ -49,20 +57,34 @@ def is_obs_flagged(obs_id, flagged_range_dicts):
 	'''
 	boolean check for if observation is flagged
 
-	input: observation id, list of flagged range dicts
-	output: boolean value if flagged
+	Args:
+		obs_id (int): observation id
+		flagged_range_dicts (list): flagged range dicts
+
+	Returns:
+		bool: is it flagged
 	'''
 	for flagged_range_dict in flagged_range_dicts:
 		if obs_id >= flagged_range_dict['start_utc'] and obs_id <= flagged_range_dict['end_utc']:
 			return True
+
 	return False
 
 def get_data_hours_in_set(start, end, polarization, era_type, flagged_range_dicts):
 	'''
 	finds total amount of hours total, and total flagged
 
-	input: start time, end time, polarization, era type, list of flagged range dicts
-	output: total amount of data hours, total amount of flagged data hours
+	Args:
+		start (str): start time
+		end (str): end time
+		flagged_range_dicts (dict): flagged range
+		polarization (str): polarization
+		era_type (str): era type
+		flagged_range_dicts (list): flagged range dicts
+
+	Returns:
+		int: total amount of data hours
+		int: total amount of flagged data hours
 	'''
 	total_data_hrs = flagged_data_hrs = 0
 
@@ -263,7 +285,8 @@ def get_filters():
 	'''
 	get filters for database
 
-	output: filters html
+	Returns:
+		html: filters
 	'''
 	users = db_utils.query(database='search', table='user')
 	return render_template('filters.html', users=users)
@@ -273,7 +296,8 @@ def get_sets():
 	'''
 	get all sets
 
-	output: set list html
+	Returns:
+		html: set list
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		request_content = request.get_json()
