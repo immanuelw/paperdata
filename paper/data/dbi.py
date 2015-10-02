@@ -155,14 +155,14 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 	def drop_db(self, Base):
 		super(DataBaseInterface, self).drop_db(Base)
 
-	def add_to_table(self, TABLE, entry_dict, s):
+	def add_to_table(self, s, TABLE, entry_dict):
 		'''
 		create a new entry.
 
 		Args:
+			s (object): session object
 			TABLE (str): table name
 			entry_dict (dict): dict of attributes for object
-			s (object): session object
 		'''
 		table = getattr(sys.modules[__name__], TABLE.title())
 		if TABLE in self.main_fields:
@@ -174,6 +174,6 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 			#get the observation corresponding to this file
 			OBS = s.query(obs_table).get(entry_dict['obsnum'])
 			setattr(ENTRY, 'observation', OBS)  #associate the file with an observation
-		self.add_entry(ENTRY, s)
+		self.add_entry(s, ENTRY)
 
 		return None

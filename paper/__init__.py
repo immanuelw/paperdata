@@ -167,16 +167,16 @@ class DataBaseInterface(object):
 		'''
 		Table.__table__.create(bind=self.engine)
 
-	def get_entry(self, TABLE, unique_value, s):
+	def get_entry(self, s, TABLE, unique_value):
 		'''
 		retrieves any object.
 		Errors if there are more than one of the same object in the db. This is bad and should
 		never happen
 
 		Args:
+			s (object): session object
 			TABLE (str): table name
 			unique_value (int/float/str): primary key value of row
-			s (object): session object
 
 		Returns:
 			object: table object
@@ -189,30 +189,29 @@ class DataBaseInterface(object):
 
 		return ENTRY
 
-	def set_entry(self, ENTRY, field, new_value, s):
+	def set_entry(self, s, ENTRY, field, new_value):
 		'''
 		sets the value of any entry
 
 		Args:
+			s (object): session object
 			ENTRY (object): entry object
 			field (str): field to be changed
 			new_value (int/float/str): value to change field in entry to
-			s (object): session object
 		'''
 		setattr(ENTRY, field, new_value)
-		self.add_entry(ENTRY, s)
+		self.add_entry(s, ENTRY)
 
 		return None
 
-	def add_entry(self, ENTRY, s):
+	def add_entry(self, s, ENTRY):
 		'''
 		adds entry to database and commits
 		does not add if duplicate found
 
 		Args:
-		Args:
-			ENTRY (object): entry object
 			s (object): session object
+			ENTRY (object): entry object
 		'''
 		try:
 			s.add(ENTRY)
