@@ -40,7 +40,7 @@ if __name__ == '__main__':
 	backup_db.paperbackup(dbi)
 
 	print('dropping db...')
-	dbi.drop_db()
+	dbi.drop_db(pdbi.Base)
 
 	print('creating db again...')
 	dbi.create_db()

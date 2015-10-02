@@ -134,9 +134,11 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		'''
 		Unique Interface for the paperdata database
 
-		input: paperdata database configuration file
+		Args:
+			configfile (str): paperdata database configuration file
 		'''
 		super(DataBaseInterface, self).__init__(configfile=configfile)
+		self.main_fields = ('observation', 'feed', 'log', 'rtp_file', 'rtp_observation', 'rtp_log')
 
 	def create_db(self):
 		'''
@@ -150,33 +152,34 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		event.listen(File.__table__, 'after_create', insert_update_trigger)
 		Base.metadata.create_all()
 
-	def drop_db(self):
-		'''
-		drops the tables in the database.
-		'''
-		Base.metadata.bind = self.engine
-		Base.metadata.drop_all()
+	def drop_db(self, Base):
+		super(DataBaseInterface, self).drop_db(Base)
 
-	def add_to_table(self, s=None, TABLE=None, entry_dict=None, open_sess=False):
+	def add_to_table(self, TABLE, entry_dict, s=None, open_sess=False):
 		'''
 		create a new entry.
 
-		input: session object(optional), tablename, dict of attributes for object, open session boolean variable
+		Args:
+			TABLE (str): table name
+			entry_dict (dict): dict of attributes for object
+			s (Optional[session object]): session object -- defaults to None
+			open_sess (Optional[bool]): variable if session is already open -- defaults to False
 		'''
 		table = getattr(sys.modules[__name__], TABLE.title())
-		if TABLE in ('observation', 'feed', 'log', 'rtp_file', 'rtp_observation', 'rtp_log'):
+		if s is None:
+			s = self.Session()
+			open_sess = True
+		if TABLE in self.main_fields:
 			ENTRY = table(**entry_dict)
 		elif TABLE in ('file',):
 			#files linked to observations
 			obs_table = getattr(sys.modules[__name__], 'Observation')
 			ENTRY = table(**entry_dict)
 			#get the observation corresponding to this file
-			if s is None:
-				s = self.Session()
-				open_sess = True
 			OBS = s.query(obs_table).get(entry_dict['obsnum'])
 			setattr(ENTRY, 'observation', OBS)  #associate the file with an observation
 		self.add_entry(s, ENTRY)
 		if open_sess:
 			s.close()
+
 		return None

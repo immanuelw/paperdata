@@ -88,6 +88,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 			configfile (str): ganglia database configuration file
 		'''
 		super(DataBaseInterface, self).__init__(configfile=configfile)
+		self.main_fields = ('filesystem', 'monitor', 'ram', 'iostat', 'cpu')
 
 	def create_db(self):
 		'''
@@ -121,13 +122,14 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 			s (Optional[session object]): session object -- defaults to None
 			open_sess (Optional[bool]): variable if session is already open -- defaults to False
 		'''
+		table = getattr(sys.modules[__name__], TABLE.title())
 		if s is None:
 			s = self.Session()
 			open_sess = True
-		table = getattr(sys.modules[__name__], TABLE.title())
-		if TABLE in ('filesystem', 'monitor', 'ram', 'iostat', 'cpu'):
+		if TABLE in self.main_fields:
 			ENTRY = table(**entry_dict)
 		self.add_entry(s, ENTRY)
 		if open_sess:
 			s.close()
+
 		return None
