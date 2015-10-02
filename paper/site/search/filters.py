@@ -8,8 +8,10 @@ def set_hyperlink_filter(comment):
 	'''
 	sets hyperlinks for comments
 
-	input: comment
-	output: comment with all hyperlinks converted
+	Args:
+		comment (str): comment
+	Returns:
+		str: comment with all hyperlinks converted
 	'''
 	comment_copy = str(comment)
 
