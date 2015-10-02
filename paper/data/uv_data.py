@@ -15,38 +15,61 @@ import aipy as A
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 def five_round(num):
+	'''
+	rounds number to five significant figures
+
+	Args:
+		num (float): number
+
+	Returns:
+		float(5): number
+	'''
 	return round(num, 5)
 
 def jdpol2obsnum(jd, pol, djd):
 	'''
 	calculates unique observation number for observations
 
-	input: julian date float, pol string, and length of obs in fraction of julian date
-	output: a unique integer index for observation
+	Args:
+		jd (float): julian date float
+		pol (str): polarization
+		length (float): length of obs in fraction of julian date
+
+	Returns:
+		int: a unique integer index for observation
 	'''
 	dublinjd = jd - 2415020  #use Dublin Julian Date
 	obsint = int(dublinjd/djd)  #divide up by length of obs
 	polnum = A.miriad.str2pol[pol]+10
 	assert(obsint < 2**31)
+
 	return int(obsint + polnum*(2**32))
 
 def get_lst(julian_date):
 	'''
 	calculates local sidereal hours for any julian date
 
-	input: julian date
-	output: lst hours rounded to one decimal place
+	Args:
+		julian_date (float): julian date
+
+	Returns:
+		float(1): lst hours rounded to one decimal place
 	'''
 	gmst = convert.juliandate_to_gmst(julian_date)
 	lst = convert.gmst_to_lst(gmst, longitude=25)
+
 	return round(lst, 1)
 
 def julian_era(julian_date):
 	'''
 	indicates julian day and set of data
 
-	input: julian date
-	output: era of julian date and julian day
+	Args:
+		julian_date (float): julian date
+	Returns:
+		tuple:
+			int: era of julian date
+			int: julian day
 	'''
 	if julian_date < 2456100:
 		era = 32
@@ -63,21 +86,32 @@ def is_edge(prev_obs, next_obs):
 	'''
 	checks if observation is on the edge of each day's observation cycle
 
-	input: previous and next observation
-	output: boolean value -- is it on the edge of a julian day
+	Args:
+		prev_obs (database object): previous observation
+		next_obs (database object): next observation
+
+	Returns:
+		bool: on the edge of a julian day
 	'''
 	if (prev_obs, next_obs) == (None, None):
 		edge = None
 	else:
 		edge = (None in (prev_obs, next_obs))
+
 	return edge
 
-def obs_pn(s, obsnum):
+def obs_pn(obsnum, s):
 	'''
 	gets the previous and next observations for any obsnum
 
-	input: session object, obsnum
-	output: previous, next observation objects if available, None otherwise
+	Args:
+		obsnum (int): observation number
+		s (session object): session object
+
+	Returns:
+		tuple:
+			object: previous observation object if available, None otherwise
+			object: next observation object if available, None otherwise
 	'''
 	table = getattr(pdbi, 'Observation')
 	PREV_OBS = s.query(table).filter(getattr(table, 'obsnum') == obsnum - 1).one()
@@ -97,8 +131,14 @@ def obs_edge(obsnum, sess=None):
 	'''
 	checks for previous and next observations, and if obsnum is on edge of julain day
 
-	input: obsnum, session object if available
-	output: previous and next observation if available -- None otherwise, boolean indicator on if edge observation
+	Args:
+		obsnum (int): observation number
+		sess (session object): session object if available
+	Returns:
+		tuple:
+			object: previous observation object if available, None otherwise
+			object: next observation object if available, None otherwise
+			bool: on the edge of julian day
 	'''
 	if obsnum == None:
 		prev_obs = None
@@ -107,9 +147,8 @@ def obs_edge(obsnum, sess=None):
 	else:
 		if sess is None:
 			dbi = pdbi.DataBaseInterface()
-			s = dbi.Session()
-			prev_obs, next_obs = obs_pn(s, obsnum)
-			s.close()
+			with dbi.session_scope() as s:
+				prev_obs, next_obs = obs_pn(s, obsnum)
 		else:
 			prev_obs, next_obs = obs_pn(sess, obsnum)
 		edge = is_edge(prev_obs, next_obs)
@@ -120,8 +159,15 @@ def calc_times(uv):
 	'''
 	takes in uv file and calculates time based information
 
-	input: uv file object
-	output: time start, time end, delta time, and length of uv file object
+	Args:
+		uv (file object): uv file object
+
+	Returns:
+		tuple:
+			float(5): time start
+			float(5): time end
+			float(5): delta time
+			float(5): length of uv file object
 	'''
 	time_start = 0
 	time_end = 0
@@ -156,8 +202,20 @@ def calc_uv_data(host, full_path, mode=None):
 	'''
 	takes in uv* files and pulls data about observation
 
-	input: host of system, full_path of uv* file
-	output: time start, time end, delta time, julian date, polarization, length, and obsnum of uv file object
+	Args:
+		host (str): host of system
+		full_path (str): full_path of uv* file
+		mode (Optional[str]): mode of data to get time from --defaults to None
+
+	Returns:
+		tuple:
+			float(5): time start
+			float(5): time end
+			float(5): delta time
+			float(5): julian date
+			str: polarization
+			float(5): length
+			int: obsnum of uv file object
 	'''
 	filetype = full_path.split('.')[-1]
 	#allows uv access
@@ -193,10 +251,9 @@ def calc_uv_data(host, full_path, mode=None):
 if __name__ == '__main__':
 	input_host = sys.argv[1]
 	input_path = sys.argv[2]
+	mode = None
 	if len(sys.argv) == 4:
 		mode = sys.argv[3]
-	else:
-		mode = None
 
 	uv_data = calc_uv_data(input_host, input_path, mode)
 	if uv_data is None:
