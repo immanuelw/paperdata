@@ -206,6 +206,7 @@ def datetime_to_juliandate(dt):
 	'''
 	A = date_to_juliandate(dt.year, dt.month, dt.day)
 	B = time_to_decimal(dt.time()) / 24.
+
 	return A + B
 
 def juliandate_to_modifiedjd(juliandate):
@@ -243,6 +244,7 @@ def datetime_to_modifiedjd(dt):
 		float: the Modified Julian Date
 	'''
 	jd = datetime_to_juliandate(dt)
+
 	return juliandate_to_modifiedjd(jd)
 
 def juliandate_to_gmst(juliandate):
@@ -367,6 +369,7 @@ def modifiedjd_to_utc(modifiedjd):
 		object: datetime object in UTC time
 	'''
 	juliandate = modifiedjd_to_juliandate(modifiedjd)
+
 	return juliandate_to_utc(juliandate)
 
 def gmst_to_lst(hours, longitude):
@@ -431,6 +434,7 @@ def gps_to_utc(timestamp):
 	'''
 	offset = next((seconds for date, seconds in LEAP_SECONDS
 				   if timestamp >= utc_from_string(date)), 0)
+
 	return timestamp - offset
 
 def utc_to_gps(timestamp):
@@ -445,6 +449,7 @@ def utc_to_gps(timestamp):
 	'''
 	offset = next((seconds for date, seconds in LEAP_SECONDS
 				   if timestamp >= utc_from_string(date)), 0)
+
 	return timestamp + offset
 
 def utc_from_string(date):
@@ -458,6 +463,7 @@ def utc_from_string(date):
 		float: UTC timestamp in seconds
 	'''
 	t = strptime(date, '%B %d, %Y')
+
 	return calendar.timegm(t)
 
 def gps_from_string(date):
@@ -471,6 +477,7 @@ def gps_from_string(date):
 		float: GPS timestamp in seconds
 	'''
 	t = strptime(date, '%B %d, %Y')
+
 	return utc_to_gps(calendar.timegm(t))
 
 def gps_to_lst(timestamp, longitude):
@@ -486,6 +493,7 @@ def gps_to_lst(timestamp, longitude):
 	'''
 	utc_timestamp = gps_to_utc(timestamp)
 	utc = datetime.datetime.utcfromtimestamp(utc_timestamp)
+
 	return utc_to_lst(utc, longitude)
 
 def gps_to_datetime(timestamp):
@@ -499,6 +507,7 @@ def gps_to_datetime(timestamp):
 		object: datetime object
 	'''
 	gps_dt = datetime.datetime.utcfromtimestamp(timestamp)
+
 	return gps_dt
 
 def datetime_to_gps(dt):
@@ -512,4 +521,5 @@ def datetime_to_gps(dt):
 		float: GPS timestamp in seconds
 	'''
 	timestamp = calendar.timegm(dt.timetuple())
+
 	return timestamp
