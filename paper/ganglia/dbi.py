@@ -108,12 +108,8 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		event.listen(table, 'after_create', insert_update_trigger_2)
 		Base.metadata.create_all()
 
-	def drop_db(self):
-		'''
-		drops the tables in the database.
-		'''
-		Base.metadata.bind = self.engine
-		Base.metadata.drop_all()
+	def drop_db(self, Base):
+		super(DataBaseInterface, self).drop_db(Base)
 
 	def add_to_table(self, TABLE, entry_dict, s=None, open_sess=False):
 		'''

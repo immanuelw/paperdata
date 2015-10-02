@@ -122,6 +122,13 @@ class DataBaseInterface(object):
 		finally:
 			session.close()
 
+	def drop_db(self, Base):
+		'''
+		drops the tables in the database.
+		'''
+		Base.metadata.bind = self.engine
+		Base.metadata.drop_all()
+
 	def create_table(Table):
 		'''
 		creates a table in the database.
