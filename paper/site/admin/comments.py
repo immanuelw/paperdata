@@ -9,7 +9,8 @@ def get_all_comments():
 	'''
 	get all comments
 
-	output: comments html
+	Returns:
+		html: comments
 	'''
 	try:
 		threads = db_utils.query(database='admin', table='thread', sort_tuples=(('last_updated', 'desc'),))

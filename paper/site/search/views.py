@@ -30,8 +30,9 @@ def str_val(value):
 
 	Args:
 		value (float): numerical time value
+
 	Returns:
-		str: time unit string
+		str: time unit
 	'''
 	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
 	str_val = ' '.join((str_val, 'ago'))

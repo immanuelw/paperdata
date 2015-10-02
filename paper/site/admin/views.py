@@ -13,21 +13,29 @@ def time_val(value):
 	'''
 	determines how much time to divide by and divides time by that to make human readable
 
-	input: numerical time value
-	output: numerical time value divided
+	Args:
+		value (float): numerical time value
+
+	Returns:
+		float: numerical time value divided
 	'''
 	time_val = 1 if value < 500 else 60 if value < 3600 else 3600 if value < 86400 else 86400
+
 	return value / time_val
 
 def str_val(value):
 	'''
 	determines which time unit to use
 
-	input: numerical time value
-	output: time unit string
+	Args:
+		value (float): numerical time value
+
+	Returns:
+		str: time unit
 	'''
 	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
 	str_val = ' '.join((str_val, 'ago'))
+
 	return str_val
 
 @app.route('/')
@@ -38,7 +46,8 @@ def index():
 	'''
 	start page of the website
 
-	output: index html
+	Returns:
+		html: index
 	'''
 	return render_template('index.html')
 
@@ -62,6 +71,12 @@ def data_amount():
 
 @app.route('/source_table', methods = ['GET'])
 def source_table():
+	'''
+	table of sources
+
+	Returns:
+		html: source table
+	'''
 	sort_tuples = (('timestamp', 'desc'),)
 	output_vars = ('timestamp', 'julian_day')
 
@@ -94,6 +109,12 @@ def source_table():
 
 @app.route('/filesystem', methods = ['GET'])
 def filesystem():
+	'''
+	table of filesystems
+
+	Returns:
+		html: filesystem table
+	'''
 	#system_header = (('Free', None), ('File Host', None), ('Last Report', None) , ('Usage Percent', None))
 	system_header = (('File Host', None), ('Last Report', None) , ('Usage Percent', None))
 	try:
@@ -132,6 +153,12 @@ def filesystem():
 
 @app.route('/rtp_summary_table', methods = ['POST'])
 def rtp_summary_table():
+	'''
+	summary of rtp status
+
+	Returns:
+		html: rtp summary table
+	'''
 	obs_vars = ('files',)
 	file_vars = ('host', 'path', 'julian_day', 'transferred', 'new_host', 'new_path', 'timestamp')
 
@@ -220,7 +247,8 @@ def teardown_request(exception):
 	'''
 	exit database after request
 
-	input: exception
+	Args:
+		exception (exception): exception
 	'''
 	paper_db = getattr(g, 'paper_session', None)
 	pyg_db = getattr(g, 'pyg_session', None)
@@ -235,7 +263,10 @@ def profile():
 	'''
 	access user profile
 
-	output: profile html or redirect for login
+	Returns:
+		html: profile
+		OR
+		html: redirect for login
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
@@ -254,7 +285,10 @@ def user_page():
 	'''
 	access user page
 
-	output: user page html or redirect for login
+	Returns:
+		html: user page
+		OR
+		html: redirect for login
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
