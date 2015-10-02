@@ -32,7 +32,7 @@ def filesystem(ssh, host, path):
 	generates table information for filesystem table
 
 	Args:
-		ssh (ssh object): ssh object
+		ssh (object): ssh object
 		host (str): host of filesystem
 		path (str): path to search
 
@@ -72,7 +72,7 @@ def iostat(ssh, host):
 	generates table information for iostat table
 
 	Args:
-		ssh (ssh object): ssh object
+		ssh (object): ssh object
 		host (str): host of filesystem
 
 	Returns:
@@ -135,7 +135,7 @@ def ram_free(ssh, host):
 	generates table information for ram table
 
 	Args:
-		ssh (ssh object): ssh object
+		ssh (object): ssh object
 		host (str): host of filesystem
 
 	Returns:
@@ -205,7 +205,7 @@ def cpu_perc(ssh, host):
 	generates table information for cpu table
 
 	Args:
-		ssh (ssh object): ssh object
+		ssh (object): ssh object
 		host (str): host of filesystem
 
 	Returns:
@@ -268,7 +268,7 @@ def add_data(ssh, host):
 	generates table information for all tables
 
 	Args:
-		ssh (ssh object): ssh object
+		ssh (object): ssh object
 		host (str): host of filesystem
 	'''
 	with ppdata.ssh_scope(host) as ssh:

@@ -119,7 +119,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Args:
 			TABLE (str): table name
 			entry_dict (dict): dict of attributes for object
-			s (Optional[session object]): session object -- defaults to None
+			s (Optional[object]): session object -- defaults to None
 			open_sess (Optional[bool]): variable if session is already open -- defaults to False
 		'''
 		table = getattr(sys.modules[__name__], TABLE.title())
