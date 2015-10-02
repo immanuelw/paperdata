@@ -87,8 +87,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Args:
 			configfile (str): ganglia database configuration file --defaults to ~/ganglia.cfg
 		'''
-		super(ppdata.DataBaseInterface, self).__init__(configfile=configfile)
-		self.main_fields = ('filesystem', 'monitor', 'ram', 'iostat', 'cpu')
+		super(DataBaseInterface, self).__init__(configfile=configfile)
 
 	def create_db(self):
 		'''
@@ -116,7 +115,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Args:
 			object: Base database object
 		'''
-		super(ppdata.DataBaseInterface, self).drop_db(Base)
+		super(DataBaseInterface, self).drop_db(Base)
 
 	def add_entry_dict(self, s, TABLE, entry_dict):
 		'''
@@ -127,7 +126,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 			TABLE (str): table name
 			entry_dict (dict): dict of attributes for object
 		'''
-		super(ppdata.DataBaseInterface, self).add_entry_dict(__name__, s, TABLE, entry_dict)
+		super(DataBaseInterface, self).add_entry_dict(__name__, s, TABLE, entry_dict)
 
 	def get_entry(self, s, TABLE, unique_value):
 		'''
@@ -143,4 +142,4 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Returns:
 			object: table object
 		'''
-		super(ppdata.DataBaseInterface, self).get_entry(__name__, s, TABLE, unique_value)
+		super(DataBaseInterface, self).get_entry(__name__, s, TABLE, unique_value)
