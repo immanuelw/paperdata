@@ -112,24 +112,18 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 	def drop_db(self, Base):
 		super(DataBaseInterface, self).drop_db(Base)
 
-	def add_to_table(self, TABLE, entry_dict, s=None, open_sess=False):
+	def add_to_table(self, TABLE, entry_dict, s):
 		'''
 		create a new entry.
 
 		Args:
 			TABLE (str): table name
 			entry_dict (dict): dict of attributes for object
-			s (Optional[object]): session object -- defaults to None
-			open_sess (Optional[bool]): variable if session is already open -- defaults to False
+			s (object): session object
 		'''
 		table = getattr(sys.modules[__name__], TABLE.title())
-		if s is None:
-			s = self.Session()
-			open_sess = True
 		if TABLE in self.main_fields:
 			ENTRY = table(**entry_dict)
-		self.add_entry(s, ENTRY)
-		if open_sess:
-			s.close()
+		self.add_entry(ENTRY, s)
 
 		return None
