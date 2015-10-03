@@ -6,7 +6,7 @@ import os, sys, logging
 import paper as ppdata
 
 Base = ppdata.Base
-logger = logging.getLogger('ganglia')
+logger = logging.getLogger('paper.ganglia')
 
 #############
 #

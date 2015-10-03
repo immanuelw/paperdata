@@ -5,7 +5,7 @@ import os, sys, logging
 import paper as ppdata
 
 Base = ppdata.Base
-logger = logging.getLogger('data')
+logger = logging.getLogger('paper.data')
 
 #########
 #
