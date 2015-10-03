@@ -133,11 +133,11 @@ class cpu:
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
 #dictionary of instantiated classes
-instant_class = {'filesystem':filesystem(),
-				'monitor':monitor(),
-				'ram':ram(),
-				'iostat':iostat(),
-				'cpu':cpu()}
+instant_class = {'filesystem': filesystem(),
+				'monitor': monitor(),
+				'ram': ram(),
+				'iostat': iostat(),
+				'cpu': cpu()}
 classes = instant_class.keys()
 all_classes = instant_class.values()
 

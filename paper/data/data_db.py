@@ -231,13 +231,13 @@ class rtp_log:
 						'key': 'No', 'description': 'time action was taken'}}
 
 #dictionary of instantiated classes
-instant_class = {'file':file(),
-				'observation':observation(),
-				'feed':feed(),
-				'log':log(),
-				'rtp_file':rtp_file(),
-				'rtp_observation':rtp_observation(),
-				'rtp_log':rtp_log()}
+instant_class = {'file': file(),
+				'observation': observation(),
+				'feed': feed(),
+				'log': log(),
+				'rtp_file': rtp_file(),
+				'rtp_observation': rtp_observation(),
+				'rtp_log': rtp_log()}
 classes = instant_class.keys()
 all_classes = instant_class.values()
 
