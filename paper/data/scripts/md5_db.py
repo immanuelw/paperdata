@@ -27,10 +27,10 @@ def md5_db(data_dbi):
 			timestamp = int(time.time())
 			data_dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
 			data_dbi.set_entry(s, FILE, 'timestamp', timestamp)
-			log_data = {'action':'update md5sum',
-						'table':'file',
-						'obsnum':getattr(FILE, 'full_path'),
-						'timestamp':timestamp}
+			log_data = {'action': 'update md5sum',
+						'table': 'file',
+						'obsnum': getattr(FILE, 'full_path'),
+						'timestamp': timestamp}
 
 			data_dbi.add_entry(s, 'log', log_data)
 

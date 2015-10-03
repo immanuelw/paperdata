@@ -18,6 +18,7 @@ import add_files, move_files
 
 ### Author: Immanuel Washington
 ### Date: 8-20-14
+
 def add_data(dbi, data_dbi):
 	'''
 	transfer data from paperdistiller database to create data for paperdata tables
@@ -101,41 +102,41 @@ def add_data(dbi, data_dbi):
 
 			timestamp = int(time.time())
 
-			obs_data = {'obsnum':obsnum,
-						'julian_date':julian_date,
-						'polarization':polarization,
-						'julian_day':julian_day,
-						'lst':lst,
-						'era':era,
-						'era_type':era_type,
-						'length':length,
-						'time_start':time_start,
-						'time_end':time_end,
-						'delta_time':delta_time,
-						'prev_obs':prev_obs, 
-						'next_obs':next_obs,
-						'edge':edge,
-						'timestamp':timestamp}
-			raw_data = {'host':host,
-						'path':path,
-						'filename':filename,
-						'filetype':filetype,
-						'full_path':full_path,
-						'obsnum':obsnum,
-						'filesize':filesize,
-						'md5sum':md5,
-						'tape_index':tape_index,
-						'source_host':source_host,
-						'write_to_tape':write_to_tape,
-						'delete_file':delete_file,
-						'timestamp':timestamp}
+			obs_data = {'obsnum': obsnum,
+						'julian_date': julian_date,
+						'polarization': polarization,
+						'julian_day': julian_day,
+						'lst': lst,
+						'era': era,
+						'era_type': era_type,
+						'length': length,
+						'time_start': time_start,
+						'time_end': time_end,
+						'delta_time': delta_time,
+						'prev_obs': prev_obs, 
+						'next_obs': next_obs,
+						'edge': edge,
+						'timestamp': timestamp}
+			raw_data = {'host': host,
+						'path': path,
+						'filename': filename,
+						'filetype': filetype,
+						'full_path': full_path,
+						'obsnum': obsnum,
+						'filesize': filesize,
+						'md5sum': md5,
+						'tape_index': tape_index,
+						'source_host': source_host,
+						'write_to_tape': write_to_tape,
+						'delete_file': delete_file,
+						'timestamp': timestamp}
 			action = 'add by bridge'
 			table = None
 			identifier = full_path
-			log_data = {'action':action,
-						'table':table,
-						'identifier':identifier,
-						'timestamp':timestamp}
+			log_data = {'action': action,
+						'table': table,
+						'identifier': identifier,
+						'timestamp': timestamp}
 			data_dbi.add_entry_dict(sess, 'observation', obs_data)
 			data_dbi.add_entry_dict(sess, 'file', raw_data)
 			data_dbi.add_entry_dict(sess, 'log', log_data)

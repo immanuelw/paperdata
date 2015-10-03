@@ -40,19 +40,19 @@ def gen_feed_data(host, full_path):
 
 	timestamp = int(time.time())
 
-	feed_data = {'host':host,
-				'path':os.path.dirname(full_path)
-				'filename':os.path.basename(full_path)
-				'full_path':full_path,
-				'julian_day':int(uv['time']),
-				'ready_to_move':False,
-				'moved_to_distill':False,
-				'timestamp':timestamp}
+	feed_data = {'host': host,
+				'path': os.path.dirname(full_path)
+				'filename': os.path.basename(full_path)
+				'full_path': full_path,
+				'julian_day': int(uv['time']),
+				'ready_to_move': False,
+				'moved_to_distill': False,
+				'timestamp': timestamp}
 
-	log_data = {'action':'add by feed',
-				'table':'feed',
-				'identifier':full_path,
-				'timestamp':timestamp}
+	log_data = {'action': 'add by feed',
+				'table': 'feed',
+				'identifier': full_path,
+				'timestamp': timestamp}
 
 	return feed_data, log_data
 
