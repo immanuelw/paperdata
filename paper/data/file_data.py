@@ -44,6 +44,7 @@ def sizeof_fmt(num):
 	'''
 	for byte_size in ('KB', 'MB'):
 		num /= 1024.0
+
 	return round(num, 1)
 
 def calc_size(host, path, filename):
@@ -144,6 +145,7 @@ def file_names(full_path):
 	path = os.path.dirname(full_path)
 	filename = os.path.basename(full_path)
 	filetype = filename.split('.')[-1]
+
 	return path, filename, filetype
 
 if __name__ == '__main__':
