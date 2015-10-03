@@ -17,13 +17,14 @@ class filesystem:
 						'free_space',
 						'percent_space',
 						'timestamp')
-		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that us being monitored'),
-						'system':('VARCHAR(100)', 'None', 'No', 'directory that is being searched for space'),
-						'total_space':('BIGINT', 'None', 'No', 'total space in system in bytes'),
-						'used_space':('BIGINT', 'None', 'No', 'used space in system in bytes'),
-						'free_space':('BIGINT', 'None', 'No', 'free space in system in bytes'),
-						'percent_space':('BIGINT', 'None', 'No', 'percent of used space in system'),
-						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
+		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'system that us being monitored'},
+						'system': {'type': 'VARCHAR(100)', 'default': 'None',
+						'key': 'No', 'description': 'directory that is being searched for space'},
+						'total_space': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'total space in system in bytes'},
+						'used_space': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'used space in system in bytes'},
+						'free_space': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'free space in system in bytes'},
+						'percent_space': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'percent of used space in system'},
+						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
 class monitor:
 	def __init__(self):
@@ -38,17 +39,26 @@ class monitor:
 						'time_start',
 						'time_end',
 						'timestamp')
-		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'node that uv file is being compressed on'),
-						'path':('VARCHAR(100)', 'None', 'No', 'directory that file is located in'),
-						'filename':('VARCHAR(100)', 'None', 'No', 'name/path of uv file being compressed'),
-						'full_path':('VARCHAR(200)', 'None', 'No', 'combination of host, path, and filename'),
-						'status':('VARCHAR(100)', 'None', 'No', 'state of compression file is currently doing'),
-						'full_stats':('VARCHAR(200)', 'None', 'Unique', 'combination of full_path and status \
-										which is a unique identifier for each file'),
-						'del_time':('BIGINT', 'None', 'No', 'time taken to finish step -- status transition'),
-						'time_start':('BIGINT', 'None', 'No', 'time process started as a integer -- process transition'),
-						'time_end':('BIGINT', 'None', 'No', 'time process ended as an integer -- process transition'),
-						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
+		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None',
+						'key': 'No', 'description': 'node that uv file is being compressed on'},
+						'path': {'type': 'VARCHAR(100)', 'default': 'None',
+						'key': 'No', 'description': 'directory that file is located in'},
+						'filename': {'type': 'VARCHAR(100)', 'default': 'None',
+						'key': 'No', 'description': 'name/path of uv file being compressed'},
+						'full_path': {'type': 'VARCHAR(200)', 'default': 'None',
+						'key': 'No', 'description': 'combination of host, path, and filename'},
+						'status': {'type': 'VARCHAR(100)', 'default': 'None',
+						'key': 'No', 'description': 'state of compression file is currently doing'},
+						'full_stats': {'type': 'VARCHAR(200)', 'default': 'None',
+						'key': 'Unique', 'combination of full_path and status which is a unique identifier for each file'},
+						'del_time': {'type': 'BIGINT', 'default': 'None',
+						'key': 'No', 'description': 'time taken to finish step -- status transition'},
+						'time_start': {'type': 'BIGINT', 'default': 'None',
+						'key': 'No', 'description': 'time process started as a integer -- process transition'},
+						'time_end': {'type': 'BIGINT', 'default': 'None',
+						'key': 'No', 'description': 'time process ended as an integer -- process transition'},
+						'timestamp': {'type': 'BIGINT', 'default': 'None',
+						'key': 'No', 'description': 'time entry was updated'}}
 
 class ram:
 	def __init__(self):
@@ -66,19 +76,19 @@ class ram:
 						'swap_used',
 						'swap_free',
 						'timestamp')
-		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that is being monitored'),
-						'total':('BIGINT', 'None', 'No', 'total ram'),
-						'used':('BIGINT', 'None', 'No', 'used ram'),
-						'free':('BIGINT', 'None', 'No', 'free ram'),
-						'shared':('BIGINT', 'None', 'No', 'shared ram'),
-						'buffers':('BIGINT', 'None', 'No', 'buffers'),
-						'cached':('BIGINT', 'None', 'No', 'cached ram'),
-						'bc_used':('BIGINT', 'None', 'No', ''),
-						'bc_free':('BIGINT', 'None', 'No', ''),
-						'swap_total':('BIGINT', 'None', 'No', ''),
-						'swap_used':('BIGINT', 'None', 'No', ''),
-						'swap_free':('BIGINT', 'None', 'No', ''),
-						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
+		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'system that is being monitored'},
+						'total': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'total ram'},
+						'used': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'used ram'},
+						'free': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'free ram'},
+						'shared': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'shared ram'},
+						'buffers': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'buffers'},
+						'cached': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'cached ram'},
+						'bc_used': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': ''},
+						'bc_free': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': ''},
+						'swap_total': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': ''},
+						'swap_used': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': ''},
+						'swap_free': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': ''},
+						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
 class iostat:
 	def __init__(self):
@@ -91,14 +101,14 @@ class iostat:
 						'bl_reads',
 						'bl_writes',
 						'timestamp')
-		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that is being monitored'),
-						'device':('VARCHAR(100)', 'None', 'No', ''),
-						'tps':('DECIMAL(7,2)', 'None', 'No', ''),
-						'read_s':('DECIMAL(7,2)', 'None', 'No', 'reads per second'),
-						'write_s':('DECIMAL(7,2)', 'None', 'No', 'writes per second'),
-						'bl_reads':('BIGINT', 'None', 'No', 'block reads'),
-						'bl_writes':('BIGINT', 'None', 'No', 'block writes'),
-						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
+		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'system that is being monitored'},
+						'device': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': ''},
+						'tps': {'type': 'DECIMAL(7,2)', 'default': 'None', 'key': 'No', 'description': ''},
+						'read_s': {'type': 'DECIMAL(7,2)', 'default': 'None', 'key': 'No', 'description': 'reads per second'},
+						'write_s': {'type': 'DECIMAL(7,2)', 'default': 'None', 'key': 'No', 'description': 'writes per second'},
+						'bl_reads': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'block reads'},
+						'bl_writes': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'block writes'},
+						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
 class cpu:
 	def __init__(self):
@@ -111,14 +121,16 @@ class cpu:
 						'idle_perc',
 						'intr_s',
 						'timestamp')
-		self.db_descr = {'host':('VARCHAR(100)', 'None', 'No', 'system that is being monitored'),
-						'cpu':('INT', 'None', 'No', 'No', 'number of cpu/processor being monitored'),
-						'user_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu being used by user'),
-						'sys_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu being used by system'),
-						'iowait_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu waiting'),
-						'idle_perc':('DECIMAL(5,2)', 'None', 'No', 'percent of cpu that is idle'),
-						'intr_s':('INT', 'None', 'No', 'instructions (per second?)'),
-						'timestamp':('BIGINT', 'None', 'No', 'time entry was updated')}
+		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'system that is being monitored'},
+						'cpu': {'type': 'INT', 'default': 'None', 'key': 'No', 'description': 'number of cpu/processor being monitored'},
+						'user_perc': {'type': 'DECIMAL(5,2)', 'default': 'None',
+						'key': 'No', 'description': 'percent of cpu being used by user'},
+						'sys_perc': {'type': 'DECIMAL(5,2)', 'default': 'None',
+						'key': 'No', 'description': 'percent of cpu being used by system'},
+						'iowait_perc': {'type': 'DECIMAL(5,2)', 'default': 'None', 'key': 'No', 'description': 'percent of cpu waiting'},
+						'idle_perc': {'type': 'DECIMAL(5,2)', 'default': 'None', 'key': 'No', 'description': 'percent of cpu that is idle'},
+						'intr_s': {'type': 'INT', 'default': 'None', 'key': 'No', 'description': 'instructions (per second?)'},
+						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
 #dictionary of instantiated classes
 instant_class = {'filesystem':filesystem(),
