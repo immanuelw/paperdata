@@ -15,7 +15,8 @@ def main():
 		with open(filename, 'ab') as df:
 			df.write(var_class.table + '\n')
 		for field in var_class.db_list:
-			full_item = [field, var_class.db_descr[field][0], var_class.db_descr[field][1], var_class.db_descr[field][2], var_class.db_descr[field][3]]
+			full_item = [field, var_class.db_descr[field]['type'], var_class.db_descr[field]['default'],
+								var_class.db_descr[field]['primary key'], var_class.db_descr[field]['description']]
 			x.add_row(full_item)
 			stuff = x.get_string()
 		with open(filename, 'ab') as df:
