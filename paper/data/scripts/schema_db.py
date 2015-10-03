@@ -11,12 +11,12 @@ def main():
 	var_classes = pdb.all_classes
 
 	for var_class in var_classes:
-		x = prettytable.PrettyTable(['Field', 'Type', 'Default', 'Unique Key', 'Description'])
+		x = prettytable.PrettyTable(['Field', 'Type', 'Default', 'Key', 'Description'])
 		with open(filename, 'ab') as df:
 			df.write(var_class.table + '\n')
 		for field in var_class.db_list:
 			full_item = [field, var_class.db_descr[field]['type'], var_class.db_descr[field]['default'],
-								var_class.db_descr[field]['primary key'], var_class.db_descr[field]['description']]
+								var_class.db_descr[field]['key'], var_class.db_descr[field]['description']]
 			x.add_row(full_item)
 			stuff = x.get_string()
 		with open(filename, 'ab') as df:
