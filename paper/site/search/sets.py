@@ -289,6 +289,7 @@ def get_filters():
 		html: filters
 	'''
 	users = db_utils.query(database='search', table='user')
+
 	return render_template('filters.html', users=users)
 
 @app.route('/get_sets', methods = ['POST'])
