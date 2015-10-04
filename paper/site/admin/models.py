@@ -2,7 +2,7 @@ from paper.site.flask_app import admin_db as db
 from datetime import datetime
 
 class User(db.Model):
-	__tablename__ = 'user'
+	__tablename__ = 'User'
 	username = db.Column(db.String(32), primary_key=True)
 	# SHA-512 returns a 512-bit hash, which is 512 bits / 8 bits per byte * 2 hex digits per byte = 128 hex digits.
 	password = db.Column(db.String(128), nullable=False)
@@ -34,8 +34,8 @@ class User(db.Model):
 	def get_id(self):
 		return self.username
 
-class Data_Amount(db.Model):
-	__tablename__ = 'data_amount'
+class DataAmount(db.Model):
+	__tablename__ = 'DataAmount'
 	# AUTO_INCREMENT is automatically set on the first Integer primary key column that is not marked as a foreign key.
 	id = db.Column(db.Integer, primary_key=True)
 	# Store a 'created_on' string field for the current time that is automatically inserted with a new entry into the database.
@@ -56,7 +56,7 @@ class Data_Amount(db.Model):
 		return data_dict
 
 class Thread(db.Model):
-	__tablename__ = 'thread'
+	__tablename__ = 'Thread'
 	id = db.Column(db.Integer, primary_key=True)
 	title = db.Column(db.String(100), nullable=False)
 	username = db.Column(db.String(32))
@@ -64,7 +64,7 @@ class Thread(db.Model):
 	last_updated = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Comment(db.Model):
-	__tablename__ = 'comment'
+	__tablename__ = 'Comment'
 	id = db.Column(db.Integer, primary_key=True)
 	thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'))
 	text = db.Column(db.String(1000), nullable=False)

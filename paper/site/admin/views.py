@@ -54,7 +54,7 @@ def index():
 @app.route('/data_amount', methods = ['GET'])
 def data_amount():
 	try:
-		data = db_utils.query(database='admin', table='data_amount', sort_tuples=(('created_on', 'desc'),))[0]
+		data = db_utils.query(database='admin', table='DataAmount', sort_tuples=(('created_on', 'desc'),))[0]
 	except:
 		data = None
 
@@ -81,13 +81,13 @@ def source_table():
 	output_vars = ('timestamp', 'julian_day')
 
 	try:	
-		corr_source = db_utils.query(database='paperdata', table='rtp_file', field_tuples=(('transferred', '==', None),),
+		corr_source = db_utils.query(database='paperdata', table='RTPFile', field_tuples=(('transferred', '==', None),),
 										sort_tuples=sort_tuples)[0]
 
-		rtp_source = db_utils.query(database='paperdata', table='rtp_file',	field_tuples=(('transferred', '==', True),),
+		rtp_source = db_utils.query(database='paperdata', table='RTPFile',	field_tuples=(('transferred', '==', True),),
 									sort_tuples=sort_tuples)[0]
 
-		paper_source = db_utils.query(database='paperdata', table='observation', sort_tuples=sort_tuples)[0]
+		paper_source = db_utils.query(database='paperdata', table='Observation', sort_tuples=sort_tuples)[0]
 
 		source_tuples = (('Correlator', corr_source), ('RTP', rtp_source), ('Folio Scan', paper_source))
 	except:
@@ -118,7 +118,7 @@ def filesystem():
 	#system_header = (('Free', None), ('File Host', None), ('Last Report', None) , ('Usage Percent', None))
 	system_header = (('File Host', None), ('Last Report', None) , ('Usage Percent', None))
 	try:
-		systems = db_utils.query(database='ganglia', table='filesystem',
+		systems = db_utils.query(database='ganglia', table='Filesystem',
 									sort_tuples=(('timestamp', 'desc'), ('host', 'asc')), group_tuples=('host',))
 
 		system_names = (getattr(system, 'host') for system in systems)
@@ -163,23 +163,23 @@ def rtp_summary_table():
 	file_vars = ('host', 'path', 'julian_day', 'transferred', 'new_host', 'new_path', 'timestamp')
 
 	try:
-		rtp_obs = db_utils.query(database='paperdata', table='rtp_observation', sort_tuples=(('julian_day', 'desc'),))
+		rtp_obs = db_utils.query(database='paperdata', table='RTPObservation', sort_tuples=(('julian_day', 'desc'),))
 		files_list = (getattr(obs, 'files') for obs in rtp_obs)
-		rtp_files = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
-		file_list = [{var: getattr(rtp_file, var) for var in file_vars} for rtp_file in rtp_files]
+		RTPFiles = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
+		file_list = [{var: getattr(RTPFile, var) for var in file_vars} for RTPFile in RTPFiles]
 	except:
 		file_list = (None,)
 
 	file_info = {}
 
-	for rtp_file in file_list:
-		if not rtp_file is None:
-			sa_host_path = ':'.join(rtp_file['host'], rtp_file['path'])
-			usa_host_path = ':'.join(rtp_file['new_host'], rtp_file['new_path'])
+	for RTPFile in file_list:
+		if not RTPFile is None:
+			sa_host_path = ':'.join(RTPFile['host'], RTPFile['path'])
+			usa_host_path = ':'.join(RTPFile['new_host'], RTPFile['new_path'])
 
-			julian_day = rtp_file['julian_day']
-			transferred = rtp_file['transferred']
-			timestamp = rtp_file['time_stamp']
+			julian_day = RTPFile['julian_day']
+			transferred = RTPFile['transferred']
+			timestamp = RTPFile['time_stamp']
 
 			if julian_day in file_info.keys():
 				file_info[julian_day]['count'] += 1
@@ -270,8 +270,8 @@ def profile():
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
-			user = db_utils.query(database='admin', table='user',	field_tuples=(('username', '==', g.user.username),),)[0]
-			setList = db_utils.query(database='admin', table='set', field_tuples=(('username', '==', g.user.username),))[0]
+			user = db_utils.query(database='admin', table='User',	field_tuples=(('username', '==', g.user.username),),)[0]
+			setList = db_utils.query(database='admin', table='Set', field_tuples=(('username', '==', g.user.username),))[0]
 		except:
 			user = (None,)
 			setList = (None,)
@@ -292,9 +292,9 @@ def user_page():
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
-			user = db_utils.query(database='admin', table='user',	field_tuples=(('username', '==', g.user.username),))[0]
-			userList = db_utils.query(database='admin', table='user')[0]
-			setList = db_utils.query(database='admin', table='set')[0]
+			user = db_utils.query(database='admin', table='User', field_tuples=(('username', '==', g.user.username),))[0]
+			userList = db_utils.query(database='admin', table='User')[0]
+			setList = db_utils.query(database='admin', table='Set')[0]
 		except:
 			user = (None,)
 			userList = (None,)
