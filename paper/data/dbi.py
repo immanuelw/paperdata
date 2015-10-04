@@ -79,8 +79,8 @@ class Feed(Base, ppdata.DictFix):
 	filename = Column(String(100)) #zen.*.*.uv
 	full_path = Column(String(200), primary_key=True)
 	julian_day = Column(Integer)
-	ready_to_move = Column(Boolean)
-	moved_to_distill = Column(Boolean)
+	is_movable = Column(Boolean)
+	is_moved = Column(Boolean)
 	timestamp = Column(BigInteger)
 
 class Log(Base, ppdata.DictFix):

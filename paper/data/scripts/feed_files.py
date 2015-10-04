@@ -45,8 +45,8 @@ def gen_feed_data(host, full_path):
 				'filename': os.path.basename(full_path)
 				'full_path': full_path,
 				'julian_day': int(uv['time']),
-				'ready_to_move': False,
-				'moved_to_distill': False,
+				'is_movable': False,
+				'is_moved': False,
 				'timestamp': timestamp}
 
 	log_data = {'action': 'add by feed',

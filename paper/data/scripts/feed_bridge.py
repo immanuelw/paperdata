@@ -24,7 +24,7 @@ from email import Encoders
 ### Author: Immanuel Washington
 ### Date: 11-23-14
 
-def set_feed(s, dbi, source, output_host, output_dir, moved_to_distill=True):
+def set_feed(s, dbi, source, output_host, output_dir, is_moved=True):
 	'''
 	updates table for feed file
 
@@ -34,12 +34,12 @@ def set_feed(s, dbi, source, output_host, output_dir, moved_to_distill=True):
 		source (str): source file
 		output_host (str): output host
 		output_dir (str): output directory
-		moved_to_distill (bool): checks whether to move to paperdistiller --defaults to False
+		is_moved (bool): checks whether to move to paperdistiller --defaults to False
 	'''
 	FEED = dbi.get_entry(s, 'feed', source)
 	dbi.set_entry(s, FEED, 'host', output_host)
 	dbi.set_entry(s, FEED, 'path', output_dir)
-	dbi.set_entry(s, FEED, 'moved_to_distill', moved_to_distill)
+	dbi.set_entry(s, FEED, 'is_moved', is_moved)
 
 	return None
 
@@ -94,7 +94,7 @@ def count_days(dbi):
 
 		for full_path in to_move:
 			FEED = dbi.get_entry(s, 'feed', source)
-			dbi.set_entry(s, FEED, 'ready_to_move', True)
+			dbi.set_entry(s, FEED, 'is_movable', True)
 
 	return None
 
@@ -113,7 +113,7 @@ def find_data(dbi):
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
-		FEEDs = s.query(table).filter(getattr(table, 'moved_to_distill') == False).filter(getattr(table, 'ready_to_move') == True).all()
+		FEEDs = s.query(table).filter(getattr(table, 'is_moved') == False).filter(getattr(table, 'is_movable') == True).all()
 
 	#only move one day at a time
 	feed_host = FEEDs[0].host
