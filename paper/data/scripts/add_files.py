@@ -169,12 +169,9 @@ def calc_obs_data(dbi, host, full_path):
 				'delete_file': delete_file,
 				'timestamp': timestamp}
 
-	action = 'add by scan'
-	table = None
-	identifier = full_path
-	log_data = {'action': action,
-				'table': table,
-				'identifier': identifier,
+	log_data = {'action': 'add by scan',
+				'table': None,
+				'identifier': full_path,
 				'timestamp': timestamp}
 
 	return obs_data, file_data, log_data
