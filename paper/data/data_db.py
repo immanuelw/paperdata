@@ -107,8 +107,8 @@ class feed:
 						'filename',
 						'full_path',
 						'julian_day',
-						'ready_to_move',
-						'moved_to_distill',
+						'is_movable',
+						'is_moved',
 						'timestamp')
 		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'host of file system that file is located on'},
@@ -120,9 +120,9 @@ class feed:
 						'key': 'Primary', 'description': 'combination of host, path, and filename which is a unique identifier for each file'},
 						'julian_day': {'type': 'INTEGER', 'default': 'None',
 						'key': 'No', 'description': 'integer value of julian date'},
-						'ready_to_move': {'type': 'BOOLEAN', 'default': 'None',
+						'is_movable': {'type': 'BOOLEAN', 'default': 'None',
 						'key': 'No', 'description': 'boolean value indicated whether file is ready to be moved to distill'},
-						'moved_to_distill': {'type': 'BOOLEAN', 'default': 'None',
+						'is_moved': {'type': 'BOOLEAN', 'default': 'None',
 						'key': 'No', 'description': 'boolean value indicated whether file has been moved to distill yet'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
