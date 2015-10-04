@@ -68,7 +68,7 @@ def paperbackup(dbi):
 	s = dbi.Session()
 	print(timestamp)
 	for table in tables:
-		db_file = '{table}_{timestamp}.json'.format(timestamp=timestamp)
+		db_file = '{table}_{timestamp}.json'.format(table=table, timestamp=timestamp)
 		dbo = os.path.join(backup_dir, db_file)
 		print(db_file)
 			DB_table = getattr(ddbi, table.title())
