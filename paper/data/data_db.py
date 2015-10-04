@@ -7,7 +7,7 @@
 
 from __future__ import print_function
 
-class file:
+class file(object):
 	def __init__(self):
 		self.table = 'file'
 		self.db_list = ('host',
@@ -50,7 +50,7 @@ class file:
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
 
-class observation:
+class observation(object):
 	def __init__(self):
 		self.table = 'observation'
 		self.db_list = ('obsnum',
@@ -99,7 +99,7 @@ class observation:
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
 
-class feed:
+class feed(object):
 	def __init__(self):
 		self.table = 'feed'
 		self.db_list = ('host',
@@ -127,7 +127,7 @@ class feed:
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
 
-class log:
+class log(object):
 	def __init__(self):
 		self.table = 'log'
 		self.db_list = ('action',
@@ -143,7 +143,7 @@ class log:
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time action was taken'}}
 
-class rtp_file:
+class rtp_file(object):
 	def __init__(self):
 		self.table = 'rtp_file'
 		self.db_list = ('host',
@@ -183,7 +183,7 @@ class rtp_file:
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
 
-class rtp_observation:
+class rtp_observation(object):
 	def __init__(self):
 		self.table = 'rtp_observation'
 		self.db_list = ('obsnum',
@@ -214,7 +214,7 @@ class rtp_observation:
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
 
-class rtp_log:
+class rtp_log(object):
 	def __init__(self):
 		self.table = 'rtp_log'
 		self.db_list = ('action',

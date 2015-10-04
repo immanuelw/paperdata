@@ -7,7 +7,7 @@
 
 from __future__ import print_function
 
-class filesystem:
+class filesystem(object):
 	def __init__(self):
 		self.table = 'filesystem'
 		self.db_list = ('host',
@@ -26,7 +26,7 @@ class filesystem:
 						'percent_space': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'percent of used space in system'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
-class monitor:
+class monitor(object):
 	def __init__(self):
 		self.table = 'monitor'
 		self.db_list = ('host',
@@ -60,7 +60,7 @@ class monitor:
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was updated'}}
 
-class ram:
+class ram(object):
 	def __init__(self):
 		self.table = 'ram'
 		self.db_list = ('host',
@@ -90,7 +90,7 @@ class ram:
 						'swap_free': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': ''},
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
-class iostat:
+class iostat(object):
 	def __init__(self):
 		self.table = 'iostat'
 		self.db_list = ('host',
@@ -110,7 +110,7 @@ class iostat:
 						'bl_writes': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'block writes'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
-class cpu:
+class cpu(object):
 	def __init__(self):
 		self.table = 'cpu'
 		self.db_list = ('host',
