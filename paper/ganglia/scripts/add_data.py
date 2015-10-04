@@ -39,11 +39,6 @@ def filesystem(ssh, host, path):
 	Returns:
 		dict: filesystem information
 	'''
-	timestamp = int(time.time())
-	system_data = {}
-	system_data['host'] = host
-	system_data['system'] = path
-	system_data['timestamp'] = timestamp
 	if ssh is None:
 		fi = psutil.disk_usage(path)
 		total = fi.total
@@ -51,7 +46,7 @@ def filesystem(ssh, host, path):
 		free = fi.free
 		percent = fi.percent
 	else:
-		stdin, folio, stderr = ssh.exec_command('df -B 1')
+		_, folio, _ = ssh.exec_command('df -B 1')
 		for output in folio.split('\n'):
 			filesystem = output.split(' ')[-1]
 			if filesystem in (path,):
@@ -60,10 +55,13 @@ def filesystem(ssh, host, path):
 				free = int(output.split(' ')[-2])
 				percent = int(output.split(' ')[-1].split('%')[-1])
 
-	system_data['total_space'] = total
-	system_data['used_space'] = used
-	system_data['free_space'] = free
-	system_data['percent_space'] = percent
+	system_data = {'host': host,
+					'system': path,
+					'timestamp': int(time.time()),
+					'total_space': total,
+					'used_space': used,
+					'free_space': free,
+					'percent_space': percent}
 
 	return system_data
 
@@ -83,24 +81,23 @@ def iostat(ssh, host):
 	if ssh is None:
 		io = psutil.disk_io_counters(perdisk=True)
 		for device, value in io.items():
-			iostat_data[device] = {'host': host}
-			iostat_data[device]['timestamp'] = timestamp
 			tps = None
 			read_s = round(value.read_count / float(value.read_time), 2)
 			write_s = round(value.write_count / float(value.write_time), 2)
 			bl_reads = value.read_bytes
 			bl_writes = value.write_bytes
 
-			iostat_data[device]['device'] = device
-			iostat_data[device]['tps'] = tps
-			iostat_data[device]['read_s'] = read_s
-			iostat_data[device]['write_s'] = write_s
-			iostat_data[device]['bl_reads'] = bl_reads
-			iostat_data[device]['bl_writes'] = bl_writes
+			iostat_data[device] = {'host': host,
+									'timestamp': timestamp,
+									'device': device,
+									'tps': tps,
+									'read_s': read_s,
+									'write_s': write_s,
+									'bl_reads': bl_reads,
+									'bl_writes': bl_writes}
 
-		return iostat_data
 	else:
-		stdin, folio, stderr = ssh.exec_command('iostat')
+		_, folio, _ = ssh.exec_command('iostat')
 
 		folio_use = []
 		folio_name = folio.split('\n')[0].split(' ')[2].strip('()')
@@ -121,12 +118,14 @@ def iostat(ssh, host):
 			bl_reads = int(row[4])
 			bl_writes = int(row[5])
 
-			iostat_data[device]['device'] = device
-			iostat_data[device]['tps'] = tps
-			iostat_data[device]['read_s'] = read_s
-			iostat_data[device]['write_s'] = write_s
-			iostat_data[device]['bl_reads'] = bl_reads
-			iostat_data[device]['bl_writes'] = bl_writes
+			iostat_data[device] = {'host': host,
+									'timestamp': timestamp,
+									'device': device,
+									'tps': tps,
+									'read_s': read_s,
+									'write_s': write_s,
+									'bl_reads': bl_reads,
+									'bl_writes': bl_writes}
 
 	return iostat_data
 
@@ -142,10 +141,6 @@ def ram_free(ssh, host):
 		dict: ram information
 	'''
 	#Calculates ram usage on folio
-	timestamp = int(time.time())
-	ram_data = {}
-	ram_data['host'] = host
-	ram_data['timestamp'] = timestamp
 	if ssh is None:
 		ram1 = psutil.virtual_memory()
 		ram2 = psutil.swap_memory()
@@ -186,17 +181,19 @@ def ram_free(ssh, host):
 				swap_used = int(row[2])
 				swap_free = int(row[3])
 
-	ram_data['total'] = total
-	ram_data['used'] = used
-	ram_data['free'] = free
-	ram_data['shared'] = shared
-	ram_data['buffers'] = buffers
-	ram_data['cached'] = cached
-	ram_data['bc_used'] = bc_used
-	ram_data['bc_free'] = bc_free
-	ram_data['swap_total'] = swap_total
-	ram_data['swap_used'] = swap_used
-	ram_data['swap_free'] = swap_free
+	ram_data = {'host': host,
+				'timestamp': int(time.time()),
+				'total': total,
+				'used': used,
+				'free': free,
+				'shared': shared,
+				'buffers': buffers,
+				'cached': cached,
+				'bc_used': bc_used,
+				'bc_free': bc_free,
+				'swap_total': swap_total,
+				'swap_used': swap_used,
+				'swap_free': swap_free}
 
 	return ram_data
 
@@ -217,8 +214,6 @@ def cpu_perc(ssh, host):
 	if ssh is None:
 		cpu_all = psutil.cpu_times_percent(interval=1, percpu=True)
 		for key, value in enumerate(cpu_all):
-			cpu_data[key] = {'host': host}
-			cpu_data[key]['timestamp'] = timestamp
 			cpu = key
 			user_perc = value.user
 			sys_perc = value.system
@@ -226,16 +221,17 @@ def cpu_perc(ssh, host):
 			idle_perc = value.idle
 			intr_s = None
 
-			cpu_data[key]['cpu'] = key
-			cpu_data[key]['user_perc'] = user_perc
-			cpu_data[key]['sys_perc'] = sys_perc
-			cpu_data[key]['iowait_perc'] = iowait_perc
-			cpu_data[key]['idle_perc'] = idle_perc
-			cpu_data[key]['intr_s'] = intr_s
-		return cpu_data
+			cpu_data[key] = {'host': host,
+							'timestamp': timestamp,
+							'cpu': cpu,
+							'user_perc': user_perc,
+							'sys_perc': sys_perc,
+							'iowait_perc': iowait_perc,
+							'idle_perc': idle_perc,
+							'intr_s': intr_s}
 
 	else:
-		stdin, folio, stderr = ssh.exec_command('mpstat -P ALL 1 1')
+		_, folio, _ = ssh.exec_command('mpstat -P ALL 1 1')
 		for output in folio.split('\n'):
 			if output in (folio.split('\n')[0], folio.split('\n')[1]):
 				continue
@@ -245,8 +241,6 @@ def cpu_perc(ssh, host):
 				cpu.append(new_line)
 		for key, row in enumerate(cpu[3:]):
 			#skip first three lines
-			cpu_data[key] = {'host': host}
-			cpu_data[key]['timestamp'] = timestamp
 			cpu = int(row[2])
 			user_perc = two_round(row[3])
 			sys_perc = two_round(row[5])
@@ -254,12 +248,14 @@ def cpu_perc(ssh, host):
 			idle_perc = two_round(row[10])
 			intr_s = two_round(row[11])
 
-			cpu_data[key]['cpu'] = key
-			cpu_data[key]['user_perc'] = user_perc
-			cpu_data[key]['sys_perc'] = sys_perc
-			cpu_data[key]['iowait_perc'] = iowait_perc
-			cpu_data[key]['idle_perc'] = idle_perc
-			cpu_data[key]['intr_s'] = intr_s
+			cpu_data[key] = {'host': host,
+							'timestamp': timestamp,
+							'cpu': cpu,
+							'user_perc': user_perc,
+							'sys_perc': sys_perc,
+							'iowait_perc': iowait_perc,
+							'idle_perc': idle_perc,
+							'intr_s': intr_s}
 
 	return cpu_data
 
