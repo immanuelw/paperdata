@@ -80,8 +80,7 @@ def add_data(dbi, data_dbi):
 			else:
 				time_start, time_end, delta_time, _ = add_files.get_uv_data(host, full_path, mode='time')
 
-			lst = uv_data.get_lst(julian_date)		
-			era, julian_day = uv_data.julian_era(julian_date)
+			era, julian_day, lst = uv_data.date_info(julian_date)
 
 			#indicates type of file in era
 			era_type = None
