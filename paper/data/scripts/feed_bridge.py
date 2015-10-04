@@ -36,7 +36,7 @@ def set_feed(s, dbi, source, output_host, output_dir, is_moved=True):
 		output_dir (str): output directory
 		is_moved (bool): checks whether to move to paperdistiller --defaults to False
 	'''
-	FEED = dbi.get_entry(s, 'feed', source)
+	FEED = dbi.get_entry(s, 'Feed', source)
 	dbi.set_entry(s, FEED, 'host', output_host)
 	dbi.set_entry(s, FEED, 'path', output_dir)
 	dbi.set_entry(s, FEED, 'is_moved', is_moved)
@@ -93,7 +93,7 @@ def count_days(dbi):
 		to_move = tuple(getattr(FEED, 'full_path') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
 
 		for full_path in to_move:
-			FEED = dbi.get_entry(s, 'feed', source)
+			FEED = dbi.get_entry(s, 'Feed', source)
 			dbi.set_entry(s, FEED, 'is_movable', True)
 
 	return None

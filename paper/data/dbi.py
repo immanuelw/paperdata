@@ -33,7 +33,7 @@ str2pol = {	'I' :  1,   # Stokes Paremeters
 #############
 
 class Observation(Base, ppdata.DictFix):
-	__tablename__ = 'observation'
+	__tablename__ = 'Observation'
 	obsnum = Column(BigInteger, primary_key=True)
 	julian_date = Column(Numeric(12,5))
 	polarization = Column(String(4))
@@ -52,7 +52,7 @@ class Observation(Base, ppdata.DictFix):
 	timestamp = Column(BigInteger)
 
 class File(Base, ppdata.DictFix):
-	__tablename__ = 'file'
+	__tablename__ = 'File'
 	host = Column(String(100))
 	path = Column(String(100)) #directory
 	filename = Column(String(100)) #zen.*.*.uv/uvcRRE/uvcRREzx...
@@ -73,7 +73,7 @@ class File(Base, ppdata.DictFix):
 	observation = relationship(Observation, backref=backref('files', uselist=True))
 
 class Feed(Base, ppdata.DictFix):
-	__tablename__ = 'feed'
+	__tablename__ = 'Feed'
 	host = Column(String(100))
 	path = Column(String(100)) #directory
 	filename = Column(String(100)) #zen.*.*.uv
@@ -84,7 +84,7 @@ class Feed(Base, ppdata.DictFix):
 	timestamp = Column(BigInteger)
 
 class Log(Base, ppdata.DictFix):
-	__tablename__ = 'log'
+	__tablename__ = 'Log'
 	#__table_args__ = (PrimaryKeyConstraint('action', 'identifier', 'timestamp', name='action_time'),)
 	action = Column(String(100), nullable=False)
 	table = Column(String(100))
@@ -92,14 +92,14 @@ class Log(Base, ppdata.DictFix):
 	action_time = Column(String(200), primary_key=True)
 	timestamp = Column(BigInteger)
 
-#def Rtp_File(Base, ppdata.DictFix):
-#	__tablename__ = 'rtp_file'
+#def RTPFile(Base, ppdata.DictFix):
+#	__tablename__ = 'RTPFile'
 #	host = Column(String(100), nullable=False)
 #	path = Column(String(100), nullable=False) #directory
 #	filename = Column(String(100), nullable=False) #zen.*.*.uv/uvcRRE/uvcRREzx...
 #	filetype = Column(String(20), nullable=False) #uv, uvcRRE, etc.
 #	full_path = Column(String(200), primary_key=True)
-#	obsnum = Column(BigInteger, ForeignKey('rtp_observation.obsnum'))
+#	obsnum = Column(BigInteger, ForeignKey('RTPObservation.obsnum'))
 #	filesize = Column(Numeric(7,2))
 #	md5sum = Column(String(32))
 #	is_transferred = Column(Boolean)
@@ -109,20 +109,20 @@ class Log(Base, ppdata.DictFix):
 #	timestamp = Column(BigInteger)
 #	observation = relationship(Rtp_Observation, backref=backref('files', uselist=True))
 
-#class Rtp_Observation(Base, ppdata.DictFix):
-#	__tablename__ = 'rtp_observation'
+#class RTPObservation(Base, ppdata.DictFix):
+#	__tablename__ = 'RTPObservation'
 #	obsnum = Column(BigInteger, primary_key=True)
 #	julian_date = Column(Numeric(12,5))
 #	polarization = Column(String(4))
 #	julian_day = Column(Integer)
 #	era = Column(Integer)
-#	length = Column(Numeric(6,5)) #length of rtp_observation in fraction of a day
+#	length = Column(Numeric(6,5)) #length of RTPObservation in fraction of a day
 #	prev_obs = Column(BigInteger, unique=True)
 #	next_obs = Column(BigInteger, unique=True)
 #	timestamp = Column(BigInteger)
 
-#class Rtp_Log(Base, ppdata.DictFix):
-#	__tablename__ = 'rtp_log'
+#class RTPLog(Base, ppdata.DictFix):
+#	__tablename__ = 'RTPLog'
 #	__table_args__ = (PrimaryKeyConstraint('action', 'identifier', 'timestamp', name='action_time'),)
 #	action = Column(String(100), nullable=False)
 #	table = Column(String(100))

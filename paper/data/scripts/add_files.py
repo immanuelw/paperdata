@@ -271,15 +271,15 @@ def add_files_to_db(dbi, input_host, input_paths):
 			filename = os.path.basename(input_path)
 			obs_data, file_data, log_data = calc_obs_data(input_host, input_path)
 			try:
-				dbi.add_entry_dict(s, 'observation', obs_data)
+				dbi.add_entry_dict(s, 'Observation', obs_data)
 			except:
 				print('Failed to load in obs ', path, filename)
 			try:
-				dbi.add_entry_dict(s, 'file', file_data)
+				dbi.add_entry_dict(s, 'File', file_data)
 			except:
 				print('Failed to load in file ', path, filename)
 			try:
-				dbi.add_entry_dict(s, 'log', log_data)
+				dbi.add_entry_dict(s, 'Log', log_data)
 			except:
 				print('Failed to load in log ', path, filename)
 

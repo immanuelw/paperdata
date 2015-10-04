@@ -91,8 +91,8 @@ def add_feeds_to_db(dbi, input_host, input_paths):
 	with dbi.session_scope() as s:
 		for source in input_paths:
 			feed_data, log_data = gen_feed_data(input_host, source)
-			dbi.add_entry_dict(s, 'feed', feed_data)
-			dbi.add_entry_dict(s, 'log', log_data)
+			dbi.add_entry_dict(s, 'Feed', feed_data)
+			dbi.add_entry_dict(s, 'Log', log_data)
 
 	return None
 

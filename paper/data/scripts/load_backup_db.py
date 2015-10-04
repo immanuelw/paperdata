@@ -52,10 +52,10 @@ if __name__ == '__main__':
 		backup_file = sys.argv[2]
 		load_backup(dbi, backup_file, table=backup_table)
 	else:
-		#load_backup(dbi, table='observation')
-		load_backup(dbi, table='file')
-		#load_backup(dbi, table='feed')
-		#load_backup(dbi, table='log')
-		#load_backup(dbi, table='rtp_file')
+		#load_backup(dbi, table='Observation')
+		load_backup(dbi, table='File')
+		#load_backup(dbi, table='Feed')
+		#load_backup(dbi, table='Log')
+		#load_backup(dbi, table='RTPFile')
 	add_files.update_obsnums(dbi)
 	add_files.connect_observations(dbi)

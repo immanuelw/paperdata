@@ -7,9 +7,9 @@
 
 from __future__ import print_function
 
-class file(object):
+class File(object):
 	def __init__(self):
-		self.table = 'file'
+		self.table = 'File'
 		self.db_list = ('host',
 						'path',
 						'filename',
@@ -50,9 +50,9 @@ class file(object):
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
 
-class observation(object):
+class Observation(object):
 	def __init__(self):
-		self.table = 'observation'
+		self.table = 'Observation'
 		self.db_list = ('obsnum',
 						'julian_date',
 						'polarization',
@@ -99,9 +99,9 @@ class observation(object):
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
 
-class feed(object):
+class Feed(object):
 	def __init__(self):
-		self.table = 'feed'
+		self.table = 'Feed'
 		self.db_list = ('host',
 						'path',
 						'filename',
@@ -127,9 +127,9 @@ class feed(object):
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
 
-class log(object):
+class Log(object):
 	def __init__(self):
-		self.table = 'log'
+		self.table = 'Log'
 		self.db_list = ('action',
 						'table',
 						'identifier',
@@ -143,9 +143,9 @@ class log(object):
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time action was taken'}}
 
-class rtp_file(object):
+class RTPFile(object):
 	def __init__(self):
-		self.table = 'rtp_file'
+		self.table = 'RTPFile'
 		self.db_list = ('host',
 						'path',
 						'filename',
@@ -183,9 +183,9 @@ class rtp_file(object):
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
 
-class rtp_observation(object):
+class RTPObservation(object):
 	def __init__(self):
-		self.table = 'rtp_observation'
+		self.table = 'RTPObservation'
 		self.db_list = ('obsnum',
 						'julian_date',
 						'polarization',
@@ -196,27 +196,27 @@ class rtp_observation(object):
 						'next_obs',
 						'timestamp')
 		self.db_descr = {'obsnum': {'type': 'BIGINT', 'default': 'None',
-						'key': 'Primary', 'description': 'rtp_observation number used to track files using integer'},
+						'key': 'Primary', 'description': 'RTPObservation number used to track files using integer'},
 						'julian_date': {'type': 'DECIMAL(12, 5)', 'default': 'None',
-						'key': 'No', 'description': 'julian date of rtp_observation'},
+						'key': 'No', 'description': 'julian date of RTPObservation'},
 						'polarization': {'type': 'VARCHAR(4)', 'default': 'None',
-						'key': 'No', 'description': 'polarization of rtp_observation'},
+						'key': 'No', 'description': 'polarization of RTPObservation'},
 						'julian_day': {'type': 'INTEGER', 'default': 'None',
 						'key': 'No', 'description': 'integer value of julian date'},
 						'era': {'type': 'INTEGER', 'default': 'None',
-						'key': 'No', 'description': 'era of rtp_observation taken: 32, 64, 128'},
+						'key': 'No', 'description': 'era of RTPObservation taken: 32, 64, 128'},
 						'length': {'type': 'DECIMAL(6, 5)', 'default': 'None',
-						'key': 'No', 'description': 'length of time data was taken for particular rtp_observation'},
+						'key': 'No', 'description': 'length of time data was taken for particular RTPObservation'},
 						'prev_obs': {'type': 'BIGINT', 'default': 'None',
-						'key': 'Unique', 'description': 'rtp_observation number of previous rtp_observation'},
+						'key': 'Unique', 'description': 'RTPObservation number of previous RTPObservation'},
 						'next_obs': {'type': 'BIGINT', 'default': 'None',
-						'key': 'Unique', 'description': 'rtp_observation number of next rtp_observation'},
+						'key': 'Unique', 'description': 'RTPObservation number of next RTPObservation'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
 
-class rtp_log(object):
+class RTPLog(object):
 	def __init__(self):
-		self.table = 'rtp_log'
+		self.table = 'RTPLog'
 		self.db_list = ('action',
 						'table',
 						'identifier',
@@ -231,13 +231,13 @@ class rtp_log(object):
 						'key': 'No', 'description': 'time action was taken'}}
 
 #dictionary of instantiated classes
-instant_class = {'file': file(),
-				'observation': observation(),
+instant_class = {'File': File(),
+				'Observation': Observation(),
 				'feed': feed(),
-				'log': log(),
-				'rtp_file': rtp_file(),
-				'rtp_observation': rtp_observation(),
-				'rtp_log': rtp_log()}
+				'Log': Log(),
+				'RTPFile': RTPFile(),
+				'RTPObservation': RTPObservation(),
+				'RTPLog': RTPLog()}
 classes = instant_class.keys()
 all_classes = instant_class.values()
 

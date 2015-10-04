@@ -195,7 +195,7 @@ class DataBaseInterface(object):
 			TABLE (str): table name
 			entry_dict (dict): dict of attributes for object
 		'''
-		table = getattr(sys.modules[mod_name], TABLE.title())
+		table = getattr(sys.modules[mod_name], TABLE)
 		ENTRY = table(**entry_dict)
 		self.add_entry(s, ENTRY)
 
@@ -216,7 +216,7 @@ class DataBaseInterface(object):
 		Returns:
 			object: table object
 		'''
-		table = getattr(sys.modules[mod_name], TABLE.title())
+		table = getattr(sys.modules[mod_name], TABLE)
 		try:
 			ENTRY = s.query(table).get(unique_value)
 		except:
