@@ -33,11 +33,11 @@ def load_backup(dbi, backup_file=None, table=None):
 		backup_file = '/data4/paper/paperdata_backup/{timestamp}/{table}_{timestamp}.json'.format(table=table, timestamp=timestamp)
 
 	with dbi.session_scope() as s, open(backup, 'r') as backup_db:
-		read = json.load(backup_db)
-		for row in read:
-			print(row.items())
+		entry_list = json.load(backup_db)
+		for entry_dict in entry_list:
+			print(entry_dict.items())
 			try:
-				dbi.add_entry_dict(s, table, row)
+				dbi.add_entry_dict(s, table, entry_dict)
 			except KeyboardInterrupt:
 				raise
 			except:
