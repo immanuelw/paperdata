@@ -21,7 +21,7 @@ def get_dbi(database):
 			object: module object
 	'''
 	host = socket.gethostname()
-	if database == 'paper':
+	if database == 'paperdata':
 		module = pdbi
 		configfile = '/mnt/paperdata/paperdata.cfg'
 		if host == 'seharu':
@@ -210,10 +210,10 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 	'''
 	if data_source is not None:
 		dbi, module = get_dbi(data_source.database)
-		table = getattr(module, data_source.table.title())
+		table = getattr(module, data_source.table)
 	elif database is not None:
 		dbi, module = get_dbi(database)
-		table = getattr(module, table.title())
+		table = getattr(module, table)
 	else:
 		dbi, module = get_dbi(getattr(data_source, 'database'))
 		table = getattr(data_source, 'table')
