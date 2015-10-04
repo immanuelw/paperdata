@@ -57,8 +57,10 @@ def get_uv_data(host, full_path, mode=None):
 				sftp.put(uv_data_script, moved_script)
 		sftp.close()
 
+		base_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path)
+
 		if mode is None:
-			uv_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path)
+			uv_comm = base_comm
 			_, uv_dat, _ = ssh.exec_command(uv_comm)
 			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [round(float(info), 5) if key in (0, 1, 2, 3, 5)
 																							else int(info) if key in (6,)
@@ -67,7 +69,7 @@ def get_uv_data(host, full_path, mode=None):
 			return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
 		elif mode == 'time':
-			uv_comm = 'python {moved_script} {host} {full_path} time'.format(moved_script=moved_script, host=host, full_path=full_path)
+			uv_comm = ' '.join((base_comm, mode))
 			_, uv_dat, _ = ssh.exec_command(uv_comm)
 			time_start, time_end, delta_time, length = [round(float(info), 5) for info in uv_dat.read().split(',')]
 
@@ -87,7 +89,6 @@ def calc_obs_data(dbi, host, full_path):
 			dict: file values
 			dict: log values
 	'''
-	host = host
 	path, filename, filetype = file_data.file_names(full_path)
 
 	pol_dict = pdbi.str2pol
@@ -102,18 +103,17 @@ def calc_obs_data(dbi, host, full_path):
 
 	elif filetype in ('npz',):
 		#filename is zen.2456640.24456.xx.uvcRE.npz or zen.2456243.24456.uvcRE.npz
-		jdate = ''.join(filename.split('.')[1], '.', filename.split('.')[2])
+		jdate = '.'.join((filename.split('.')[1], filename.split('.')[2]))
 		julian_date = round(float(jdate, 5))
 
 		with dbi.session_scope() as s:
 			if len(filename.split('.')) == 5:
 				polarization = 'all'
-				pol = polarization
 			elif len(filename.split('.')) == 6:
 				polarization = filename.split('.')[3]
-				pol = polarization
 			table = getattr(pdbi, 'Observation')
-			OBS = s.query(table).filter(getattr(table, 'julian_date') == julian_date).filter(getattr(table, 'polarization') == pol).one()
+			OBS = s.query(table).filter(getattr(table, 'julian_date') == julian_date)\
+								.filter(getattr(table, 'polarization') == polarization).one()
 
 			time_start = getattr(OBS, 'time_start')
 			time_end = getattr(OBS, 'time_end')
@@ -229,7 +229,7 @@ def set_obs(s, dbi, OBS, field):
 		edge_obs = getattr(EDGE_OBS, 'obsnum')
 		dbi.set_entry(s, OBS, field, edge_obs)
 	else:
-		pol = OBS.polarization
+		pol = getattr(OBS, 'polarization')
 		EDGE_OBS = s.query(table).filter(getattr(table, 'julian_date') == edge_time).filter(getattr(table, 'polarization') == pol).one()
 		if EDGE_OBS is not None:
 			edge_obs = EDGE_OBS.obsnum
