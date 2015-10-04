@@ -102,7 +102,7 @@ class Log(Base, ppdata.DictFix):
 #	obsnum = Column(BigInteger, ForeignKey('rtp_observation.obsnum'))
 #	filesize = Column(Numeric(7,2))
 #	md5sum = Column(String(32))
-#	transferred = Column(Boolean)
+#	is_transferred = Column(Boolean)
 #	julian_day = Column(Integer)
 #	new_host = Column(String(100))
 #	new_path = Column(String(100))
