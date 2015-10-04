@@ -7,9 +7,9 @@
 
 from __future__ import print_function
 
-class filesystem(object):
+class Filesystem(object):
 	def __init__(self):
-		self.table = 'filesystem'
+		self.table = 'Filesystem'
 		self.db_list = ('host',
 						'system',
 						'total_space',
@@ -26,9 +26,9 @@ class filesystem(object):
 						'percent_space': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'percent of used space in system'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
-class monitor(object):
+class Monitor(object):
 	def __init__(self):
-		self.table = 'monitor'
+		self.table = 'Monitor'
 		self.db_list = ('host',
 						'path',
 						'filename',
@@ -60,9 +60,9 @@ class monitor(object):
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was updated'}}
 
-class ram(object):
+class Ram(object):
 	def __init__(self):
-		self.table = 'ram'
+		self.table = 'Ram'
 		self.db_list = ('host',
 						'total',
 						'used',
@@ -90,9 +90,9 @@ class ram(object):
 						'swap_free': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': ''},
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
-class iostat(object):
+class Iostat(object):
 	def __init__(self):
-		self.table = 'iostat'
+		self.table = 'Iostat'
 		self.db_list = ('host',
 						'device',
 						'tps',
@@ -110,9 +110,9 @@ class iostat(object):
 						'bl_writes': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'block writes'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
-class cpu(object):
+class Cpu(object):
 	def __init__(self):
-		self.table = 'cpu'
+		self.table = 'Cpu'
 		self.db_list = ('host',
 						'cpu',
 						'user_perc',
@@ -133,11 +133,11 @@ class cpu(object):
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
 #dictionary of instantiated classes
-instant_class = {'filesystem': filesystem(),
-				'monitor': monitor(),
-				'ram': ram(),
-				'iostat': iostat(),
-				'cpu': cpu()}
+instant_class = {'Filesystem': Filesystem(),
+				'Monitor': Monitor(),
+				'Ram': Ram(),
+				'Iostat': Iostat(),
+				'Cpu': Cpu()}
 classes = instant_class.keys()
 all_classes = instant_class.values()
 

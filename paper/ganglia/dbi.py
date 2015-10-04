@@ -15,7 +15,7 @@ logger = logging.getLogger('paper.ganglia')
 #############
 
 class Filesystem(Base, ppdata.DictFix):
-	__tablename__ = 'filesystem'
+	__tablename__ = 'Filesystem'
 	__table_args__ = (PrimaryKeyConstraint('host', 'system', 'timestamp', name='host_system_time'),)
 	host = Column(String(100)) #folio
 	system = Column(String(100)) #/data4
@@ -26,7 +26,7 @@ class Filesystem(Base, ppdata.DictFix):
 	timestamp = Column(BigInteger) #seconds since 1970
 
 class Monitor(Base, ppdata.DictFix):
-	__tablename__ = 'monitor'
+	__tablename__ = 'Monitor'
 	host = Column(String(100))
 	path = Column(String(100))
 	filename = Column(String(100))
@@ -39,7 +39,7 @@ class Monitor(Base, ppdata.DictFix):
 	timestamp = Column(BigInteger)
 
 class Ram(Base, ppdata.DictFix):
-	__tablename__ = 'ram'
+	__tablename__ = 'Ram'
 	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
 	total = Column(BigInteger)
@@ -56,7 +56,7 @@ class Ram(Base, ppdata.DictFix):
 	timestamp = Column(BigInteger)
 
 class Iostat(Base, ppdata.DictFix):
-	__tablename__ = 'iostat'
+	__tablename__ = 'Iostat'
 	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
 	device = Column(String(100))
@@ -68,7 +68,7 @@ class Iostat(Base, ppdata.DictFix):
 	timestamp = Column(BigInteger)
 
 class Cpu(Base, ppdata.DictFix):
-	__tablename__ = 'cpu'
+	__tablename__ = 'Cpu'
 	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
 	cpu = Column(Integer)

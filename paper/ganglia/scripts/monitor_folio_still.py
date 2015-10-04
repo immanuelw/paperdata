@@ -143,7 +143,7 @@ try:
 				file_time.update({filename:time.time()})
 		with pyg_dbi.session_scope as s:
 			for monitor_data in file_log:
-				pyg_dbi.add_entry_dict(s, 'monitor', monitor_data)
+				pyg_dbi.add_entry_dict(s, 'Monitor', monitor_data)
 		file_log = []
 		s.close()
 		statusscr.refresh()

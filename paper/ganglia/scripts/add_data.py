@@ -272,20 +272,20 @@ def add_data(ssh, host):
 		with dbi.session_scope() as s:
 			iostat_all_data = iostat(ssh, host)
 			for name, iostat_data in iostat_all_data.items():
-				dbi.add_entry_dict(s, 'iostat', iostat_data)
+				dbi.add_entry_dict(s, 'Iostat', iostat_data)
 
 			ram_data = ram_free(ssh, host)
-			dbi.add_entry_dict(s, 'ram', ram_data)
+			dbi.add_entry_dict(s, 'Ram', ram_data)
 
 			cpu_all_data = cpu_perc(ssh, host)
 			for key, cpu_data in cpu_all_data.items():
-				dbi.add_entry_dict(s, 'cpu', cpu_data)
+				dbi.add_entry_dict(s, 'Cpu', cpu_data)
 
 			if host in ('folio',):
 				paths = ('/data3', '/data4')
 				for path in paths:
 					system_data = filesystem(ssh, path)
-					dbi.add_entry_dict(s, 'filesystem', system_data)
+					dbi.add_entry_dict(s, 'Filesystem', system_data)
 
 	return None
 
