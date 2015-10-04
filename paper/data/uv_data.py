@@ -133,14 +133,13 @@ def calc_times(uv):
 
 	return time_start, time_end, delta_time, length
 
-def calc_uv_data(host, full_path, mode=None):
+def calc_uv_data(host, full_path):
 	'''
 	takes in uv* files and pulls data about observation
 
 	Args:
 		host (str): host of system
 		full_path (str): full_path of uv* file
-		mode (Optional[str]): mode of data to get time from --defaults to None
 
 	Returns:
 		tuple:
@@ -160,6 +159,8 @@ def calc_uv_data(host, full_path, mode=None):
 		except:
 			return None
 
+		time_start, time_end, delta_time, length = calc_times(uv)
+
 		#indicates julian date
 		julian_date = round(uv['time'], 5)
 
@@ -168,10 +169,6 @@ def calc_uv_data(host, full_path, mode=None):
 			polarization = pol_dict[uv['pol']]
 		elif uv['npol'] == 4:
 			polarization = 'all'
-
-		time_start, time_end, delta_time, length = calc_times(uv)
-		if mode == 'time':
-			return time_start, time_end, delta_time, length
 
 		#gives each file unique id
 		if length > 0:
@@ -190,7 +187,7 @@ if __name__ == '__main__':
 	if len(sys.argv) == 4:
 		mode = sys.argv[3]
 
-	uv_data = calc_uv_data(input_host, input_path, mode)
+	uv_data = calc_uv_data(input_host, input_path)
 	if uv_data is None:
 		sys.exit()
 	output_string = ','.join(uv_data)

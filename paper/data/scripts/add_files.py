@@ -18,7 +18,7 @@ from sqlalchemy import or_
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def get_uv_data(host, full_path, mode=None):
+def get_uv_data(host, full_path):
 	'''
 	pulls relevant observation data from uv* file
 	pulls from remote systems if necessary
@@ -26,7 +26,6 @@ def get_uv_data(host, full_path, mode=None):
 	Args:
 		host (str): host of system
 		full_path (str): full_path of uv* file
-		mode (Optional[str]): mode of data to indicate which data to output --defaults to None
 
 	Returns:
 		tuple:
@@ -37,12 +36,6 @@ def get_uv_data(host, full_path, mode=None):
 			str: polarization
 			float(5): length
 			int: obsnum of uv file object
-		OR
-		tuple:
-			float(5): time start
-			float(5): time end
-			float(5): delta time
-			float(5): length
 	'''
 	with ppdata.ssh_scope(host) as ssh:
 		uv_data_script = os.path.expanduser('~/paper/data/uv_data.py')
@@ -57,23 +50,14 @@ def get_uv_data(host, full_path, mode=None):
 				sftp.put(uv_data_script, moved_script)
 		sftp.close()
 
-		base_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path)
 
-		if mode is None:
-			uv_comm = base_comm
-			_, uv_dat, _ = ssh.exec_command(uv_comm)
-			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [round(float(info), 5) if key in (0, 1, 2, 3, 5)
-																							else int(info) if key in (6,)
-																							else info
-																							for key, info in enumerate(uv_dat.read().split(','))]
-			return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
-
-		elif mode == 'time':
-			uv_comm = ' '.join((base_comm, mode))
-			_, uv_dat, _ = ssh.exec_command(uv_comm)
-			time_start, time_end, delta_time, length = [round(float(info), 5) for info in uv_dat.read().split(',')]
-
-		return time_start, time_end, delta_time, length
+		uv_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path)
+		_, uv_dat, _ = ssh.exec_command(uv_comm)
+		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [round(float(info), 5) if key in (0, 1, 2, 3, 5)
+																						else int(info) if key in (6,)
+																						else info
+																						for key, info in enumerate(uv_dat.read().split(','))]
+		return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
 def calc_obs_data(dbi, host, full_path):
 	'''
