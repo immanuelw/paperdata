@@ -45,24 +45,10 @@ def jdpol2obsnum(jd, pol, djd):
 
 	return int(obsint + polnum*(2**32))
 
-def get_lst(julian_date):
-	'''
-	calculates local sidereal hours for any julian date
-
-	Args:
-		julian_date (float): julian date
-
-	Returns:
-		float(1): lst hours rounded to one decimal place
-	'''
-	gmst = convert.juliandate_to_gmst(julian_date)
-	lst = convert.gmst_to_lst(gmst, longitude=25)
-
-	return round(lst, 1)
-
-def julian_era(julian_date):
+def date_info(julian_date):
 	'''
 	indicates julian day and set of data
+	calculates local sidereal hours for that julian date
 
 	Args:
 		julian_date (float): julian date
@@ -70,6 +56,7 @@ def julian_era(julian_date):
 		tuple:
 			int: era of julian date
 			int: julian day
+			float(1): lst hours rounded to one decimal place
 	'''
 	if julian_date < 2456100:
 		era = 32
@@ -80,7 +67,10 @@ def julian_era(julian_date):
 
 	julian_day = int(julian_date)
 
-	return era, julian_day
+	gmst = convert.juliandate_to_gmst(julian_date)
+	lst = convert.gmst_to_lst(gmst, longitude=25)
+
+	return era, julian_day, round(lst, 1)
 
 def is_edge(prev_obs, next_obs):
 	'''

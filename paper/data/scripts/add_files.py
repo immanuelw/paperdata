@@ -121,8 +121,7 @@ def calc_obs_data(dbi, host, full_path):
 			length = getattr(OBS, 'length')
 			obsnum = getattr(OBS, 'obsnum')
 
-	lst = uv_data.get_lst(julian_date)
-	era, julian_day = uv_data.julian_era(julian_date)
+	era, julian_day, lst = uv_data.date_info(julian_date)
 
 	#indicates type of file in era
 	era_type = None
