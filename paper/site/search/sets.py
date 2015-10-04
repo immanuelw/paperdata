@@ -88,7 +88,7 @@ def get_data_hours_in_set(start, end, polarization, era_type, flagged_range_dict
 	'''
 	total_data_hrs = flagged_data_hrs = 0
 
-	all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
+	all_obs_ids_tuples = db_utils.query(database='paperdata', table='Observation',
 										field_tuples=(('time_start', '>=', start), ('time_end', '<=', end),
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),
@@ -121,7 +121,7 @@ def save_new_set():
 		if len(name) == 0:
 			return jsonify(error=True, message='Name cannot be empty.')
 
-		sets = db_utils.query(database='search', table='set', field_tuples=(('name', '>=', name),))
+		sets = db_utils.query(database='search', table='Set', field_tuples=(('name', '>=', name),))
 		if len(sets) > 0:
 			return jsonify(error=True, message='Name must be unique.')
 
@@ -170,7 +170,7 @@ def upload_set():
 		if len(set_name) == 0:
 			return jsonify(error=True, message='Name cannot be empty.')
 
-		sets = db_utils.query(database='search', table='set', field_tuples=(('name', '==', set_name),))
+		sets = db_utils.query(database='search', table='Set', field_tuples=(('name', '==', set_name),))
 		if len(sets) > 0:
 			return jsonify(error=True, message='Name must be unique.')
 
@@ -198,11 +198,11 @@ def upload_set():
 		host = request.form['host']
 		filetype = request.form['filetype']
 
-		all_obs_ids_tuples = db_utils.query(database='paperdata', table='observation',
-										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
-										('polarization', None if polarization == 'all' else '==', polarization),
-										('era_type', None if era_type == 'all' else '==', era_type)),
-										sort_tuples=(('time_start', 'asc'),))
+		all_obs_ids_tuples = db_utils.query(database='paperdata', table='Observation',
+											field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
+											('polarization', None if polarization == 'all' else '==', polarization),
+											('era_type', None if era_type == 'all' else '==', era_type)),
+											sort_tuples=(('time_start', 'asc'),))
 
 		all_obs_ids = [getattr(obs, 'obsnum') for obs in all_obs_ids_tuples]
 
@@ -243,16 +243,16 @@ def download_set():
 	set_id = request.args['set_id']
 	arg_type = request.args['arg_type']
 
-	the_set = db_utils.query(database='search', table='set', field_tuples=(('id', '==', set_id),),)[0]
+	the_set = db_utils.query(database='search', table='Set', field_tuples=(('id', '==', set_id),),)[0]
 
 	if the_set is not None:
-		flagged_subsets = db_utils.query(database='search', table='flagged_subset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),),)
+		flagged_subsets = db_utils.query(database='search', table='FlaggedSubset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),),)
 		polarization = getattr(the_set, 'polarization')
 		era_type = getattr(the_set, 'era_type')
 		if arg_type == 'obs':
 			output_vars = ('obsnum', 'julian_date', 'polarization', 'era_type', 'length', 'time_start', 'time_end')
 
-			obs_objs = db_utils.query(database='paperdata', table='observation',
+			obs_objs = db_utils.query(database='paperdata', table='Observation',
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),
@@ -261,7 +261,7 @@ def download_set():
 			info_dict = {getattr(obs_obj, 'obsnum'): {var: getattr(obs_obj, var) for var in output_vars} for obs_obj in obs_objs}
 
 		elif arg_type == 'file':
-			obs_objs = db_utils.query(database='paperdata', table='observation',
+			obs_objs = db_utils.query(database='paperdata', table='Observation',
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),
@@ -288,7 +288,7 @@ def get_filters():
 	Returns:
 		html: filters
 	'''
-	users = db_utils.query(database='search', table='user')
+	users = db_utils.query(database='search', table='User')
 
 	return render_template('filters.html', users=users)
 
@@ -333,7 +333,7 @@ def get_sets():
 			elif sort == 'time':
 				sort_tuples = (('created_on', 'desc'),)
 
-		setList = db_utils.query(database='search', table='set', field_tuples=field_tuples, sort_tuples=sort_tuples)
+		setList = db_utils.query(database='search', table='Set', field_tuples=field_tuples, sort_tuples=sort_tuples)
 
 		include_delete_buttons = request_content['includeDeleteButtons']
 
@@ -349,7 +349,7 @@ def delete_set():
 	if (g.user is not None and g.user.is_authenticated()):
 		set_id = request.form['set_id']
 
-		theSet = db_utils.query(database='search', table='set', field_tuples=(('id', '==', set_id),),)[0]
+		theSet = db_utils.query(database='search', table='Set', field_tuples=(('id', '==', set_id),),)[0]
 
 		db.session.delete(theSet)
 		db.session.commit()

@@ -64,7 +64,7 @@ def get_unsubscribed_data_sources():
 		html: unsubscribed data sources
 	'''
 	if g.user is not None and g.user.is_authenticated():
-		all_data_sources = db_utils.query(database='search', table='graph_data_source')
+		all_data_sources = db_utils.query(database='search', table='GraphDataSource')
 
 		subscribed_data_sources = g.user.subscribed_data_sources
 
@@ -85,8 +85,8 @@ def update_active_data_sources():
 		request_content = request.get_json()
 		new_active_data_sources_names = request_content['activeDataSources']
 
-		new_active_data_sources = db_utils.query(database='search', table='graph_data_source',
-																field_tuples=(('name', 'in', new_active_data_sources_names),))
+		new_active_data_sources = db_utils.query(database='search', table='GraphDataSource',
+													field_tuples=(('name', 'in', new_active_data_sources_names),))
 
 		current_active_data_sources = g.user.active_data_sources
 		active_to_remove = list(set(current_active_data_sources) -\
@@ -114,7 +114,7 @@ def subscribe_to_data_source():
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
-		data_source = db_utils.query(database='search', table='graph_data_source', field_tuples=(('name', '==', data_source_name),))[0]
+		data_source = db_utils.query(database='search', table='GraphDataSource', field_tuples=(('name', '==', data_source_name),))[0]
 
 		g.user.subscribed_data_sources.append(data_source)
 		db.session.add(g.user)
@@ -131,7 +131,7 @@ def unsubscribe_from_data_source():
 	if g.user is not None and g.user.is_authenticated():
 		data_source_name = request.form['dataSource']
 
-		data_source = db_utils.query(database='search', table='graph_data_source', field_tuples=(('name', '==', data_source_name),))[0]
+		data_source = db_utils.query(database='search', table='GraphDataSource', field_tuples=(('name', '==', data_source_name),))[0]
 
 		g.user.subscribed_data_sources.remove(data_source)
 		try:
@@ -150,7 +150,7 @@ def get_graph_types():
 	'''
 	get all graph types
 	'''
-	graph_types = db_utils.query(database='search', table='graph_type', field_tuples=(('name', '!=', 'Obs_File'),))
+	graph_types = db_utils.query(database='search', table='GraphType', field_tuples=(('name', '!=', 'Obs_File'),)
 
 	return render_template('graph_type_list.html', graph_types=graph_types)
 
@@ -190,7 +190,7 @@ def create_data_source():
 				letters, _, or spaces.''')
 
 		#Is the data source name unique?
-		data_source = db_utils.query(database='search', table='graph_data_source', field_tuples=(('name', '==', data_source_name),))[0]
+		data_source = db_utils.query(database='search', table='GraphDataSource', field_tuples=(('name', '==', data_source_name),))[0]
 		if data_source is not None:
 			return jsonify(error=True, message='The data source name must be unique.')
 
@@ -208,7 +208,7 @@ def create_data_source():
 			return jsonify(error=True,
 				message='The column {column} does not exist in that table or is not a numeric column.'.format(column=missing_columns[0]))
 		
-		graph_data_source = getattr(models, 'Graph_Data_Source')()
+		graph_data_source = getattr(models, 'GraphDataSource')()
 		setattr(graph_data_source, 'name', data_source_name)
 		setattr(graph_data_source, 'graph_type', graph_type)
 		setattr(graph_data_source, 'host', host)
@@ -223,7 +223,7 @@ def create_data_source():
 		for column in columns:
 			graph_data_source_column = getattr(models, 'Graph_Data_Source_Column')()
 			setattr(graph_data_source_column, 'name', column)
-			setattr(graph_data_source_column, 'graph_data_source', data_source_name)
+			setattr(graph_data_source_column, 'GraphDataSource', data_source_name)
 
 			db.session.add(graph_data_source_column)
 
@@ -249,7 +249,7 @@ def get_graph_data(data_source_str, start_utc, end_utc, the_set):
 	Returns:
 		dict: lists of times, count, and obsnums for graph
 	'''
-	data_source = db_utils.query(database='search', table='graph_data_source', field_tuples=(('name', '==', data_source_str),))[0]
+	data_source = db_utils.query(database='search', table='GraphDataSource', field_tuples=(('name', '==', data_source_str),))[0]
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = db.utils.get_set_strings()
 	data = {pol_str: {era_type: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}

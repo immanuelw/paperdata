@@ -60,7 +60,7 @@ def index(setName=None):
 		active_data_sources = g.user.active_data_sources
 
 	if setName is not None:
-		the_set = db_utils.query(database='search', table='set', field_tuples=(('name', '==', setName),))[0]
+		the_set = db_utils.query(database='search', table='Set', field_tuples=(('name', '==', setName),))[0]
 
 		if the_set is not None:
 			start_datetime, end_datetime = db_utils.get_datetime_from_utc(the_set.start, the_set.end)
@@ -98,7 +98,7 @@ def get_graph():
 	if data_source_str is None:
 		return make_response('No data source', 500)
 	try:
-		data_source = db_utils.query(database='search', table='graph_data_source', field_tuples=(('name', '==', data_source_str),))[0]
+		data_source = db_utils.query(database='search', table='GraphDataSource', field_tuples=(('name', '==', data_source_str),))[0]
 	except IndexError:
 		data_source = None
 		#return make_response('Source not found', 500)
@@ -192,7 +192,7 @@ def obs_table():
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 	try:
-		response = db_utils.query(database='paperdata', table='observation', 
+		response = db_utils.query(database='paperdata', table='Observation', 
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),))
 		log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response]
@@ -219,7 +219,7 @@ def file_table():
 	output_vars=('host', 'full_path', 'obsnum', 'filesize')
 
 	try:
-		all_obs_list = db_utils.query(database='paperdata', table='observation', 
+		all_obs_list = db_utils.query(database='paperdata', table='Observation', 
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 										sort_tuples=(('time_start', 'asc'),))
 		files_list = (getattr(obs, 'files') for obs in all_obs_list)
@@ -279,8 +279,8 @@ def profile():
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
-			user = db_utils.query(database='search', table='user',	field_tuples=(('username', '==', g.user.username),),)[0]
-			setList = db_utils.query(database='search', table='set', field_tuples=(('username', '==', g.user.username),))[0]
+			user = db_utils.query(database='search', table='User',	field_tuples=(('username', '==', g.user.username),),)[0]
+			setList = db_utils.query(database='search', table='Set', field_tuples=(('username', '==', g.user.username),))[0]
 		except:
 			user = (None,)
 			setList = (None,)
@@ -301,9 +301,9 @@ def user_page():
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
-			user = db_utils.query(database='search', table='user',	field_tuples=(('username', '==', g.user.username),))[0]
-			userList = db_utils.query(database='search', table='user')[0]
-			setList = db_utils.query(database='search', table='set')[0]
+			user = db_utils.query(database='search', table='User',	field_tuples=(('username', '==', g.user.username),))[0]
+			userList = db_utils.query(database='search', table='User')[0]
+			setList = db_utils.query(database='search', table='Set')[0]
 		except:
 			user = (None,)
 			userList = (None,)
@@ -331,11 +331,11 @@ def data_summary_table():
 	start_utc =  misc_utils.get_jd_from_datetime(startdatetime)
 	end_utc =  misc_utils.get_jd_from_datetime(enddatetime)
 
-	response = db_utils.query(database='paperdata', table='observation',
+	response = db_utils.query(database='paperdata', table='Observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),))
 	#try:
-	#	response = db_utils.query(database='paperdata', table='observation',
+	#	response = db_utils.query(database='paperdata', table='Observation',
 	#								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 	#								sort_tuples=(('time_start', 'asc'),))
 	#except:
