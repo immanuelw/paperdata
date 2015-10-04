@@ -87,7 +87,7 @@ def add_data(dbi, data_dbi):
 
 			prev_obs = None
 			next_obs = None
-			edge = None
+			is_edge = None
 
 			filesize = file_data.calc_size(host, path, filename)
 			md5 = getattr(FILE, 'md5sum')
@@ -96,8 +96,8 @@ def add_data(dbi, data_dbi):
 			tape_index = None
 
 			source_host = host
-			write_to_tape = True
-			delete_file = False
+			is_tapeable = True
+			is_deletable = False
 
 			timestamp = int(time.time())
 
@@ -114,7 +114,7 @@ def add_data(dbi, data_dbi):
 						'delta_time': delta_time,
 						'prev_obs': prev_obs, 
 						'next_obs': next_obs,
-						'edge': edge,
+						'is_edge': is_edge,
 						'timestamp': timestamp}
 			raw_data = {'host': host,
 						'path': path,
@@ -126,8 +126,8 @@ def add_data(dbi, data_dbi):
 						'md5sum': md5,
 						'tape_index': tape_index,
 						'source_host': source_host,
-						'write_to_tape': write_to_tape,
-						'delete_file': delete_file,
+						'is_tapeable': is_tapeable,
+						'is_deletable': is_deletable,
 						'timestamp': timestamp}
 			action = 'add by bridge'
 			table = None
@@ -150,7 +150,7 @@ def add_data(dbi, data_dbi):
 				compr_data['filetype'] = compr_filetype
 				compr_data['filesize'] = file_data.calc_size(host, path, compr_filename)
 				compr_data['md5sum'] = file_data.calc_md5sum(host, path, compr_filename)
-				compr_data['write_to_tape'] = False
+				compr_data['is_tapeable'] = False
 				data_dbi.add_entry_dict(sess, 'file', compr_data)
 				movable_paths[compr_filetype].append(compr_path)
 
@@ -163,7 +163,7 @@ def add_data(dbi, data_dbi):
 				npz_data['filetype'] = npz_filetype
 				npz_data['filesize'] = file_data.calc_size(host, path, npz_filename)
 				npz_data['md5sum'] = file_data.calc_md5sum(host, path, npz_filename)
-				npz_data['write_to_tape'] = False
+				npz_data['is_tapeable'] = False
 				data_dbi.add_entry_dict(sess, 'file', npz_data)
 				movable_paths[npz_filetype].append(npz_path)
 	s.close()

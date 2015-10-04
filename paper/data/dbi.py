@@ -48,7 +48,7 @@ class Observation(Base, ppdata.DictFix):
 	delta_time = Column(Numeric(12,5))
 	prev_obs = Column(BigInteger, unique=True)
 	next_obs = Column(BigInteger, unique=True)
-	edge = Column(Boolean)
+	is_edge = Column(Boolean)
 	timestamp = Column(BigInteger)
 
 class File(Base, ppdata.DictFix):
@@ -65,8 +65,8 @@ class File(Base, ppdata.DictFix):
 	tape_index = Column(String(100))
 	### maybe unnecessary fields
 	source_host = Column(String(100))
-	write_to_tape = Column(Boolean)
-	delete_file = Column(Boolean)
+	is_tapeable = Column(Boolean)
+	is_deletable = Column(Boolean)
 	timestamp = Column(BigInteger)
 	#this next line creates an attribute Observation.files which is the list of all
 	#  files associated with this observation

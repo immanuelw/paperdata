@@ -84,11 +84,11 @@ def is_edge(prev_obs, next_obs):
 		bool: on the edge of a julian day
 	'''
 	if (prev_obs, next_obs) == (None, None):
-		edge = None
+		is_edge = None
 	else:
-		edge = (None in (prev_obs, next_obs))
+		is_edge = (None in (prev_obs, next_obs))
 
-	return edge
+	return is_edge
 
 def calc_times(uv):
 	'''

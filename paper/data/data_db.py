@@ -20,8 +20,8 @@ class file:
 						'md5sum',
 						'tape_index',
 						'source_host',
-						'write_to_tape',
-						'delete_file',
+						'is_tapeable',
+						'is_deletable',
 						'timestamp')
 		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'host of file system that file is located on'},
@@ -43,9 +43,9 @@ class file:
 						'key': 'No', 'description': 'indexed location of file on tape'},
 						'source_host': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'original source(host) of file'},
-						'write_to_tape': {'type': 'BOOLEAN', 'default': 'None',
+						'is_tapeable': {'type': 'BOOLEAN', 'default': 'None',
 						'key': 'No', 'description': 'boolean value indicated whether file needs to be written to tape'},
-						'delete_file': {'type': 'BOOLEAN', 'default': 'None',
+						'is_deletable': {'type': 'BOOLEAN', 'default': 'None',
 						'key': 'No', 'description': 'boolean value indicated whether file needs to be deleted from its host'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}
@@ -66,7 +66,7 @@ class observation:
 						'delta_time',
 						'prev_obs',
 						'next_obs',
-						'edge',
+						'is_edge',
 						'timestamp')
 		self.db_descr = {'obsnum': {'type': 'BIGINT', 'default': 'None',
 						'key': 'Primary', 'description': 'observation number used to track files using integer'},
@@ -94,7 +94,7 @@ class observation:
 						'key': 'Unique', 'description': 'observation number of previous observation'},
 						'next_obs': {'type': 'BIGINT', 'default': 'None',
 						'key': 'Unique', 'description': 'observation number of next observation'},
-						'edge': {'type': 'BOOLEAN', 'default': 'None',
+						'is_edge': {'type': 'BOOLEAN', 'default': 'None',
 						'key': 'No', 'description': 'boolean value indicating if observation at beginning/end of night or not'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time entry was last updated'}}

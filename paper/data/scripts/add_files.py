@@ -112,15 +112,15 @@ def calc_obs_data(dbi, host, full_path):
 
 	prev_obs = None
 	next_obs = None
-	edge = None
+	is_edge = None
 
 	filesize = file_data.calc_size(host, path, filename)
 	md5 = file_data.calc_md5sum(host, path, filename)
 	tape_index = None
 
 	source_host = host
-	write_to_tape = False
-	delete_file = False
+	is_tapeable = False
+	is_deletable = False
 
 	timestamp = int(time.time())
 
@@ -137,7 +137,7 @@ def calc_obs_data(dbi, host, full_path):
 				'delta_time': delta_time,
 				'prev_obs': prev_obs, 
 				'next_obs': next_obs,
-				'edge': edge,
+				'is_edge': is_edge,
 				'timestamp': timestamp}
 	file_data = {'host': host,
 				'path': path,
@@ -149,8 +149,8 @@ def calc_obs_data(dbi, host, full_path):
 				'md5sum': md5,
 				'tape_index': tape_index,
 				'source_host': source_host,
-				'write_to_tape': write_to_tape,
-				'delete_file': delete_file,
+				'is_tapeable': is_tapeable,
+				'is_deletable': is_deletable,
 				'timestamp': timestamp}
 
 	log_data = {'action': 'add by scan',
@@ -232,8 +232,8 @@ def update_obsnums(dbi):
 			PREV_OBS = set_obs(s, dbi, OBS, 'prev_obs')
 			NEXT_OBS = set_obs(s, dbi, OBS, 'next_obs')
 			#sets edge 
-			edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
-			dbi.set_entry(s, OBS, 'edge', edge)
+			is_edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
+			dbi.set_entry(s, OBS, 'is_edge', is_edge)
 
 	return None
 
