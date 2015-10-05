@@ -133,11 +133,12 @@ def calc_times(uv):
 
 	return time_start, time_end, delta_time, length
 
-def calc_uv_data(host, full_path):
+def calc_uv_data(named_host, host, full_path):
 	'''
 	takes in uv* files and pulls data about observation
 
 	Args:
+		named_host (str) : host user is on
 		host (str): host of system
 		full_path (str): full_path of uv* file
 
@@ -151,34 +152,54 @@ def calc_uv_data(host, full_path):
 			float(5): length
 			int: obsnum of uv file object
 	'''
-	filetype = full_path.split('.')[-1]
-	#allows uv access
-	if filetype in ('uv', 'uvcRRE'):
-		try:
-			uv = A.miriad.UV(full_path)
-		except:
+	if named_host == host:
+		filetype = full_path.split('.')[-1]
+		#allows uv access
+		if filetype not in ('uv', 'uvcRRE'):
 			return None
-
-		time_start, time_end, delta_time, length = calc_times(uv)
-
-		#indicates julian date
-		julian_date = round(uv['time'], 5)
-
-		#assign letters to each polarization
-		if uv['npol'] == 1:
-			polarization = pol_dict[uv['pol']]
-		elif uv['npol'] == 4:
-			polarization = 'all'
-
-		#gives each file unique id
-		if length > 0:
-			obsnum = jdpol2obsnum(julian_date, polarization, length)
 		else:
-			obsnum = None
+			try:
+				uv = A.miriad.UV(full_path)
+			except:
+				return None
 
-		return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
+			time_start, time_end, delta_time, length = calc_times(uv)
+
+			#indicates julian date
+			julian_date = round(uv['time'], 5)
+
+			#assign letters to each polarization
+			if uv['npol'] == 1:
+				polarization = pol_dict[uv['pol']]
+			elif uv['npol'] == 4:
+				polarization = 'all'
+
+			#gives each file unique id
+			if length > 0:
+				obsnum = jdpol2obsnum(julian_date, polarization, length)
+			else:
+				obsnum = None
+
 	else:
-		return None
+		uv_data_script = os.path.expanduser('~/paperdata/paper/data/uv_data.py')
+		moved_script = './uv_data.py'
+		uv_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path)
+		with ppdata.ssh_scope(host) as ssh:
+			with ssh.open_sftp() as sftp:
+				try:
+					filestat = sftp.stat(uv_data_script)
+				except(IOError):
+					try:
+						filestat = sftp.stat(moved_script)
+					except(IOError):
+						sftp.put(uv_data_script, moved_script)
+
+			_, uv_dat, _ = ssh.exec_command(uv_comm)
+			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [round(float(info), 5) if key in (0, 1, 2, 3, 5)
+																							else int(info) if key in (6,)
+																							else info
+																							for key, info in enumerate(uv_dat.read().split(','))]
+	return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
 if __name__ == '__main__':
 	input_host = sys.argv[1]

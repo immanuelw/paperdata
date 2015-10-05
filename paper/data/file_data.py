@@ -66,10 +66,9 @@ def calc_size(host, path, filename):
 		size = sizeof_fmt(get_size(full_path))
 	else:
 		with ppdata.ssh_scope(host) as ssh:
-			sftp = ssh.open_sftp()
-			size_bytes = sftp.stat(full_path).st_size
-			size = sizeof_fmt(size_bytes)
-			sftp.close()
+			with ssh.open_sftp() as sftp:
+				size_bytes = sftp.stat(full_path).st_size
+				size = sizeof_fmt(size_bytes)
 
 	return size
 
@@ -118,10 +117,9 @@ def calc_md5sum(host, path, filename):
 	else:
 		with ppdata.ssh_scope(host) as ssh:
 			try:
-				sftp = ssh.open_sftp()
-				remote_path = sftp.file(full_path, mode='r')
-				md5 = remote_path.check('md5', block_size=65536)
-				sftp.close()
+				with ssh.open_sftp() as sftp:
+					remote_path = sftp.file(full_path, mode='r')
+					md5 = remote_path.check('md5', block_size=65536)
 			except(IOError):
 				vis_path = os.path.join(full_path, 'visdata')
 				_, md5_out, _ = ssh.exec_command('md5sum {vis_path}'.format(vis_path=vis_path))

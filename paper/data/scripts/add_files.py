@@ -18,47 +18,6 @@ from sqlalchemy import or_
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def get_uv_data(host, full_path):
-	'''
-	pulls relevant observation data from uv* file
-	pulls from remote systems if necessary
-
-	Args:
-		host (str): host of system
-		full_path (str): full_path of uv* file
-
-	Returns:
-		tuple:
-			float(5): time start
-			float(5): time end
-			float(5): delta time
-			float(5): julian date
-			str: polarization
-			float(5): length
-			int: obsnum of uv file object
-	'''
-	with ppdata.ssh_scope(host) as ssh:
-		uv_data_script = os.path.expanduser('~/paper/data/uv_data.py')
-		sftp = ssh.open_sftp()
-		moved_script = './uv_data.py'
-		try:
-			filestat = sftp.stat(uv_data_script)
-		except(IOError):
-			try:
-				filestat = sftp.stat(moved_script)
-			except(IOError):
-				sftp.put(uv_data_script, moved_script)
-		sftp.close()
-
-
-		uv_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path)
-		_, uv_dat, _ = ssh.exec_command(uv_comm)
-		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [round(float(info), 5) if key in (0, 1, 2, 3, 5)
-																						else int(info) if key in (6,)
-																						else info
-																						for key, info in enumerate(uv_dat.read().split(','))]
-		return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
-
 def calc_obs_data(dbi, host, full_path):
 	'''
 	generates all relevant data from uv* file
@@ -79,11 +38,7 @@ def calc_obs_data(dbi, host, full_path):
 
 	#allows uv access
 	named_host = socket.gethostname()
-	if filetype in ('uv', 'uvcRRE'):
-		if named_host == host:
-			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = uv_data.calc_uv_data(host, full_path)
-		else:
-			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = get_uv_data(host, full_path)
+	time_start, time_end, delta_time, julian_date, polarization, length, obsnum = uv_data.calc_uv_data(named_host, host, full_path)
 
 	elif filetype in ('npz',):
 		#filename is zen.2456640.24456.xx.uvcRE.npz or zen.2456243.24456.uvcRE.npz
