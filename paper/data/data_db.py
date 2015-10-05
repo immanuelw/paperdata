@@ -233,7 +233,7 @@ class RTPLog(object):
 #dictionary of instantiated classes
 instant_class = {'File': File(),
 				'Observation': Observation(),
-				'feed': feed(),
+				'Feed': Feed(),
 				'Log': Log(),
 				'RTPFile': RTPFile(),
 				'RTPObservation': RTPObservation(),
