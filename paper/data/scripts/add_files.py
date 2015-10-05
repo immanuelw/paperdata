@@ -34,31 +34,10 @@ def calc_obs_data(dbi, host, full_path):
 	'''
 	path, filename, filetype = file_data.file_names(full_path)
 
-	pol_dict = pdbi.str2pol
-
-	#allows uv access
-	named_host = socket.gethostname()
-	time_start, time_end, delta_time, julian_date, polarization, length, obsnum = uv_data.calc_uv_data(named_host, host, full_path)
-
+	if filetype in ('uv', 'uvcRRE'):
+		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = uv_data.calc_uv_data(host, full_path)
 	elif filetype in ('npz',):
-		#filename is zen.2456640.24456.xx.uvcRE.npz or zen.2456243.24456.uvcRE.npz
-		jdate = '.'.join((filename.split('.')[1], filename.split('.')[2]))
-		julian_date = round(float(jdate, 5))
-
-		with dbi.session_scope() as s:
-			if len(filename.split('.')) == 5:
-				polarization = 'all'
-			elif len(filename.split('.')) == 6:
-				polarization = filename.split('.')[3]
-			table = getattr(pdbi, 'Observation')
-			OBS = s.query(table).filter(getattr(table, 'julian_date') == julian_date)\
-								.filter(getattr(table, 'polarization') == polarization).one()
-
-			time_start = getattr(OBS, 'time_start')
-			time_end = getattr(OBS, 'time_end')
-			delta_time = getattr(OBS, 'delta_time')
-			length = getattr(OBS, 'length')
-			obsnum = getattr(OBS, 'obsnum')
+		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = uv_data.calc_npz_data(dbi, filename)
 
 	era, julian_day, lst = uv_data.date_info(julian_date)
 

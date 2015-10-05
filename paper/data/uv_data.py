@@ -3,8 +3,9 @@
 # Add files to paper
 
 from __future__ import print_function
-import sys
 import os
+import sys
+import socket
 from paper.data import dbi as pdbi
 import paper.convert as convert
 import aipy as A
@@ -133,12 +134,56 @@ def calc_times(uv):
 
 	return time_start, time_end, delta_time, length
 
-def calc_uv_data(named_host, host, full_path):
+def calc_npz_data(dbi, filename):
+	'''
+	takes in npz files and pulls data about observation
+
+	Args:
+		dbi (object): database interface object
+		filename (str): filename of npz file [Ex: zen.2456640.24456.xx.uvcRE.npz OR zen.2456243.24456.uvcRE.npz]
+
+	Returns:
+		tuple:
+			float(5): time start
+			float(5): time end
+			float(5): delta time
+			float(5): julian date
+			str: polarization
+			float(5): length
+			int: obsnum of uv file object
+		OR
+		tuple:
+			None for every field if no corresponding observation found
+	'''
+	filetype = filename.split('.')[-1]
+	if filetype not in ('npz',):
+		return (None,) * 7
+	
+	jdate = '.'.join((filename.split('.')[1], filename.split('.')[2]))
+	julian_date = round(float(jdate, 5))
+
+	with dbi.session_scope() as s:
+		if len(filename.split('.')) == 5:
+			polarization = 'all'
+		elif len(filename.split('.')) == 6:
+			polarization = filename.split('.')[3]
+		table = getattr(pdbi, 'Observation')
+		OBS = s.query(table).filter(getattr(table, 'julian_date') == julian_date)\
+							.filter(getattr(table, 'polarization') == polarization).one()
+
+		time_start = getattr(OBS, 'time_start')
+		time_end = getattr(OBS, 'time_end')
+		delta_time = getattr(OBS, 'delta_time')
+		length = getattr(OBS, 'length')
+		obsnum = getattr(OBS, 'obsnum')
+
+	return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
+
+def calc_uv_data(host, full_path):
 	'''
 	takes in uv* files and pulls data about observation
 
 	Args:
-		named_host (str) : host user is on
 		host (str): host of system
 		full_path (str): full_path of uv* file
 
@@ -151,23 +196,28 @@ def calc_uv_data(named_host, host, full_path):
 			str: polarization
 			float(5): length
 			int: obsnum of uv file object
+		OR
+		tuple:
+			None for every field if no corresponding observation found
 	'''
+	named_host = socket.gethostname()
 	if named_host == host:
 		filetype = full_path.split('.')[-1]
 		#allows uv access
 		if filetype not in ('uv', 'uvcRRE'):
-			return None
+			return (None,) * 7
 		else:
 			try:
 				uv = A.miriad.UV(full_path)
 			except:
-				return None
+				return (None,) * 7
 
 			time_start, time_end, delta_time, length = calc_times(uv)
 
 			#indicates julian date
 			julian_date = round(uv['time'], 5)
 
+			pol_dict = pdbi.str2pol
 			#assign letters to each polarization
 			if uv['npol'] == 1:
 				polarization = pol_dict[uv['pol']]
