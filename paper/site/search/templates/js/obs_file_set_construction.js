@@ -146,7 +146,7 @@ var getCurrentObsDataSeries = function() {
 	{% endif %}
 };
 
-var getCurrentFlaggedSet = function() {
+var getCurrentObsFlaggedSet = function() {
 	var polarization = currentObsData['polarization'];
 	var era_type = currentObsData['era_type'];
 	return flaggedObsDict[polarization][era_type];
@@ -168,7 +168,7 @@ var getCurrentFileDataSeries = function() {
 	{% endif %}
 };
 
-var getCurrentFlaggedSet = function() {
+var getCurrentFileFlaggedSet = function() {
 	var host = currentFileData['host'];
 	var filetype = currentFileData['filetype'];
 	return flaggedFileDict[host][filetype];
@@ -222,8 +222,8 @@ var dataSetChanged = function() {
 		removeAllPlotBands();
 
 		// Set the correct flagged ranges.
-		flaggedObsRanges = getCurrentFlaggedSet();
-		flaggedFileRanges = getCurrentFlaggedSet();
+		flaggedObsRanges = getCurrentObsFlaggedSet();
+		flaggedFileRanges = getCurrentFileFlaggedSet();
 		hideDataOnDataSetChange();
 
 		addAllPlotBands();
@@ -232,8 +232,8 @@ var dataSetChanged = function() {
 		updateSetConstructionTable();
 	} else {
 		// Set the correct flagged ranges.
-		flaggedObsRanges = getCurrentFlaggedSet();
-		flaggedFileRanges = getCurrentFlaggedSet();
+		flaggedObsRanges = getCurrentObsFlaggedSet();
+		flaggedFileRanges = getCurrentFileFlaggedSet();
 		hideDataOnDataSetChange();
 	}
 };
@@ -375,7 +375,7 @@ var getObsAndFileCountInRange = function(startTime, endTime) {
 
 	var flaggedObs = getCurrentObsDataSeries().slice(dataIndices.obsStartIndex, dataIndices.obsEndIndex + 1);
 
-	var flaggedFile = file_counts.slice(dataIndices.fileStartIndex, dataIndices.fileEndIndex + 1);
+	var flaggedFile = getCurrentFileDataSeries().slice(dataIndices.fileStartIndex, dataIndices.fileEndIndex + 1);
 
 	var obsCount = 0, fileCount = 0;
 
@@ -511,12 +511,15 @@ var reinsertDataForRange = function(index) {
 		var fileSeries = _chart.series[1];
 		{% if is_set %}
 		var obsSeriesData = obs_counts;
+		var fileSeriesData = file_counts;
 		{% else %}
 		var polarization = currentObsData['polarization'];
 		var era_type = currentObsData['era_type'];
 		var obsSeriesData = obs_counts[polarization][era_type];
+		var host = currentFileData['host'];
+		var filetype = currentFileData['filetype'];
+		var fileSeriesData = file_counts[host][filetype];
 		{% endif %}
-		var fileSeriesData = file_counts;
 
 		var obsSeriesGraphData = getSeriesDataCopyFromGraph(obsSeries);
 		var fileSeriesGraphData = getSeriesDataCopyFromGraph(fileSeries);
@@ -634,6 +637,6 @@ var sliderChanged = function(slider) {
 	};
 
 	_chart.series[0].update(newOptions, false); // Don't redraw chart.
-	_chart.series[1].update(newOptions);
+	_chart.series[1].update(newOptions, false);
 };
 dataSourceObj.sliderChanged = sliderChanged;
