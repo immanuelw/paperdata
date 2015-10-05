@@ -49,12 +49,12 @@ def paperbackup(dbi):
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 
-	tables = ('filesystem', 'monitor', 'iostat', 'ram', 'cpu')
-	table_sorts = {'filesystem': {'first': 'timestamp', 'second': 'host', 'third': 'system'},
-					'monitor': {'first': 'timestamp', 'second': 'host', 'third': 'filename'},
-					'iostat': {'first': 'timestamp', 'second': 'host', 'third': 'device'},
-					'ram': {'first': 'timestamp', 'second': 'host', 'third': 'total'},
-					'cpu': {'first': 'timestamp', 'second': 'host', 'third': 'cpu'}}
+	tables = ('Filesystem', 'Monitor', 'Iostat', 'Ram', 'Cpu')
+	table_sorts = {'Filesystem': {'first': 'timestamp', 'second': 'host', 'third': 'system'},
+					'Monitor': {'first': 'timestamp', 'second': 'host', 'third': 'filename'},
+					'Iostat': {'first': 'timestamp', 'second': 'host', 'third': 'device'},
+					'Ram': {'first': 'timestamp', 'second': 'host', 'third': 'total'},
+					'Cpu': {'first': 'timestamp', 'second': 'host', 'third': 'cpu'}}
 	with dbi.session_scope as s:
 		print(timestamp)
 		for table in tables:
