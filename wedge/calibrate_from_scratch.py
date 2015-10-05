@@ -35,7 +35,8 @@ if __name__ == '__main__':
 
 	cal_image = ''.join((filename, '.cal'))
 
-	clean(vis=filename, imagename=cal_image, imagermode='csclean', psfmode='clark', threshold='10Jy', niter=10000, mode='mfs', weighting='uniform', cell=['3arcmin', '3arcmin'], imsize=[1024, 1024], gridmode='widefield', wprojplanes=32, gain=0.2, stokes='I')
+	clean(vis=filename, imagename=cal_image, imagermode='csclean', psfmode='clark', threshold='10Jy', niter=10000, mode='mfs',
+			weighting='uniform', cell=['3arcmin', '3arcmin'], imsize=[1024, 1024], gridmode='widefield', wprojplanes=32, gain=0.2, stokes='I')
 
 	clean2fits(cal_image, cal_image)
 
@@ -43,6 +44,7 @@ if __name__ == '__main__':
 
 	fixed_raw = ''.join((filename_raw, '_image'))
 
-	clean(vis=filename_raw, imagename=fixed_raw, imagermode='csclean', psfmode='clark', threshold='10Jy', niter=10000, mode='mfs', weighting='uniform', cell=['3arcmin', '3arcmin'], imsize=[1024, 1024], gridmode='widefield', wprojplanes=32, gain=0.2, stokes='I')
+	clean(vis=filename_raw, imagename=fixed_raw, imagermode='csclean', psfmode='clark', threshold='10Jy', niter=10000, mode='mfs',
+			weighting='uniform', cell=['3arcmin', '3arcmin'], imsize=[1024, 1024], gridmode='widefield', wprojplanes=32, gain=0.2, stokes='I')
 
 	clean2fits(fixed_raw, fixed_raw)
