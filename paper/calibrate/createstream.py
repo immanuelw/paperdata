@@ -34,7 +34,7 @@ if __name__ == '__main__':
 	#timestream = '/data2/home/lingj/anaconda/pkgs/driftscan-master/examples/paper/pydriver/ts1/timestream_f/'
 	baseline1 = 0
 	baseline2 = 0
-	base = N.empty((528,2),dtype=int)
+	base = N.empty((528, 2), dtype=int)
 	polarization = N.array(['yy','xx','xy','yx'])
 	suffix = '.uvcRREXC'
 	i = 0
@@ -61,23 +61,17 @@ if __name__ == '__main__':
 	print 'Preparing the baselines'
 
 	# Fills the base array with the proper combinations of antenna pairs
-	while True:
-		# Starts a new first antenna once the second one hits max. e.g.
-		#	   1_31 is followed by 2_0
-		if baseline2 == 32:
-				baseline1 += 1
-				baseline2 = 0
-		# Ends the filling once all antenna pairs are filled
-		if baseline1 == 32:
-				break
-		# Starts the filling with an antenna with itself. e.g.
-		#	   0_0 or 3_3 etc
-		if baseline2 >= baseline1:
+	# Starts a new first antenna once the second one hits max. e.g.
+	#	   1_31 is followed by 2_0
+	for baseline1 in range(32):
+		for baseline2 in range(32):
+			# Starts the filling with an antenna with itself. e.g.
+			#	   0_0 or 3_3 etc
+			if baseline2 >= baseline1:
 				base[i][0] = baseline1
 				base[i][1] = baseline2
 				i += 1
-		baseline2 += 1
-
+		
 	'''----------------------------------------------
 			SECTION: Reads in data from files
 	--------------------------------------------'''
