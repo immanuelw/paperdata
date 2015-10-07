@@ -89,8 +89,7 @@ class PaperArray(telescope.SimplePolarisedTelescope):
 			for j in range(self.gridv):
 				pos[i, j, 0] = i * self.dish_width
 				pos[i, j, 1] = j * self.dish_width
-		
-		
+				
 		A =  pos.reshape((self.gridu * self.gridv, 2))
 		
 		for i in range(32):
