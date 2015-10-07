@@ -45,13 +45,13 @@ if __name__ == '__main__':
 	freq = 0
 
 	# Reads in the uv files
-	files = sorted(glob(raw_data + 'zen*' + suffix))
+	files = sorted(glob(''.join((raw_data, 'zen*', suffix)))
 	num_files = len(files)
 
 	# 3D arrays to contain the data and flag information
 	#size = (528, 203, 4, num_files*14)
 	#data_tab = N.empty(size, dtype=N.complex128)
-	basedata = N.empty((203, 4, num_files*14), dtype=N.complex128)
+	basedata = N.empty((203, 4, num_files * 14), dtype=N.complex128)
 	#flags = N.zeros(size, dtype='i8')
 
 	'''----------------------------------------------
@@ -119,7 +119,7 @@ if __name__ == '__main__':
 						for l, datum in enumerate(d):
 							#print datum.shape
 						#	spec_num = 909
-							basedata[freq][polnum][k*14 + spec_num] = datum
+							basedata[freq][polnum][k * 14 + spec_num] = datum
 							freq += 1
 						spec_num += 1
 							#print freq
@@ -128,12 +128,12 @@ if __name__ == '__main__':
 		#print spec_num
 		#print freq
 		# Writes the data to an intermediate hdf5 file grouped by baselines
-		temp_file = basepath + b + '.hdf5'
+		temp_file = ''.join((basepath, b,'.hdf5'))
 		#if not os.path.exists(timestream + 'baselines/'):
 		#	os.makedirs(timestream + 'baselines/')
 		with h5py.File(temp_file, 'w') as f:
 		# Creates the data set, gives values, and closes the file
-			daset = f.create_dataset('data',(203,4,num_files*14),dtype=N.complex128)
+			daset = f.create_dataset('data', (203, 4, num_files * 14), dtype=N.complex128)
 			daset[...] = basedata[...]
 			sys.stdout.flush()
 
