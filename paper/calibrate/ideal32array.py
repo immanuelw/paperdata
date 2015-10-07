@@ -6,7 +6,7 @@ from cora.util import coord
 from drift.core import telescope
 
 def beam_circular(angpos, zenith, diameter):
-	"""Beam pattern for a uniformly illuminated circular dish.
+	'''Beam pattern for a uniformly illuminated circular dish.
 	
 	Parameters
 	----------
@@ -21,7 +21,7 @@ def beam_circular(angpos, zenith, diameter):
 	-------
 	beam : np.ndarray
 		Beam pattern at each position in angpos.
-	"""
+	'''
 	
 	def jinc(x):
 		return 0.5 * (jn(0, x) + jn(2, x))

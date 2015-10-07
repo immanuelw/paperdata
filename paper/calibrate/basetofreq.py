@@ -23,35 +23,21 @@ import os
 from glob import glob
 import csv
 
-#print 'Initializing program'
-# Declares and initiates variables
-directory = 'psa904/'
-raw_data = os.path.join('/data4/raw_data/Sep2011/', directory)
-home = '/data4/paper/mmodes/'
-timestream = os.path.join(home, 'storage/psa32redun/', directory, 'RREXC_timestream/')
-basepath = os.path.join(home, 'storage/psa32redun/', directory, 'RREXC_baseline/')
-#freqpath = os.path.join(home, 'storage/psa32dualpol/', directory, 'RREC_timestreams/') #maybe later
-#timestream = '/data2/home/lingj/anaconda/pkgs/driftscan-master/examples/paper/pydriver/ts1/timestream_f/'
-baseline1 = 0
-baseline2 = 0
-base = N.empty((528, 2), dtype=int)
-polarization = N.array(['yy','xx','xy','yx'])
-suffix = '.uvcRREXC'
-i = 0
-first = False
-time = 0
-polnum = 0
-spec_num = 0
-freq = 0
-
-
-'''----------------------------------------------
-	SECTION: Writes Timestream
---------------------------------------------'''
-
 #SK SK SK
 
 if __name__ == '__main__': 
+	#print 'Initializing program'
+	# Declares and initiates variables
+	directory = 'psa904/'
+	raw_data = os.path.join('/data4/raw_data/Sep2011/', directory)
+	home = '/data4/paper/mmodes/'
+	timestream = os.path.join(home, 'storage/psa32redun/', directory, 'RREXC_timestream/')
+	basepath = os.path.join(home, 'storage/psa32redun/', directory, 'RREXC_baseline/')
+	#freqpath = os.path.join(home, 'storage/psa32dualpol/', directory, 'RREC_timestreams/') #maybe later
+	#timestream = '/data2/home/lingj/anaconda/pkgs/driftscan-master/examples/paper/pydriver/ts1/timestream_f/'
+	'''----------------------------------------------
+	SECTION: Writes Timestream
+	--------------------------------------------'''
 	#base1, base2, dist = N.loadtxt('sorted_baselines.csv', delimiter=',', unpack=True)
 	with open('UniqueBaselinesSorted.csv','r') as csvfile:
 		reader = csv.reader(csvfile, delimiter=',')

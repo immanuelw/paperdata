@@ -32,8 +32,6 @@ if __name__ == '__main__':
 	timestream = os.path.join(home, 'storage/psa32redun/', directory, 'RREXC_timestream/')
 	basepath = os.path.join(home, 'storage/psa32redun/', directory, 'RREXC_baseline/')
 	#timestream = '/data2/home/lingj/anaconda/pkgs/driftscan-master/examples/paper/pydriver/ts1/timestream_f/'
-	baseline1 = 0
-	baseline2 = 0
 	base = N.empty((528, 2), dtype=int)
 	polarization = N.array(['yy','xx','xy','yx'])
 	suffix = '.uvcRREXC'
