@@ -19,11 +19,13 @@ def five_round(num):
 	'''
 	rounds number to five significant figures
 
-	Args:
-		num (float): number
+	Parameters
+	----------
+	num (float): number
 
-	Returns:
-		float(5): number
+	Returns
+	-------
+	float(5): number
 	'''
 	return round(num, 5)
 
@@ -31,13 +33,15 @@ def jdpol2obsnum(jd, pol, djd):
 	'''
 	calculates unique observation number for observations
 
-	Args:
-		jd (float): julian date float
-		pol (str): polarization
-		length (float): length of obs in fraction of julian date
+	Parameters
+	----------
+	jd (float): julian date float
+	pol (str): polarization
+	length (float): length of obs in fraction of julian date
 
-	Returns:
-		int: a unique integer index for observation
+	Returns
+	-------
+	int: a unique integer index for observation
 	'''
 	dublinjd = jd - 2415020  #use Dublin Julian Date
 	obsint = int(dublinjd/djd)  #divide up by length of obs
@@ -51,13 +55,16 @@ def date_info(julian_date):
 	indicates julian day and set of data
 	calculates local sidereal hours for that julian date
 
-	Args:
-		julian_date (float): julian date
-	Returns:
-		tuple:
-			int: era of julian date
-			int: julian day
-			float(1): lst hours rounded to one decimal place
+	Parameters
+	----------
+	julian_date (float): julian date
+
+	Returns
+	-------
+	tuple:
+		int: era of julian date
+		int: julian day
+		float(1): lst hours rounded to one decimal place
 	'''
 	if julian_date < 2456100:
 		era = 32
@@ -77,12 +84,14 @@ def is_edge(prev_obs, next_obs):
 	'''
 	checks if observation is on the edge of each day's observation cycle
 
-	Args:
-		prev_obs (database object): previous observation
-		next_obs (database object): next observation
+	Parameters
+	----------
+	prev_obs (database object): previous observation
+	next_obs (database object): next observation
 
-	Returns:
-		bool: on the edge of a julian day
+	Returns
+	-------
+	bool: on the edge of a julian day
 	'''
 	if (prev_obs, next_obs) == (None, None):
 		is_edge = None
@@ -95,15 +104,17 @@ def calc_times(uv):
 	'''
 	takes in uv file and calculates time based information
 
-	Args:
-		uv (file object): uv file object
+	Parameters
+	----------
+	uv (file object): uv file object
 
-	Returns:
-		tuple:
-			float(5): time start
-			float(5): time end
-			float(5): delta time
-			float(5): length of uv file object
+	Returns
+	-------
+	tuple:
+		float(5): time start
+		float(5): time end
+		float(5): delta time
+		float(5): length of uv file object
 	'''
 	time_start = 0
 	time_end = 0
@@ -138,22 +149,24 @@ def calc_npz_data(dbi, filename):
 	'''
 	takes in npz files and pulls data about observation
 
-	Args:
-		dbi (object): database interface object
+	Parameters
+	----------
+	dbi (object): database interface object
 		filename (str): filename of npz file [Ex: zen.2456640.24456.xx.uvcRE.npz OR zen.2456243.24456.uvcRE.npz]
 
-	Returns:
-		tuple:
-			float(5): time start
-			float(5): time end
-			float(5): delta time
-			float(5): julian date
-			str: polarization
-			float(5): length
-			int: obsnum of uv file object
-		OR
-		tuple:
-			None for every field if no corresponding observation found
+	Returns
+	-------
+	tuple:
+		float(5): time start
+		float(5): time end
+		float(5): delta time
+		float(5): julian date
+		str: polarization
+		float(5): length
+		int: obsnum of uv file object
+	OR
+	tuple:
+		None for every field if no corresponding observation found
 	'''
 	filetype = filename.split('.')[-1]
 	if filetype not in ('npz',):
@@ -183,22 +196,24 @@ def calc_uv_data(host, full_path):
 	'''
 	takes in uv* files and pulls data about observation
 
-	Args:
-		host (str): host of system
-		full_path (str): full_path of uv* file
+	Parameters
+	----------
+	host (str): host of system
+	full_path (str): full_path of uv* file
 
-	Returns:
-		tuple:
-			float(5): time start
-			float(5): time end
-			float(5): delta time
-			float(5): julian date
-			str: polarization
-			float(5): length
-			int: obsnum of uv file object
-		OR
-		tuple:
-			None for every field if no corresponding observation found
+	Returns
+	-------
+	tuple:
+		float(5): time start
+		float(5): time end
+		float(5): delta time
+		float(5): julian date
+		str: polarization
+		float(5): length
+		int: obsnum of uv file object
+	OR
+	tuple:
+		None for every field if no corresponding observation found
 	'''
 	named_host = socket.gethostname()
 	if named_host == host:

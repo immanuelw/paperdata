@@ -18,11 +18,13 @@ def decimal_default(obj):
 	'''
 	fixes decimal issue with json module
 
-	Args:
-		obj (object)
+	Parameters
+	----------
+	obj (object)
 
-	Returns:
-		object: float version of decimal object
+	Returns
+	-------
+	object: float version of decimal object
 	'''
 	if isinstance(obj, decimal.Decimal):
 		return float(obj)
@@ -31,9 +33,10 @@ def rsync_copy(source, destination):
 	'''
 	uses rsync to copy files and make sure they have not changed by using md5 (c option)
 
-	Args:
-		source (str): source file path
-		destination (str): destination path
+	Parameters
+	----------
+	source (str): source file path
+	destination (str): destination path
 	'''
 	subprocess.check_output(['rsync', '-ac', source, destination])
 
@@ -46,12 +49,14 @@ def ssh_scope(host, username=None):
 	can use 'with'
 	SSH/SFTP connection to remote host
 
-	Args:
-		host (str): remote host
-		username (str): username --defaults to None
+	Parameters
+	----------
+	host (str): remote host
+	username (str): username --defaults to None
 
-	Returns:
-		object: ssh object to be used to run commands to remote host
+	Returns
+	-------
+	object: ssh object to be used to run commands to remote host
 	'''
 	ssh = paramiko.SSHClient()
 	ssh.load_system_host_keys()
@@ -81,8 +86,9 @@ class DictFix(object):
 		'''
 		convert object to dict
 
-		Returns:
-			dict: table attributes
+		Returns
+		-------
+		dict: table attributes
 		'''
 		try:
 			new_dict = {}
@@ -98,8 +104,9 @@ class DataBaseInterface(object):
 		Connect to the database and make a session creator
 		superclass of DBI for paperdata, paperdev, and ganglia databases
 
-		Args:
-			configfile (Optional[str]): configuration file --defaults to ~/paperdata.cfg
+		Parameters
+		----------
+		configfile (Optional[str]): configuration file --defaults to ~/paperdata.cfg
 		'''
 		if not configfile is None:
 			config = configparser.ConfigParser()
@@ -135,8 +142,9 @@ class DataBaseInterface(object):
 		creates a session scope
 		can use 'with'
 
-		Returns:
-			object: session scope to be used to access database with 'with'
+		Returns
+		-------
+		object: session scope to be used to access database with 'with'
 		'''
 		session = self.Session()
 		try:
@@ -152,8 +160,9 @@ class DataBaseInterface(object):
 		'''
 		drops the tables in the database.
 
-		Args:
-			Base (object): base object for database
+		Parameters
+		----------
+		Base (object): base object for database
 		'''
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
@@ -162,8 +171,9 @@ class DataBaseInterface(object):
 		'''
 		creates a table in the database.
 
-		Args:
-			Table (object): table object
+		Parameters
+		----------
+		Table (object): table object
 		'''
 		Table.__table__.create(bind=self.engine)
 
@@ -172,9 +182,10 @@ class DataBaseInterface(object):
 		adds entry to database and commits
 		does not add if duplicate found
 
-		Args:
-			s (object): session object
-			ENTRY (object): entry object
+		Parameters
+		----------
+		s (object): session object
+		ENTRY (object): entry object
 		'''
 		try:
 			s.add(ENTRY)
@@ -189,11 +200,12 @@ class DataBaseInterface(object):
 		'''
 		create a new entry.
 
-		Args:
-			mod_name (str): name of module to access models
-			s (object): session object
-			TABLE (str): table name
-			entry_dict (dict): dict of attributes for object
+		Parameters
+		----------
+		mod_name (str): name of module to access models
+		s (object): session object
+		TABLE (str): table name
+		entry_dict (dict): dict of attributes for object
 		'''
 		table = getattr(sys.modules[mod_name], TABLE)
 		ENTRY = table(**entry_dict)
@@ -207,14 +219,16 @@ class DataBaseInterface(object):
 		Errors if there are more than one of the same object in the db. This is bad and should
 		never happen
 
-		Args:
-			mod_name (str): name of module to access models
-			s (object): session object
-			TABLE (str): table name
-			unique_value (int/float/str): primary key value of row
+		Parameters
+		----------
+		mod_name (str): name of module to access models
+		s (object): session object
+		TABLE (str): table name
+		unique_value (int/float/str): primary key value of row
 
-		Returns:
-			object: table object
+		Returns
+		-------
+		object: table object
 		'''
 		table = getattr(sys.modules[mod_name], TABLE)
 		try:
@@ -228,11 +242,12 @@ class DataBaseInterface(object):
 		'''
 		sets the value of any entry
 
-		Args:
-			s (object): session object
-			ENTRY (object): entry object
-			field (str): field to be changed
-			new_value (int/float/str): value to change field in entry to
+		Parameters
+		----------
+		s (object): session object
+		ENTRY (object): entry object
+		field (str): field to be changed
+		new_value (int/float/str): value to change field in entry to
 		'''
 		setattr(ENTRY, field, new_value)
 		self.add_entry(s, ENTRY)

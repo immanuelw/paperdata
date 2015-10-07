@@ -19,11 +19,13 @@ def two_round(num):
 	'''
 	rounds value to two decimal places
 
-	Args:
-		num (int/float/string): number
+	Parameters
+	----------
+	num (int/float/string): number
 
-	Returns:
-		float(2): number
+	Returns
+	-------
+	float(2): number
 	'''
 	return round(float(num), 2)
 
@@ -31,13 +33,15 @@ def filesystem(ssh, host, path):
 	'''
 	generates table information for filesystem table
 
-	Args:
-		ssh (object): ssh object
-		host (str): host of filesystem
-		path (str): path to search
+	Parameters
+	----------
+	ssh (object): ssh object
+	host (str): host of filesystem
+	path (str): path to search
 
-	Returns:
-		dict: filesystem information
+	Returns
+	-------
+	dict: filesystem information
 	'''
 	if ssh is None:
 		fi = psutil.disk_usage(path)
@@ -69,12 +73,14 @@ def iostat(ssh, host):
 	'''
 	generates table information for iostat table
 
-	Args:
-		ssh (object): ssh object
-		host (str): host of filesystem
+	Parameters
+	----------
+	ssh (object): ssh object
+	host (str): host of filesystem
 
-	Returns:
-		dict: iostat information
+	Returns
+	-------
+	dict: iostat information
 	'''
 	timestamp = int(time.time())
 	iostat_data = {}
@@ -133,12 +139,14 @@ def ram_free(ssh, host):
 	'''
 	generates table information for ram table
 
-	Args:
-		ssh (object): ssh object
-		host (str): host of filesystem
+	Parameters
+	----------
+	ssh (object): ssh object
+	host (str): host of filesystem
 
-	Returns:
-		dict: ram information
+	Returns
+	-------
+	dict: ram information
 	'''
 	#Calculates ram usage on folio
 	if ssh is None:
@@ -201,12 +209,14 @@ def cpu_perc(ssh, host):
 	'''
 	generates table information for cpu table
 
-	Args:
-		ssh (object): ssh object
-		host (str): host of filesystem
+	Parameters
+	----------
+	ssh (object): ssh object
+	host (str): host of filesystem
 
-	Returns:
-		dict: cpu usage information
+	Returns
+	-------
+	dict: cpu usage information
 	'''
 	#Calculates cpu usage on folio
 	timestamp = int(time.time())
@@ -259,13 +269,14 @@ def cpu_perc(ssh, host):
 
 	return cpu_data
 
-def add_data(ssh, host):
+def add_data(host):
 	'''
 	generates table information for all tables
 
-	Args:
-		ssh (object): ssh object
-		host (str): host of filesystem
+	Parameters
+	----------
+	ssh (object): ssh object
+	host (str): host of filesystem
 	'''
 	with ppdata.ssh_scope(host) as ssh:
 		dbi = pyg.DataBaseInterface()
@@ -293,6 +304,4 @@ if __name__ == '__main__':
 	hosts = ('folio', 'node01', 'node02', 'node03', 'node04', 'node05', 'node06', 'node07', 'node08', 'node09', 'node10')
 	named_host = socket.gethostname()
 	for host in hosts:
-		if host == named_host:
-			add_data(None, host)
 		add_data(host)

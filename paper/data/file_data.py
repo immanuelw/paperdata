@@ -18,11 +18,13 @@ def get_size(start_path):
 	'''
 	output byte size of directory or file
 
-	Args:
-		start_path (str): path of directory or file
+	Parameters
+	----------
+	start_path (str): path of directory or file
 
-	Returns:
-		int: amount of bytes
+	Returns
+	-------
+	int: amount of bytes
 	'''
 	total_size = 0
 	for dirpath, dirnames, filenames in os.walk(start_path):
@@ -36,11 +38,13 @@ def sizeof_fmt(num):
 	'''
 	converts bytes to MB
 
-	Args:
-		num (int): amount of bytes
+	Parameters
+	----------
+	num (int): amount of bytes
 
-	Returns:
-		float: amount of MB to 1 decimal place
+	Returns
+	-------
+	float: amount of MB to 1 decimal place
 	'''
 	for byte_size in ('KB', 'MB'):
 		num /= 1024.0
@@ -52,13 +56,15 @@ def calc_size(host, path, filename):
 	calculates size of directory or file on any host
 	logins into host if necessary
 
-	Args:
-		host (str): host of file
+	Parameters
+	----------
+	host (str): host of file
 		path (str): path of file
 		filename (str): unique name of directory or file
 
-	Returns:
-		float: size of directory or file in MB
+	Returns
+	-------
+	float: size of directory or file in MB
 	'''
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
@@ -76,11 +82,13 @@ def get_md5sum(fname):
 	'''
 	calculate the md5 checksum of a file whose filename entry is fname.
 
-	Args:
-		fname (str): path of directory or file
+	Parameters
+	----------
+	fname (str): path of directory or file
 
-	Returns:
-		str: 32-bit hex integer md5 checksum
+	Returns
+	-------
+	str: 32-bit hex integer md5 checksum
 	'''
 	fname = fname.split(':')[-1]
 	BLOCKSIZE = 65536
@@ -102,13 +110,15 @@ def calc_md5sum(host, path, filename):
 	calculates md5 checksum of directory or file on any host
 	logins into host if necessary
 
-	Args:
-		host (str): host of file
+	Parameters
+	----------
+	host (str): host of file
 		path (str): path of file
 		filename (str): unique name of directory or file
 
-	Returns:
-		str: md5 checksum
+	Returns
+	-------
+	str: md5 checksum
 	'''
 	named_host = socket.gethostname()
 	full_path = os.path.join(path, filename)
@@ -131,14 +141,16 @@ def file_names(full_path):
 	'''
 	separates full path of directory or file into parts
 
-	Args:
-		full_path (str): full path of directory or file
+	Parameters
+	----------
+	full_path (str): full path of directory or file
 
-	Returns:
-		tuple:
-			str: partial path,
-			str: directory/file name
-			str: extension/filetype
+	Returns
+	-------
+	tuple:
+		str: partial path,
+		str: directory/file name
+		str: extension/filetype
 	'''
 	path = os.path.dirname(full_path)
 	filename = os.path.basename(full_path)

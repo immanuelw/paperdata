@@ -134,8 +134,9 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		'''
 		Unique Interface for the paperdata database
 
-		Args:
-			configfile (str): paperdata database configuration file
+		Parameters
+		----------
+		configfile (str): paperdata database configuration file
 		'''
 		super(DataBaseInterface, self).__init__(configfile=configfile)
 
@@ -155,8 +156,9 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		'''
 		drops tables in the database
 
-		Args:
-			object: Base database object
+		Parameters
+		----------
+		Base (object): Base database object
 		'''
 		super(DataBaseInterface, self).drop_db(Base)
 
@@ -164,10 +166,11 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		'''
 		create a new entry.
 
-		Args:
-			s (object): session object
-			TABLE (str): table name
-			entry_dict (dict): dict of attributes for object
+		Parameters
+		----------
+		s (object): session object
+		TABLE (str): table name
+		entry_dict (dict): dict of attributes for object
 		'''
 		super(DataBaseInterface, self).add_entry_dict(__name__, s, TABLE, entry_dict)
 
@@ -177,12 +180,14 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		Errors if there are more than one of the same object in the db. This is bad and should
 		never happen
 
-		Args:
-			s (object): session object
-			TABLE (str): table name
-			unique_value (int/float/str): primary key value of row
+		Parameters
+		----------
+		s (object): session object
+		TABLE (str): table name
+		unique_value (int/float/str): primary key value of row
 
-		Returns:
-			object: table object
+		Returns
+		-------
+		object: table object
 		'''
 		super(DataBaseInterface, self).get_entry(__name__, s, TABLE, unique_value)
