@@ -27,12 +27,14 @@ def enough_space(required_space, space_path):
 	'''
 	checks path for enough space
 
-	Args:
-		required_space (int): amount of space needed in bytes
-		space_path (str): path to check for spacce
+	Parameters
+	----------
+	required_space (int): amount of space needed in bytes
+	space_path (str): path to check for spacce
 
-	Returns:
-		bool: is there enough space
+	Returns
+	-------
+	bool: is there enough space
 	'''
 	free_space = psutil.disk_usage(space_path).free
 
@@ -45,8 +47,9 @@ def email_space(table):
 	'''
 	emails people if there is not enough space on folio
 
-	Args:
-		table (str): table name
+	Parameters
+	----------
+	table (str): table name
 	'''
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
@@ -72,13 +75,15 @@ def null_check(dbi, input_host, input_paths):
 	'''
 	checks if file(s) is(are) in database
 
-	Args:
-		dbi (object): database interface object
-		input_host (str): host of files
-		input_paths (list): uv* file paths
+	Parameters
+	----------
+	dbi (object): database interface object
+	input_host (str): host of files
+	input_paths (list): uv* file paths
 
-	Returns:
-		bool: are there any files not in database -- True if there are None
+	Returns
+	-------
+	bool: are there any files not in database -- True if there are None
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'File')
@@ -98,13 +103,14 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 	'''
 	updates table for moved file
 
-	Args:
-		s (object): session object
-		dbi (object): database interface object
-		input_host (str): user host
-		source (str): source file
-		output_host (str): output host
-		output_dir (str): output directory
+	Parameters
+	----------
+	s (object): session object
+	dbi (object): database interface object
+	input_host (str): user host
+	source (str): source file
+	output_host (str): output host
+	output_dir (str): output directory
 	'''
 	full_path = ''.join((input_host, ':', source))
 	timestamp = int(time.time())
@@ -125,12 +131,13 @@ def move_files(dbi, input_host=None, input_paths=None, output_host=None, output_
 	'''
 	move files
 
-	Args:
-		dbi (object): database interface object
-		input_host (str): file host --defaults to None
-		input_paths (list): file paths --defaults to None
-		output_host (str): output host --defaults to None
-		output_dir (str): output directory --defaults to None
+	Parameters
+	----------
+	dbi (object): database interface object
+	input_host (str): file host --defaults to None
+	input_paths (list): file paths --defaults to None
+	output_host (str): output host --defaults to None
+	output_dir (str): output directory --defaults to None
 	'''
 	named_host = socket.gethostname()
 	input_host = raw_input('Source directory host: ') if input_host is None else input_host

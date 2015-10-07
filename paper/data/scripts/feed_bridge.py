@@ -28,13 +28,14 @@ def set_feed(s, dbi, source, output_host, output_dir, is_moved=True):
 	'''
 	updates table for feed file
 
-	Args:
-		s (object): session object
-		dbi (object): database interface object
-		source (str): source file
-		output_host (str): output host
-		output_dir (str): output directory
-		is_moved (bool): checks whether to move to paperdistiller --defaults to False
+	Parameters
+	----------
+	s (object): session object
+	dbi (object): database interface object
+	source (str): source file
+	output_host (str): output host
+	output_dir (str): output directory
+	is_moved (bool): checks whether to move to paperdistiller --defaults to False
 	'''
 	FEED = dbi.get_entry(s, 'Feed', source)
 	dbi.set_entry(s, FEED, 'host', output_host)
@@ -47,13 +48,14 @@ def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
 	'''
 	moves files and adds to feed directory and table
 
-	Args:
-		dbi (object): database interface object
-		input_host (str): file host
-		input_paths (list): file paths
-		source (str): source file
-		output_host (str): output host
-		output_dir (str): output directory
+	Parameters
+	----------
+	dbi (object): database interface object
+	input_host (str): file host
+	input_paths (list): file paths
+	source (str): source file
+	output_host (str): output host
+	output_dir (str): output directory
 	'''
 	#different from move_files, adds to feed
 	named_host = socket.gethostname()
@@ -81,8 +83,9 @@ def count_days(dbi):
 	'''
 	checks amount of days in feed table and sets to move if reach requirement
 
-	Args:
-		dbi (object): database interface object
+	Parameters
+	----------
+	dbi (object): database interface object
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
@@ -102,14 +105,16 @@ def find_data(dbi):
 	'''
 	finds data to move from feed table
 
-	Args:
-		dbi (object): database interface object
+	Parameters
+	----------
+	dbi (object): database interface object
 
-	Returns:
-		tuple:
-			list: file paths to move
-			str: file host
-			list: filenames to be moved
+	Returns
+	-------
+	tuple:
+		list: file paths to move
+		str: file host
+		list: filenames to be moved
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
@@ -128,8 +133,9 @@ def email_paperfeed(files):
 	'''
 	emails people that files are being moved to feed
 
-	Args:
-		files (list): files being moved
+	Parameters
+	----------
+	files (list): files being moved
 	'''
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
@@ -158,8 +164,9 @@ def feed_bridge(dbi):
 	bridges feed and paperdistiller
 	moves files and pulls relevant data to add to paperdistiller from feed
 
-	Args:
-		dbi (object): database interface object
+	Parameters
+	----------
+	dbi (object): database interface object
 	'''
 	#Minimum amount of space to move a day ~3.1TiB
 	required_space = 1112373311360

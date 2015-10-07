@@ -21,9 +21,10 @@ def json_data(dbo, dump_objects):
 	'''
 	dumps list of objects into a json file
 
-	Args:
-		dbo (str): filename
-		dump_objects (list): database objects query
+	Parameters
+	----------
+	dbo (str): filename
+	dump_objects (list): database objects query
 	'''
 	with open(dbo, 'w') as f:
 		data = [ser_data.to_dict() for ser_data in dump_objects.all()]
@@ -35,8 +36,9 @@ def paperbackup(dbi):
 	'''
 	backups database by loading into json files, named by timestamp
 
-	Args:
-		dbi (object): database interface object
+	Parameters
+	----------
+	dbi (object): database interface object
 	'''
 	timestamp = int(time.time())
 	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(timestamp))

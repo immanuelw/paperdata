@@ -21,11 +21,13 @@ def to_dict(ser_data):
 	'''
 	creates a dict of database object's attributes
 
-	Args:
-		ser_data (object): database object
+	Parameters
+	----------
+	ser_data (object): database object
 
-	Returns:
-		dict: database object's attributes
+	Returns
+	-------
+	dict: database object's attributes
 	'''
 	json_dict = ser_data.__dict__
 	try:
@@ -39,9 +41,10 @@ def json_data(dbo, dump_objects):
 	'''
 	dumps list of objects into a json file
 
-	Args:
-		dbo (str): filename
-		dump_objects (list): database objects query
+	Parameters
+	----------
+	dbo (str): filename
+	dump_objects (list): database objects query
 	'''
 	with open(dbo, 'w') as f:
 		data = [to_dict(ser_data) for ser_data in dump_objects.all()]
@@ -53,8 +56,9 @@ def paperbackup(dbi):
 	'''
 	backups database by loading into json files, named by timestamp
 
-	Args:
-		dbi (object): database interface object
+	Parameters
+	----------
+	dbi (object): database interface object
 	'''
 	timestamp = int(time.time())
 	backup_dir = os.path.join('/data4/paper/paperdistiller_backup', str(timestamp))
