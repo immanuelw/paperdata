@@ -205,7 +205,7 @@ def add_files_to_db(dbi, input_host, input_paths):
 	Parameters
 	----------
 	dbi (object): database interface object
-	input_host (str): host of files, list of uv* file paths
+	input_host (str): host of files
 	input_paths (list): paths of uv* files
 	'''
 	with dbi.session_scope() as s:
