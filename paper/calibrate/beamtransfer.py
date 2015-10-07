@@ -197,32 +197,29 @@ class BeamTransfer(object):
 	@property
 	def _picklefile(self):
 		# The filename for the pickled telescope
-		return self.directory + '/telescopeobject.pickle'
+		return os.path.join(self.directory, '/telescopeobject.pickle')
 
 	def _mdir(self, mi):
 		# Pattern to form the `m` ordered file.
-		pat = self.directory + '/beam_m/' + util.natpattern(self.telescope.mmax)
+		pat = os.path.join(self.directory, '/beam_m/', util.natpattern(self.telescope.mmax))
 		return pat % abs(mi)
 
 	def _mfile(self, mi):
 		# Pattern to form the `m` ordered file.
-		return self._mdir(mi) + '/beam.hdf5'
+		return os.path.join(self._mdir(mi), '/beam.hdf5')
 
 	def _fdir(self, fi):
 		# Pattern to form the `freq` ordered file.
-		pat = self.directory + '/beam_f/' + util.natpattern(self.telescope.nfreq)
+		pat = os.path.join(self.directory, '/beam_f/', util.natpattern(self.telescope.nfreq))
 		return pat % fi
 
 	def _ffile(self, fi):
 		# Pattern to form the `freq` ordered file.
-		return self._fdir(fi) + '/beam.hdf5'
+		return os.path.join(self._fdir(fi), '/beam.hdf5')
 
 	def _svdfile(self, mi):
 		# Pattern to form the `m` ordered file.
-
-		# Pattern to form the `m` ordered file.
-		pat = self.directory + '/beam_m/' + util.natpattern(self.telescope.mmax) + '/svd.hdf5'
-
+		pat = os.path.join(self.directory, '/beam_m/', util.natpattern(self.telescope.mmax), '/svd.hdf5')
 		return pat % mi
 
 	#===================================================
