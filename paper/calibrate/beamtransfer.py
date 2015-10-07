@@ -641,7 +641,7 @@ class BeamTransfer(object):
 
 	def _generate_mfiles(self, regen=False):
 
-		if os.path.exists(self.directory + '/beam_m/COMPLETED') and not regen:
+		if os.path.exists(os.path.join(self.directory, '/beam_m/COMPLETED')) and not regen:
 			if mpiutil.rank0:
 				print '******* m-files already generated ********'
 			return
@@ -752,7 +752,7 @@ class BeamTransfer(object):
 		if mpiutil.rank0:
 
 			# Make file marker that the m's have been correctly generated:
-			open(self.directory + '/beam_m/COMPLETED', 'a').close()
+			open(os.path.join(self.directory, '/beam_m/COMPLETED'), 'a').close()
 
 			# Print out timing
 			print '=== MPI transpose took {t_time} s ==='.format(t_time=(et - st))
@@ -891,7 +891,7 @@ class BeamTransfer(object):
 
 		if mpiutil.rank0:
 
-			with h5py.File(self.directory + '/svdspectrum.hdf5', 'w') as f:
+			with h5py.File(os.path.join(self.directory, '/svdspectrum.hdf5'), 'w') as f:
 
 				f.create_dataset('singularvalues', data=svdspectrum)
 
@@ -910,7 +910,7 @@ class BeamTransfer(object):
 			The full set of singular values across all m-modes.
 		'''
 
-		with h5py.File(self.directory + '/svdspectrum.hdf5', 'r') as f:
+		with h5py.File(os.path.join(self.directory, '/svdspectrum.hdf5'), 'r') as f:
 			svd = f['singularvalues'][:]
 		
 		return svd
