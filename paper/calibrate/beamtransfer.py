@@ -286,7 +286,7 @@ class BeamTransfer(object):
 
 		Returns
 		-------
-		beam : np.ndarray (nfreq, 2, npairs, npol_sky, lmax+1)
+		beam : np.ndarray (nfreq, 2, npairs, npol_sky, lmax + 1)
 		'''
 
 		return self._load_beam_m(mi, fi=fi)
@@ -375,7 +375,7 @@ class BeamTransfer(object):
 
 		Returns
 		-------
-		invbeam : np.ndarray (nfreq, npol_sky, lmax+1, 2, npairs)
+		invbeam : np.ndarray (nfreq, npol_sky, lmax + 1, 2, npairs)
 		'''
 
 		beam = self.beam_m(mi)
@@ -422,7 +422,7 @@ class BeamTransfer(object):
 
 		Returns
 		-------
-		beam : np.ndarray (nfreq, svd_len, npol_sky, lmax+1)
+		beam : np.ndarray (nfreq, svd_len, npol_sky, lmax + 1)
 		'''
 		
 		with h5py.File(self._svdfile(mi), 'r') as svdfile:
@@ -453,7 +453,7 @@ class BeamTransfer(object):
 
 		Returns
 		-------
-		beam : np.ndarray (nfreq, svd_len, npol_sky, lmax+1)
+		beam : np.ndarray (nfreq, svd_len, npol_sky, lmax + 1)
 		'''
 		
 		with h5py.File(self._svdfile(mi), 'r') as svdfile:
@@ -911,7 +911,7 @@ class BeamTransfer(object):
 
 		Returns
 		-------
-		svarray : np.ndarray[mmax+1, nfreq, svd_len]
+		svarray : np.ndarray[mmax + 1, nfreq, svd_len]
 			The full set of singular values across all m-modes.
 		'''
 
@@ -941,7 +941,7 @@ class BeamTransfer(object):
 		mi : integer
 			Mode index to fetch for.
 		vec : np.ndarray
-			Sky data vector packed as [nfreq, npol, lmax+1]
+			Sky data vector packed as [nfreq, npol, lmax + 1]
 
 		Returns
 		-------
@@ -1205,7 +1205,7 @@ class BeamTransfer(object):
 		mi : integer
 			Mode index to fetch for.
 		vec : np.ndarray
-			Sky data vector packed as [nfreq, lmax+1]
+			Sky data vector packed as [nfreq, lmax + 1]
 		temponly: boolean
 			Force projection of temperature part only (default: False)
 
@@ -1244,7 +1244,7 @@ class BeamTransfer(object):
 		mi : integer
 			Mode index to fetch for.
 		vec : np.ndarray
-			Sky data vector packed as [nfreq, lmax+1]
+			Sky data vector packed as [nfreq, lmax + 1]
 		temponly: boolean
 			Force projection of temperature part only (default: False)
 		conj: boolean
@@ -1503,7 +1503,7 @@ class BeamTransferFullSVD(BeamTransfer):
 	@property
 	def svd_len(self):
 		'''The size of the SVD output matrices.'''
-		return min((self.telescope.lmax+1) * self.telescope.num_pol_sky, self.ntel)
+		return min((self.telescope.lmax + 1) * self.telescope.num_pol_sky, self.ntel)
 
 
 
