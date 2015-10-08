@@ -181,7 +181,7 @@ def paperbridge(dbi, data_dbi, auto=False):
 	----------
 	dbi | object: distiller database interface object
 	data_dbi | object: data database interface object
-	auto (bool): track whether to wait -- defaults to False
+	auto | bool: track whether to wait -- defaults to False
 	'''
 	#Calculate amount of space needed to move a day ~1.1TB
 	required_space = 1112661213184

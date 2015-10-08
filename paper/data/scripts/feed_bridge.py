@@ -35,7 +35,7 @@ def set_feed(s, dbi, source, output_host, output_dir, is_moved=True):
 	source | str: source file
 	output_host | str: output host
 	output_dir | str: output directory
-	is_moved (bool): checks whether to move to paperdistiller --defaults to False
+	is_moved | bool: checks whether to move to paperdistiller --defaults to False
 	'''
 	FEED = dbi.get_entry(s, 'Feed', source)
 	dbi.set_entry(s, FEED, 'host', output_host)
