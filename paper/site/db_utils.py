@@ -72,7 +72,7 @@ def get_table_names(database):
 
 	Returns
 	-------
-	list: table names
+	list[str]: table names
 	'''
 	insp = inspector(database)
 	table_names = insp.get_table_names()
@@ -90,7 +90,7 @@ def get_column_names(database, table):
 
 	Returns
 	-------
-	list: column names
+	list[str]: column names
 	'''
 	insp = inspector(database)
 	#it's a list of dicts
@@ -147,11 +147,11 @@ def sort_clause(table, sort_tuples):
 	Parameters
 	----------
 	table | str: table name
-	sort_tuples | list: tuples indicating field to sort and sort order
+	sort_tuples | list[tuple[str]]: tuples indicating field to sort and sort order
 
 	Returns
 	-------
-	list: clauses
+	list[object]: clauses
 	'''
 	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in sort_tuples]
 
@@ -164,11 +164,11 @@ def group_clause(table, group_tuples):
 	Parameters
 	----------
 	table | str: table name
-	group_tuples | list: tuples indicating fields to group
+	group_tuples | list[tuple[str]]: tuples indicating fields to group
 
 	Returns
 	-------
-	list: clauses
+	list[object]: clauses
 	'''
 	clause_list = [getattr(table, field_name) for field_name in field_group_tuples]
 
@@ -182,13 +182,13 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples):
 	----------
 	s | object: session object
 	table | str: table name
-	field_tuples | list: tuples of field names, equivalency values, and values to limit query
-	sort_tuples | list: tuples indicating field to sort and sort order
-	group_tuples | list: tuples indicating fields to group
+	field_tuples | list[tuple[str]]: tuples of field names, equivalency values, and values to limit query
+	sort_tuples | list[tuple[str]]: tuples indicating field to sort and sort order
+	group_tuples | list[tuple[str]]: tuples indicating fields to group
 
 	Returns
 	-------
-	list: objects corresponding to filtered query made
+	list[object]: objects corresponding to filtered query made
 	'''
 	results = s.query(table)
 	if field_tuples is not None:
@@ -224,7 +224,7 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 
 	Returns
 	-------
-	list: objects corresponding to filtered query
+	list[object]: objects corresponding to filtered query
 	'''
 	if data_source is not None:
 		dbi, module = get_dbi(data_source.database)

@@ -7,7 +7,7 @@ def get_set_strings():
 
 	Returns
 	-------
-	list: set strings for polarization, era_type, host, and filetype
+	list[str]: set strings for polarization, era_type, host, and filetype
 	'''
 	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
 	era_type_strs = ('all',)
