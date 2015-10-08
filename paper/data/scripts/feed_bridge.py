@@ -7,10 +7,10 @@ import os
 import time
 import shutil
 import socket
-import subprocess
 import smtplib
 import paper as ppdata
 from paper.data import dbi as pdbi
+import distill_files
 import move_files
 from sqlalchemy import func
 from sqlalchemy.sql import label
@@ -176,11 +176,10 @@ def feed_bridge(dbi):
 		move_feed_files(dbi, input_host, input_paths, output_host, output_dir)
 		#EMAIL PEOPLE THAT DATA IS BEING MOVED AND LOADED
 		email_paperfeed(input_paths)
-		#ADD_OBSERVATIONS.PY ON LIST OF DATA IN NEW LOCATION
+		#ADD FILES TO PAPERDISTILLER ON LIST OF DATA IN NEW LOCATION
 		out_dir = os.path.join(output_dir, 'zen.*.uv')
-		add_obs = 'python /usr/global/paper/CanopyVirtualEnvs/PAPER_Distiller/bin/add_observations.py {out_dir}'.format(out_dir=out_dir)
-		#shell = True because wildcards can't be done without it
-		subprocess.call(add_obs, shell=True)
+		obs_paths = glob.glob(out_dir)
+		distill_files.add_files_to_distill(obs_paths)
 	else:
 		table = 'Feed'
 		move_files.email_space(table)

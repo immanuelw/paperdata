@@ -112,6 +112,9 @@ def add_files_to_distill(input_paths):
 	print('done')
 
 if __name__ == '__main__':
-	path_str = sys.argv[1]
+	if len(sys.argv) == 2:
+		path_str = sys.argv[1]
+	else:
+		path_str = raw_input('Input [wildcard included] paths for observations to add: ')
 	input_paths = glob.glob(path_str)
 	add_files_to_distill(input_paths)
