@@ -22,8 +22,8 @@ def get_jd_from_datetime(start_time=None, end_time=None):
 
 	Parameters
 	----------
-	start_time (object/str): start time --defaults to None
-	end_time (object/str): end time --defaults to None
+	start_time | object/str: start time --defaults to None
+	end_time | object/str: end time --defaults to None
 
 	Returns
 	-------

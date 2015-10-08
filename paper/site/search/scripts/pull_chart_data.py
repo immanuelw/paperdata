@@ -46,8 +46,6 @@ def log_query_time(var_name):
 	'''
 	write_to_log('{var_name} query ran in {profile_time} seconds'.format(var_name=var_name, profile_time=profile())
 
-	return None
-
 def update():
 	'''
 	pull data and update database
