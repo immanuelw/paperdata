@@ -82,16 +82,17 @@ def add_files_to_distill(input_paths):
 		for pol in pols:
 			#filter off all pols but the one I'm currently working on
 			files = sorted([input_path for input_path in nightfiles if file2pol(input_path) == pol])
-			for i, input_path in enumerate(files):
-				try:
-					dbi.get_obs(uv_data.jdpol2obsnum(float(file2jd(input_path)), file2pol(input_path), djd))
-					print(input_path, 'found in db, skipping')
-				except:
-					obsinfo.append({'julian_date': float(file2jd(input_path)),
-									'pol': file2pol(input_path),
-									'host': socket.gethostname(),
-									'filename': input_path,
-									'length': djd}) #note the db likes jd for all time units
+			with dbi.session_scope() as s:
+				for i, input_path in enumerate(files):
+					try:
+						dbi.get_entry(ddbi, s, 'observation', uv_data.jdpol2obsnum(float(file2jd(input_path)), file2pol(input_path), djd))
+						print(input_path, 'found in db, skipping')
+					except:
+						obsinfo.append({'julian_date': float(file2jd(input_path)),
+										'pol': file2pol(input_path),
+										'host': socket.gethostname(),
+										'filename': input_path,
+										'length': djd}) #note the db likes jd for all time units
 
 		for i, obs in enumerate(obsinfo):
 			if i != 0:
@@ -104,7 +105,10 @@ def add_files_to_distill(input_paths):
 		print('adding {obs_len} observations to the still db'.format(obs_len=len(obsinfo)))
 
 		try:
-			dbi.add_observations(obsinfo)
+			with dbi.session_scope() as s:
+				for info_dict in obs_info:
+					dbi.add_entry_dict(ddbi, s, 'observation', info_dict)
+				#dbi.add_observations(obsinfo)
 		except:
 			print('problem!')
 	print('done')
