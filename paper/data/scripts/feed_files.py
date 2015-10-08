@@ -52,7 +52,7 @@ def gen_feed_data(host, full_path):
 				'timestamp': timestamp}
 
 	log_data = {'action': 'add by feed',
-				'table': 'feed',
+				'table': 'Feed',
 				'identifier': full_path,
 				'timestamp': timestamp}
 

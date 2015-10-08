@@ -120,7 +120,7 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 	dbi.set_entry(s, FILE, 'timestamp', timestamp)
 	identifier = getattr(FILE, 'full_path')
 	log_data = {'action': 'move',
-				'table': 'file',
+				'table': 'File',
 				'identifier': identifier,
 				'timestamp': timestamp}
 	dbi.add_entry_dict(s, 'Log', log_data)

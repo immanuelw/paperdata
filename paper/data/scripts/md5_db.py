@@ -24,13 +24,13 @@ def md5_db(data_dbi):
 		table = getattr(pdbi, 'File')
 		FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
 		for FILE in FILEs:
-			md5 = file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
+			full_path = getattr(FILE, 'full_path')
 			timestamp = int(time.time())
-			data_dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path'), getattr(FILE, 'filename'))
+			data_dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), full_path))
 			data_dbi.set_entry(s, FILE, 'timestamp', timestamp)
 			log_data = {'action': 'update md5sum',
-						'table': 'file',
-						'obsnum': getattr(FILE, 'full_path'),
+						'table': 'File',
+						'identifier': full_path,
 						'timestamp': timestamp}
 
 			data_dbi.add_entry(s, 'log', log_data)
@@ -49,8 +49,7 @@ def md5_distiller(dbi):
 	table = getattr(ddbi, 'File')
 	FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
 	for FILE in FILEs:
-		full_path = getattr(FILE, 'path')
-		setattr(FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), os.path.dirname(full_path), os.path.basename(full_path)))
+		setattr(FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path')))
 		s.add(FILE)
 		s.commit()
 	s.close()
