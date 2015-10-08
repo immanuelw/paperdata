@@ -148,8 +148,7 @@ def file_names(full_path):
 		str: directory/file name
 		str: extension/filetype
 	'''
-	path = os.path.dirname(full_path)
-	filename = os.path.basename(full_path)
+	path, filename = os.path.split(full_path)
 	filetype = filename.split('.')[-1]
 
 	return path, filename, filetype
