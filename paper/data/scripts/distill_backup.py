@@ -65,17 +65,17 @@ def paperbackup(dbi):
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 
-	tables = ('observation', 'file', 'log')
-	table_sorts = {'observation': {'first': 'julian_date', 'second': 'pol'},
-					'file': {'first': 'obsnum', 'second': 'filename'},
-					'log': {'first': 'obsnum', 'second': 'timestamp'}}
+	tables = ('Observation', 'File', 'Log')
+	table_sorts = {'Observation': {'first': 'julian_date', 'second': 'pol'},
+					'File': {'first': 'obsnum', 'second': 'filename'},
+					'Log': {'first': 'obsnum', 'second': 'timestamp'}}
 	s = dbi.Session()
 	print(timestamp)
 	for table in tables:
-		db_file = '{table}_{timestamp}.json'.format(table=table, timestamp=timestamp)
+		db_file = '{table}_{timestamp}.json'.format(table=table.lower(), timestamp=timestamp)
 		dbo = os.path.join(backup_dir, db_file)
 		print(db_file)
-			DB_table = getattr(ddbi, table.title())
+			DB_table = getattr(ddbi, table)
 			DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
 											getattr(DB_table, table_sorts[table]['second']).asc())
 		json_data(dbo, DB_dump)
