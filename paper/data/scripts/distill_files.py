@@ -50,7 +50,7 @@ def add_files_to_distill(input_paths):
 
 	Parameters
 	----------
-	zenuv | str: full path of file
+	full_path | str: full path of file
 	'''
 	#connect to the database
 	dbi = ddbi.DataBaseInterface()
