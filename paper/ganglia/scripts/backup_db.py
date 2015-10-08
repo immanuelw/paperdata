@@ -60,7 +60,7 @@ def paperbackup(dbi):
 	with dbi.session_scope as s:
 		print(timestamp)
 		for table in tables:
-			db_file = '{table}_{timestamp}.json'.format(table=table, timestamp=timestamp)
+			db_file = '{table}_{timestamp}.json'.format(table=table.lower(), timestamp=timestamp)
 			dbo = os.path.join(backup_dir, db_file)
 			print(db_file)
 
