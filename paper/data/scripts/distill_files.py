@@ -94,7 +94,6 @@ def add_files_to_distill(input_paths):
 									'length': djd}) #note the db likes jd for all time units
 
 		for i, obs in enumerate(obsinfo):
-			filename = obs['filename']
 			if i != 0:
 				if n.abs(obsinfo[i - 1]['julian_date'] - obs['julian_date']) < (djd * 1.2):
 					obsinfo[i].update({'neighbor_low': obsinfo[i - 1]['julian_date']})
@@ -108,7 +107,6 @@ def add_files_to_distill(input_paths):
 			dbi.add_observations(obsinfo)
 		except:
 			print('problem!')
-			#dbi.test_db()
 	print('done')
 
 if __name__ == '__main__':
