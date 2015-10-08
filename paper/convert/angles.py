@@ -25,7 +25,7 @@ def hours_to_radians(angle):
 
 	Parameters
 	----------
-	hours(float): angle in decimal hours
+	hours | float: angle in decimal hours
 
 	Returns
 	-------
