@@ -121,10 +121,7 @@ class DataBaseInterface(object):
 				try:
 					self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
 				except:
-					try:
-						self.dbinfo['password'] = bytes(self.dbinfo['password'], 'ascii').decode('unicode_escape')
-					except:
-						self.dbinfo['password'] = self.dbinfo['password']
+					self.dbinfo['password'] = bytes(self.dbinfo['password'], 'ascii').decode('unicode_escape')
 			else:
 				logging.info(' '.join((configfile, 'Not Found')))
 		try:
