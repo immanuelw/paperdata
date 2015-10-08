@@ -1,0 +1,8 @@
+build
+output
+*pyc
+.*.swp
+.*.swo
+*.cfg
+*.sh
+*__pycache__*
