@@ -69,8 +69,6 @@ def email_space(table):
 
 	server.quit()
 
-	return None
-
 def null_check(dbi, input_host, input_paths):
 	'''
 	checks if file(s) is(are) in database
@@ -125,8 +123,6 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 				'timestamp': timestamp}
 	dbi.add_entry_dict(s, 'Log', log_data)
 
-	return None
-
 def move_files(dbi, input_host=None, input_paths=None, output_host=None, output_dir=None):
 	'''
 	move files
@@ -157,7 +153,7 @@ def move_files(dbi, input_host=None, input_paths=None, output_host=None, output_
 	if not nulls:
 		#if any file not in db -- don't move anything
 		print('File(s) not in database')
-		return None
+		return
 
 	destination = ''.join((output_host, ':', output_dir))
 	with dbi.session_scope() as s:
@@ -175,8 +171,6 @@ def move_files(dbi, input_host=None, input_paths=None, output_host=None, output_
 					set_move_table(s, dbi, input_host, source, output_host, output_dir)
 					ssh.exec_command(rsync_del_command)
 	print('Completed transfer')
-
-	return None
 
 if __name__ == '__main__':
 	dbi = pdbi.DataBaseInterface()

@@ -191,8 +191,6 @@ class DataBaseInterface(object):
 			s.rollback()
 			print('Duplicate entry found ... skipping entry')
 
-		return None
-
 	def add_entry_dict(self, mod_name, s, TABLE, entry_dict):
 		'''
 		create a new entry.
@@ -207,8 +205,6 @@ class DataBaseInterface(object):
 		table = getattr(sys.modules[mod_name], TABLE)
 		ENTRY = table(**entry_dict)
 		self.add_entry(s, ENTRY)
-
-		return None
 
 	def get_entry(self, mod_name, s, TABLE, unique_value):
 		'''
@@ -248,5 +244,3 @@ class DataBaseInterface(object):
 		'''
 		setattr(ENTRY, field, new_value)
 		self.add_entry(s, ENTRY)
-
-		return None

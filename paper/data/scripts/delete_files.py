@@ -68,8 +68,6 @@ def set_delete_table(s, dbi, input_host, source, output_host, output_dir):
 				'timestamp': timestamp}
 	dbi.add_entry_dict(s, 'Log', log_data)
 
-	return None
-
 def delete_files(dbi, input_host, input_paths, output_host, output_dir):
 	'''
 	delete files
@@ -99,8 +97,6 @@ def delete_files(dbi, input_host, input_paths, output_host, output_dir):
 					set_delete_table(s, dbi, input_host, source, output_host, output_dir)
 					ssh.exec_command(rsync_del_command)
 	print('Completed transfer')
-
-	return None
 
 if __name__ == '__main__':
 	input_host = raw_input('Source directory host: ')

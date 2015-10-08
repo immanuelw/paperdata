@@ -99,8 +99,6 @@ def add_feeds_to_db(dbi, input_host, input_paths):
 			dbi.add_entry_dict(s, 'Feed', feed_data)
 			dbi.add_entry_dict(s, 'Log', log_data)
 
-	return None
-
 def add_feeds(dbi, input_host, input_paths):
 	'''
 	generates list of input files, check for duplicates, add information to database
@@ -124,8 +122,6 @@ def add_feeds(dbi, input_host, input_paths):
 	feed_output = '/data4/paper/feed/'
 	input_paths = dupe_check(dbi, input_host, input_paths)
 	add_feeds_to_db(dbi, input_host, input_paths)
-
-	return None
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2:

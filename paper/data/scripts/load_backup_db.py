@@ -27,7 +27,7 @@ def load_backup(dbi, backup_file=None, table=None):
 	table | str: table name --defaults to None
 	'''
 	if table is None:
-		return None
+		return
 	if backup_file is None:
 		backup_list = sorted(glob.glob('/data4/paper/paperdata_backup/[0-9]*'), reverse=True)
 		timestamp = int(backup_list[0].split('/')[-1])
@@ -43,8 +43,6 @@ def load_backup(dbi, backup_file=None, table=None):
 				raise
 			except:
 				print('Failed to load in entry')
-
-	return None
 
 if __name__ == '__main__':
 	dbi = pdbi.DataBaseInterface()

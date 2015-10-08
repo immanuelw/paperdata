@@ -298,8 +298,6 @@ def add_data(host):
 					system_data = filesystem(ssh, path)
 					dbi.add_entry_dict(s, 'Filesystem', system_data)
 
-	return None
-
 if __name__ == '__main__':
 	hosts = ('folio', 'node01', 'node02', 'node03', 'node04', 'node05', 'node06', 'node07', 'node08', 'node09', 'node10')
 	named_host = socket.gethostname()

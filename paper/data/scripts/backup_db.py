@@ -30,8 +30,6 @@ def json_data(dbo, dump_objects):
 		data = [ser_data.to_dict() for ser_data in dump_objects.all()]
 		json.dump(data, f, sort_keys=True, indent=1, default=ppdata.decimal_default)
 
-	return None
-
 def paperbackup(dbi):
 	'''
 	backups database by loading into json files, named by timestamp
@@ -63,8 +61,6 @@ def paperbackup(dbi):
 												getattr(DB_table, table_sorts[table]['second']).asc())
 			json_data(dbo, DB_dump)
 			print('Table data backup saved')
-
-	return None
 
 if __name__ == '__main__':
 	dbi = pdbi.DataBaseInterface()

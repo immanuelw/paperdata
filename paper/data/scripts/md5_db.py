@@ -35,8 +35,6 @@ def md5_db(data_dbi):
 
 			data_dbi.add_entry(s, 'log', log_data)
 
-	return None
-
 def md5_distiller(dbi):
 	'''
 	updates md5sums for all files without in database
@@ -53,8 +51,6 @@ def md5_distiller(dbi):
 		s.add(FILE)
 		s.commit()
 	s.close()
-
-	return None
 
 if __name__ == '__main__':
 	if len(sys.argv) != 2:

@@ -203,8 +203,6 @@ def paperbridge(dbi, data_dbi, auto=False):
 		if auto:
 			time.sleep(14400)
 
-	return None
-
 if __name__ == '__main__':
 	dbi = ddbi.DataBaseInterface()
 	data_dbi = pdbi.DataBaseInterface()

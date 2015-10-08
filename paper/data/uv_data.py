@@ -115,6 +115,9 @@ def calc_times(uv):
 		float(5): time end
 		float(5): delta time
 		float(5): length of uv file object
+	OR
+	tuple:
+		None for very field
 	'''
 	time_start = 0
 	time_end = 0
@@ -131,7 +134,7 @@ def calc_times(uv):
 				c_time = t
 				n_times += 1
 	except:
-		return None
+		return (None,) * 4
 
 	if n_times > 1:
 		delta_time = -(time_start - time_end) / (n_times - 1)

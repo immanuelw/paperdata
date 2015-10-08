@@ -42,8 +42,6 @@ def set_feed(s, dbi, source, output_host, output_dir, is_moved=True):
 	dbi.set_entry(s, FEED, 'path', output_dir)
 	dbi.set_entry(s, FEED, 'is_moved', is_moved)
 
-	return None
-
 def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
 	'''
 	moves files and adds to feed directory and table
@@ -77,8 +75,6 @@ def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
 
 	print('Completed transfer')
 
-	return None
-
 def count_days(dbi):
 	'''
 	checks amount of days in feed table and sets to move if reach requirement
@@ -98,8 +94,6 @@ def count_days(dbi):
 		for full_path in to_move:
 			FEED = dbi.get_entry(s, 'Feed', source)
 			dbi.set_entry(s, FEED, 'is_movable', True)
-
-	return None
 
 def find_data(dbi):
 	'''
@@ -157,8 +151,6 @@ def email_paperfeed(files):
 
 	server.quit()
 
-	return None
-
 def feed_bridge(dbi):
 	'''
 	bridges feed and paperdistiller
@@ -193,8 +185,6 @@ def feed_bridge(dbi):
 		table = 'Feed'
 		move_files.email_space(table)
 		time.sleep(21600)
-
-	return None
 
 if __name__ == '__main__':
 	dbi = pdbi.DataBaseInterface()

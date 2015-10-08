@@ -176,8 +176,6 @@ def update_obsnums(dbi):
 			is_edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
 			dbi.set_entry(s, OBS, 'is_edge', is_edge)
 
-	return None
-
 def connect_observations(dbi):
 	'''
 	connects file with observation object
@@ -195,8 +193,6 @@ def connect_observations(dbi):
 			#get the observation corresponding to this file
 			OBS = s.query(obs_table).get(getattr(FILE, 'obsnum'))
 			dbi.set_entry(s, FILE, 'observation', OBS)  #associate the file with an observation
-
-	return None
 
 def add_files_to_db(dbi, input_host, input_paths):
 	'''
@@ -226,8 +222,6 @@ def add_files_to_db(dbi, input_host, input_paths):
 			except:
 				print('Failed to load in log ', path, filename)
 
-	return None
-
 def add_files(dbi, input_host, input_paths):
 	'''
 	generates list of input files, check for duplicates, add information to database
@@ -254,8 +248,6 @@ def add_files(dbi, input_host, input_paths):
 	add_files_to_db(dbi, input_host, npz_paths)
 	update_obsnums(dbi)
 	connect_observations(dbi)
-
-	return None
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2:
