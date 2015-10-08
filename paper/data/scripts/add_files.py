@@ -43,20 +43,10 @@ def calc_obs_data(dbi, host, full_path):
 
 	era, julian_day, lst = uv_data.date_info(julian_date)
 
-	#indicates type of file in era
-	era_type = None
-
-	prev_obs = None
-	next_obs = None
-	is_edge = None
-
 	filesize = file_data.calc_size(host, full_path)
 	md5 = file_data.calc_md5sum(host, full_path)
-	tape_index = None
 
 	source_host = host
-	is_tapeable = False
-	is_deletable = False
 
 	timestamp = int(time.time())
 
@@ -66,15 +56,16 @@ def calc_obs_data(dbi, host, full_path):
 				'julian_day': julian_day,
 				'lst': lst,
 				'era': era,
-				'era_type': era_type,
+				'era_type': None,
 				'length': length,
 				'time_start': time_start,
 				'time_end': time_end,
 				'delta_time': delta_time,
-				'prev_obs': prev_obs, 
-				'next_obs': next_obs,
-				'is_edge': is_edge,
+				'prev_obs': None, 
+				'next_obs': None,
+				'is_edge': None,
 				'timestamp': timestamp}
+
 	file_data = {'host': host,
 				'path': path,
 				'filename': filename,
@@ -83,10 +74,10 @@ def calc_obs_data(dbi, host, full_path):
 				'obsnum': obsnum,
 				'filesize': filesize,
 				'md5sum': md5,
-				'tape_index': tape_index,
+				'tape_index': None,
 				'source_host': source_host,
-				'is_tapeable': is_tapeable,
-				'is_deletable': is_deletable,
+				'is_tapeable': False,
+				'is_deletable': False,
 				'timestamp': timestamp}
 
 	log_data = {'action': 'add by scan',
