@@ -30,15 +30,10 @@ def bandpass_normalize(bandpass_table, bandpass_table_inv):
 	tb.close()
 	tb.done()
 
-	return None
-
 def clean2fits(infile_dict, outfile_dict):
 	for in_name in outfile_dict.keys()
-		ia.open(infile_dict[in_name])
-		ia.tofits(outfile_dict[in_name], overwrite=True)
-		ia.close()
-
-	return True
+		with infile_dict[in_name] as ia:
+			ia.tofits(outfile_dict[in_name], overwrite=True)
 
 if __name__ == '__main__':
 	# look for there files on elwood

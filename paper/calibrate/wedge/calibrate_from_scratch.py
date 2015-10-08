@@ -1,10 +1,8 @@
 def clean2fits(imagename,outname):
-  images = ['image','residual','model','psf']
-  for image in images:
-	ia.open('.'.join((imagename, image)))
-	ia.tofits(''.join((outname, '_', image, '.fits')), overwrite=True)
-	ia.close()
-  return True
+	images = ['image','residual','model','psf']
+	for image in images:
+		with open('.'.join((imagename, image))) as ia:
+			ia.tofits(''.join((outname, '_', image, '.fits')), overwrite=True)
 
 if __name__ == '__main__':
 	filename = 'zen.2455819.51677.uvcRRECXRM.MS.copy1'

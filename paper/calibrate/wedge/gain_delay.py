@@ -2,27 +2,23 @@ import glob
 import json
 import decimal
 import numpy as np
+import paper as ppdata
 '''
 Generates gain and delay from coeff*.npz files and phase_*.npz files
 '''
 
-def decimal_default(obj):
-	'''
-	fixes decimal issue with json module
-	'''
-	if isinstance(obj, decimal.Decimal):
-		return float(obj)
-
 def json_data(dbo, full_dict):
 	'''
-	dumps list of objects into a json file
+	dumps dict into a json file
 
-	input: filename, list of database objects
+	Parameters
+	----------
+	dbo | str: filename
+	full_dict | dict of gain and delay information to be dumped
 	'''
 	with open(dbo, 'w') as f:
 		data = [full_dict]
-		json.dump(data, f, sort_keys=True, indent=1, default=decimal_default)
-	return None
+		json.dump(data, f, sort_keys=True, indent=1, default=ppdata.decimal_default)
 
 def gen_gain(file_path):
 	freqs = np.load('/data4/paper/exchange_sa_upenn/abscal_paramters/frequency.npz')['frequency']
@@ -32,6 +28,7 @@ def gen_gain(file_path):
 	for pol_num, polarization in enumerate(('x', 'y')):
 		for ant_num in range(32):
 			gain[ant_num][polarization] = np.polyfit(freqs, gain_data[pol_num, :, ant_num]), 1)
+
 	return gain
 
 def gen_delay(file_path):
@@ -41,6 +38,7 @@ def gen_delay(file_path):
 		for ant_num in range(32):
 			#delay is output in ns
 			delay[ant_num][polarization] = np.polyfit(np.linspace(0.1, 0.2, 203), delay_data[pol_num, :, ant_num]), 1)
+
 	return delay
 
 if __name__ == '__main__':
