@@ -86,7 +86,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 
 		Parameters
 		----------
-		configfile (Optional[str]): ganglia database configuration file --defaults to ~/ganglia.cfg
+		configfile | Optional[str]: ganglia database configuration file --defaults to ~/ganglia.cfg
 		'''
 		super(DataBaseInterface, self).__init__(configfile=configfile)
 

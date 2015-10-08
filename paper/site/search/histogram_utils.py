@@ -70,10 +70,10 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 	----------
 	start_utc | int: start time in utc
 	end_utc | int: end time in utc
-	host_strs (Optional[list]): hosts --defaults to None
-	filetype_strs (Optional[list]): filetypes --defaults to None
-	set_host (Optional[str]: )set host --defaults to None
-	set_filetype (Optional[str]): set filetype --defaults to None
+	host_strs | Optional[list]: hosts --defaults to None
+	filetype_strs | Optional[list]: filetypes --defaults to None
+	set_host | Optional[str]: set host --defaults to None
+	set_filetype | Optional[str]: set filetype --defaults to None
 
 	Returns
 	-------

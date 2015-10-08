@@ -106,9 +106,9 @@ def make_clause(table, field_name, equivalency, value):
 	Parameters
 	----------
 	table | str: table name
-		field_name | str: field name
-		equivalency | str: type of equivalency
-		value (int/float/str) value to compare against
+	field_name | str: field name
+	equivalency | str: type of equivalency
+	value | int/float/str: value to compare against
 
 	Returns
 	-------
@@ -215,12 +215,12 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 
 	Parameters
 	----------
-	data_source (Optional[object]): data source object --defaults to None
-	database (Optional[str]): database name --defaults to None
-	table (Optional[str]): table name --defaults to None
-	field_tuples (Optional[list]): tuples of field names, equivalency values, and values to limit query -- defaults to None
-	sort_tuples (Optional[list]): tuples indicating field to sort and sort order --defaults to None
-	group_tuples (Optional[list]): tuples indicating fields to group --defaults to None
+	data_source | Optional[object]: data source object --defaults to None
+	database | Optional[str]: database name --defaults to None
+	table | Optional[str]: table name --defaults to None
+	field_tuples | Optional[list]: tuples of field names, equivalency values, and values to limit query -- defaults to None
+	sort_tuples | Optional[list]: tuples indicating field to sort and sort order --defaults to None
+	group_tuples | Optional[list]: tuples indicating fields to group --defaults to None
 
 	Returns
 	-------

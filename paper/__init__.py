@@ -106,7 +106,7 @@ class DataBaseInterface(object):
 
 		Parameters
 		----------
-		configfile (Optional[str]): configuration file --defaults to ~/paperdata.cfg
+		configfile | Optional[str]: configuration file --defaults to ~/paperdata.cfg
 		'''
 		if not configfile is None:
 			config = configparser.ConfigParser()

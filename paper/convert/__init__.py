@@ -47,9 +47,9 @@ def gcal2jd(year, month, day, hour=None, minute=None, second=None):
 	year | int: gregorian year
 	month | int: gregorian month
 	day | int: gregorian day
-	hour (Optional[int]): gregorian hour
-	minute (Optional[int]): gregorian minute
-	second (Optional[float]): gregorian second
+	hour | Optional[int]: gregorian hour
+	minute | Optional[int]: gregorian minute
+	second | Optional[float]: gregorian second
 
 	Returns
 	-------
