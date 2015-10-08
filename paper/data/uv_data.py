@@ -106,7 +106,7 @@ def calc_times(uv):
 
 	Parameters
 	----------
-	uv (file object): uv file object
+	uv | file object: uv file object
 
 	Returns
 	-------
