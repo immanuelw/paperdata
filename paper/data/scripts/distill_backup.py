@@ -73,9 +73,10 @@ def paperbackup(dbi):
 		db_file = '{table}_{timestamp}.json'.format(table=table.lower(), timestamp=timestamp)
 		dbo = os.path.join(backup_dir, db_file)
 		print(db_file)
-			DB_table = getattr(ddbi, table)
-			DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
-											getattr(DB_table, table_sorts[table]['second']).asc())
+		table = table.lower()
+		DB_table = getattr(ddbi, table)
+		DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
+												getattr(DB_table, table_sorts[table]['second']).asc())
 		json_data(dbo, DB_dump)
 		print('Table data backup saved')
 	s.close()
