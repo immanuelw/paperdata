@@ -52,7 +52,7 @@ def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
 	----------
 	dbi | object: database interface object
 	input_host | str: file host
-	input_paths | list: file paths
+	input_paths | list[str]: file paths
 	source | str: source file
 	output_host | str: output host
 	output_dir | str: output directory
@@ -112,9 +112,9 @@ def find_data(dbi):
 	Returns
 	-------
 	tuple:
-		list: file paths to move
+		list[str]: file paths to move
 		str: file host
-		list: filenames to be moved
+		list[str]: filenames to be moved
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
@@ -135,7 +135,7 @@ def email_paperfeed(files):
 
 	Parameters
 	----------
-	files | list: files being moved
+	files | list[str]: files being moved
 	'''
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()

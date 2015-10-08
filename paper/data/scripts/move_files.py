@@ -79,7 +79,7 @@ def null_check(dbi, input_host, input_paths):
 	----------
 	dbi | object: database interface object
 	input_host | str: host of files
-	input_paths | list: uv* file paths
+	input_paths | list[str]: uv* file paths
 
 	Returns
 	-------
@@ -135,7 +135,7 @@ def move_files(dbi, input_host=None, input_paths=None, output_host=None, output_
 	----------
 	dbi | object: database interface object
 	input_host | str: file host --defaults to None
-	input_paths | list: file paths --defaults to None
+	input_paths | list[str]: file paths --defaults to None
 	output_host | str: output host --defaults to None
 	output_dir | str: output directory --defaults to None
 	'''

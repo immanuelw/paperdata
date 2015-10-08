@@ -44,7 +44,7 @@ def json_data(dbo, dump_objects):
 	Parameters
 	----------
 	dbo | str: filename
-	dump_objects | list: database objects query
+	dump_objects | list[object]: database objects query
 	'''
 	with open(dbo, 'w') as f:
 		data = [to_dict(ser_data) for ser_data in dump_objects.all()]

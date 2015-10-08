@@ -66,11 +66,11 @@ def dupe_check(dbi, input_host, input_paths):
 	----------
 	dbi | object: database interface object
 	input_host | str: file host
-	input_paths | list: file paths
+	input_paths | list[str]: file paths
 
 	Returns
 	-------
-	list: files not in feed table
+	list[str]: files not in feed table
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
@@ -91,7 +91,7 @@ def add_feeds_to_db(dbi, input_host, input_paths):
 	----------
 	dbi | object: database interface object
 	input_host | str: file host
-	input_paths | list: file paths
+	input_paths | list[str]: file paths
 	'''
 	with dbi.session_scope() as s:
 		for source in input_paths:

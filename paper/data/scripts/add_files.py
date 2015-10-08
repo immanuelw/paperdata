@@ -104,11 +104,11 @@ def dupe_check(dbi, input_host, input_paths):
 	----------
 	dbi | object: database interface object
 	input_host | str: host of uv* files
-	input_paths | list: paths of uv* files
+	input_paths | list[str]: paths of uv* files
 
 	Returns
 	-------
-	list: paths that are not already in database
+	list[str]: paths that are not already in database
 	'''
 	with dbi.session_scope() as s:
 		#all files on same host
@@ -206,7 +206,7 @@ def add_files_to_db(dbi, input_host, input_paths):
 	----------
 	dbi | object: database interface object
 	input_host | str: host of files
-	input_paths | list: paths of uv* files
+	input_paths | list[str]: paths of uv* files
 	'''
 	with dbi.session_scope() as s:
 		for input_path in input_paths:
@@ -235,7 +235,7 @@ def add_files(dbi, input_host, input_paths):
 	Parameters
 	----------
 	dbi | object: database interface object
-	input_host | str: host of files, list of uv* file paths
+	input_host | str: host of files
 	input_paths | str: string to indicate paths of uv* files
 	'''
 	named_host = socket.gethostname()

@@ -30,7 +30,7 @@ def delete_check(dbi, input_host):
 
 	Returns
 	-------
-	list: uv* file paths of files to be deleted
+	list[str]: uv* file paths of files to be deleted
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'File')
@@ -78,7 +78,7 @@ def delete_files(dbi, input_host, input_paths, output_host, output_dir):
 	----------
 	dbi | object: database interface object
 	input_host | str: user host
-	input_paths | list: file paths
+	input_paths | list[str]: file paths
 	output_host | str: output host
 	output_dir | str: output directory
 	'''
