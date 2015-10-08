@@ -1,4 +1,3 @@
-from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float,func,DateTime,Enum,BigInteger,Numeric,Text
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
 from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship, backref
@@ -15,11 +14,11 @@ FILE_PROCESSING_STAGES = ('NEW','UV_POT', 'UV', 'UVC', 'CLEAN_UV', 'UVCR', 'CLEA
 #
 #   The basic definition of our database
 #
-########
+#############
 
 class Observation(Base):
 	__tablename__ = 'observation'
-	julian_date = Column(Numeric(16,8))
+	julian_date = Column(Numeric(16, 8))
 	pol = Column(String(4))
 	obsnum = Column(BigInteger, primary_key=True)
 	status = Column(Enum(*FILE_PROCESSING_STAGES, name='FILE_PROCESSING_STAGES'))
@@ -45,16 +44,14 @@ class File(Base):
 	filenum = Column(Integer, primary_key=True)
 	filename = Column(String(100))
 	host = Column(String(100))
-	obsnum=Column(BigInteger,ForeignKey('observation.obsnum'))
-	#this next line creates an attribute Observation.files which is the list of all
-	#  files associated with this observation
+	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
 	observation = relationship(Observation, backref=backref('files', uselist=True))
 	md5sum = Column(Integer)
 
 class Log(Base):
 	__tablename__ = 'log'
-	lognum = Column(Integer,primary_key=True)
-	obsnum = Column(BigInteger,ForeignKey('observation.obsnum'))
+	lognum = Column(Integer, primary_key=True)
+	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
 	stage = Column(Enum(*FILE_PROCESSING_STAGES, name='FILE_PROCESSING_STAGES'))
 	exit_status = Column(Integer)
 	timestamp = Column(DateTime, nullable=False, default=func.current_timestamp())
