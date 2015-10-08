@@ -272,7 +272,6 @@ def calc_uv_data(host, full_path):
 if __name__ == '__main__':
 	input_host = sys.argv[1]
 	input_path = sys.argv[2]
-	mode = None
 	if len(sys.argv) == 4:
 		mode = sys.argv[3]
 
