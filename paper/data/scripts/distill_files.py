@@ -7,75 +7,90 @@ KEY NOTE: Assumes all files are contiguous.  I sort the files by jd and then mat
    ddr algorithm
 '''
 from __future__ import print_function
-import optparse
 import os
 import sys
+import glob
 import re
 import socket
 import numpy as n
 import ddr_compress.dbi as ddbi 
-import uv_data
+from paper.data import uv_data
 
-def file2jd(zenuv):
-	return re.findall(r'\d+\.\d+', zenuv)[0]
+def file2jd(full_path):
+	'''
+	pulls julian date from filename
 
-def file2pol(zenuv):
-	return re.findall(r'\.(.{2})\.',zenuv)[0]
+	Parameters
+	----------
+	full_path | str: full path of file
 
-def add_observations():
-	o = optparse.OptionParser()
-	o.set_usage('add_observations.py *.uv')
-	o.set_description(__doc__)
-	o.add_option('--length', type=float, help='length of the input observations in minutes [default=average difference between filenames]')
-	o.add_option('-t', action='store_true', help='Test. Only print, do not touch db')
-	o.add_option('--overwrite', action='store_true',
-					help='Default action is to skip observations already in the db. Setting this option overrides this safety feature and attempts anyway')
-	opts, args = o.parse_args(sys.argv[1:])
+	Returns
+	-------
+	float(5): julian date
+	'''
+	return re.findall(r'\d+\.\d+', full_path)[0]
 
+def file2pol(full_path):
+	'''
+	pulls polarization from filename
+
+	Parameters
+	----------
+	full_path | str: full path of file
+
+	Returns
+	-------
+	str: polarization
+	'''
+	return re.findall(r'\.(.{2})\.', full_path)[0]
+
+def add_files_to_distill(input_paths):
+	'''
+	adds files to paperdistiller database
+
+	Parameters
+	----------
+	zenuv | str: full path of file
+	'''
 	#connect to the database
 	dbi = ddbi.DataBaseInterface()
 
 	#check that all files exist
-	for filename in args:
-		assert(filename.startswith('/'))
-		assert(os.path.exists(filename))
+	for input_path in input_paths:
+		assert(input_path.startswith('/'))
+		assert(os.path.exists(input_path))
 
 	#now run through all the files and build the relevant information for the db
 	# get the pols
-	pols = [file2pol(filename) for filename in args]
-	jds = n.array([file2jd(filename) for filename in args])
+	pols = [file2pol(input_path) for input_path in input_paths]
+	jds = n.array([file2jd(input_path) for input_path in input_paths])
 	nights = list(set(jds.astype(n.int)))
 
-	if not opts.length is None:
-		djd =  opts.length / 60. / 24
-	else:
-		jds_onepol = n.sort([jd for i, jd in enumerate(jds) if pols[i] == pols[0] and jd.astype(int) == nights[0]])
-		djd = n.mean(n.diff(jds_onepol))
-		print('setting length to ', djd, ' days')
+	jds_onepol = n.sort([jd for i, jd in enumerate(jds) if pols[i] == pols[0] and jd.astype(int) == nights[0]])
+	djd = n.mean(n.diff(jds_onepol))
+	print('setting length to ', djd, ' days')
 
 	pols = list(set(pols))#these are the pols I have to iterate over
 	print('found the following pols', pols)
 	print('found the following nights', nights)
 
 	for night in nights:
-		print 'adding night' ,night
+		print('adding night', night)
 		obsinfo = []
-		nightfiles = [filename for filename in args if int(float(file2jd(filename))) == night]
-		print len(nightfiles)
+		nightfiles = [input_path for input_path in input_paths if int(float(file2jd(input_path))) == night]
+		print(len(nightfiles))
 		for pol in pols:
 			#filter off all pols but the one I'm currently working on
-			files = sorted([filename for filename in nightfiles if file2pol(filename) == pol])
-			for i, filename in enumerate(files):
+			files = sorted([input_path for input_path in nightfiles if file2pol(input_path) == pol])
+			for i, input_path in enumerate(files):
 				try:
-					dbi.get_obs(uv_data.jdpol2obsnum(float(file2jd(filename)), file2pol(filename), djd))
-					if opts.overwrite:
-						raise(StandardError)
+					dbi.get_obs(uv_data.jdpol2obsnum(float(file2jd(input_path)), file2pol(input_path), djd))
 					print(filename, 'found in db, skipping')
 				except:
-					obsinfo.append({'julian_date': float(file2jd(filename)),
-									'pol': file2pol(filename),
+					obsinfo.append({'julian_date': float(file2jd(input_path)),
+									'pol': file2pol(input_path),
 									'host': socket.gethostname(),
-									'filename': filename,
+									'filename': input_path,
 									'length': djd}) #note the db likes jd for all time units
 
 		for i, obs in enumerate(obsinfo):
@@ -87,15 +102,7 @@ def add_observations():
 				if n.abs(obsinfo[i + 1]['julian_date'] - obs['julian_date']) < (djd * 1.2):
 					obsinfo[i].update({'neighbor_high': obsinfo[i + 1]['julian_date']})
 
-		#assert(len(obsinfo) == len(args))
-		if opts.t:
-			print('NOT ADDING OBSERVATIONS TO DB')
-			print('HERE is what would have been added')
-			for obs in obsinfo:
-				print(obs['filename'], uv_data.jdpol2obsnum(obs['julian_date'], obs['pol'], obs['length']))
-				print('neighbors', obs.get('neighbor_low', None), obs.get('neighbor_high', None))
-		elif len(obsinfo)>0:
-			print('adding {len} observations to the still db'.format(len=len(obsinfo)))
+		print('adding {obs_len} observations to the still db'.format(obs_len=len(obsinfo)))
 
 		try:
 			dbi.add_observations(obsinfo)
@@ -105,5 +112,6 @@ def add_observations():
 	print('done')
 
 if __name__ == '__main__':
-	add_observations()
-	print('This is a module now')
+	path_str = sys.argv[1]
+	input_paths = glob.glob(path_str)
+	add_files_to_distill(input_paths)
