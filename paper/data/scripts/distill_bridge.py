@@ -131,12 +131,9 @@ def add_data(dbi, data_dbi):
 						'is_tapeable': is_tapeable,
 						'is_deletable': is_deletable,
 						'timestamp': timestamp}
-			action = 'add by bridge'
-			table = None
-			identifier = full_path
-			log_data = {'action': action,
-						'table': table,
-						'identifier': identifier,
+			log_data = {'action': 'add by bridge',
+						'table': None,
+						'identifier': full_path,
 						'timestamp': timestamp}
 			data_dbi.add_entry_dict(sess, 'Observation', obs_data)
 			data_dbi.add_entry_dict(sess, 'File', raw_data)

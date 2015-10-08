@@ -160,20 +160,20 @@ def move_files(dbi, input_host=None, input_paths=None, output_host=None, output_
 		return None
 
 	destination = ''.join((output_host, ':', output_dir))
-	if named_host == input_host:
-		with dbi.session_scope() as s:
+	with dbi.session_scope() as s:
+		if named_host == input_host:
 			for source in input_paths:
 				ppdata.rsync_copy(source, destination)
 				set_move_table(s, dbi, input_host, source, output_host, output_dir)
 				shutil.rmtree(source)
-	else:
-		with ppdata.ssh_scope(input_host) as ssh:
-			for source in input_paths:
-				rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
-				rsync_del_command = '''rm -r {source}'''.format(source=source)
-				ssh.exec_command(rsync_copy_command)
-				set_move_table(input_host, source, output_host, output_dir)
-				ssh.exec_command(rsync_del_command)
+		else:
+			with ppdata.ssh_scope(input_host) as ssh:
+				for source in input_paths:
+					rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
+					rsync_del_command = '''rm -r {source}'''.format(source=source)
+					ssh.exec_command(rsync_copy_command)
+					set_move_table(s, dbi, input_host, source, output_host, output_dir)
+					ssh.exec_command(rsync_del_command)
 	print('Completed transfer')
 
 	return None
