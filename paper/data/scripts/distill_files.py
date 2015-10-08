@@ -85,7 +85,7 @@ def add_files_to_distill(input_paths):
 			for i, input_path in enumerate(files):
 				try:
 					dbi.get_obs(uv_data.jdpol2obsnum(float(file2jd(input_path)), file2pol(input_path), djd))
-					print(filename, 'found in db, skipping')
+					print(input_path, 'found in db, skipping')
 				except:
 					obsinfo.append({'julian_date': float(file2jd(input_path)),
 									'pol': file2pol(input_path),
