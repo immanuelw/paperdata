@@ -33,7 +33,7 @@ def md5_db(data_dbi):
 						'identifier': full_path,
 						'timestamp': timestamp}
 
-			data_dbi.add_entry(s, 'log', log_data)
+			data_dbi.add_entry(s, 'Log', log_data)
 
 def md5_distiller(dbi):
 	'''
@@ -47,7 +47,7 @@ def md5_distiller(dbi):
 	table = getattr(ddbi, 'File')
 	FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
 	for FILE in FILEs:
-		setattr(FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'path')))
+		setattr(FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'filename')))
 		s.add(FILE)
 		s.commit()
 	s.close()
