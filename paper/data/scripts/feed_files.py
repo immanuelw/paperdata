@@ -38,7 +38,7 @@ def gen_feed_data(host, full_path):
 	try:
 		uv = A.miriad.UV(full_path)
 	except:
-		return None
+		return (None,) * 2
 
 	timestamp = int(time.time())
 
