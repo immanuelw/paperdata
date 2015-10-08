@@ -91,10 +91,10 @@ def add_data(dbi, data_dbi):
 			next_obs = None
 			is_edge = None
 
-			filesize = file_data.calc_size(host, path, filename)
+			filesize = file_data.calc_size(host, full_path)
 			md5 = getattr(FILE, 'md5sum')
 			if md5 is None:
-				md5 = file_data.calc_md5sum(host, path, filename)
+				md5 = file_data.calc_md5sum(host, full_path)
 			tape_index = None
 
 			source_host = host

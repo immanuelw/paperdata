@@ -59,15 +59,13 @@ def calc_size(host, path, filename):
 	Parameters
 	----------
 	host | str: host of file
-		path | str: path of file
-		filename | str: unique name of directory or file
+	full_path | str: full path of directory or file
 
 	Returns
 	-------
 	float: size of directory or file in MB
 	'''
 	named_host = socket.gethostname()
-	full_path = os.path.join(path, filename)
 	if named_host == host:
 		size = sizeof_fmt(get_size(full_path))
 	else:
@@ -113,15 +111,13 @@ def calc_md5sum(host, path, filename):
 	Parameters
 	----------
 	host | str: host of file
-		path | str: path of file
-		filename | str: unique name of directory or file
+	full_path | str: full path of directory or file
 
 	Returns
 	-------
 	str: md5 checksum
 	'''
 	named_host = socket.gethostname()
-	full_path = os.path.join(path, filename)
 	if named_host == host:
 		md5 = get_md5sum(full_path)
 	else:
