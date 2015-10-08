@@ -11,11 +11,13 @@ def load_user(id):
 	'''
 	load user
 
-	Args:
-		id (int): user id
+	Parameters
+	----------
+	id (int): user id
 
-	Returns:
-		object: user object
+	Returns
+	-------
+	object: user object
 	'''
 	user = db_utils.query(database='admin', table='User', field_tuples=(('username', '==', id),))[0]
 	return user
@@ -25,8 +27,9 @@ def login():
 	'''
 	login
 
-	Returns:
-		html: login
+	Returns
+	-------
+	html: login
 	'''
 	if g.user is not None and g.user.is_authenticated():
 		return redirect(url_for('index'))
@@ -53,8 +56,9 @@ def signup():
 	'''
 	signup
 
-	Returns:
-		html: signup
+	Returns
+	-------
+	html: signup
 	'''
 	if g.user is not None and g.user.is_authenticated():
 		return redirect(url_for('index'))
@@ -98,8 +102,9 @@ def logout():
 	'''
 	logout
 
-	Returns:
-		html: redirect to index
+	Returns
+	-------
+	html: redirect to index
 	'''
 	logout_user()
 	flash('You were logged out', 'flash')
@@ -110,8 +115,9 @@ def delete_user():
 	'''
 	delete user from database and delete all sets associated to user
 
-	Returns:
-		html: redirect to user page
+	Returns
+	-------
+	html: redirect to user page
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		username = request.form['username']

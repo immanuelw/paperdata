@@ -13,11 +13,13 @@ def time_val(value):
 	'''
 	determines how much time to divide by and divides time by that to make human readable
 
-	Args:
-		value (float): numerical time value
+	Parameters
+	----------
+	value (float): numerical time value
 
-	Returns:
-		float: numerical time value divided
+	Returns
+	-------
+	float: numerical time value divided
 	'''
 	time_val = 1 if value < 500 else 60 if value < 3600 else 3600 if value < 86400 else 86400
 
@@ -27,11 +29,13 @@ def str_val(value):
 	'''
 	determines which time unit to use
 
-	Args:
-		value (float): numerical time value
+	Parameters
+	----------
+	value (float): numerical time value
 
-	Returns:
-		str: time unit
+	Returns
+	-------
+	str: time unit
 	'''
 	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
 	str_val = ' '.join((str_val, 'ago'))
@@ -46,13 +50,21 @@ def index():
 	'''
 	start page of the website
 
-	Returns:
-		html: index
+	Returns
+	-------
+	html: index
 	'''
 	return render_template('index.html')
 
 @app.route('/data_amount', methods = ['GET'])
 def data_amount():
+	'''
+	table of the amount of data
+
+	Returns
+	-------
+	html: data amount table
+	'''
 	try:
 		data = db_utils.query(database='admin', table='DataAmount', sort_tuples=(('created_on', 'desc'),))[0]
 	except:
@@ -74,8 +86,9 @@ def source_table():
 	'''
 	table of sources
 
-	Returns:
-		html: source table
+	Returns
+	-------
+	html: source table
 	'''
 	sort_tuples = (('timestamp', 'desc'),)
 	output_vars = ('timestamp', 'julian_day')
@@ -112,8 +125,9 @@ def filesystem():
 	'''
 	table of filesystems
 
-	Returns:
-		html: filesystem table
+	Returns
+	-------
+	html: filesystem table
 	'''
 	#system_header = (('Free', None), ('File Host', None), ('Last Report', None) , ('Usage Percent', None))
 	system_header = (('File Host', None), ('Last Report', None) , ('Usage Percent', None))
@@ -156,8 +170,9 @@ def rtp_summary_table():
 	'''
 	summary of rtp status
 
-	Returns:
-		html: rtp summary table
+	Returns
+	-------
+	html: rtp summary table
 	'''
 	obs_vars = ('files',)
 	file_vars = ('host', 'path', 'julian_day', 'transferred', 'new_host', 'new_path', 'timestamp')
@@ -247,8 +262,9 @@ def teardown_request(exception):
 	'''
 	exit database after request
 
-	Args:
-		exception (exception): exception
+	Parameters
+	----------
+	exception (exception): exception
 	'''
 	paper_db = getattr(g, 'paper_session', None)
 	pyg_db = getattr(g, 'pyg_session', None)
@@ -263,10 +279,11 @@ def profile():
 	'''
 	access user profile
 
-	Returns:
-		html: profile
-		OR
-		html: redirect for login
+	Returns
+	-------
+	html: profile
+	OR
+	html: redirect for login
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
@@ -285,8 +302,9 @@ def user_page():
 	'''
 	access user page
 
-	Returns:
-		html: user page
+	Returns
+	-------
+	html: user page
 		OR
 		html: redirect for login
 	'''

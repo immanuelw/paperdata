@@ -12,13 +12,15 @@ def get_dbi(database):
 	'''
 	selects interface and module for input database
 
-	Args:
-		database (str): database name
+	Parameters
+	----------
+	database (str): database name
 
-	Returns:
-		tuple:
-			object: database interface object
-			object: module object
+	Returns
+	-------
+	tuple:
+		object: database interface object
+		object: module object
 	'''
 	host = socket.gethostname()
 	if database == 'paperdata':
@@ -47,11 +49,13 @@ def inspector(database):
 	'''
 	access into database metadata
 
-	Args:
-		database (str): database name
+	Parameters
+	----------
+	database (str): database name
 
-	Returns:
-		object: inspector object
+	Returns
+	-------
+	object: inspector object
 	'''
 	dbi, _ = get_dbi(database)
 	insp = reflection.Inspector.from_engine(dbi.engine)
@@ -62,11 +66,13 @@ def get_table_names(database):
 	'''
 	gets all table names in database
 
-	Args:
-		database (str): database name
+	Parameters
+	----------
+	database (str): database name
 
-	Returns:
-		list: table names
+	Returns
+	-------
+	list: table names
 	'''
 	insp = inspector(database)
 	table_names = insp.get_table_names()
@@ -77,12 +83,14 @@ def get_column_names(database, table):
 	'''
 	gets all column names in table
 
-	Args:
-		database (str): database name
-		table (str): table name
+	Parameters
+	----------
+	database (str): database name
+	table (str): table name
 
-	Returns:
-		list: column names
+	Returns
+	-------
+	list: column names
 	'''
 	insp = inspector(database)
 	#it's a list of dicts
@@ -95,14 +103,16 @@ def make_clause(table, field_name, equivalency, value):
 	'''
 	generates a clause for sqlalchemy filters
 
-	Args:
-		table (str): table name
+	Parameters
+	----------
+	table (str): table name
 		field_name (str): field name
 		equivalency (str): type of equivalency
 		value (int/float/str) value to compare against
 
-	Returns:
-		object?: sqlalchemy clause
+	Returns
+	-------
+	object?: sqlalchemy clause
 	'''
 	field = getattr(table, field_name)
 	if equivalency is None:
@@ -134,12 +144,14 @@ def sort_clause(table, sort_tuples):
 	'''
 	generates a sorting clause for sqlalchemy filter
 
-	Args:
-		table (str): table name
-		sort_tuples (list): tuples indicating field to sort and sort order
+	Parameters
+	----------
+	table (str): table name
+	sort_tuples (list): tuples indicating field to sort and sort order
 
-	Returns:
-		list: clauses
+	Returns
+	-------
+	list: clauses
 	'''
 	clause_list = [getattr(getattr(table, field_name), field_order)() for field_name, field_order in sort_tuples]
 
@@ -149,12 +161,14 @@ def group_clause(table, group_tuples):
 	'''
 	generates a grouping clause for sqlalchemy filter
 
-	Args:
-		table (str): table name
-		group_tuples (list): tuples indicating fields to group
+	Parameters
+	----------
+	table (str): table name
+	group_tuples (list): tuples indicating fields to group
 
-	Returns:
-		list: clauses
+	Returns
+	-------
+	list: clauses
 	'''
 	clause_list = [getattr(table, field_name) for field_name in field_group_tuples]
 
@@ -164,15 +178,17 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples):
 	'''
 	outputs results from a query after filtering
 
-	Args:
-		s (object): session object
-		table (str): table name
-		field_tuples (list): tuples of field names, equivalency values, and values to limit query
-		sort_tuples (list): tuples indicating field to sort and sort order
-		group_tuples (list): tuples indicating fields to group
+	Parameters
+	----------
+	s (object): session object
+	table (str): table name
+	field_tuples (list): tuples of field names, equivalency values, and values to limit query
+	sort_tuples (list): tuples indicating field to sort and sort order
+	group_tuples (list): tuples indicating fields to group
 
-	Returns:
-		list: objects corresponding to filtered query made
+	Returns
+	-------
+	list: objects corresponding to filtered query made
 	'''
 	results = s.query(table)
 	if field_tuples is not None:
@@ -197,16 +213,18 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 	'''
 	pulls list of object from database after filtering query
 
-	Args:
-		data_source (Optional[object]): data source object --defaults to None
-		database (Optional[str]): database name --defaults to None
-		table (Optional[str]): table name --defaults to None
-		field_tuples (Optional[list]): tuples of field names, equivalency values, and values to limit query -- defaults to None
-		sort_tuples (Optional[list]): tuples indicating field to sort and sort order --defaults to None
-		group_tuples (Optional[list]): tuples indicating fields to group --defaults to None
+	Parameters
+	----------
+	data_source (Optional[object]): data source object --defaults to None
+	database (Optional[str]): database name --defaults to None
+	table (Optional[str]): table name --defaults to None
+	field_tuples (Optional[list]): tuples of field names, equivalency values, and values to limit query -- defaults to None
+	sort_tuples (Optional[list]): tuples indicating field to sort and sort order --defaults to None
+	group_tuples (Optional[list]): tuples indicating fields to group --defaults to None
 
-	Returns:
-		list: objects corresponding to filtered query
+	Returns
+	-------
+	list: objects corresponding to filtered query
 	'''
 	if data_source is not None:
 		dbi, module = get_dbi(data_source.database)

@@ -8,15 +8,16 @@ def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era_
 	'''
 	insert set into database
 
-	Args:
-		name (str): set name
-		start (str): start time
-		end (str): end time
-		flagged_range_dicts (dict): flagged range
-		polarization (str): polarization
-		era_type (str): era type
-		total_data_hrs (int): total data hours
-		flagged_data_hrs (int): flagged data hours
+	Parameters
+	----------
+	name (str): set name
+	start (str): start time
+	end (str): end time
+	flagged_range_dicts (dict): flagged range
+	polarization (str): polarization
+	era_type (str): era type
+	total_data_hrs (int): total data hours
+	flagged_data_hrs (int): flagged data hours
 	'''
 	new_set = getattr(models, 'Set')()
 	setattr(new_set, 'username', g.user.username)
@@ -57,12 +58,14 @@ def is_obs_flagged(obs_id, flagged_range_dicts):
 	'''
 	boolean check for if observation is flagged
 
-	Args:
-		obs_id (int): observation id
-		flagged_range_dicts (list): flagged range dicts
+	Parameters
+	----------
+	obs_id (int): observation id
+	flagged_range_dicts (list): flagged range dicts
 
-	Returns:
-		bool: is it flagged
+	Returns
+	-------
+	bool: is it flagged
 	'''
 	for flagged_range_dict in flagged_range_dicts:
 		if obs_id >= flagged_range_dict['start_utc'] and obs_id <= flagged_range_dict['end_utc']:
@@ -74,16 +77,18 @@ def get_data_hours_in_set(start, end, polarization, era_type, flagged_range_dict
 	'''
 	finds total amount of hours total, and total flagged
 
-	Args:
-		start (str): start time
-		end (str): end time
-		flagged_range_dicts (dict): flagged range
-		polarization (str): polarization
-		era_type (str): era type
-		flagged_range_dicts (list): flagged range dicts
+	Parameters
+	----------
+	start (str): start time
+	end (str): end time
+	flagged_range_dicts (dict): flagged range
+	polarization (str): polarization
+	era_type (str): era type
+	flagged_range_dicts (list): flagged range dicts
 
-	Returns:
-		int: total amount of data hours
+	Returns
+	-------
+	int: total amount of data hours
 		int: total amount of flagged data hours
 	'''
 	total_data_hrs = flagged_data_hrs = 0
@@ -285,8 +290,9 @@ def get_filters():
 	'''
 	get filters for database
 
-	Returns:
-		html: filters
+	Returns
+	-------
+	html: filters
 	'''
 	users = db_utils.query(database='search', table='User')
 
@@ -297,8 +303,9 @@ def get_sets():
 	'''
 	get all sets
 
-	Returns:
-		html: set list
+	Returns
+	-------
+	html: set list
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		request_content = request.get_json()

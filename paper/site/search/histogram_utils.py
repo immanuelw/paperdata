@@ -7,11 +7,13 @@ def get_plot_bands(the_set):
 	'''
 	get plot bands for a set
 
-	Args:
-		the_set (object): set object
+	Parameters
+	----------
+	the_set (object): set object
 
-	Returns:
-		dict: start, end, and color of flagged subset of set object
+	Returns
+	-------
+	dict: start, end, and color of flagged subset of set object
 	'''
 	flagged_subsets = db_utils.query(database='search', table='FlaggedSubset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),))
 
@@ -24,16 +26,18 @@ def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
 	'''
 	get all observations to plot
 
-	Args:
-		start_utc (int): start time in utc
-		ebd_utc (int): end time in utc
-		set_pol (str): set polarization
-		set_era_type (str): set era type
+	Parameters
+	----------
+	start_utc (int): start time in utc
+	end_utc (int): end time in utc
+	set_pol (str): set polarization
+	set_era_type (str): set era type
 
-	Returns:
-		tuple:
-			dict: 2D dict of count by polarization and era type
-			dict: 2D dict of lists of dicts of time and obsnum by polarization and era type
+	Returns
+	-------
+	tuple:
+		dict: 2D dict of count by polarization and era type
+		dict: 2D dict of lists of dicts of time and obsnum by polarization and era type
 	'''
 	response = db_utils.query(database='paperdata', table='Observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
@@ -62,18 +66,20 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 	'''
 	get all files to plot
 
-	Args:
-		start_utc (int): start time in utc
-		end_utc (int): end time in utc
-		host_strs (Optional[list]): hosts --defaults to None
-		filetype_strs (Optional[list]): filetypes --defaults to None
-		set_host (Optional[str]: )set host --defaults to None
-		set_filetype (Optional[str]): set filetype --defaults to None
+	Parameters
+	----------
+	start_utc (int): start time in utc
+	end_utc (int): end time in utc
+	host_strs (Optional[list]): hosts --defaults to None
+	filetype_strs (Optional[list]): filetypes --defaults to None
+	set_host (Optional[str]: )set host --defaults to None
+	set_filetype (Optional[str]): set filetype --defaults to None
 
-	Returns:
-		tuple:
-			dict: 2D dict of count by host and filetype
-			dict: 2D dict of lists of dicts of time and obsnum by host and filetype
+	Returns
+	-------
+	tuple:
+		dict: 2D dict of count by host and filetype
+		dict: 2D dict of lists of dicts of time and obsnum by host and filetype
 	'''
 	base_length = 0.00696
 	try:
@@ -116,14 +122,16 @@ def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 	'''
 	generate histogram after limiting time
 
-	Args:
-		start_utc (int): start time in utc
-		end_utc (int): end time in utc
-		start_time_str (str): start time string
-		end_time_str (str): end time string
+	Parameters
+	----------
+	start_utc (int): start time in utc
+	end_utc (int): end time in utc
+	start_time_str (str): start time string
+	end_time_str (str): end time string
 
-	Returns:
-		html: histogram
+	Returns
+	-------
+	html: histogram
 	'''
 	try:
 		response = db_utils.query(database='paperdata', table='Observation',

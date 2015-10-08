@@ -9,8 +9,9 @@ def get_all_comments():
 	'''
 	get all comments
 
-	Returns:
-		html: comments
+	Returns
+	-------
+	html: comments
 	'''
 	try:
 		threads = db_utils.query(database='search', table='Thread', sort_tuples=(('last_updated', 'desc'),))

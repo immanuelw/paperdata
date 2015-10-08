@@ -41,8 +41,9 @@ def get_users_data_sources():
 	'''
 	get all of current user's data sources
 
-	Returns:
-		html: data sources
+	Returns
+	-------
+	html: data sources
 	'''
 	if g.user is not None and g.user.is_authenticated():
 		active_data_sources = g.user.active_data_sources
@@ -60,8 +61,9 @@ def get_unsubscribed_data_sources():
 	'''
 	get all data sources user is not subscribed to
 
-	Returns:
-		html: unsubscribed data sources
+	Returns
+	-------
+	html: unsubscribed data sources
 	'''
 	if g.user is not None and g.user.is_authenticated():
 		all_data_sources = db_utils.query(database='search', table='GraphDataSource')
@@ -240,14 +242,16 @@ def get_graph_data(data_source_str, start_utc, end_utc, the_set):
 	'''
 	get graph data from data source sets
 
-	Args:
-		data_source_str (str): data source string
-		start_utc (int): start time in utc
-		end_utc (int): end time in utc
-		the_set (object): set object
+	Parameters
+	----------
+	data_source_str (str): data source string
+	start_utc (int): start time in utc
+	end_utc (int): end time in utc
+	the_set (object): set object
 
-	Returns:
-		dict: lists of times, count, and obsnums for graph
+	Returns
+	-------
+	dict: lists of times, count, and obsnums for graph
 	'''
 	data_source = db_utils.query(database='search', table='GraphDataSource', field_tuples=(('name', '==', data_source_str),))[0]
 
@@ -282,11 +286,13 @@ def which_data_set(the_set):
 	'''
 	selects filters from set object
 
-	Args:
-		the_set (object): set object
+	Parameters
+	----------
+	the_set (object): set object
 
-	Returns:
-		list: filter values
+	Returns
+	-------
+	list: filter values
 	'''
 	polarization = getattr(the_set, 'polarization')
 	era =  getattr(the_set, 'era')
@@ -302,14 +308,16 @@ def separate_data_into_sets(data, data_source, start_utc, end_utc):
 	'''
 	get graph data from data source sets
 
-	Args:
-		data (dict): data dictionary
-		data_source (object): data source object
-		start_utc (int): start time in utc
-		end_utc (int): end time in utc
+	Parameters
+	----------
+	data (dict): data dictionary
+	data_source (object): data source object
+	start_utc (int): start time in utc
+	end_utc (int): end time in utc
 
-	Returns:
-		dict: lists of times, count, and obsnums for graph
+	Returns
+	-------
+	dict: lists of times, count, and obsnums for graph
 	'''
 	obsid_results = db_utils.query(data_source=data_source,
 									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),

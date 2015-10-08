@@ -14,13 +14,14 @@ def create_user(database, first_name, last_name, email, username, password):
 	'''
 	creates user when called through command
 
-	Args:
-		database (str): database name
-		first_name (str): first name of user
-		last_name (str): last name
-		email (str): email address
-		username (str): username
-		password (str): password
+	Parameters
+	----------
+	database (str): database name
+	first_name (str): first name of user
+	last_name (str): last name
+	email (str): email address
+	username (str): username
+	password (str): password
 	'''
 	if not database or not first_name or not last_name or not email or not username or not password:
 		print('Please pass all required parameters.\n Usage: flask/bin/python3.4 -m search.manage user create_user -db <database> fn <first name> -ln <last name> -e <email> -u <username> -p <password>')
