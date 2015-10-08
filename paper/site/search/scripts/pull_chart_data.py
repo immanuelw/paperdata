@@ -16,8 +16,9 @@ def write_to_log(msg):
 	'''
 	write message to log
 
-	Args:
-		msg | str: message
+	Parameters
+	----------
+	msg | str: message
 	'''
 	print(msg)
 
@@ -25,8 +26,9 @@ def profile():
 	'''
 	profile the time to run certain functions
 
-	Returns:
-		int: time taken by function in seconds
+	Returns
+	-------
+	int: time taken by function in seconds
 	'''
 	global profiling_mark
 	result = datetime.now() - profiling_mark
@@ -38,8 +40,9 @@ def log_query_time(var_name):
 	'''
 	write time taken to query database to log
 
-	Args:
-		var_name | str: variable name
+	Parameters
+	----------
+	var_name | str: variable name
 	'''
 	write_to_log('{var_name} query ran in {profile_time} seconds'.format(var_name=var_name, profile_time=profile())
 
