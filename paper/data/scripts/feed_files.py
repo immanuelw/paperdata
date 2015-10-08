@@ -40,11 +40,13 @@ def gen_feed_data(host, full_path):
 	except:
 		return (None,) * 2
 
+	path, filename = os.path.split(full_path)
+
 	timestamp = int(time.time())
 
 	feed_data = {'host': host,
-				'path': os.path.dirname(full_path)
-				'filename': os.path.basename(full_path)
+				'path': path,
+				'filename': filename,
 				'full_path': full_path,
 				'julian_day': int(uv['time']),
 				'is_movable': False,
@@ -60,7 +62,7 @@ def gen_feed_data(host, full_path):
 
 def dupe_check(dbi, input_host, input_paths):
 	'''
-	checks for files already in feed table
+	checks for files already in feed table on the same host
 
 	Parameters
 	----------
@@ -74,12 +76,12 @@ def dupe_check(dbi, input_host, input_paths):
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
-		FEEDs = s.query(table).all()
+		FEEDs = s.query(table).filter(getattr(table, 'host') == input_host).all()
 	#all files on same host
-	filenames = tuple(os.path.join(getattr(FEED, 'path'), getattr(FEED, 'filename')) for FEED in FEEDs if getattr(FEED, 'host') == input_host)
+	all_paths = tuple(getattr(FEED, 'full_path') for FEED in FEEDs)
 
 	#for each input file, check if in filenames
-	unique_paths = tuple(input_path for input_path in input_paths if input_path not in filenames)
+	unique_paths = tuple(input_path for input_path in input_paths if input_path not in all_paths)
 		
 	return unique_paths
 
