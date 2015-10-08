@@ -38,10 +38,7 @@ def enough_space(required_space, space_path):
 	'''
 	free_space = psutil.disk_usage(space_path).free
 
-	if required_space < free_space:
-		return True
-
-	return False
+	return required_space < free_space
 
 def email_space(table):
 	'''
@@ -92,10 +89,7 @@ def null_check(dbi, input_host, input_paths):
 	#for each input file, check if in filenames
 	nulls = tuple(input_path for input_path in input_paths if input_path not in filenames)
 		
-	if len(nulls) > 0:
-		return False
-
-	return True
+	return len(nulls) == 0
 
 def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 	'''
