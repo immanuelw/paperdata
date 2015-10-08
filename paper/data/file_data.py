@@ -14,20 +14,20 @@ import paper as ppdata
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def get_size(start_path):
+def get_size(full_path):
 	'''
 	output byte size of directory or file
 
 	Parameters
 	----------
-	start_path | str: path of directory or file
+	full_path | str: path of directory or file
 
 	Returns
 	-------
 	int: amount of bytes
 	'''
 	total_size = 0
-	for dirpath, dirnames, filenames in os.walk(start_path):
+	for dirpath, dirnames, filenames in os.walk(full_path):
 		for f in filenames:
 			fp = os.path.join(dirpath, f)
 			total_size += os.path.getsize(fp)
@@ -51,7 +51,7 @@ def sizeof_fmt(num):
 
 	return round(num, 1)
 
-def calc_size(host, path, filename):
+def calc_size(host, full_path):
 	'''
 	calculates size of directory or file on any host
 	logins into host if necessary
@@ -76,34 +76,34 @@ def calc_size(host, path, filename):
 
 	return size
 
-def get_md5sum(fname):
+def get_md5sum(full_path):
 	'''
-	calculate the md5 checksum of a file whose filename entry is fname.
+	calculate the md5 checksum of a uv file
 
 	Parameters
 	----------
-	fname | str: path of directory or file
+	full_path | str: path of directory or file
 
 	Returns
 	-------
 	str: 32-bit hex integer md5 checksum
 	'''
-	fname = fname.split(':')[-1]
+	full_path = full_path.split(':')[-1]
 	BLOCKSIZE = 65536
 	hasher = hashlib.md5()
 	try:
-		afile = open(fname, 'rb')
+		afile = open(full_path, 'rb')
 	except(IOError):
-		fname = os.path.join(fname, 'visdata')
-		afile = open(fname, 'rb')
+		fname = os.path.join(full_path, 'visdata')
+		afile = open(full_path, 'rb')
 	buf = afile.read(BLOCKSIZE)
-	while len(buf) >0:
+	while len(buf) > 0:
 		hasher.update(buf)
 		buf = afile.read(BLOCKSIZE)
 
 	return hasher.hexdigest()
 
-def calc_md5sum(host, path, filename):
+def calc_md5sum(host, full_path):
 	'''
 	calculates md5 checksum of directory or file on any host
 	logins into host if necessary
@@ -124,8 +124,8 @@ def calc_md5sum(host, path, filename):
 		with ppdata.ssh_scope(host) as ssh:
 			try:
 				with ssh.open_sftp() as sftp:
-					remote_path = sftp.file(full_path, mode='r')
-					md5 = remote_path.check('md5', block_size=65536)
+					with sftp.file(full_path, mode='r') as remote_path:
+						md5 = remote_path.check('md5', block_size=65536)
 			except(IOError):
 				vis_path = os.path.join(full_path, 'visdata')
 				_, md5_out, _ = ssh.exec_command('md5sum {vis_path}'.format(vis_path=vis_path))
