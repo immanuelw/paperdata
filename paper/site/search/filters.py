@@ -10,7 +10,7 @@ def set_hyperlink_filter(comment):
 
 	Parameters
 	----------
-	comment (str): comment
+	comment | str: comment
 
 	Returns
 	-------

@@ -25,8 +25,8 @@ def delete_check(dbi, input_host):
 
 	Parameters
 	----------
-	dbi (object): database interface object
-		host (str): host of system
+	dbi | object: database interface object
+		host | str: host of system
 
 	Returns
 	-------
@@ -47,12 +47,12 @@ def set_delete_table(s, dbi, input_host, source, output_host, output_dir):
 
 	Parameters
 	----------
-	s (object): session object
-	dbi (object): database interface object
-	input_host (str): user host
-	source (str): source file
-	output_host (str): output host
-	output_dir (str): output directory
+	s | object: session object
+	dbi | object: database interface object
+	input_host | str: user host
+	source | str: source file
+	output_host | str: output host
+	output_dir | str: output directory
 	'''
 	full_path = ''.join((input_host, ':', source))
 	timestamp = int(time.time())
@@ -76,11 +76,11 @@ def delete_files(dbi, input_host, input_paths, output_host, output_dir):
 
 	Parameters
 	----------
-	dbi (object): database interface object
-	input_host (str): user host
-	input_paths (list): file paths
-	output_host (str): output host
-	output_dir (str): output directory
+	dbi | object: database interface object
+	input_host | str: user host
+	input_paths | list: file paths
+	output_host | str: output host
+	output_dir | str: output directory
 	'''
 	named_host = socket.gethostname()
 	destination = ''.join((output_host, ':', output_dir))

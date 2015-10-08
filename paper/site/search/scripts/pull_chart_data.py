@@ -17,7 +17,7 @@ def write_to_log(msg):
 	write message to log
 
 	Args:
-		msg (str): message
+		msg | str: message
 	'''
 	print(msg)
 
@@ -39,7 +39,7 @@ def log_query_time(var_name):
 	write time taken to query database to log
 
 	Args:
-		var_name (str): variable name
+		var_name | str: variable name
 	'''
 	write_to_log('{var_name} query ran in {profile_time} seconds'.format(var_name=var_name, profile_time=profile())
 

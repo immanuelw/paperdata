@@ -244,10 +244,10 @@ def get_graph_data(data_source_str, start_utc, end_utc, the_set):
 
 	Parameters
 	----------
-	data_source_str (str): data source string
-	start_utc (int): start time in utc
-	end_utc (int): end time in utc
-	the_set (object): set object
+	data_source_str | str: data source string
+	start_utc | int: start time in utc
+	end_utc | int: end time in utc
+	the_set | object: set object
 
 	Returns
 	-------
@@ -288,7 +288,7 @@ def which_data_set(the_set):
 
 	Parameters
 	----------
-	the_set (object): set object
+	the_set | object: set object
 
 	Returns
 	-------
@@ -310,10 +310,10 @@ def separate_data_into_sets(data, data_source, start_utc, end_utc):
 
 	Parameters
 	----------
-	data (dict): data dictionary
-	data_source (object): data source object
-	start_utc (int): start time in utc
-	end_utc (int): end time in utc
+	data | dict: data dictionary
+	data_source | object: data source object
+	start_utc | int: start time in utc
+	end_utc | int: end time in utc
 
 	Returns
 	-------

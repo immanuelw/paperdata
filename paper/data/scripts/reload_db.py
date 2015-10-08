@@ -19,7 +19,7 @@ def find_paths(input_host):
 
 	Parameters
 	----------
-	input_host (str): system host of files
+	input_host | str: system host of files
 
 	Returns
 	-------

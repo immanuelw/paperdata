@@ -35,9 +35,9 @@ def filesystem(ssh, host, path):
 
 	Parameters
 	----------
-	ssh (object): ssh object
-	host (str): host of filesystem
-	path (str): path to search
+	ssh | object: ssh object
+	host | str: host of filesystem
+	path | str: path to search
 
 	Returns
 	-------
@@ -75,8 +75,8 @@ def iostat(ssh, host):
 
 	Parameters
 	----------
-	ssh (object): ssh object
-	host (str): host of filesystem
+	ssh | object: ssh object
+	host | str: host of filesystem
 
 	Returns
 	-------
@@ -141,8 +141,8 @@ def ram_free(ssh, host):
 
 	Parameters
 	----------
-	ssh (object): ssh object
-	host (str): host of filesystem
+	ssh | object: ssh object
+	host | str: host of filesystem
 
 	Returns
 	-------
@@ -211,8 +211,8 @@ def cpu_perc(ssh, host):
 
 	Parameters
 	----------
-	ssh (object): ssh object
-	host (str): host of filesystem
+	ssh | object: ssh object
+	host | str: host of filesystem
 
 	Returns
 	-------
@@ -275,8 +275,8 @@ def add_data(host):
 
 	Parameters
 	----------
-	ssh (object): ssh object
-	host (str): host of filesystem
+	ssh | object: ssh object
+	host | str: host of filesystem
 	'''
 	with ppdata.ssh_scope(host) as ssh:
 		dbi = pyg.DataBaseInterface()

@@ -15,7 +15,7 @@ def time_val(value):
 
 	Parameters
 	----------
-	value (float): numerical time value
+	value | float: numerical time value
 
 	Returns
 	-------
@@ -31,7 +31,7 @@ def str_val(value):
 
 	Parameters
 	----------
-	value (float): numerical time value
+	value | float: numerical time value
 
 	Returns
 	-------

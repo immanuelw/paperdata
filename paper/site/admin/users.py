@@ -13,7 +13,7 @@ def load_user(id):
 
 	Parameters
 	----------
-	id (int): user id
+	id | int: user id
 
 	Returns
 	-------

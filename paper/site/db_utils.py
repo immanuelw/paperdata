@@ -14,7 +14,7 @@ def get_dbi(database):
 
 	Parameters
 	----------
-	database (str): database name
+	database | str: database name
 
 	Returns
 	-------
@@ -51,7 +51,7 @@ def inspector(database):
 
 	Parameters
 	----------
-	database (str): database name
+	database | str: database name
 
 	Returns
 	-------
@@ -68,7 +68,7 @@ def get_table_names(database):
 
 	Parameters
 	----------
-	database (str): database name
+	database | str: database name
 
 	Returns
 	-------
@@ -85,8 +85,8 @@ def get_column_names(database, table):
 
 	Parameters
 	----------
-	database (str): database name
-	table (str): table name
+	database | str: database name
+	table | str: table name
 
 	Returns
 	-------
@@ -105,9 +105,9 @@ def make_clause(table, field_name, equivalency, value):
 
 	Parameters
 	----------
-	table (str): table name
-		field_name (str): field name
-		equivalency (str): type of equivalency
+	table | str: table name
+		field_name | str: field name
+		equivalency | str: type of equivalency
 		value (int/float/str) value to compare against
 
 	Returns
@@ -146,8 +146,8 @@ def sort_clause(table, sort_tuples):
 
 	Parameters
 	----------
-	table (str): table name
-	sort_tuples (list): tuples indicating field to sort and sort order
+	table | str: table name
+	sort_tuples | list: tuples indicating field to sort and sort order
 
 	Returns
 	-------
@@ -163,8 +163,8 @@ def group_clause(table, group_tuples):
 
 	Parameters
 	----------
-	table (str): table name
-	group_tuples (list): tuples indicating fields to group
+	table | str: table name
+	group_tuples | list: tuples indicating fields to group
 
 	Returns
 	-------
@@ -180,11 +180,11 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples):
 
 	Parameters
 	----------
-	s (object): session object
-	table (str): table name
-	field_tuples (list): tuples of field names, equivalency values, and values to limit query
-	sort_tuples (list): tuples indicating field to sort and sort order
-	group_tuples (list): tuples indicating fields to group
+	s | object: session object
+	table | str: table name
+	field_tuples | list: tuples of field names, equivalency values, and values to limit query
+	sort_tuples | list: tuples indicating field to sort and sort order
+	group_tuples | list: tuples indicating fields to group
 
 	Returns
 	-------

@@ -21,7 +21,7 @@ def five_round(num):
 
 	Parameters
 	----------
-	num (float): number
+	num | float: number
 
 	Returns
 	-------
@@ -35,9 +35,9 @@ def jdpol2obsnum(jd, pol, djd):
 
 	Parameters
 	----------
-	jd (float): julian date float
-	pol (str): polarization
-	length (float): length of obs in fraction of julian date
+	jd | float: julian date float
+	pol | str: polarization
+	length | float: length of obs in fraction of julian date
 
 	Returns
 	-------
@@ -57,7 +57,7 @@ def date_info(julian_date):
 
 	Parameters
 	----------
-	julian_date (float): julian date
+	julian_date | float: julian date
 
 	Returns
 	-------
@@ -151,8 +151,8 @@ def calc_npz_data(dbi, filename):
 
 	Parameters
 	----------
-	dbi (object): database interface object
-		filename (str): filename of npz file [Ex: zen.2456640.24456.xx.uvcRE.npz OR zen.2456243.24456.uvcRE.npz]
+	dbi | object: database interface object
+		filename | str: filename of npz file [Ex: zen.2456640.24456.xx.uvcRE.npz OR zen.2456243.24456.uvcRE.npz]
 
 	Returns
 	-------
@@ -198,8 +198,8 @@ def calc_uv_data(host, full_path):
 
 	Parameters
 	----------
-	host (str): host of system
-	full_path (str): full_path of uv* file
+	host | str: host of system
+	full_path | str: full_path of uv* file
 
 	Returns
 	-------

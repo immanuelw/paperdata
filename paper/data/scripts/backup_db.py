@@ -23,8 +23,8 @@ def json_data(dbo, dump_objects):
 
 	Parameters
 	----------
-	dbo (str): filename
-	dump_objects (list): database objects query
+	dbo | str: filename
+	dump_objects | list: database objects query
 	'''
 	with open(dbo, 'w') as f:
 		data = [ser_data.to_dict() for ser_data in dump_objects.all()]
@@ -38,7 +38,7 @@ def paperbackup(dbi):
 
 	Parameters
 	----------
-	dbi (object): database interface object
+	dbi | object: database interface object
 	'''
 	timestamp = int(time.time())
 	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(timestamp))

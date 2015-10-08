@@ -11,7 +11,7 @@ def hours_to_degrees(angle):
 
 	Parameters
 	----------
-	hours (float): angle in decimal hours
+	hours | float: angle in decimal hours
 
 	Returns
 	-------
@@ -39,7 +39,7 @@ def degrees_to_hours(angle):
 
 	Parameters
 	----------
-	angle (float): angle in degrees
+	angle | float: angle in degrees
 
 	Returns
 	-------
@@ -53,7 +53,7 @@ def radians_to_hours(angle):
 
 	Parameters
 	----------
-	angle (float): angle in degrees
+	angle | float: angle in degrees
 
 	Returns
 	-------

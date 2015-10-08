@@ -51,7 +51,7 @@ def get_utc_from_datetime(date_time):
 
 	Parameters
 	----------
-	date_time (object): datetime object
+	date_time | object: datetime object
 
 	Returns
 	-------

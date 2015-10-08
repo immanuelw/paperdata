@@ -10,14 +10,14 @@ def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era_
 
 	Parameters
 	----------
-	name (str): set name
-	start (str): start time
-	end (str): end time
-	flagged_range_dicts (dict): flagged range
-	polarization (str): polarization
-	era_type (str): era type
-	total_data_hrs (int): total data hours
-	flagged_data_hrs (int): flagged data hours
+	name | str: set name
+	start | str: start time
+	end | str: end time
+	flagged_range_dicts | dict: flagged range
+	polarization | str: polarization
+	era_type | str: era type
+	total_data_hrs | int: total data hours
+	flagged_data_hrs | int: flagged data hours
 	'''
 	new_set = getattr(models, 'Set')()
 	setattr(new_set, 'username', g.user.username)
@@ -60,8 +60,8 @@ def is_obs_flagged(obs_id, flagged_range_dicts):
 
 	Parameters
 	----------
-	obs_id (int): observation id
-	flagged_range_dicts (list): flagged range dicts
+	obs_id | int: observation id
+	flagged_range_dicts | list: flagged range dicts
 
 	Returns
 	-------
@@ -79,12 +79,12 @@ def get_data_hours_in_set(start, end, polarization, era_type, flagged_range_dict
 
 	Parameters
 	----------
-	start (str): start time
-	end (str): end time
-	flagged_range_dicts (dict): flagged range
-	polarization (str): polarization
-	era_type (str): era type
-	flagged_range_dicts (list): flagged range dicts
+	start | str: start time
+	end | str: end time
+	flagged_range_dicts | dict: flagged range
+	polarization | str: polarization
+	era_type | str: era type
+	flagged_range_dicts | list: flagged range dicts
 
 	Returns
 	-------

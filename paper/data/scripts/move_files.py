@@ -29,8 +29,8 @@ def enough_space(required_space, space_path):
 
 	Parameters
 	----------
-	required_space (int): amount of space needed in bytes
-	space_path (str): path to check for spacce
+	required_space | int: amount of space needed in bytes
+	space_path | str: path to check for spacce
 
 	Returns
 	-------
@@ -49,7 +49,7 @@ def email_space(table):
 
 	Parameters
 	----------
-	table (str): table name
+	table | str: table name
 	'''
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
@@ -77,9 +77,9 @@ def null_check(dbi, input_host, input_paths):
 
 	Parameters
 	----------
-	dbi (object): database interface object
-	input_host (str): host of files
-	input_paths (list): uv* file paths
+	dbi | object: database interface object
+	input_host | str: host of files
+	input_paths | list: uv* file paths
 
 	Returns
 	-------
@@ -105,12 +105,12 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 
 	Parameters
 	----------
-	s (object): session object
-	dbi (object): database interface object
-	input_host (str): user host
-	source (str): source file
-	output_host (str): output host
-	output_dir (str): output directory
+	s | object: session object
+	dbi | object: database interface object
+	input_host | str: user host
+	source | str: source file
+	output_host | str: output host
+	output_dir | str: output directory
 	'''
 	full_path = ''.join((input_host, ':', source))
 	timestamp = int(time.time())
@@ -133,11 +133,11 @@ def move_files(dbi, input_host=None, input_paths=None, output_host=None, output_
 
 	Parameters
 	----------
-	dbi (object): database interface object
-	input_host (str): file host --defaults to None
-	input_paths (list): file paths --defaults to None
-	output_host (str): output host --defaults to None
-	output_dir (str): output directory --defaults to None
+	dbi | object: database interface object
+	input_host | str: file host --defaults to None
+	input_paths | list: file paths --defaults to None
+	output_host | str: output host --defaults to None
+	output_dir | str: output directory --defaults to None
 	'''
 	named_host = socket.gethostname()
 	input_host = raw_input('Source directory host: ') if input_host is None else input_host

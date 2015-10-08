@@ -20,7 +20,7 @@ def get_size(start_path):
 
 	Parameters
 	----------
-	start_path (str): path of directory or file
+	start_path | str: path of directory or file
 
 	Returns
 	-------
@@ -40,7 +40,7 @@ def sizeof_fmt(num):
 
 	Parameters
 	----------
-	num (int): amount of bytes
+	num | int: amount of bytes
 
 	Returns
 	-------
@@ -58,9 +58,9 @@ def calc_size(host, path, filename):
 
 	Parameters
 	----------
-	host (str): host of file
-		path (str): path of file
-		filename (str): unique name of directory or file
+	host | str: host of file
+		path | str: path of file
+		filename | str: unique name of directory or file
 
 	Returns
 	-------
@@ -84,7 +84,7 @@ def get_md5sum(fname):
 
 	Parameters
 	----------
-	fname (str): path of directory or file
+	fname | str: path of directory or file
 
 	Returns
 	-------
@@ -112,9 +112,9 @@ def calc_md5sum(host, path, filename):
 
 	Parameters
 	----------
-	host (str): host of file
-		path (str): path of file
-		filename (str): unique name of directory or file
+	host | str: host of file
+		path | str: path of file
+		filename | str: unique name of directory or file
 
 	Returns
 	-------
@@ -143,7 +143,7 @@ def file_names(full_path):
 
 	Parameters
 	----------
-	full_path (str): full path of directory or file
+	full_path | str: full path of directory or file
 
 	Returns
 	-------

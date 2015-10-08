@@ -136,7 +136,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 
 		Parameters
 		----------
-		configfile (str): paperdata database configuration file
+		configfile | str: paperdata database configuration file
 		'''
 		super(DataBaseInterface, self).__init__(configfile=configfile)
 
@@ -158,7 +158,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 
 		Parameters
 		----------
-		Base (object): Base database object
+		Base | object: Base database object
 		'''
 		super(DataBaseInterface, self).drop_db(Base)
 
@@ -168,9 +168,9 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 
 		Parameters
 		----------
-		s (object): session object
-		TABLE (str): table name
-		entry_dict (dict): dict of attributes for object
+		s | object: session object
+		TABLE | str: table name
+		entry_dict | dict: dict of attributes for object
 		'''
 		super(DataBaseInterface, self).add_entry_dict(__name__, s, TABLE, entry_dict)
 
@@ -182,9 +182,9 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 
 		Parameters
 		----------
-		s (object): session object
-		TABLE (str): table name
-		unique_value (int/float/str): primary key value of row
+		s | object: session object
+		TABLE | str: table name
+		unique_value | int/float/str: primary key value of row
 
 		Returns
 		-------

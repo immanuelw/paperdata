@@ -24,8 +24,8 @@ def calc_obs_data(dbi, host, full_path):
 
 	Parameters
 	----------
-	host (str): host of system
-	full_path (str): full path of uv* file
+	host | str: host of system
+	full_path | str: full path of uv* file
 
 	Returns
 	-------
@@ -102,9 +102,9 @@ def dupe_check(dbi, input_host, input_paths):
 
 	Parameters
 	----------
-	dbi (object): database interface object
-	input_host (str): host of uv* files
-	input_paths (list): paths of uv* files
+	dbi | object: database interface object
+	input_host | str: host of uv* files
+	input_paths | list: paths of uv* files
 
 	Returns
 	-------
@@ -127,10 +127,10 @@ def set_obs(s, dbi, OBS, field):
 
 	Parameters
 	----------
-	s (object): session object
-	dbi (object): database interface object
-	OBS (object): observation object
-	field (str): field to update
+	s | object: session object
+	dbi | object: database interface object
+	OBS | object: observation object
+	field | str: field to update
 
 	Returns
 	-------
@@ -163,7 +163,7 @@ def update_obsnums(dbi):
 
 	Parameters
 	----------
-	dbi (object): database interface object
+	dbi | object: database interface object
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Observation')
@@ -184,7 +184,7 @@ def connect_observations(dbi):
 
 	Parameters
 	----------
-	dbi (object): database interface object
+	dbi | object: database interface object
 	'''
 	with dbi.session_scope() as s:
 		file_table = getattr(pdbi, 'File')
@@ -204,9 +204,9 @@ def add_files_to_db(dbi, input_host, input_paths):
 
 	Parameters
 	----------
-	dbi (object): database interface object
-	input_host (str): host of files
-	input_paths (list): paths of uv* files
+	dbi | object: database interface object
+	input_host | str: host of files
+	input_paths | list: paths of uv* files
 	'''
 	with dbi.session_scope() as s:
 		for input_path in input_paths:
@@ -234,9 +234,9 @@ def add_files(dbi, input_host, input_paths):
 
 	Parameters
 	----------
-	dbi (object): database interface object
-	input_host (str): host of files, list of uv* file paths
-	input_paths (str): string to indicate paths of uv* files
+	dbi | object: database interface object
+	input_host | str: host of files, list of uv* file paths
+	input_paths | str: string to indicate paths of uv* files
 	'''
 	named_host = socket.gethostname()
 	if named_host == input_host:

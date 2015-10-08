@@ -22,9 +22,9 @@ def load_backup(dbi, backup_file=None, table=None):
 
 	Parameters
 	----------
-	dbi (object): database interface object,
-	backup_file (str): name of backup file --defaults to None
-	table (str): table name --defaults to None
+	dbi | object: database interface object,
+	backup_file | str: name of backup file --defaults to None
+	table | str: table name --defaults to None
 	'''
 	if table is None:
 		return None

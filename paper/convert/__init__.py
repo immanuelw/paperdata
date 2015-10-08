@@ -44,9 +44,9 @@ def gcal2jd(year, month, day, hour=None, minute=None, second=None):
 
 	Parameters
 	----------
-	year (int): gregorian year
-	month (int): gregorian month
-	day (int): gregorian day
+	year | int: gregorian year
+	month | int: gregorian month
+	day | int: gregorian day
 	hour (Optional[int]): gregorian hour
 	minute (Optional[int]): gregorian minute
 	second (Optional[float]): gregorian second
@@ -85,8 +85,8 @@ def jd2gcal(jd1, jd2):
 
 	Parameters
 	----------
-	jd1 (float): modified jd
-	jd2 (float): actual julian date
+	jd1 | float: modified jd
+	jd2 | float: actual julian date
 
 	Returns
 	-------
@@ -135,7 +135,7 @@ def time_to_decimal(time):
 
 	Parameters
 	----------
-	time (object): datetime.time or datetime.datetime object
+	time | object: datetime.time or datetime.datetime object
 
 	Returns
 	-------
@@ -150,7 +150,7 @@ def decimal_to_time(hours):
 
 	Parameters
 	----------
-	hours (float): input time
+	hours | float: input time
 
 	Returns
 	-------
@@ -172,9 +172,9 @@ def date_to_juliandate(year, month, day):
 
 	Parameters
 	----------
-	year (int): A Gregorian year (B.C. years are negative)
-	month (int): A Gregorian month (1-12)
-	day (int): A Gregorian day (1-31)
+	year | int: A Gregorian year (B.C. years are negative)
+	month | int: A Gregorian month (1-12)
+	day | int: A Gregorian day (1-31)
 
 	Returns
 	-------
@@ -210,7 +210,7 @@ def datetime_to_juliandate(dt):
 
 	Parameters
 	----------
-	dt (object): datetime object
+	dt | object: datetime object
 
 	Returns
 	-------
@@ -227,7 +227,7 @@ def juliandate_to_modifiedjd(juliandate):
 
 	Parameters
 	----------
-	juliandate (float): a Julian Date
+	juliandate | float: a Julian Date
 	
 	Returns
 	-------
@@ -241,7 +241,7 @@ def modifiedjd_to_juliandate(modifiedjd):
 
 	Parameters
 	----------
-	modifiedjf (float): a Modified Julian Date
+	modifiedjf | float: a Modified Julian Date
 
 	Returns
 	-------
@@ -255,7 +255,7 @@ def datetime_to_modifiedjd(dt):
 
 	Parameters
 	----------
-	dt (object): datetime object
+	dt | object: datetime object
 
 	Returns
 	-------
@@ -271,7 +271,7 @@ def juliandate_to_gmst(juliandate):
 
 	Parameters
 	----------
-	juliandate (float): Julian Date
+	juliandate | float: Julian Date
 
 	Returns
 	-------
@@ -295,7 +295,7 @@ def utc_to_gmst(dt):
 
 	Parameters
 	----------
-	dt (object): datetime object in UTC time
+	dt | object: datetime object in UTC time
 
 	Returns
 	-------
@@ -313,7 +313,7 @@ def gmst_to_utc(dt):
 
 	Parameters
 	----------
-	dt (object): datetime object in GMST time
+	dt | object: datetime object in GMST time
 
 	Returns
 	-------
@@ -340,7 +340,7 @@ def juliandate_to_utc(juliandate):
 
 	Parameters
 	----------
-	juliandate (float): a Julian Date
+	juliandate | float: a Julian Date
 
 	Returns
 	-------
@@ -390,7 +390,7 @@ def modifiedjd_to_utc(modifiedjd):
 
 	Parameters
 	----------
-	juliandate (float): a Modified Julian Date
+	juliandate | float: a Modified Julian Date
 
 	Returns
 	-------
@@ -406,8 +406,8 @@ def gmst_to_lst(hours, longitude):
 
 	Parameters
 	----------
-	hours (float): decimal hours in GMST
-	longitude (float): location in degrees, E positive
+	hours | float: decimal hours in GMST
+	longitude | float: location in degrees, E positive
 
 	Returns
 	-------
@@ -426,8 +426,8 @@ def lst_to_gmst(hours, longitude):
 
 	Parameters
 	----------
-	hours (float): decimal hours in LST
-	longitude (float): location in degrees, E positive
+	hours | float: decimal hours in LST
+	longitude | float: location in degrees, E positive
 
 	Returns
 	-------
@@ -445,8 +445,8 @@ def utc_to_lst(dt, longitude):
 
 	Parameters
 	----------
-	dt (object): datetime object in UTC
-	longitude (float): location in degrees, E positive
+	dt | object: datetime object in UTC
+	longitude | float: location in degrees, E positive
 
 	Returns
 	-------
@@ -462,7 +462,7 @@ def gps_to_utc(timestamp):
 
 	Parameters
 	----------
-	timestamp (float): GPS timestamp in seconds
+	timestamp | float: GPS timestamp in seconds
 
 	Returns
 	-------
@@ -479,7 +479,7 @@ def utc_to_gps(timestamp):
 
 	Parameters
 	----------
-	timestamp (float): UTC timestamp in seconds
+	timestamp | float: UTC timestamp in seconds
 
 	Returns
 	-------
@@ -496,7 +496,7 @@ def utc_from_string(date):
 
 	Parameters
 	----------
-	date (str): date string
+	date | str: date string
 
 	Returns
 	-------
@@ -512,7 +512,7 @@ def gps_from_string(date):
 
 	Parameters
 	----------
-	date (str): date string
+	date | str: date string
 
 	Returns
 	-------
@@ -528,8 +528,8 @@ def gps_to_lst(timestamp, longitude):
 
 	Parameters
 	----------
-	timestamp (float): GPS timestamp in seconds
-	longitude (float): location in degrees, E positive
+	timestamp | float: GPS timestamp in seconds
+	longitude | float: location in degrees, E positive
 
 	Returns
 	-------
@@ -546,7 +546,7 @@ def gps_to_datetime(timestamp):
 
 	Parameters
 	----------
-	timestamp (float): GPS timestamp in seconds.
+	timestamp | float: GPS timestamp in seconds.
 
 	Returns
 	-------
@@ -562,7 +562,7 @@ def datetime_to_gps(dt):
 
 	Parameters
 	----------
-	dt (object): GPS datetime object
+	dt | object: GPS datetime object
 
 	Returns
 	-------

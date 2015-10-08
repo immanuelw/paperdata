@@ -11,7 +11,7 @@ def decimal_to_sexagesimal(decimal):
 
 	Parameters
 	----------
-	decimal (float): decimal number to be converted to sexagismal
+	decimal | float: decimal number to be converted to sexagismal
 
 	Returns
 	-------
@@ -39,9 +39,9 @@ def sexagesimal_to_decimal(hd, minutes, seconds):
 
 	Parameters
 	----------
-	hd (float): hours or degrees.
-	minutes (float): minutes or arcminutes
-	seconds (float): seconds or arcseconds
+	hd | float: hours or degrees.
+	minutes | float: minutes or arcminutes
+	seconds | float: seconds or arcseconds
 
 	Returns
 	-------

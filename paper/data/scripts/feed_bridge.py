@@ -30,11 +30,11 @@ def set_feed(s, dbi, source, output_host, output_dir, is_moved=True):
 
 	Parameters
 	----------
-	s (object): session object
-	dbi (object): database interface object
-	source (str): source file
-	output_host (str): output host
-	output_dir (str): output directory
+	s | object: session object
+	dbi | object: database interface object
+	source | str: source file
+	output_host | str: output host
+	output_dir | str: output directory
 	is_moved (bool): checks whether to move to paperdistiller --defaults to False
 	'''
 	FEED = dbi.get_entry(s, 'Feed', source)
@@ -50,12 +50,12 @@ def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
 
 	Parameters
 	----------
-	dbi (object): database interface object
-	input_host (str): file host
-	input_paths (list): file paths
-	source (str): source file
-	output_host (str): output host
-	output_dir (str): output directory
+	dbi | object: database interface object
+	input_host | str: file host
+	input_paths | list: file paths
+	source | str: source file
+	output_host | str: output host
+	output_dir | str: output directory
 	'''
 	#different from move_files, adds to feed
 	named_host = socket.gethostname()
@@ -85,7 +85,7 @@ def count_days(dbi):
 
 	Parameters
 	----------
-	dbi (object): database interface object
+	dbi | object: database interface object
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
@@ -107,7 +107,7 @@ def find_data(dbi):
 
 	Parameters
 	----------
-	dbi (object): database interface object
+	dbi | object: database interface object
 
 	Returns
 	-------
@@ -135,7 +135,7 @@ def email_paperfeed(files):
 
 	Parameters
 	----------
-	files (list): files being moved
+	files | list: files being moved
 	'''
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
@@ -166,7 +166,7 @@ def feed_bridge(dbi):
 
 	Parameters
 	----------
-	dbi (object): database interface object
+	dbi | object: database interface object
 	'''
 	#Minimum amount of space to move a day ~3.1TiB
 	required_space = 1112373311360

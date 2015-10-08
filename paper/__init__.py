@@ -35,8 +35,8 @@ def rsync_copy(source, destination):
 
 	Parameters
 	----------
-	source (str): source file path
-	destination (str): destination path
+	source | str: source file path
+	destination | str: destination path
 	'''
 	subprocess.check_output(['rsync', '-ac', source, destination])
 
@@ -51,8 +51,8 @@ def ssh_scope(host, username=None):
 
 	Parameters
 	----------
-	host (str): remote host
-	username (str): username --defaults to None
+	host | str: remote host
+	username | str: username --defaults to None
 
 	Returns
 	-------
@@ -162,7 +162,7 @@ class DataBaseInterface(object):
 
 		Parameters
 		----------
-		Base (object): base object for database
+		Base | object: base object for database
 		'''
 		Base.metadata.bind = self.engine
 		Base.metadata.drop_all()
@@ -173,7 +173,7 @@ class DataBaseInterface(object):
 
 		Parameters
 		----------
-		Table (object): table object
+		Table | object: table object
 		'''
 		Table.__table__.create(bind=self.engine)
 
@@ -184,8 +184,8 @@ class DataBaseInterface(object):
 
 		Parameters
 		----------
-		s (object): session object
-		ENTRY (object): entry object
+		s | object: session object
+		ENTRY | object: entry object
 		'''
 		try:
 			s.add(ENTRY)
@@ -202,10 +202,10 @@ class DataBaseInterface(object):
 
 		Parameters
 		----------
-		mod_name (str): name of module to access models
-		s (object): session object
-		TABLE (str): table name
-		entry_dict (dict): dict of attributes for object
+		mod_name | str: name of module to access models
+		s | object: session object
+		TABLE | str: table name
+		entry_dict | dict: dict of attributes for object
 		'''
 		table = getattr(sys.modules[mod_name], TABLE)
 		ENTRY = table(**entry_dict)
@@ -221,10 +221,10 @@ class DataBaseInterface(object):
 
 		Parameters
 		----------
-		mod_name (str): name of module to access models
-		s (object): session object
-		TABLE (str): table name
-		unique_value (int/float/str): primary key value of row
+		mod_name | str: name of module to access models
+		s | object: session object
+		TABLE | str: table name
+		unique_value | int/float/str: primary key value of row
 
 		Returns
 		-------
@@ -244,10 +244,10 @@ class DataBaseInterface(object):
 
 		Parameters
 		----------
-		s (object): session object
-		ENTRY (object): entry object
-		field (str): field to be changed
-		new_value (int/float/str): value to change field in entry to
+		s | object: session object
+		ENTRY | object: entry object
+		field | str: field to be changed
+		new_value | int/float/str: value to change field in entry to
 		'''
 		setattr(ENTRY, field, new_value)
 		self.add_entry(s, ENTRY)
