@@ -104,7 +104,7 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 	output_host | str: output host
 	output_dir | str: output directory
 	'''
-	full_path = ''.join((input_host, ':', source))
+	full_path = ':'.join((input_host, source))
 	timestamp = int(time.time())
 	FILE = dbi.get_entry(s, 'File', full_path)
 	dbi.set_entry(s, FILE, 'host', output_host)
@@ -149,7 +149,7 @@ def move_files(dbi, input_host=None, input_paths=None, output_host=None, output_
 		print('File(s) not in database')
 		return
 
-	destination = ''.join((output_host, ':', output_dir))
+	destination = ':'.join((output_host, output_dir))
 	with dbi.session_scope() as s:
 		if named_host == input_host:
 			for source in input_paths:

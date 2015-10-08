@@ -57,7 +57,7 @@ def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
 	'''
 	#different from move_files, adds to feed
 	named_host = socket.gethostname()
-	destination = ''.join((output_host, ':', output_dir))
+	destination = ':'.join((output_host, output_dir))
 	with dbi.session_scope() as s:
 		if named_host == input_host:
 			for source in input_paths:
