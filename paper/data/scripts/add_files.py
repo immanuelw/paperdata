@@ -262,6 +262,7 @@ def add_files(dbi, input_host, input_paths):
 	add_files_to_db(dbi, input_host, npz_paths)
 	update_obsnums(dbi)
 	connect_observations(dbi)
+	#update_md5(dbi)
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2:
