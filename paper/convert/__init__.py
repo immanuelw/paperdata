@@ -2,7 +2,7 @@ from time import strptime
 import datetime
 import math
 import calendar
-from . import base, angles
+import numpy as np
 
 LEAP_SECONDS = (('July 1, 2015', 17),
 				('July 1, 2012', 16),
@@ -25,6 +25,106 @@ LEAP_SECONDS = (('July 1, 2015', 17),
 
 MJD_0 = 2400000.5
 MJD_JD2000 = 51544.5
+
+def hours_to_degrees(angle):
+	'''
+	converts decimal hours to degrees
+
+	Parameters
+	----------
+	hours | float: angle in decimal hours
+
+	Returns
+	-------
+	float: angle in degrees
+	'''
+	return angle * 15.
+
+def hours_to_radians(angle):
+	'''
+	converts decimal hours to radians
+
+	Parameters
+	----------
+	hours | float: angle in decimal hours
+
+	Returns
+	-------
+	float: angle in radians
+	'''
+	return np.radians(hours_to_degrees(angle))
+
+def degrees_to_hours(angle):
+	'''
+	converts degrees to decimal hours
+
+	Parameters
+	----------
+	angle | float: angle in degrees
+
+	Returns
+	-------
+	float: angle in decimal hours
+	'''
+	return angle / 15.
+
+def radians_to_hours(angle):
+	'''
+	converts degrees to decimal hours
+
+	Parameters
+	----------
+	angle | float: angle in degrees
+
+	Returns
+	-------
+	float: angle in decimal hours
+	'''
+	return degrees_to_hours(np.degrees(angle))
+
+def decimal_to_sexagesimal(decimal):
+	'''
+	convert decimal hours or degrees to sexagesimal
+
+	Parameters
+	----------
+	decimal | float: decimal number to be converted to sexagismal
+
+	Returns
+	-------
+	tuple:
+		int: hours
+		int: minutes
+		float: seconds
+	OR
+	tuple:
+		int: degrees
+		int: arcminutes
+		float: arcseconds
+	'''
+	fractional, integral = np.modf(decimal)
+	min_fractional, minutes = np.modf(fractional * 60)
+	seconds = min_fractional * 60.
+
+	return integral.astype(int), minutes.astype(int), seconds
+
+def sexagesimal_to_decimal(hd, minutes, seconds):
+	'''
+	convert sexagesimal hours or degrees to decimal
+	Warning! Ensure each part has the correct sign
+	e.g. -111d36m12s should be entered as (-111, -36, -12)
+
+	Parameters
+	----------
+	hd | float: hours or degrees.
+	minutes | float: minutes or arcminutes
+	seconds | float: seconds or arcseconds
+
+	Returns
+	-------
+	float: decimal hours or degrees
+	'''
+	return hd + minutes / 60. + seconds / 3600.
 
 def fpart(x):
 	'''
