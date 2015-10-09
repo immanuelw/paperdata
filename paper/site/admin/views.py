@@ -158,10 +158,10 @@ def filesystem():
 			this_sys['time'] = time_val(system_time)
 			this_sys['used_perc'] = used_perc
 
-			#this_sys['stats'] = ' '.join(system_name, 'stats')
+			#this_sys['stats'] = ' '.join((system_name, 'stats'))
 			#this_sys['free_perc'] = 100 - used_space
 			#used_space = getattr(system, 'used_space') / 1024.0 ** 3 #convert to GiB
-			#this_sys['used_space'] = ' '.join(str(used_space), 'GB')
+			#this_sys['used_space'] = ' '.join((str(used_space), 'GB'))
 
 	return render_template('filesystem_table.html', system_header=system_header, system_dict=system_dict)
 
@@ -175,7 +175,7 @@ def rtp_summary_table():
 	html: rtp summary table
 	'''
 	obs_vars = ('files',)
-	file_vars = ('host', 'path', 'julian_day', 'transferred', 'new_host', 'new_path', 'timestamp')
+	file_vars = ('host', 'base_path', 'julian_day', 'transferred', 'new_host', 'new_path', 'timestamp')
 
 	try:
 		rtp_obs = db_utils.query(database='paperdata', table='RTPObservation', sort_tuples=(('julian_day', 'desc'),))
@@ -189,8 +189,8 @@ def rtp_summary_table():
 
 	for RTPFile in file_list:
 		if not RTPFile is None:
-			sa_host_path = ':'.join(RTPFile['host'], RTPFile['path'])
-			usa_host_path = ':'.join(RTPFile['new_host'], RTPFile['new_path'])
+			sa_host_path = ':'.join((RTPFile['host'], RTPFile['path']))
+			usa_host_path = ':'.join((RTPFile['new_host'], RTPFile['new_path']))
 
 			julian_day = RTPFile['julian_day']
 			transferred = RTPFile['transferred']
