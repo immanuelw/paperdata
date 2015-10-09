@@ -1,7 +1,0 @@
-build
-output
-clock.py
-*pyc
-.*.swp
-.*.swo
-*.cfg
