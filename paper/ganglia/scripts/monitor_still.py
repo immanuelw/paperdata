@@ -59,12 +59,12 @@ try:
 					obsnum = getattr(OBS, 'obsnum')
 					FILE = dbi.get_entry(ddbi, s, 'file', obsnum)
 					host = getattr(FILE, 'host')
-					path, filename = os.path.split(getattr(FILE, 'filename'))
+					base_path, filename = os.path.split(getattr(FILE, 'filename'))
 					status = getattr(OBS, 'status')
 					still_host = getattr(OBS, 'stillhost')
 					current_pid = getattr(OBS, 'currentpid')
 				except:
-					host, path, filename = 'host', '/path/to/', 'zen.2345672.23245.uv'
+					host, base_path, filename = 'host', '/path/to/', 'zen.2345672.23245.uv'
 					status = 'WTF'
 
 				col = int(j / statusscr.getmaxyx()[0])
@@ -81,7 +81,7 @@ try:
 					continue
 
 				#check for new filenames
-				full_path = ':'.join((still_host, os.path.join(path, filename)))
+				full_path = ':'.join((still_host, os.path.join(base_path, filename)))
 				full_stats = '&'.join((full_path, status))
 
 				if filename not in file_dict['pid'].keys():
@@ -92,7 +92,7 @@ try:
 				if file_dict['pid'][filename] != current_pid:
 					file_dict['end'].update({filename: int(time.time())})
 					entry_dict = {'host': still_host,
-									'path': path,
+									'base_path': base_path,
 									'filename': filename,
 									'full_path': full_path,
 									'status': status,
@@ -109,7 +109,7 @@ try:
 				if filename not in file_dict['status'].keys():
 					file_dict['status'].update({filename: status})
 					entry_dict = {'host': still_host,
-									'path': path,
+									'base_path': base_path,
 									'filename': filename,
 									'full_path': full_path,
 									'status': status,
@@ -124,7 +124,7 @@ try:
 				#write output log
 				if file_dict['status'][filename] != status:
 					entry_dict = {'host': still_host,
-									'path': path,
+									'base_path': base_path,
 									'filename': file_name,
 									'full_path': full_path,
 									'status': status,

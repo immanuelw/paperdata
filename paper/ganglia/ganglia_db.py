@@ -30,7 +30,7 @@ class Monitor(object):
 	def __init__(self):
 		self.table = 'Monitor'
 		self.db_list = ('host',
-						'path',
+						'base_path',
 						'filename',
 						'full_path',
 						'status',
@@ -41,7 +41,7 @@ class Monitor(object):
 						'timestamp')
 		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'node that uv file is being compressed on'},
-						'path': {'type': 'VARCHAR(100)', 'default': 'None',
+						'base_path': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'directory that file is located in'},
 						'filename': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'name/path of uv file being compressed'},

@@ -28,7 +28,7 @@ class Filesystem(Base, ppdata.DictFix):
 class Monitor(Base, ppdata.DictFix):
 	__tablename__ = 'Monitor'
 	host = Column(String(100))
-	path = Column(String(100))
+	base_path = Column(String(100))
 	filename = Column(String(100))
 	full_path = Column(String(200))
 	status = Column(String(100))
@@ -100,12 +100,12 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
 										after INSERT or UPDATE on Monitor \
 										FOR EACH ROW \
-										SET NEW.full_path = concat(NEW.host, ':', NEW.path, '/', NEW.filename)''')
+										SET NEW.full_path = concat(NEW.host, ':', NEW.base_path, '/', NEW.filename)''')
 		event.listen(table, 'after_create', insert_update_trigger)
 		insert_update_trigger_2 = DDL('''CREATE TRIGGER insert_update_trigger_2 \
 										after INSERT or UPDATE on Monitor \
 										FOR EACH ROW \
-										SET NEW.full_stats = concat(NEW.full_path, '+', NEW.status)''')
+										SET NEW.full_stats = concat(NEW.full_path, '&', NEW.status)''')
 		event.listen(table, 'after_create', insert_update_trigger_2)
 		Base.metadata.create_all()
 
