@@ -3,7 +3,7 @@ File
 |     Field     |      Type     | Default | Unique Key |                                    Description                                     |
 +---------------+---------------+---------+------------+------------------------------------------------------------------------------------+
 |      host     |  VARCHAR(100) |   None  |     No     |                    host of file system that file is located on                     |
-|      path     |  VARCHAR(100) |   None  |     No     |                         directory that file is located in                          |
+|   base_path   |  VARCHAR(100) |   None  |     No     |                         directory that file is located in                          |
 |    filename   |  VARCHAR(100) |   None  |     No     |                    name of file (ex: zen.2446321.16617.uvcRRE)                     |
 |    filetype   |  VARCHAR(20)  |   None  |     No     |                           filetype (ex: uv, uvcRRE, npz)                           |
 |   full_path   |  VARCHAR(200) |   None  |   Unique   | combination of host, path, and filename which is a unique identifier for each file |
@@ -39,7 +39,7 @@ Feed
 |      Field       |     Type     | Default | Unique Key |                                    Description                                     |
 +------------------+--------------+---------+------------+------------------------------------------------------------------------------------+
 |       host       | VARCHAR(100) |   None  |     No     |                    host of file system that file is located on                     |
-|       path       | VARCHAR(100) |   None  |     No     |                         directory that file is located in                          |
+|     base_path    | VARCHAR(100) |   None  |     No     |                         directory that file is located in                          |
 |     filename     | VARCHAR(100) |   None  |     No     |                    name of file (ex: zen.2446321.16617.uvcRRE)                     |
 |    full_path     | VARCHAR(200) |   None  |   Unique   | combination of host, path, and filename which is a unique identifier for each file |
 |    julian_day    |   INTEGER    |   None  |     No     | the last 4 digits for any julian date to separate into days: ex:(2456601 -> 6601)  |
