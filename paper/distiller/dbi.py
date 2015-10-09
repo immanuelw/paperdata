@@ -16,6 +16,15 @@ FILE_PROCESSING_STAGES = ('NEW','UV_POT', 'UV', 'UVC', 'CLEAN_UV', 'UVCR', 'CLEA
 #
 #############
 
+class File(Base):
+	__tablename__ = 'file'
+	filenum = Column(Integer, primary_key=True)
+	filename = Column(String(100))
+	host = Column(String(100))
+	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
+	observation = relationship(Observation, backref=backref('files', uselist=True))
+	md5sum = Column(Integer)
+
 class Observation(Base):
 	__tablename__ = 'observation'
 	julian_date = Column(Numeric(16, 8))
@@ -38,15 +47,6 @@ class Neighbors(Base):
 	__tablename__ = 'neighbors'
 	low_neighbor_id = Column(BigInteger, ForeignKey('observation.obsnum'), unique=True),
 	high_neighbor_id = Column(BigInteger, ForeignKey('observation.obsnum'), unique=True)
-
-class File(Base):
-	__tablename__ = 'file'
-	filenum = Column(Integer, primary_key=True)
-	filename = Column(String(100))
-	host = Column(String(100))
-	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
-	observation = relationship(Observation, backref=backref('files', uselist=True))
-	md5sum = Column(Integer)
 
 class Log(Base):
 	__tablename__ = 'log'
