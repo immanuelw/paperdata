@@ -66,7 +66,7 @@ if __name__ == '__main__':
 				antproj[ant][i] = antmeters[ant][i] / math.sin(n.radians(lat))
 			#if i == 2:
 			#	antproj[ant][i] = antmeters[ant][i] / math.sin(n.radians(lat))
-			line = ' '.join((str(ant), str(antmeters[ant][0]), str(antmeters[ant][1])))
+			line = '{ant} {ant_x} {ant_y}'.format(ant=ant, ant_x=antmeters[ant][0], ant_y=antmeters[ant][1]])
 			print line
 			f.write(line + '\n')
 	'''

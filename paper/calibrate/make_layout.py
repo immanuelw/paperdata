@@ -24,7 +24,7 @@ if __name__ == '__main__':
 		if not os.path.exists(freq_dir):
 			os.makedirs(freq_dir)
 
-		with h5py.File(os.path.join(freq_dir, hdf5), 'a') as F, h5py.File(os.path.join(raw_timestream, str(freq), hdf5), 'r') as oldF:
+		with h5py.File(os.path.join(freq_dir, hdf5), 'a') as F, h5py.File(os.path.join(raw_timestream, fnum, hdf5), 'r') as oldF:
 			ts = oldF['/timestream']
 
 			F.create_dataset('/baselines', data=tel.baselines)

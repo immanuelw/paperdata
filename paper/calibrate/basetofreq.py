@@ -44,7 +44,8 @@ if __name__ == '__main__':
 		basefiles = [''.join((basepath, row[0], '.hdf5')) for row in reader]
 
 	#might shout at us bcse numpy arrays
-	#basefiles = [''.join((basepath, str(int(val_1)), '_', str(int(val_2)), '.hdf5')) for val_1, val_2 in zip(base1, base2)]
+	#basefiles = ['{basepath}{val_a}_{val_b}.hdf5'.format(basepath=basepath,
+	#														val_a=int(val_1), val_b=int(val_2)) for val_1, val_2 in zip(base1, base2)]
 
 	#SK SK SK
 
@@ -57,7 +58,7 @@ if __name__ == '__main__':
 	for freq in range(dimen[0]):
 		print freq
 		sys.stdout.flush()
-		freqpath = ''.join((timestream, str(freq), '/'))
+		freqpath = '{timestream}{freq}/'.format(timestream=timestream, freq=freq)
 
 		# Iterates through all of the baseline hdf5 files made in createstream.py
 		for k, fl in enumerate(basefiles):

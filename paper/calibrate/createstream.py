@@ -78,7 +78,7 @@ if __name__ == '__main__':
 	# Iterates through all of the possible baselines
 	for n, (b1, b2) in enumerate(base):
 
-		b = '_'.join((str(b1), str(b2)))
+		b = '{b1}_{b2}'.format(b1=b1, b2=b2)
 		print b	
 		first = True
 
@@ -126,7 +126,7 @@ if __name__ == '__main__':
 		#print spec_num
 		#print freq
 		# Writes the data to an intermediate hdf5 file grouped by baselines
-		temp_file = ''.join((basepath, b,'.hdf5'))
+		temp_file = ''.join((basepath, b, '.hdf5'))
 		#if not os.path.exists(timestream + 'baselines/'):
 		#	os.makedirs(timestream + 'baselines/')
 		with h5py.File(temp_file, 'w') as f:
