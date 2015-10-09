@@ -274,7 +274,7 @@ def download_set():
 			host = getattr(the_set, 'host')
 			filetype = getattr(the_set, 'filetype')
 
-			output_vars = ('host', 'path', 'filename', 'obsnum', 'filesize', 'md5sum', 'write_to_tape', 'delete_file')
+			output_vars = ('host', 'base_path', 'filename', 'obsnum', 'filesize', 'md5sum', 'write_to_tape', 'delete_file')
 
 			file_list = (obs_file for obs in obs_objs for obs_file in getattr(obs, 'files'))
 			file_objs = (file_obj for file_obj in file_list if getattr(file_obj, 'host') == host and getattr(file_obj, 'filetype') == filetype)
