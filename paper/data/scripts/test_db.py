@@ -9,7 +9,7 @@ import shutil
 from paper.data import dbi as pdbi
 import add_files
 import backup_db
-import load_backup_db
+import restore_db_db
 import move_files
 import delete_files
 
@@ -48,8 +48,8 @@ if __name__ == '__main__':
 	dbi.create_db()
 
 	print('loading db...')
-	load_backup(dbi, table='File')
-	load_backup(dbi, table='Observation')
+	restore_db(dbi, table='File')
+	restore_db(dbi, table='Observation')
 	add_files.update_obsnums(dbi)
 	add_files.connect_observations(dbi)
 

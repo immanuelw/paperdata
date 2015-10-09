@@ -16,7 +16,7 @@ import sqlalchemy.exc
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def load_backup(dbi, backup_file=None, table=None):
+def restore_db(dbi, backup_file=None, table=None):
 	'''
 	loads backups from json into database
 
@@ -49,12 +49,12 @@ if __name__ == '__main__':
 	if len(sys.argv) == 3:
 		backup_table = sys.argv[1]
 		backup_file = sys.argv[2]
-		load_backup(dbi, backup_file, table=backup_table)
+		restore_db(dbi, backup_file, table=backup_table)
 	else:
-		#load_backup(dbi, table='Observation')
-		load_backup(dbi, table='File')
-		#load_backup(dbi, table='Feed')
-		#load_backup(dbi, table='Log')
-		#load_backup(dbi, table='RTPFile')
+		#restore_db(dbi, table='Observation')
+		restore_db(dbi, table='File')
+		#restore_db(dbi, table='Feed')
+		#restore_db(dbi, table='Log')
+		#restore_db(dbi, table='RTPFile')
 	add_files.update_obsnums(dbi)
 	add_files.connect_observations(dbi)
