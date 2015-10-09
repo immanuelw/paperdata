@@ -8,6 +8,8 @@ paper
 
 Main package for modules
 
+------------------------
+
 data
 
 Contains various scripts which crawl certain hosts and build paperdata database.
@@ -21,10 +23,6 @@ ganglia
 
 Contains scripts to record the state of each host at any time in the ganglia databasw
 
-convert
-
-time conversions module
-
 site
 
 module & scripts for instantiation of websites for paperdata
@@ -32,3 +30,14 @@ module & scripts for instantiation of websites for paperdata
 calibration
 
 module & scripts for calibration of uv files
+
+
+
+convert
+
+time conversions module
+
+schema
+
+schema script function
+
