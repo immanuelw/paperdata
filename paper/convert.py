@@ -1,3 +1,4 @@
+from __future__ import print_function
 from time import strptime
 import datetime
 import math
@@ -671,3 +672,6 @@ def datetime_to_gps(dt):
 	timestamp = calendar.timegm(dt.timetuple())
 
 	return timestamp
+
+if __name__ == '__main__':
+	print('This is a module!')
