@@ -195,14 +195,14 @@ def calc_npz_data(dbi, filename):
 
 	return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
-def calc_uv_data(host, full_path):
+def calc_uv_data(host, path):
 	'''
 	takes in uv* files and pulls data about observation
 
 	Parameters
 	----------
 	host | str: host of system
-	full_path | str: full_path of uv* file
+	path | str: path of uv* file
 
 	Returns
 	-------
@@ -220,13 +220,13 @@ def calc_uv_data(host, full_path):
 	'''
 	named_host = socket.gethostname()
 	if named_host == host:
-		filetype = full_path.split('.')[-1]
+		filetype = path.split('.')[-1]
 		#allows uv access
 		if filetype not in ('uv', 'uvcRRE'):
 			return (None,) * 7
 		else:
 			try:
-				uv = A.miriad.UV(full_path)
+				uv = A.miriad.UV(path)
 			except:
 				return (None,) * 7
 
@@ -251,7 +251,7 @@ def calc_uv_data(host, full_path):
 	else:
 		uv_data_script = os.path.expanduser('~/paperdata/paper/data/uv_data.py')
 		moved_script = './uv_data.py'
-		uv_comm = 'python {moved_script} {host} {full_path}'.format(moved_script=moved_script, host=host, full_path=full_path)
+		uv_comm = 'python {moved_script} {host} {path}'.format(moved_script=moved_script, host=host, path=path)
 		with ppdata.ssh_scope(host) as ssh:
 			with ssh.open_sftp() as sftp:
 				try:

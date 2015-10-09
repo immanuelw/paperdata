@@ -54,7 +54,7 @@ class Observation(Base, ppdata.DictFix):
 class File(Base, ppdata.DictFix):
 	__tablename__ = 'File'
 	host = Column(String(100))
-	path = Column(String(100)) #directory
+	base_path = Column(String(100)) #directory
 	filename = Column(String(100)) #zen.*.*.uv/uvcRRE/uvcRREzx...
 	filetype = Column(String(20)) #uv, uvcRRE, etc.
 	full_path = Column(String(200), primary_key=True)
@@ -75,7 +75,7 @@ class File(Base, ppdata.DictFix):
 class Feed(Base, ppdata.DictFix):
 	__tablename__ = 'Feed'
 	host = Column(String(100))
-	path = Column(String(100)) #directory
+	base_path = Column(String(100)) #directory
 	filename = Column(String(100)) #zen.*.*.uv
 	full_path = Column(String(200), primary_key=True)
 	julian_day = Column(Integer)
@@ -95,7 +95,7 @@ class Log(Base, ppdata.DictFix):
 #def RTPFile(Base, ppdata.DictFix):
 #	__tablename__ = 'RTPFile'
 #	host = Column(String(100), nullable=False)
-#	path = Column(String(100), nullable=False) #directory
+#	base_path = Column(String(100), nullable=False) #directory
 #	filename = Column(String(100), nullable=False) #zen.*.*.uv/uvcRRE/uvcRREzx...
 #	filetype = Column(String(20), nullable=False) #uv, uvcRRE, etc.
 #	full_path = Column(String(200), primary_key=True)
@@ -148,7 +148,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
 										after INSERT or UPDATE on file \
 										FOR EACH ROW \
-										SET NEW.full_path = concat(NEW.host, ':', NEW.path, '/', NEW.filename)''')
+										SET NEW.full_path = concat(NEW.host, ':', NEW.base_path, '/', NEW.filename)''')
 		event.listen(File.__table__, 'after_create', insert_update_trigger)
 		Base.metadata.create_all()
 

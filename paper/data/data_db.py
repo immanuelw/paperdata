@@ -11,7 +11,7 @@ class File(object):
 	def __init__(self):
 		self.table = 'File'
 		self.db_list = ('host',
-						'path',
+						'base_path',
 						'filename',
 						'filetype',
 						'full_path',
@@ -25,7 +25,7 @@ class File(object):
 						'timestamp')
 		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'host of file system that file is located on'},
-						'path': {'type': 'VARCHAR(100)', 'default': 'None',
+						'base_path': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'directory that file is located in'},
 						'filename': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'name of file (ex: zen.2446321.16617.uvcRRE)'},
@@ -103,7 +103,7 @@ class Feed(object):
 	def __init__(self):
 		self.table = 'Feed'
 		self.db_list = ('host',
-						'path',
+						'base_path',
 						'filename',
 						'full_path',
 						'julian_day',
@@ -112,7 +112,7 @@ class Feed(object):
 						'timestamp')
 		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'host of file system that file is located on'},
-						'path': {'type': 'VARCHAR(100)', 'default': 'None',
+						'base_path': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'directory that file is located in'},
 						'filename': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'name of file (ex: zen.2446321.16617.uvcRRE)'},
@@ -147,7 +147,7 @@ class RTPFile(object):
 	def __init__(self):
 		self.table = 'RTPFile'
 		self.db_list = ('host',
-						'path',
+						'base_path',
 						'filename',
 						'filetype',
 						'full_path',
@@ -160,7 +160,7 @@ class RTPFile(object):
 						'timestamp')
 		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'host of file system that file is located on'},
-						'path': {'type': 'VARCHAR(100)', 'default': 'None',
+						'base_path': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'directory that file is located in'},
 						'filename': {'type': 'VARCHAR(100)', 'default': 'None',
 						'key': 'No', 'description': 'name of file (ex: zen.2446321.16617.uvcRRE)'},

@@ -14,20 +14,20 @@ import paper as ppdata
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def get_size(full_path):
+def get_size(path):
 	'''
 	output byte size of directory or file
 
 	Parameters
 	----------
-	full_path | str: path of directory or file
+	path | str: path of directory or file
 
 	Returns
 	-------
 	int: amount of bytes
 	'''
 	total_size = 0
-	for dirpath, dirnames, filenames in os.walk(full_path):
+	for dirpath, dirnames, filenames in os.walk(path):
 		for f in filenames:
 			fp = os.path.join(dirpath, f)
 			total_size += os.path.getsize(fp)
@@ -51,7 +51,7 @@ def sizeof_fmt(num):
 
 	return round(num, 1)
 
-def calc_size(host, full_path):
+def calc_size(host, path):
 	'''
 	calculates size of directory or file on any host
 	logins into host if necessary
@@ -59,7 +59,7 @@ def calc_size(host, full_path):
 	Parameters
 	----------
 	host | str: host of file
-	full_path | str: full path of directory or file
+	path | str: path of directory or file
 
 	Returns
 	-------
@@ -67,35 +67,35 @@ def calc_size(host, full_path):
 	'''
 	named_host = socket.gethostname()
 	if named_host == host:
-		size = sizeof_fmt(get_size(full_path))
+		size = sizeof_fmt(get_size(path))
 	else:
 		with ppdata.ssh_scope(host) as ssh:
 			with ssh.open_sftp() as sftp:
-				size_bytes = sftp.stat(full_path).st_size
+				size_bytes = sftp.stat(path).st_size
 				size = sizeof_fmt(size_bytes)
 
 	return size
 
-def get_md5sum(full_path):
+def get_md5sum(path):
 	'''
 	calculate the md5 checksum of a uv file
 
 	Parameters
 	----------
-	full_path | str: path of directory or file
+	path | str: path of directory or file
 
 	Returns
 	-------
 	str: 32-bit hex integer md5 checksum
 	'''
-	full_path = full_path.split(':')[-1]
+	path = path.split(':')[-1]
 	BLOCKSIZE = 65536
 	hasher = hashlib.md5()
 	try:
-		afile = open(full_path, 'rb')
+		afile = open(path, 'rb')
 	except(IOError):
-		fname = os.path.join(full_path, 'visdata')
-		afile = open(full_path, 'rb')
+		fname = os.path.join(path, 'visdata')
+		afile = open(path, 'rb')
 	buf = afile.read(BLOCKSIZE)
 	while len(buf) > 0:
 		hasher.update(buf)
@@ -103,7 +103,7 @@ def get_md5sum(full_path):
 
 	return hasher.hexdigest()
 
-def calc_md5sum(host, full_path):
+def calc_md5sum(host, path):
 	'''
 	calculates md5 checksum of directory or file on any host
 	logins into host if necessary
@@ -111,7 +111,7 @@ def calc_md5sum(host, full_path):
 	Parameters
 	----------
 	host | str: host of file
-	full_path | str: full path of directory or file
+	path | str: path of directory or file
 
 	Returns
 	-------
@@ -119,39 +119,39 @@ def calc_md5sum(host, full_path):
 	'''
 	named_host = socket.gethostname()
 	if named_host == host:
-		md5 = get_md5sum(full_path)
+		md5 = get_md5sum(path)
 	else:
 		with ppdata.ssh_scope(host) as ssh:
 			try:
 				with ssh.open_sftp() as sftp:
-					with sftp.file(full_path, mode='r') as remote_path:
+					with sftp.file(path, mode='r') as remote_path:
 						md5 = remote_path.check('md5', block_size=65536)
 			except(IOError):
-				vis_path = os.path.join(full_path, 'visdata')
+				vis_path = os.path.join(path, 'visdata')
 				_, md5_out, _ = ssh.exec_command('md5sum {vis_path}'.format(vis_path=vis_path))
 				md5 = md5_out.read().split(' ')[0]
 
 	return md5
 
-def file_names(full_path):
+def file_names(path):
 	'''
 	separates full path of directory or file into parts
 
 	Parameters
 	----------
-	full_path | str: full path of directory or file
+	path | str: path of directory or file
 
 	Returns
 	-------
 	tuple:
-		str: partial path,
+		str: base path
 		str: directory/file name
 		str: extension/filetype
 	'''
-	path, filename = os.path.split(full_path)
+	base_path, filename = os.path.split(path)
 	filetype = filename.split('.')[-1]
 
-	return path, filename, filetype
+	return base_path, filename, filetype
 
 if __name__ == '__main__':
 	print('Not a script file, just a module')
