@@ -26,9 +26,9 @@ dbi = ddbi.DataBaseInterface()
 pyg_dbi = pyg.DataBaseInterface()
 
 stdscr.addstr('PAPER Distiller Status Board')
-stdscr.addstr(1,0,'Press "q" to exit')
+stdscr.addstr(1, 0, 'Press "q" to exit')
 statheight = 50
-statusscr = curses.newwin(statheight,200,5,0)
+statusscr = curses.newwin(statheight, 200, 5, 0)
 statusscr.keypad(1)
 statusscr.nodelay(1)
 curline = 2
@@ -77,12 +77,11 @@ try:
 				else:
 					row = j % statheight
 				try:
-					statusscr.addstr(row, col * colwidth,
-									'{filename} {status} {still_host}'.format(filename=filename, status=status, still_host=still_host))
+					statusscr.addstr(row, col * colwidth, ' '.join((filename, status, still_host)))
 				except:
 					continue
 				#check for new filenames
-				full_path = ':'.join((still_host, filename))
+				full_path = ':'.join((still_host, os.path.join(path, filename)))
 				if filename not in file_pid.keys():
 					file_pid.update({filename: current_pid})
 					time_start = int(time.time())
@@ -153,5 +152,7 @@ try:
 except(KeyboardInterrupt):
 	pass
 #terminate
-curses.nocbreak(); stdscr.keypad(0); curses.echo()
+curses.nocbreak()
+stdscr.keypad(0)
+curses.echo()
 curses.endwin()
