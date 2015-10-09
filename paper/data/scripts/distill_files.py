@@ -13,8 +13,8 @@ import glob
 import re
 import socket
 import numpy as n
-import ddr_compress.dbi as ddbi 
 from paper.data import uv_data
+from paper.distiller import dbi as ddbi
 
 def file2jd(full_path):
 	'''

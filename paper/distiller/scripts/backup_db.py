@@ -9,7 +9,7 @@ import os
 import json
 import decimal
 import paper as ppdata
-import ddr_compress.dbi as ddbi
+from paper.distiller import dbi as ddbi
 
 ### Script to Backup paper database
 ### Finds time and date and writes table into .csv file

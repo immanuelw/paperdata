@@ -9,8 +9,8 @@ import time
 import socket
 from collections import Counter
 import aipy as A
-import ddr_compress.dbi as ddbi
 from paper.data import dbi as pdbi, uv_data, file_data
+from paper.distiller import dbi as ddbi
 import add_files, move_files
 
 ### Script to load infromation quickly from paperdistiller database into paper
