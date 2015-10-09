@@ -1,6 +1,39 @@
 from datetime import datetime
 from paper.convert import gcal2jd
 
+def time_val(value):
+	'''
+	determines how much time to divide by and divides time by that to make human readable
+
+	Parameters
+	----------
+	value | float: numerical time value
+
+	Returns
+	-------
+	float: numerical time value divided
+	'''
+	time_val = 1 if value < 500 else 60 if value < 3600 else 3600 if value < 86400 else 86400
+
+	return value / time_val
+
+def str_val(value):
+	'''
+	determines which time unit to use
+
+	Parameters
+	----------
+	value | float: numerical time value
+
+	Returns
+	-------
+	str: time unit
+	'''
+	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
+	str_val = ' '.join((str_val, 'ago'))
+
+	return str_val
+
 def get_set_strings():
 	'''
 	output a list of set strings for main filterable fields

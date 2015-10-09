@@ -9,39 +9,6 @@ from paper.site import db_utils, misc_utils
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 
-def time_val(value):
-	'''
-	determines how much time to divide by and divides time by that to make human readable
-
-	Parameters
-	----------
-	value | float: numerical time value
-
-	Returns
-	-------
-	float: numerical time value divided
-	'''
-	time_val = 1 if value < 500 else 60 if value < 3600 else 3600 if value < 86400 else 86400
-
-	return value / time_val
-
-def str_val(value):
-	'''
-	determines which time unit to use
-
-	Parameters
-	----------
-	value | float: numerical time value
-
-	Returns
-	-------
-	str: time unit
-	'''
-	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
-	str_val = ' '.join((str_val, 'ago'))
-
-	return str_val
-
 @app.route('/')
 @app.route('/index')
 @app.route('/index/set/<setName>')
@@ -114,8 +81,8 @@ def source_table():
 			source_time = int(time.time() - getattr(source, 'timestamp'))
 
 			#limiting if seconds or minutes or hours shows up on last report
-			source_dict[source_name]['time_segment'] = str_val(source_time)
-			source_dict[source_name]['time'] = time_val(source_time)
+			source_dict[source_name]['time_segment'] = misc_utils.str_val(source_time)
+			source_dict[source_name]['time'] = misc_utils.time_val(source_time)
 			source_dict[source_name]['day'] = getattr(source, 'julian_day')
 
 	return render_template('source_table.html', source_names=source_names, source_dict=source_dict)
@@ -154,8 +121,8 @@ def filesystem():
 			this_sys = system_dict[system_name]
 
 			#limiting if seconds or minutes or hours shows up on last report
-			this_sys['time_segment'] = str_val(system_time)
-			this_sys['time'] = time_val(system_time)
+			this_sys['time_segment'] = misc_utils.str_val(system_time)
+			this_sys['time'] = misc_utils.time_val(system_time)
 			this_sys['used_perc'] = used_perc
 
 			#this_sys['stats'] = ' '.join((system_name, 'stats'))
