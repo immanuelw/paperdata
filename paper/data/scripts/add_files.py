@@ -185,6 +185,29 @@ def connect_observations(dbi):
 			OBS = s.query(obs_table).get(getattr(FILE, 'obsnum'))
 			dbi.set_entry(s, FILE, 'observation', OBS)  #associate the file with an observation
 
+def update_md5(dbi):
+	'''
+	updates md5sums for all files without in database
+
+	Parameters
+	----------
+	dbi | object: database interface object
+	'''
+	with dbi.session_scope() as s:
+		table = getattr(pdbi, 'File')
+		FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
+		for FILE in FILEs:
+			full_path = getattr(FILE, 'full_path')
+			timestamp = int(time.time())
+			dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), full_path))
+			dbi.set_entry(s, FILE, 'timestamp', timestamp)
+			log_data = {'action': 'update md5sum',
+						'table': 'File',
+						'identifier': full_path,
+						'timestamp': timestamp}
+
+			dbi.add_entry(s, 'Log', log_data)
+
 def add_files_to_db(dbi, input_host, input_paths):
 	'''
 	adds files to the database
