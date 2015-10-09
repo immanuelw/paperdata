@@ -19,14 +19,14 @@ from paper.data import dbi as pdbi
 ### Author: Immanuel Washington
 ### Date: 05-18-14
 
-def gen_feed_data(host, full_path):
+def gen_feed_data(host, path):
 	'''
 	generates data for feed table
 
 	Parameters
 	----------
 	host | str: system host
-	full_path | str: full path of uv* file
+	path | str: path of uv* file
 
 	Returns
 	-------
@@ -36,16 +36,17 @@ def gen_feed_data(host, full_path):
 	'''
 	#allows uv access
 	try:
-		uv = A.miriad.UV(full_path)
+		uv = A.miriad.UV(path)
 	except:
 		return (None,) * 2
 
-	path, filename = os.path.split(full_path)
+	base_path, filename = os.path.split(path)
+	full_path = ':'.join((host, path))
 
 	timestamp = int(time.time())
 
 	feed_data = {'host': host,
-				'path': path,
+				'basE_path': base_path,
 				'filename': filename,
 				'full_path': full_path,
 				'julian_day': int(uv['time']),
@@ -78,7 +79,7 @@ def dupe_check(dbi, input_host, input_paths):
 		table = getattr(pdbi, 'Feed')
 		FEEDs = s.query(table).filter(getattr(table, 'host') == input_host).all()
 	#all files on same host
-	all_paths = tuple(getattr(FEED, 'full_path') for FEED in FEEDs)
+	all_paths = tuple(os.path.join(getattr(FEED, 'base_path'), os.path.join(FEED, 'filename')) for FEED in FEEDs)
 
 	#for each input file, check if in filenames
 	unique_paths = tuple(input_path for input_path in input_paths if input_path not in all_paths)

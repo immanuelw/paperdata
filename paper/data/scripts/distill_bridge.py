@@ -60,8 +60,9 @@ def add_data(dbi, data_dbi):
 				FILE = s.query(table).filter(getattr(table, 'obsnum') == getattr(OBS, 'obsnum')).one()
 
 				host = getattr(FILE, 'host')
-				full_path = getattr(FILE, 'filename')
-				path, filename, filetype = file_data.file_names(full_path)
+				path = getattr(FILE, 'filename')
+				base_path, filename, filetype = file_data.file_names(path)
+				full_path = ':'.join((host, path))
 
 				obsnum = getattr(OBS, 'obsnum')
 				julian_date = getattr(OBS, 'julian_date')
@@ -73,21 +74,21 @@ def add_data(dbi, data_dbi):
 			
 				if named_host == host:
 					try:
-						uv = A.miriad.UV(full_path)
+						uv = A.miriad.UV(path)
 					except:
 						continue
 
 					time_start, time_end, delta_time, _  = uv_data.calc_times(uv)
 
 				else:
-					time_start, time_end, delta_time, _, _, _, _ = add_files.calc_uv_data(host, full_path)
+					time_start, time_end, delta_time, _, _, _, _ = add_files.calc_uv_data(host, path)
 
 				era, julian_day, lst = uv_data.date_info(julian_date)
 
-				filesize = file_data.calc_size(host, full_path)
+				filesize = file_data.calc_size(host, path)
 				md5 = getattr(FILE, 'md5sum')
 				if md5 is None:
-					md5 = file_data.calc_md5sum(host, full_path)
+					md5 = file_data.calc_md5sum(host, path)
 
 				source_host = host
 
@@ -110,7 +111,7 @@ def add_data(dbi, data_dbi):
 							'timestamp': timestamp}
 
 				raw_data = {'host': host,
-							'path': path,
+							'base_path': base_path,
 							'filename': filename,
 							'filetype': filetype,
 							'full_path': full_path,
@@ -131,30 +132,30 @@ def add_data(dbi, data_dbi):
 				data_dbi.add_entry_dict(sess, 'Observation', obs_data)
 				data_dbi.add_entry_dict(sess, 'File', raw_data)
 				data_dbi.add_entry_dict(sess, 'Log', log_data)
-				movable_paths[filetype].append(full_path)
+				movable_paths[filetype].append(path)
 
 				compr_filename = ''.join((filename, 'cRRE'))
-				compr_path = os.path.join(path, compr_filename)
+				compr_path = os.path.join(base_path, compr_filename)
 				if os.path.isdir(compr_path):
 					compr_filetype = 'uvcRRE'
 					compr_data = copy.deepcopy(raw_data)
 					compr_data['filename'] = compr_filename
 					compr_data['filetype'] = compr_filetype
-					compr_data['filesize'] = file_data.calc_size(host, path, compr_filename)
-					compr_data['md5sum'] = file_data.calc_md5sum(host, path, compr_filename)
+					compr_data['filesize'] = file_data.calc_size(host, base_path, compr_filename)
+					compr_data['md5sum'] = file_data.calc_md5sum(host, base_path, compr_filename)
 					compr_data['is_tapeable'] = False
 					data_dbi.add_entry_dict(sess, 'File', compr_data)
 					movable_paths[compr_filetype].append(compr_path)
 
 				npz_filename = ''.join((filename, 'cRE.npz'))
-				npz_path = os.path.join(path, npz_filename)
+				npz_path = os.path.join(base_path, npz_filename)
 				if os.path.isdir(npz_path):
 					npz_filetype = 'npz'
 					npz_data = copy.deepcopy(raw_data)
 					npz_data['filename'] = npz_filename
 					npz_data['filetype'] = npz_filetype
-					npz_data['filesize'] = file_data.calc_size(host, path, npz_filename)
-					npz_data['md5sum'] = file_data.calc_md5sum(host, path, npz_filename)
+					npz_data['filesize'] = file_data.calc_size(host, base_path, npz_filename)
+					npz_data['md5sum'] = file_data.calc_md5sum(host, base_path, npz_filename)
 					npz_data['is_tapeable'] = False
 					data_dbi.add_entry_dict(sess, 'File', npz_data)
 					movable_paths[npz_filetype].append(npz_path)

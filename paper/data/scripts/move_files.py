@@ -84,10 +84,10 @@ def null_check(dbi, input_host, input_paths):
 		table = getattr(pdbi, 'File')
 		FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
 	#all files on same host
-	filenames = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
+	paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
 
 	#for each input file, check if in filenames
-	nulls = tuple(input_path for input_path in input_paths if input_path not in filenames)
+	nulls = tuple(input_path for input_path in input_paths if input_path not in paths)
 		
 	return len(nulls) == 0
 
@@ -108,7 +108,7 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 	timestamp = int(time.time())
 	FILE = dbi.get_entry(s, 'File', full_path)
 	dbi.set_entry(s, FILE, 'host', output_host)
-	dbi.set_entry(s, FILE, 'path', output_dir)
+	dbi.set_entry(s, FILE, 'base_path', output_dir)
 	dbi.set_entry(s, FILE, 'timestamp', timestamp)
 	identifier = getattr(FILE, 'full_path')
 	log_data = {'action': 'move',

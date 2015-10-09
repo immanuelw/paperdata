@@ -39,7 +39,7 @@ def set_feed(s, dbi, source, output_host, output_dir, is_moved=True):
 	'''
 	FEED = dbi.get_entry(s, 'Feed', source)
 	dbi.set_entry(s, FEED, 'host', output_host)
-	dbi.set_entry(s, FEED, 'path', output_dir)
+	dbi.set_entry(s, FEED, 'base_path', output_dir)
 	dbi.set_entry(s, FEED, 'is_moved', is_moved)
 
 def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
@@ -89,9 +89,10 @@ def count_days(dbi):
 								.group_by(getattr(table, 'julian_day')).all()
 		all_FEEDs = s.query(table).all()
 		good_days = tuple(getattr(FEED, 'julian_day') for FEED in count_FEEDs if getattr(FEED, 'count') in (72, 288))
-		to_move = tuple(getattr(FEED, 'full_path') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
+		to_move = tuple(os.path.join(getattr(FEED, 'base_path'), getattr(FEED, 'filename'))
+						for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
 
-		for full_path in to_move:
+		for path in to_move:
 			FEED = dbi.get_entry(s, 'Feed', source)
 			dbi.set_entry(s, FEED, 'is_movable', True)
 
@@ -115,8 +116,8 @@ def find_data(dbi):
 		FEEDs = s.query(table).filter(getattr(table, 'is_moved') == False).filter(getattr(table, 'is_movable') == True).all()
 
 	#only move one day at a time
-	feed_host = FEEDs[0].host
-	feed_day = FEEDs[0].julian_day
+	feed_host = getattr(FEEDs[0], 'host')
+	feed_day = getattr(FEEDs[0], 'julian_day')
 	feed_paths = tuple(os.path.join(getattr(FEED, 'path'), getattr(FEED, 'filename'))
 						for FEED in FEEDs if getattr(FEED, 'julian_day') == feed_day)
 	feed_filenames = tuple(getattr(FEED, 'filename') for FEED in FEEDs if getattr(FEED, 'julian_day') == feed_day)

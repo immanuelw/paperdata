@@ -18,14 +18,14 @@ from sqlalchemy import or_
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def calc_obs_data(dbi, host, full_path):
+def calc_obs_data(dbi, host, path):
 	'''
 	generates all relevant data from uv* file
 
 	Parameters
 	----------
 	host | str: host of system
-	full_path | str: full path of uv* file
+	path | str: path of uv* file
 
 	Returns
 	-------
@@ -34,17 +34,18 @@ def calc_obs_data(dbi, host, full_path):
 		dict: file values
 		dict: log values
 	'''
-	path, filename, filetype = file_data.file_names(full_path)
+	base_path, filename, filetype = file_data.file_names(path)
+	full_path = ':'.join((host, path))
 
 	if filetype in ('uv', 'uvcRRE'):
-		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = uv_data.calc_uv_data(host, full_path)
+		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = uv_data.calc_uv_data(host, path)
 	elif filetype in ('npz',):
 		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = uv_data.calc_npz_data(dbi, filename)
 
 	era, julian_day, lst = uv_data.date_info(julian_date)
 
-	filesize = file_data.calc_size(host, full_path)
-	md5 = file_data.calc_md5sum(host, full_path)
+	filesize = file_data.calc_size(host, path)
+	md5 = file_data.calc_md5sum(host, path)
 
 	source_host = host
 
@@ -67,7 +68,7 @@ def calc_obs_data(dbi, host, full_path):
 				'timestamp': timestamp}
 
 	file_data = {'host': host,
-				'path': path,
+				'base_path': base_path,
 				'filename': filename,
 				'filetype': filetype,
 				'full_path': full_path,
@@ -105,10 +106,10 @@ def dupe_check(dbi, input_host, input_paths):
 		#all files on same host
 		table = getattr(pdbi, 'File')
 		FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
-		full_paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
+		paths = tuple(os.path.join(getattr(FILE, 'base_path'), getattr(FILE, 'filename')) for FILE in FILEs)
 
 	#for each input file, check if in full_paths
-	unique_paths = tuple(input_path for input_path in input_paths if input_path not in full_paths)
+	unique_paths = tuple(input_path for input_path in input_paths if input_path not in paths)
 		
 	return unique_paths
 
@@ -220,21 +221,21 @@ def add_files_to_db(dbi, input_host, input_paths):
 	'''
 	with dbi.session_scope() as s:
 		for input_path in input_paths:
-			path = os.path.dirname(input_path)
+			base_path = os.path.dirname(input_path)
 			filename = os.path.basename(input_path)
 			obs_data, file_data, log_data = calc_obs_data(input_host, input_path)
 			try:
 				dbi.add_entry_dict(s, 'Observation', obs_data)
 			except:
-				print('Failed to load in obs ', path, filename)
+				print('Failed to load in obs ', base_path, filename)
 			try:
 				dbi.add_entry_dict(s, 'File', file_data)
 			except:
-				print('Failed to load in file ', path, filename)
+				print('Failed to load in file ', base_path, filename)
 			try:
 				dbi.add_entry_dict(s, 'Log', log_data)
 			except:
-				print('Failed to load in log ', path, filename)
+				print('Failed to load in log ', base_path, filename)
 
 def add_files(dbi, input_host, input_paths):
 	'''

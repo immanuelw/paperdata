@@ -37,9 +37,9 @@ def delete_check(dbi, input_host):
 		FILEs = s.query(table).filter(getattr(table, 'delete_file') == True).filter(getattr(table, 'tape_index') != None)\
 								.filter(getattr(table, 'host') == input_host).all()
 	#all files on same host
-	full_paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
+	paths = tuple(os.path.join(getattr(FILE, 'base_path'), getattr(FILE, 'filename')) for FILE in FILEs)
 
-	return full_paths
+	return paths
 
 def set_delete_table(s, dbi, input_host, source, output_host, output_dir):
 	'''
@@ -58,7 +58,7 @@ def set_delete_table(s, dbi, input_host, source, output_host, output_dir):
 	timestamp = int(time.time())
 	FILE = dbi.get_entry(s, 'File', full_path)
 	dbi.set_entry(s, FILE, 'host', output_host)
-	dbi.set_entry(s, FILE, 'path', output_dir)
+	dbi.set_entry(s, FILE, 'base_path', output_dir)
 	dbi.set_entry(s, FILE, 'is_deletable', False)
 	dbi.set_entry(s, FILE, 'timestamp', timestamp)
 	identifier = getattr(FILE, 'full_path')

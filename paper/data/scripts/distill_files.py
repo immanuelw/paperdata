@@ -16,33 +16,33 @@ import numpy as n
 from paper.data import uv_data
 from paper.distiller import dbi as ddbi
 
-def file2jd(full_path):
+def file2jd(path):
 	'''
 	pulls julian date from filename
 
 	Parameters
 	----------
-	full_path | str: full path of file
+	path | str: path of file
 
 	Returns
 	-------
 	float(5): julian date
 	'''
-	return re.findall(r'\d+\.\d+', full_path)[0]
+	return re.findall(r'\d+\.\d+', path)[0]
 
-def file2pol(full_path):
+def file2pol(path):
 	'''
 	pulls polarization from filename
 
 	Parameters
 	----------
-	full_path | str: full path of file
+	path | str: path of file
 
 	Returns
 	-------
 	str: polarization
 	'''
-	return re.findall(r'\.(.{2})\.', full_path)[0]
+	return re.findall(r'\.(.{2})\.', path)[0]
 
 def add_files_to_distill(input_paths):
 	'''
@@ -50,7 +50,7 @@ def add_files_to_distill(input_paths):
 
 	Parameters
 	----------
-	full_path | str: full path of file
+	input_paths | list[str]: list of file paths
 	'''
 	#connect to the database
 	dbi = ddbi.DataBaseInterface()

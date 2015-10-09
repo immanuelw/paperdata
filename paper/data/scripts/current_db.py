@@ -24,7 +24,7 @@ def main():
 	for line in out:
 		x.add_row(line)
 	stuff = x.get_string()
-	with open(os.path.expanduser('~/paper/data/src/table_descr.txt'), 'wb') as df:
+	with open(os.path.expanduser('~/paperdata/paper/data/src/table_descr.txt'), 'wb') as df:
 		df.write(stuff)
 
 if __name__ == "__main__":
