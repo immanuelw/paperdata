@@ -21,7 +21,7 @@ from sqlalchemy.sql import label
 ### Author: Immanuel Washington
 ### Date: 11-23-14
 
-def set_feed(s, dbi, source, dest_host, dest_path, is_moved=True):
+def set_feed(s, dbi, source_path, dest_host, dest_path, is_moved=True):
 	'''
 	updates table for feed file
 
@@ -29,12 +29,12 @@ def set_feed(s, dbi, source, dest_host, dest_path, is_moved=True):
 	----------
 	s | object: session object
 	dbi | object: database interface object
-	source | str: source file
+	source_path | str: source file path
 	dest_host | str: output host
 	dest_path | str: output directory
 	is_moved | bool: checks whether to move to paperdistiller --defaults to False
 	'''
-	FEED = dbi.get_entry(s, 'Feed', source)
+	FEED = dbi.get_entry(s, 'Feed', source_path)
 	dbi.set_entry(s, FEED, 'host', dest_host)
 	dbi.set_entry(s, FEED, 'base_path', dest_path)
 	dbi.set_entry(s, FEED, 'is_moved', is_moved)
@@ -48,7 +48,6 @@ def move_feed_files(dbi, source_host, source_paths, dest_host, dest_path):
 	dbi | object: database interface object
 	source_host | str: file host
 	source_paths | list[str]: file paths
-	source | str: source file
 	dest_host | str: output host
 	dest_path | str: output directory
 	'''
@@ -57,17 +56,17 @@ def move_feed_files(dbi, source_host, source_paths, dest_host, dest_path):
 	destination = ':'.join((dest_host, dest_path))
 	with dbi.session_scope() as s:
 		if named_host == source_host:
-			for source in source_paths:
-				ppdata.rsync_copy(source, destination)
-				set_feed(s, dbi, source, dest_host, dest_path)
-				shutil.rmtree(source)
+			for source_path in source_paths:
+				ppdata.rsync_copy(source_path, destination)
+				set_feed(s, dbi, source_path, dest_host, dest_path)
+				shutil.rmtree(source_path)
 		else:
 			with ppdata.ssh_scope(source_host) as ssh:
-				for source in source_paths:
-					rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
-					rsync_del_command = '''rm -r {source}'''.format(source=source)
+				for source_path in source_paths:
+					rsync_copy_command = '''rsync -ac {source_path} {destination}'''.format(source_path=source_path, destination=destination)
+					rsync_del_command = '''rm -r {source_path}'''.format(source_path=source_path)
 					ssh.exec_command(rsync_copy_command)
-					set_feed(s, dbi, source, dest_host, dest_path)
+					set_feed(s, dbi, source_path, dest_host, dest_path)
 					ssh.exec_command(rsync_del_command)
 
 	print('Completed transfer')
@@ -86,11 +85,11 @@ def count_days(dbi):
 								.group_by(getattr(table, 'julian_day')).all()
 		all_FEEDs = s.query(table).all()
 		good_days = tuple(getattr(FEED, 'julian_day') for FEED in count_FEEDs if getattr(FEED, 'count') in (72, 288))
-		to_move = tuple(os.path.join(getattr(FEED, 'base_path'), getattr(FEED, 'filename'))
-						for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
+
+		to_move = (getattr(FEED, 'full_path') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
 
 		for path in to_move:
-			FEED = dbi.get_entry(s, 'Feed', source)
+			FEED = dbi.get_entry(s, 'Feed', path)
 			dbi.set_entry(s, FEED, 'is_movable', True)
 
 def find_data(dbi):

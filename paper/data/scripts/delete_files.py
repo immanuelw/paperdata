@@ -41,7 +41,7 @@ def delete_check(dbi, source_host):
 
 	return paths
 
-def set_delete_table(s, dbi, source_host, source, dest_host, dest_path):
+def set_delete_table(s, dbi, source_host, source_path, dest_host, dest_path):
 	'''
 	updates table for deleted file
 
@@ -50,11 +50,11 @@ def set_delete_table(s, dbi, source_host, source, dest_host, dest_path):
 	s | object: session object
 	dbi | object: database interface object
 	source_host | str: user host
-	source | str: source file
+	source_path | str: source file path
 	dest_host | str: output host
 	dest_path | str: output directory
 	'''
-	full_path = ':'.join((source_host, source))
+	full_path = ':'.join((source_host, source_path))
 	timestamp = int(time.time())
 	FILE = dbi.get_entry(s, 'File', full_path)
 	dbi.set_entry(s, FILE, 'host', dest_host)
@@ -84,17 +84,17 @@ def delete_files(dbi, source_host, source_paths, dest_host, dest_path):
 	destination = ':'.join((dest_host, dest_path))
 	with dbi.session_scope() as s:
 		if named_host == source_host:
-			for source in source_paths:
-				ppdata.rsync_copy(source, destination)
-				set_delete_table(s, dbi, source_host, source, dest_host, dest_path)
+			for source_path in source_paths:
+				ppdata.rsync_copy(source_path, destination)
+				set_delete_table(s, dbi, source_host, source_path, dest_host, dest_path)
 				shutil.rmtree(source)
 		else:
 			with ppdata.ssh_scope(source_host) as ssh:
-				for source in source_paths:
-					rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
-					rsync_del_command = '''rm -r {source}'''.format(source=source)
+				for source_path in source_paths:
+					rsync_copy_command = '''rsync -ac {source_path} {destination}'''.format(source_path=source_path, destination=destination)
+					rsync_del_command = '''rm -r {source_path}'''.format(source_path=source_path)
 					ssh.exec_command(rsync_copy_command)
-					set_delete_table(s, dbi, source_host, source, dest_host, dest_path)
+					set_delete_table(s, dbi, source_host, source_path, dest_host, dest_path)
 					ssh.exec_command(rsync_del_command)
 	print('Completed transfer')
 

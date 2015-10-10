@@ -46,7 +46,7 @@ def gen_feed_data(host, path):
 	timestamp = int(time.time())
 
 	feed_data = {'host': host,
-				'basE_path': base_path,
+				'base_path': base_path,
 				'filename': filename,
 				'full_path': full_path,
 				'julian_day': int(uv['time']),
@@ -97,8 +97,8 @@ def add_feeds_to_db(dbi, source_host, source_paths):
 	source_paths | list[str]: file paths
 	'''
 	with dbi.session_scope() as s:
-		for source in source_paths:
-			feed_data, log_data = gen_feed_data(source_host, source)
+		for source_path in source_paths:
+			feed_data, log_data = gen_feed_data(source_host, source_path)
 			dbi.add_entry_dict(s, 'Feed', feed_data)
 			dbi.add_entry_dict(s, 'Log', log_data)
 
