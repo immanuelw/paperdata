@@ -16,6 +16,7 @@ class Filesystem(object):
 						'used_space',
 						'free_space',
 						'percent_space',
+						'filesystem_id',
 						'timestamp')
 		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'system that us being monitored'},
 						'system': {'type': 'VARCHAR(100)', 'default': 'None',
@@ -24,6 +25,7 @@ class Filesystem(object):
 						'used_space': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'used space in system in bytes'},
 						'free_space': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'free space in system in bytes'},
 						'percent_space': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'percent of used space in system'},
+						'filesystem_id': {'type': 'VARCHAR(36)', 'default': 'None', 'key': 'Primary', 'description': 'id'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
 class Monitor(object):
@@ -75,6 +77,7 @@ class Ram(object):
 						'swap_total',
 						'swap_used',
 						'swap_free',
+						'ram_id',
 						'timestamp')
 		self.db_descr = {'host': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'system that is being monitored'},
 						'total': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'total ram'},
@@ -88,6 +91,7 @@ class Ram(object):
 						'swap_total': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': ''},
 						'swap_used': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': ''},
 						'swap_free': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': ''},
+						'ram_id': {'type': 'VARCHAR(36)', 'default': 'None', 'key': 'Primary', 'description': 'id'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
 class Iostat(object):
@@ -108,6 +112,7 @@ class Iostat(object):
 						'write_s': {'type': 'DECIMAL(7,2)', 'default': 'None', 'key': 'No', 'description': 'writes per second'},
 						'bl_reads': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'block reads'},
 						'bl_writes': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'block writes'},
+						'iostat_id': {'type': 'VARCHAR(36)', 'default': 'None', 'key': 'Primary', 'description': 'id'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
 class Cpu(object):
@@ -130,6 +135,7 @@ class Cpu(object):
 						'iowait_perc': {'type': 'DECIMAL(5,2)', 'default': 'None', 'key': 'No', 'description': 'percent of cpu waiting'},
 						'idle_perc': {'type': 'DECIMAL(5,2)', 'default': 'None', 'key': 'No', 'description': 'percent of cpu that is idle'},
 						'intr_s': {'type': 'INT', 'default': 'None', 'key': 'No', 'description': 'instructions (per second?)'},
+						'cpu_id': {'type': 'VARCHAR(36)', 'default': 'None', 'key': 'Primary', 'description': 'id'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None', 'key': 'No', 'description': 'time entry was updated'}}
 
 #dictionary of instantiated classes

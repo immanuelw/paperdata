@@ -16,13 +16,13 @@ logger = logging.getLogger('paper.ganglia')
 
 class Filesystem(Base, ppdata.DictFix):
 	__tablename__ = 'Filesystem'
-	__table_args__ = (PrimaryKeyConstraint('host', 'system', 'timestamp', name='host_system_time'),)
 	host = Column(String(100)) #folio
 	system = Column(String(100)) #/data4
 	total_space = Column(BigInteger)
 	used_space = Column(BigInteger)
 	free_space = Column(BigInteger)
 	percent_space = Column(Numeric(4,1))
+	filesystem_id = Column(String(36), primary_key=True)
 	timestamp = Column(BigInteger) #seconds since 1970
 
 class Monitor(Base, ppdata.DictFix):
@@ -40,7 +40,6 @@ class Monitor(Base, ppdata.DictFix):
 
 class Ram(Base, ppdata.DictFix):
 	__tablename__ = 'Ram'
-	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
 	total = Column(BigInteger)
 	used = Column(BigInteger)
@@ -53,11 +52,11 @@ class Ram(Base, ppdata.DictFix):
 	swap_total = Column(BigInteger)
 	swap_used = Column(BigInteger)
 	swap_free = Column(BigInteger)
+	ram_id = Column(String(36), primary_key=True)
 	timestamp = Column(BigInteger)
 
 class Iostat(Base, ppdata.DictFix):
 	__tablename__ = 'Iostat'
-	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
 	device = Column(String(100))
 	tps = Column(Numeric(7,2))
@@ -65,11 +64,11 @@ class Iostat(Base, ppdata.DictFix):
 	write_s = Column(Numeric(7,2))
 	bl_reads = Column(BigInteger)
 	bl_writes = Column(BigInteger)
+	iostat_id = Column(String(36), primary_key=True)
 	timestamp = Column(BigInteger)
 
 class Cpu(Base, ppdata.DictFix):
 	__tablename__ = 'Cpu'
-	__table_args__ = (PrimaryKeyConstraint('host', 'timestamp', name='host_time'),)
 	host = Column(String(100))
 	cpu = Column(Integer)
 	user_perc = Column(Numeric(5,2))
@@ -77,6 +76,7 @@ class Cpu(Base, ppdata.DictFix):
 	iowait_perc = Column(Numeric(5,2))
 	idle_perc = Column(Numeric(5,2))
 	intr_s = Column(Integer)
+	cpu_id = Column(String(36), primary_key=True)
 	timestamp = Column(BigInteger)
 
 class DataBaseInterface(ppdata.DataBaseInterface):

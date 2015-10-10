@@ -6,6 +6,7 @@ import sys
 import os
 import psutil
 import time
+import uuid
 import paper as ppdata
 from paper.ganglia import dbi as pyg
 
@@ -65,6 +66,7 @@ def filesystem(ssh, host, path):
 					'total_space': total,
 					'used_space': used,
 					'free_space': free,
+					'filesystem_id': str(uuid.uuid4()),
 					'percent_space': percent}
 
 	return system_data
@@ -100,6 +102,7 @@ def iostat(ssh, host):
 									'read_s': read_s,
 									'write_s': write_s,
 									'bl_reads': bl_reads,
+									'iostat_id': str(uuid.uuid4()),
 									'bl_writes': bl_writes}
 
 	else:
@@ -131,6 +134,7 @@ def iostat(ssh, host):
 									'read_s': read_s,
 									'write_s': write_s,
 									'bl_reads': bl_reads,
+									'iostat_id': str(uuid.uuid4()),
 									'bl_writes': bl_writes}
 
 	return iostat_data
@@ -201,6 +205,7 @@ def ram_free(ssh, host):
 				'bc_free': bc_free,
 				'swap_total': swap_total,
 				'swap_used': swap_used,
+				'ram_id': str(uuid.uuid4()),
 				'swap_free': swap_free}
 
 	return ram_data
@@ -238,6 +243,7 @@ def cpu_perc(ssh, host):
 							'sys_perc': sys_perc,
 							'iowait_perc': iowait_perc,
 							'idle_perc': idle_perc,
+							'cpu_id': str(uuid.uuid4()),
 							'intr_s': intr_s}
 
 	else:
@@ -265,6 +271,7 @@ def cpu_perc(ssh, host):
 							'sys_perc': sys_perc,
 							'iowait_perc': iowait_perc,
 							'idle_perc': idle_perc,
+							'cpu_id': str(uuid.uuid4()),
 							'intr_s': intr_s}
 
 	return cpu_data
