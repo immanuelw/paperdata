@@ -10,6 +10,7 @@ import glob
 import socket
 import os
 import shutil
+import uuid
 import paper as ppdata
 from paper.data import dbi as pdbi
 
@@ -65,6 +66,7 @@ def set_delete_table(s, dbi, source_host, source_path, dest_host, dest_path):
 	log_data = {'action': 'delete',
 				'table': 'file',
 				'identifier': identifier,
+				'log_id': str(uuid.uuid4()),
 				'timestamp': timestamp}
 	dbi.add_entry_dict(s, 'Log', log_data)
 

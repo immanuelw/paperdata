@@ -8,6 +8,7 @@ import os
 import time
 import glob
 import socket
+import uuid
 import aipy as A
 import paper as ppdata
 from paper.data import dbi as pdbi
@@ -57,6 +58,7 @@ def gen_feed_data(host, path):
 	log_data = {'action': 'add by feed',
 				'table': 'Feed',
 				'identifier': source,
+				'log_id': str(uuid.uuid4()),
 				'timestamp': timestamp}
 
 	return feed_data, log_data

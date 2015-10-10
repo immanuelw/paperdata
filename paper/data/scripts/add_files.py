@@ -8,6 +8,7 @@ import sys
 import glob
 import time
 import socket
+import uuid
 import paper as ppdata
 from paper.data import dbi as pdbi, uv_data, file_data
 from sqlalchemy import or_
@@ -84,6 +85,7 @@ def calc_obs_data(dbi, host, path):
 	log_data = {'action': 'add by scan',
 				'table': None,
 				'identifier': source,
+				'log_id': str(uuid.uuid4()),
 				'timestamp': timestamp}
 
 	return obs_data, file_data, log_data
@@ -205,6 +207,7 @@ def update_md5(dbi):
 			log_data = {'action': 'update md5sum',
 						'table': 'File',
 						'identifier': source,
+						'log_id': str(uuid.uuid4()),
 						'timestamp': timestamp}
 
 			dbi.add_entry(s, 'Log', log_data)

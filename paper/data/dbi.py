@@ -88,7 +88,7 @@ class Log(Base, ppdata.DictFix):
 	action = Column(String(100), nullable=False)
 	table = Column(String(100))
 	identifier = Column(String(200)) #the primary key that is used in other tables of the object being acted on
-	log_id = Column(String(300), primary_key=True)
+	log_id = Column(String(36), primary_key=True)
 	timestamp = Column(BigInteger)
 
 #def RTPFile(Base, ppdata.DictFix):
@@ -125,7 +125,7 @@ class Log(Base, ppdata.DictFix):
 #	action = Column(String(100), nullable=False)
 #	table = Column(String(100))
 #	identifier = Column(String(200)) #the primary key that is used in other tables of the object being acted on
-#	log_id = Column(String(300), primary_key=True)
+#	log_id = Column(String(36), primary_key=True)
 #	timestamp = Column(BigInteger)
 
 class DataBaseInterface(ppdata.DataBaseInterface):

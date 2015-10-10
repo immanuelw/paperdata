@@ -141,7 +141,7 @@ class Log(object):
 						'key': 'No', 'description': 'table script is acting on'},
 						'identifier': {'type': 'VARCHAR(200)', 'default': 'None',
 						'key': 'No', 'description': 'key of item that was changed'},
-						'log_id': {'type': 'VARCHAR(300)', 'default': 'None',
+						'log_id': {'type': 'VARCHAR(36)', 'default': 'None',
 						'key': 'Primary', 'description': 'id of log'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time action was taken'}}
@@ -231,7 +231,7 @@ class RTPLog(object):
 						'key': 'No', 'description': 'table script is acting on'},
 						'identifier': {'type': 'VARCHAR(200)', 'default': 'None',
 						'key': 'No', 'description': 'key of item that was changed'},
-						'log_id': {'type': 'VARCHAR(300)', 'default': 'None',
+						'log_id': {'type': 'VARCHAR(36)', 'default': 'None',
 						'key': 'Primary', 'description': 'id of log'},
 						'timestamp': {'type': 'BIGINT', 'default': 'None',
 						'key': 'No', 'description': 'time action was taken'}}

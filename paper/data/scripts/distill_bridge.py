@@ -7,6 +7,7 @@ import os
 import copy
 import time
 import socket
+import uuid
 from collections import Counter
 import aipy as A
 from paper.data import dbi as pdbi, uv_data, file_data
@@ -128,6 +129,7 @@ def add_data(dbi, data_dbi):
 				log_data = {'action': 'add by bridge',
 							'table': None,
 							'identifier': source,
+							'log_id': str(uuid.uuid4()),
 							'timestamp': timestamp}
 
 				data_dbi.add_entry_dict(sess, 'Observation', obs_data)
