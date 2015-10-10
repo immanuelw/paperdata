@@ -1,3 +1,42 @@
+'''
+paper.convert
+
+author = Immanuel Washington
+
+Functions
+---------
+hours_to_degrees
+hours_to_radians
+degrees_to_hours
+radians_to_hours
+decimal_to_sexagesimal
+sexagesimal_to_decimal
+fpart -- fractional part of value
+ipart -- integer part of value
+gcal2jd -- gregorian time date to julian date
+jd2gcal -- julian date to gregorian time date
+time_to_decimal
+decimal_to_time
+date_to_juliandate
+datetime_to_juliandate
+juliandate_to_modifiedjd
+modifiedjd_to_juliandate
+datetime_to_modifiedjd
+juliandate_to_gmst
+utc_to_gmst
+gmst_to_utc
+juliandate_to_utc
+modifiedjd_to_utc
+gmst_to_lst
+lst_to_gmst
+utc_to_lst
+gps_to_utc
+utc_to_gps
+gps_from_string
+gps_to_lst
+gps_to_datetime
+datetime_to_gps
+'''
 from __future__ import print_function
 from time import strptime
 import datetime

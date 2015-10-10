@@ -1,9 +1,26 @@
+'''
+paper.schema
+
+author = Immanuel Washington
+
+Functions
+---------
+schema_db -- creates a text file containing a table-like represetation of a database
+'''
 from __future__ import print_function
 import sys
 import os
 import prettytable
 
 def schema_db(xdb, schema_file):
+	'''
+	creates database schema file
+
+	Parameters
+	----------
+	xdb | object: module containing the schema data
+	schema_file | str: path of output file for schema
+	'''
 	with open(schema_file, 'wb') as df:
 		print('Starting ..')
 	var_classes = xdb.all_classes

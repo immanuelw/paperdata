@@ -1,3 +1,29 @@
+'''
+paper
+
+author: Immanuel Washington
+
+Functions
+---------
+decimal_default -- json fix for decimal types
+rsync_copy -- pythonic rsync
+ssh_scope -- ssh connection
+
+Classes
+-------
+DictFix -- adds dictionary to sqlalchemy objects
+DataBaseInterface -- interface to database through sqlalchemy
+
+Modules
+-------
+convert -- time conversions
+memory -- memory checking
+schema -- schema table creation
+
+Subpackages
+-----------
+'''
+
 import os
 import sys
 import paramiko
@@ -81,6 +107,10 @@ class DictFix(object):
 	'''
 	superclass for all SQLAlchemy Table objects
 	allows access to object row dictionary
+
+	Methods
+	-------
+	to_dict -- creates python dict of fields from sqlalchemy object
 	'''
 	def to_dict(self):
 		'''
@@ -91,14 +121,26 @@ class DictFix(object):
 		dict: table attributes
 		'''
 		try:
-			new_dict = {}
-			for column in self.__table__.columns:
-				new_dict[column.name] = getattr(self, column.name)
+			new_dict = {column.name: getattr(self, column.name) for column in self.__table__.columns}
 			return new_dict
 		except(exc.InvalidRequestError):
 			return None
 
 class DataBaseInterface(object):
+	'''
+	Database Interface
+	base class used to connect to databases
+
+	Methods
+	-------
+	session_scope -- context manager for session connection to database
+	drop_db -- drops all tables from database
+	create_table -- creates individual table in database
+	add_entry -- adds entry object to database
+	add_entry_dict -- adds entry to database using dict as kwarg
+	get_entry -- gets database object
+	set_entry -- updates database entry field with new value
+	'''
 	def __init__(self, configfile='~/paperdata.cfg'):
 		'''
 		Connect to the database and make a session creator

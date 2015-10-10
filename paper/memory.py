@@ -1,3 +1,13 @@
+'''
+paper.memory
+
+author: Immanuel Washington
+
+Functions
+---------
+enough_memory -- checks if memory allocation is sufficient
+email_memory -- alerts people of insufficient memory allocation through email
+'''
 from __future__ import print_function
 import psutil
 import smtplib
