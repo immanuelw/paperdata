@@ -1,7 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Load data into MySQL table 
-
 from __future__ import print_function
 import os
 import time
@@ -14,12 +10,6 @@ import distill_files
 import move_files
 from sqlalchemy import func
 from sqlalchemy.sql import label
-
-### Script to load paperdistiller with files from the paperfeed table
-### Checks /data4 for memory, moves entire days of data, then loads into paperdistiller
-
-### Author: Immanuel Washington
-### Date: 11-23-14
 
 def set_feed(s, dbi, source_path, dest_host, dest_path, is_moved=True):
 	'''

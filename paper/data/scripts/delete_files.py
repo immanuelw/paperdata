@@ -1,7 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Add files to paper
-
 from __future__ import print_function
 import sys
 import time
@@ -13,12 +9,6 @@ import shutil
 import uuid
 import paper as ppdata
 from paper.data import dbi as pdbi
-
-### Script to move files and update paper database
-### Move files and update db using dbi
-
-### Author: Immanuel Washington
-### Date: 5-06-15
 
 def delete_check(dbi, source_host):
 	'''

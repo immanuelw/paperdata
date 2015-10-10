@@ -1,20 +1,10 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Create paper tables
-
 from __future__ import print_function
 import sys
-import json
 import glob
+import json
 from paper.data import dbi as pdbi, data_db as pdb
 import add_files
 import sqlalchemy.exc
-
-### Script to create paper database
-### Instantiates tables
-
-### Author: Immanuel Washington
-### Date: 5-06-15
 
 def restore_db(dbi, backup_file=None, table=None):
 	'''

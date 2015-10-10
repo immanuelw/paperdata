@@ -1,8 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Load data into MySQL table 
-
-# import the MySQLdb and sys modules
 from __future__ import print_function
 import sys
 import time
@@ -10,12 +5,6 @@ import os
 import json
 import paper as ppdata
 from paper.data import dbi as pdbi
-
-### Script to Backup paper database
-### Finds time and date and writes table into .csv file
-
-### Author: Immanuel Washington
-### Date: 8-20-14
 
 def json_data(dbo, dump_objects):
 	'''

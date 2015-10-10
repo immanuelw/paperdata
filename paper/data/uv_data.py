@@ -1,7 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Add files to paper
-
 from __future__ import print_function
 import os
 import sys
@@ -10,11 +6,6 @@ from paper.data import dbi as pdbi
 import paper.convert as convert
 import aipy as A
 
-### Script to calculate uv data on any/other hosts
-### output uv_data in csv format: 
-
-### Author: Immanuel Washington
-### Date: 5-06-15
 def five_round(num):
 	'''
 	rounds number to five significant figures

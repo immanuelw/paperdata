@@ -1,17 +1,7 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Create paper tables
-
 import os
 import socket
 import paper as ppdata
 import add_files
-
-### Script to reload paper database
-### Crawls all hosts for files
-
-### Author: Immanuel Washington
-### Date: 5-06-15
 
 def find_paths(input_host):
 	'''

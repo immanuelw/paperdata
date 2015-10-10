@@ -1,11 +1,3 @@
-#!/usr/global/paper/CanopyVirtualEnvs/PAPER_Distiller/bin/python
-'''
-Input a list of files and insert into the db.  The files must exist and be findable on the filesystem
-NB filenames must be FULL PATH. If the root is not '/' for all files it will exit
-
-KEY NOTE: Assumes all files are contiguous.  I sort the files by jd and then match up neighboring pols as neighbors for the
-   ddr algorithm
-'''
 from __future__ import print_function
 import os
 import sys

@@ -1,7 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Add files to paper
-
 from __future__ import print_function
 import os
 import sys
@@ -12,12 +8,6 @@ import uuid
 import paper as ppdata
 from paper.data import dbi as pdbi, uv_data, file_data
 from sqlalchemy import or_
-
-### Script to add files to paper database
-### Adds files using dbi
-
-### Author: Immanuel Washington
-### Date: 5-06-15
 
 def calc_obs_data(dbi, host, path):
 	'''

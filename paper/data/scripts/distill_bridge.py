@@ -1,9 +1,5 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Load data into MySQL table 
-
-import sys
 import os
+import sys
 import copy
 import time
 import socket
@@ -14,12 +10,6 @@ from paper.data import dbi as pdbi, uv_data, file_data
 from paper.distiller import dbi as ddbi
 import paper.memory as memory
 import add_files, move_files
-
-### Script to load infromation quickly from paperdistiller database into paper
-### Queries paperdistiller for relevant information, loads paper with complete info
-
-### Author: Immanuel Washington
-### Date: 8-20-14
 
 def add_data(dbi, data_dbi):
 	'''

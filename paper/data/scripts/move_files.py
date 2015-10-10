@@ -1,24 +1,13 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Add files to paper
-
 from __future__ import print_function
+import os
 import sys
-import time
-import subprocess
 import glob
 import socket
-import os
 import shutil
+import time
 import uuid
 import paper as ppdata
 from paper.data import dbi as pdbi
-
-### Script to move files and update paper database
-### Move files and update db using dbi
-
-### Author: Immanuel Washington
-### Date: 5-06-15
 
 def null_check(dbi, source_host, source_paths):
 	'''

@@ -1,18 +1,8 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Add files to paper
-
 from __future__ import print_function
 import os
 import hashlib
 import socket
 import paper as ppdata
-
-### Module to add files to paper database
-### Adds files using dbi
-
-### Author: Immanuel Washington
-### Date: 5-06-15
 
 def get_size(path):
 	'''

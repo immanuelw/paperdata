@@ -1,10 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Module to creation of db schema
-
-### Author: Immanuel Washington
-### Date: 05-17-14
-
 from __future__ import print_function
 
 class File(object):

@@ -1,7 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Test everything in paper
-
 from __future__ import print_function
 import os
 import glob
@@ -12,12 +8,6 @@ import backup_db
 import restore_db_db
 import move_files
 import delete_files
-
-### Script to test paper functions
-### Uses scripts and module
-
-### Author: Immanuel Washington
-### Date: 9-28-15
 
 if __name__ == '__main__':
 	print('finding files to test...')

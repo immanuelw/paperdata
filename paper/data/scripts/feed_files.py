@@ -1,7 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Load data into MySQL table 
-
 from __future__ import print_function
 import sys
 import os
@@ -12,13 +8,6 @@ import uuid
 import aipy as A
 import paper as ppdata
 from paper.data import dbi as pdbi
-
-### Script to load data from anywhere into paperfeed database
-### Crawls folio or elsewhere and reads through .uv files to generate all field information
-### DOES NOT MOVE ANY DATA
-
-### Author: Immanuel Washington
-### Date: 05-18-14
 
 def gen_feed_data(host, path):
 	'''

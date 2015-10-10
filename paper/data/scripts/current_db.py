@@ -1,9 +1,6 @@
-#!/usr/bin/env python
 import os
 import prettytable
 from paper.data import dbi as pdbi
-
-#script to show state of paper
 
 def main():
 	dbi = pdbi.DataBaseInterface()
