@@ -10,63 +10,14 @@ import glob
 import socket
 import os
 import shutil
-import psutil
 import paper as ppdata
 from paper.data import dbi as pdbi
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email import Encoders
 
 ### Script to move files and update paper database
 ### Move files and update db using dbi
 
 ### Author: Immanuel Washington
 ### Date: 5-06-15
-
-def enough_space(required_space, space_path):
-	'''
-	checks path for enough space
-
-	Parameters
-	----------
-	required_space | int: amount of space needed in bytes
-	space_path | str: path to check for spacce
-
-	Returns
-	-------
-	bool: is there enough space
-	'''
-	free_space = psutil.disk_usage(space_path).free
-
-	return required_space < free_space
-
-def email_space(table):
-	'''
-	emails people if there is not enough space on folio
-
-	Parameters
-	----------
-	table | str: table name
-	'''
-	start_email = 'paperfeed.paperdata@gmail.com'
-	start_pass = 'papercomesfrom1tree'
-
-	server = smtplib.SMTP('smtp.gmail.com', 587)
-	server.ehlo()
-	server.starttls()
-
-	#Next, log in to the server
-	server.login(start_email, start_pass)
-
-	#Send the mail
-	header = 'From: PAPERBridge <paperfeed.paper@gmail.com>\nSubject: NOT ENOUGH SPACE ON FOLIO\n'
-	msgs = ''.join((header, '\nNot enough space for ', table, ' on folio'))
-
-	emails = ('immwa@sas.upenn.edu', 'jaguirre@sas.upenn.edu', 'saul.aryeh.kohn@gmail.com', 'jacobsda@sas.upenn.edu')
-	for user in emails:
-		server.sendmail(start_email, user, msgs)
-
-	server.quit()
 
 def null_check(dbi, input_host, input_paths):
 	'''
