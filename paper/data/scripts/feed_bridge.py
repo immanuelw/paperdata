@@ -86,7 +86,7 @@ def count_days(dbi):
 		all_FEEDs = s.query(table).all()
 		good_days = tuple(getattr(FEED, 'julian_day') for FEED in count_FEEDs if getattr(FEED, 'count') in (72, 288))
 
-		to_move = (getattr(FEED, 'full_path') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
+		to_move = (getattr(FEED, 'source') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
 
 		for path in to_move:
 			FEED = dbi.get_entry(s, 'Feed', path)

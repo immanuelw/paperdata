@@ -35,7 +35,7 @@ def calc_obs_data(dbi, host, path):
 		dict: log values
 	'''
 	base_path, filename, filetype = file_data.file_names(path)
-	full_path = ':'.join((host, path))
+	source = ':'.join((host, path))
 
 	if filetype in ('uv', 'uvcRRE'):
 		time_start, time_end, delta_time, julian_date, polarization, length, obsnum = uv_data.calc_uv_data(host, path)
@@ -71,7 +71,7 @@ def calc_obs_data(dbi, host, path):
 				'base_path': base_path,
 				'filename': filename,
 				'filetype': filetype,
-				'full_path': full_path,
+				'source': source,
 				'obsnum': obsnum,
 				'filesize': filesize,
 				'md5sum': md5,
@@ -83,7 +83,7 @@ def calc_obs_data(dbi, host, path):
 
 	log_data = {'action': 'add by scan',
 				'table': None,
-				'identifier': full_path,
+				'identifier': source,
 				'timestamp': timestamp}
 
 	return obs_data, file_data, log_data
@@ -108,7 +108,7 @@ def dupe_check(dbi, source_host, source_paths):
 		FILEs = s.query(table).filter(getattr(table, 'host') == source_host).all()
 		paths = tuple(os.path.join(getattr(FILE, 'base_path'), getattr(FILE, 'filename')) for FILE in FILEs)
 
-	#for each input file, check if in full_paths
+	#for each input file, check if in sources
 	unique_paths = tuple(source_path for source_path in source_paths if source_path not in paths)
 		
 	return unique_paths
@@ -198,13 +198,13 @@ def update_md5(dbi):
 		table = getattr(pdbi, 'File')
 		FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
 		for FILE in FILEs:
-			full_path = getattr(FILE, 'full_path')
+			source = getattr(FILE, 'source')
 			timestamp = int(time.time())
-			dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), full_path))
+			dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), source))
 			dbi.set_entry(s, FILE, 'timestamp', timestamp)
 			log_data = {'action': 'update md5sum',
 						'table': 'File',
-						'identifier': full_path,
+						'identifier': source,
 						'timestamp': timestamp}
 
 			dbi.add_entry(s, 'Log', log_data)

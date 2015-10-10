@@ -54,14 +54,14 @@ def set_delete_table(s, dbi, source_host, source_path, dest_host, dest_path):
 	dest_host | str: output host
 	dest_path | str: output directory
 	'''
-	full_path = ':'.join((source_host, source_path))
+	source = ':'.join((source_host, source_path))
 	timestamp = int(time.time())
-	FILE = dbi.get_entry(s, 'File', full_path)
+	FILE = dbi.get_entry(s, 'File', source)
 	dbi.set_entry(s, FILE, 'host', dest_host)
 	dbi.set_entry(s, FILE, 'base_path', dest_path)
 	dbi.set_entry(s, FILE, 'is_deletable', False)
 	dbi.set_entry(s, FILE, 'timestamp', timestamp)
-	identifier = getattr(FILE, 'full_path')
+	identifier = getattr(FILE, 'source')
 	log_data = {'action': 'delete',
 				'table': 'file',
 				'identifier': identifier,

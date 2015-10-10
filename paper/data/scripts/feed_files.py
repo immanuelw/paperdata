@@ -41,14 +41,14 @@ def gen_feed_data(host, path):
 		return (None,) * 2
 
 	base_path, filename = os.path.split(path)
-	full_path = ':'.join((host, path))
+	source = ':'.join((host, path))
 
 	timestamp = int(time.time())
 
 	feed_data = {'host': host,
 				'base_path': base_path,
 				'filename': filename,
-				'full_path': full_path,
+				'source': source,
 				'julian_day': int(uv['time']),
 				'is_movable': False,
 				'is_moved': False,
@@ -56,7 +56,7 @@ def gen_feed_data(host, path):
 
 	log_data = {'action': 'add by feed',
 				'table': 'Feed',
-				'identifier': full_path,
+				'identifier': source,
 				'timestamp': timestamp}
 
 	return feed_data, log_data

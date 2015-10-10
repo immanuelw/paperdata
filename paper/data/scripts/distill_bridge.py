@@ -63,7 +63,7 @@ def add_data(dbi, data_dbi):
 				host = getattr(FILE, 'host')
 				path = getattr(FILE, 'filename')
 				base_path, filename, filetype = file_data.file_names(path)
-				full_path = ':'.join((host, path))
+				source = ':'.join((host, path))
 
 				obsnum = getattr(OBS, 'obsnum')
 				julian_date = getattr(OBS, 'julian_date')
@@ -115,7 +115,7 @@ def add_data(dbi, data_dbi):
 							'base_path': base_path,
 							'filename': filename,
 							'filetype': filetype,
-							'full_path': full_path,
+							'source': source,
 							'obsnum': obsnum,
 							'filesize': filesize,
 							'md5sum': md5,
@@ -127,7 +127,7 @@ def add_data(dbi, data_dbi):
 
 				log_data = {'action': 'add by bridge',
 							'table': None,
-							'identifier': full_path,
+							'identifier': source,
 							'timestamp': timestamp}
 
 				data_dbi.add_entry_dict(sess, 'Observation', obs_data)
