@@ -31,10 +31,10 @@ if __name__ == '__main__':
 	dbi.create_db()
 
 	print('adding files to db...')
-	input_host = 'folio'
-	input_paths = test_paths
+	source_host = 'folio'
+	source_paths = test_paths
 
-	add_files.add_files(dbi, input_host, input_paths)
+	add_files.add_files(dbi, source_host, source_paths)
 	add_files.update_obsnums(dbi)
 	add_files.connect_observations(dbi)
 
@@ -55,17 +55,17 @@ if __name__ == '__main__':
 
 	print('moving files...')
 	#copy files first?
-	output_host = 'node16'
-	output_dir = os.path.expanduser('~/test_data/')
-	move_files.move_files(dbi, input_host, input_paths, output_host, output_dir)
+	dest_host = 'node16'
+	dest_path = os.path.expanduser('~/test_data/')
+	move_files.move_files(dbi, source_host, source_paths, dest_host, dest_path)
 
 	print('deleting files...')
-	input_host = output_host
-	output_host = 'folio'
+	source_host = dest_host
+	dest_host = 'folio'
 	del_dir = os.path.expanduser('~/test_data_2/')
-	os.mkdir(output_dir)
-	input_paths = delete_files.delete_check(input_host)
-	delete_files.delete_files(dbi, input_host, input_paths, output_host, del_dir)
+	os.mkdir(dest_path)
+	source_paths = delete_files.delete_check(source_host)
+	delete_files.delete_files(dbi, source_host, source_paths, dest_host, del_dir)
 
 	print('dropping db again...')
 	dbi.drop_db()
