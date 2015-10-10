@@ -279,7 +279,7 @@ def download_set():
 			file_list = (obs_file for obs in obs_objs for obs_file in getattr(obs, 'files'))
 			file_objs = (file_obj for file_obj in file_list if getattr(file_obj, 'host') == host and getattr(file_obj, 'filetype') == filetype)
 
-			info_dict = {getattr(file_obj, 'full_path'): {var: getattr(file_obj, var) for var in output_vars} for file_obj in file_objs}
+			info_dict = {getattr(file_obj, 'source'): {var: getattr(file_obj, var) for var in output_vars} for file_obj in file_objs}
 
 		return jsonify(info_dict)
 	else:

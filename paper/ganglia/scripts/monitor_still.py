@@ -81,8 +81,8 @@ try:
 					continue
 
 				#check for new filenames
-				full_path = ':'.join((still_host, os.path.join(base_path, filename)))
-				full_stats = '&'.join((full_path, status))
+				source = ':'.join((still_host, os.path.join(base_path, filename)))
+				full_stats = '&'.join((source, status))
 
 				if filename not in file_dict['pid'].keys():
 					file_dict['pid'].update({filename: current_pid})
@@ -94,7 +94,7 @@ try:
 					entry_dict = {'host': still_host,
 									'base_path': base_path,
 									'filename': filename,
-									'full_path': full_path,
+									'source': source,
 									'status': status,
 									'full_stats': full_stats,
 									'del_time': -1,
@@ -111,7 +111,7 @@ try:
 					entry_dict = {'host': still_host,
 									'base_path': base_path,
 									'filename': filename,
-									'full_path': full_path,
+									'source': source,
 									'status': status,
 									'full_stats': full_stats,
 									'del_time': 0,
@@ -126,7 +126,7 @@ try:
 					entry_dict = {'host': still_host,
 									'base_path': base_path,
 									'filename': file_name,
-									'full_path': full_path,
+									'source': source,
 									'status': status,
 									'full_stats': full_stats,
 									'del_time': int(time.time() - file_dict['time'][filename]),

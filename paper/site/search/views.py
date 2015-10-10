@@ -192,7 +192,7 @@ def file_table():
 	start_utc = misc_utils.get_jd_from_datetime(starttime)
 	end_utc = misc_utils.get_jd_from_datetime(endtime)
 
-	output_vars=('host', 'full_path', 'obsnum', 'filesize')
+	output_vars = ('host', 'source', 'obsnum', 'filesize')
 
 	try:
 		all_obs_list = db_utils.query(database='paperdata', table='Observation', 
