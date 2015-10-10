@@ -88,15 +88,15 @@ def calc_obs_data(dbi, host, path):
 
 	return obs_data, file_data, log_data
 
-def dupe_check(dbi, input_host, input_paths):
+def dupe_check(dbi, source_host, source_paths):
 	'''
 	checks for duplicate paths and removes to not waste time if possible
 
 	Parameters
 	----------
 	dbi | object: database interface object
-	input_host | str: host of uv* files
-	input_paths | list[str]: paths of uv* files
+	source_host | str: host of uv* files
+	source_paths | list[str]: paths of uv* files
 
 	Returns
 	-------
@@ -105,11 +105,11 @@ def dupe_check(dbi, input_host, input_paths):
 	with dbi.session_scope() as s:
 		#all files on same host
 		table = getattr(pdbi, 'File')
-		FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
+		FILEs = s.query(table).filter(getattr(table, 'host') == source_host).all()
 		paths = tuple(os.path.join(getattr(FILE, 'base_path'), getattr(FILE, 'filename')) for FILE in FILEs)
 
 	#for each input file, check if in full_paths
-	unique_paths = tuple(input_path for input_path in input_paths if input_path not in paths)
+	unique_paths = tuple(source_path for source_path in source_paths if source_path not in paths)
 		
 	return unique_paths
 
@@ -209,21 +209,21 @@ def update_md5(dbi):
 
 			dbi.add_entry(s, 'Log', log_data)
 
-def add_files_to_db(dbi, input_host, input_paths):
+def add_files_to_db(dbi, source_host, source_paths):
 	'''
 	adds files to the database
 
 	Parameters
 	----------
 	dbi | object: database interface object
-	input_host | str: host of files
-	input_paths | list[str]: paths of uv* files
+	source_host | str: host of files
+	source_paths | list[str]: paths of uv* files
 	'''
 	with dbi.session_scope() as s:
-		for input_path in input_paths:
-			base_path = os.path.dirname(input_path)
-			filename = os.path.basename(input_path)
-			obs_data, file_data, log_data = calc_obs_data(input_host, input_path)
+		for source_path in source_paths:
+			base_path = os.path.dirname(source_path)
+			filename = os.path.basename(source_path)
+			obs_data, file_data, log_data = calc_obs_data(source_host, source_path)
 			try:
 				dbi.add_entry_dict(s, 'Observation', obs_data)
 			except:
@@ -237,47 +237,47 @@ def add_files_to_db(dbi, input_host, input_paths):
 			except:
 				print('Failed to load in log ', base_path, filename)
 
-def add_files(dbi, input_host, input_paths):
+def add_files(dbi, source_host, source_paths):
 	'''
 	generates list of input files, check for duplicates, add information to database
 
 	Parameters
 	----------
 	dbi | object: database interface object
-	input_host | str: host of files
-	input_paths | str: string to indicate paths of uv* files
+	source_host | str: host of files
+	source_paths | str: string to indicate paths of uv* files
 	'''
 	named_host = socket.gethostname()
-	if named_host == input_host:
-		input_paths = glob.glob(input_paths)
+	if named_host == source_host:
+		source_paths = glob.glob(source_paths)
 	else:
-		with ppdata.ssh_scope(input_host) as ssh:
-			input_paths = raw_input('Source directory path: ')
-			_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
-			input_paths = path_out.read().split('\n')[:-1]
+		with ppdata.ssh_scope(source_host) as ssh:
+			source_paths = raw_input('Source directory path: ')
+			_, path_out, _ = ssh.exec_command('ls -d {source_paths}'.format(source_paths=source_paths))
+			source_paths = path_out.read().split('\n')[:-1]
 
-	input_paths = sorted(dupe_check(dbi, input_host, input_paths))
-	npz_paths = [npz_path for npz_path in input_paths if npz_path.endswith('.npz')]
-	input_paths = [input_path for input_path in input_paths if not input_path.endswith('.npz')]
-	add_files_to_db(dbi, input_host, input_paths)
-	add_files_to_db(dbi, input_host, npz_paths)
+	source_paths = sorted(dupe_check(dbi, source_host, source_paths))
+	npz_paths = [npz_path for npz_path in source_paths if npz_path.endswith('.npz')]
+	source_paths = [source_path for source_path in source_paths if not source_path.endswith('.npz')]
+	add_files_to_db(dbi, source_host, source_paths)
+	add_files_to_db(dbi, source_host, npz_paths)
 	update_obsnums(dbi)
 	connect_observations(dbi)
 	#update_md5(dbi)
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2:
-		input_host = sys.argv[1].split(':')[0]
-		if input_host == sys.argv[1]:
+		source_host = sys.argv[1].split(':')[0]
+		if source_host == sys.argv[1]:
 			print('Needs host')
 			sys.exit()
-		input_paths = sys.argv[1].split(':')[1]
+		source_paths = sys.argv[1].split(':')[1]
 	elif len(sys.argv) == 3:
-		input_host = sys.argv[1]
-		input_paths = sys.argv[2]
+		source_host = sys.argv[1]
+		source_paths = sys.argv[2]
 	else:
-		input_host = raw_input('Source directory host: ')
-		input_paths = raw_input('Source directory path: ')
+		source_host = raw_input('Source directory host: ')
+		source_paths = raw_input('Source directory path: ')
 
 	dbi = pdbi.DataBaseInterface()
-	add_files(dbi, input_host, input_paths)
+	add_files(dbi, source_host, source_paths)

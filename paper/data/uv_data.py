@@ -270,12 +270,12 @@ def calc_uv_data(host, path):
 	return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
 if __name__ == '__main__':
-	input_host = sys.argv[1]
-	input_path = sys.argv[2]
+	source_host = sys.argv[1]
+	source_path = sys.argv[2]
 	if len(sys.argv) == 4:
 		mode = sys.argv[3]
 
-	uv_data = calc_uv_data(input_host, input_path)
+	uv_data = calc_uv_data(source_host, source_path)
 	if uv_data is None:
 		sys.exit()
 	output_string = ','.join(uv_data)

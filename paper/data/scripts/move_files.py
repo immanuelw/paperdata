@@ -19,15 +19,15 @@ from paper.data import dbi as pdbi
 ### Author: Immanuel Washington
 ### Date: 5-06-15
 
-def null_check(dbi, input_host, input_paths):
+def null_check(dbi, source_host, source_paths):
 	'''
 	checks if file(s) is(are) in database
 
 	Parameters
 	----------
 	dbi | object: database interface object
-	input_host | str: host of files
-	input_paths | list[str]: uv* file paths
+	source_host | str: host of files
+	source_paths | list[str]: uv* file paths
 
 	Returns
 	-------
@@ -35,16 +35,16 @@ def null_check(dbi, input_host, input_paths):
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'File')
-		FILEs = s.query(table).filter(getattr(table, 'host') == input_host).all()
+		FILEs = s.query(table).filter(getattr(table, 'host') == source_host).all()
 	#all files on same host
 	paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
 
 	#for each input file, check if in filenames
-	nulls = tuple(input_path for input_path in input_paths if input_path not in paths)
+	nulls = tuple(source_path for source_path in source_paths if source_path not in paths)
 		
 	return len(nulls) == 0
 
-def set_move_table(s, dbi, input_host, source, output_host, output_dir):
+def set_move_table(s, dbi, source_host, source, dest_host, dest_path):
 	'''
 	updates table for moved file
 
@@ -52,16 +52,16 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 	----------
 	s | object: session object
 	dbi | object: database interface object
-	input_host | str: user host
+	source_host | str: user host
 	source | str: source file
-	output_host | str: output host
-	output_dir | str: output directory
+	dest_host | str: output host
+	dest_path | str: output directory
 	'''
-	full_path = ':'.join((input_host, source))
+	full_path = ':'.join((source_host, source))
 	timestamp = int(time.time())
 	FILE = dbi.get_entry(s, 'File', full_path)
-	dbi.set_entry(s, FILE, 'host', output_host)
-	dbi.set_entry(s, FILE, 'base_path', output_dir)
+	dbi.set_entry(s, FILE, 'host', dest_host)
+	dbi.set_entry(s, FILE, 'base_path', dest_path)
 	dbi.set_entry(s, FILE, 'timestamp', timestamp)
 	identifier = getattr(FILE, 'full_path')
 	log_data = {'action': 'move',
@@ -70,52 +70,52 @@ def set_move_table(s, dbi, input_host, source, output_host, output_dir):
 				'timestamp': timestamp}
 	dbi.add_entry_dict(s, 'Log', log_data)
 
-def move_files(dbi, input_host=None, input_paths=None, output_host=None, output_dir=None):
+def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_path=None):
 	'''
 	move files
 
 	Parameters
 	----------
 	dbi | object: database interface object
-	input_host | str: file host --defaults to None
-	input_paths | list[str]: file paths --defaults to None
-	output_host | str: output host --defaults to None
-	output_dir | str: output directory --defaults to None
+	source_host | str: file host --defaults to None
+	source_paths | list[str]: file paths --defaults to None
+	dest_host | str: output host --defaults to None
+	dest_path | str: output directory --defaults to None
 	'''
 	named_host = socket.gethostname()
-	input_host = raw_input('Source directory host: ') if input_host is None else input_host
-	output_host = raw_input('Destination directory host: ') if output_host is None else output_host
-	output_dir = raw_input('Destination directory: ') if output_dir is None else output_dir
+	source_host = raw_input('Source directory host: ') if source_host is None else source_host
+	dest_host = raw_input('Destination directory host: ') if dest_host is None else dest_host
+	dest_path = raw_input('Destination directory: ') if dest_path is None else dest_path
 
-	if input_paths is None:
-		if named_host == input_host:
-			input_paths = sorted(glob.glob(raw_input('Source directory path: ')))
+	if source_paths is None:
+		if named_host == source_host:
+			source_paths = sorted(glob.glob(raw_input('Source directory path: ')))
 		else:
 			with ppdata.ssh_scope(host) as ssh:
-				input_paths = raw_input('Source directory path: ')
-				_, path_out, _ = ssh.exec_command('ls -d {input_paths}'.format(input_paths=input_paths))
-				input_paths = sorted(path_out.read().split('\n')[:-1])
+				source_paths = raw_input('Source directory path: ')
+				_, path_out, _ = ssh.exec_command('ls -d {source_paths}'.format(source_paths=source_paths))
+				source_paths = sorted(path_out.read().split('\n')[:-1])
 	
-	nulls = null_check(input_host, input_paths)
+	nulls = null_check(source_host, source_paths)
 	if not nulls:
 		#if any file not in db -- don't move anything
 		print('File(s) not in database')
 		return
 
-	destination = ':'.join((output_host, output_dir))
+	destination = ':'.join((dest_host, dest_path))
 	with dbi.session_scope() as s:
-		if named_host == input_host:
-			for source in input_paths:
+		if named_host == source_host:
+			for source in source_paths:
 				ppdata.rsync_copy(source, destination)
-				set_move_table(s, dbi, input_host, source, output_host, output_dir)
+				set_move_table(s, dbi, source_host, source, dest_host, dest_path)
 				shutil.rmtree(source)
 		else:
-			with ppdata.ssh_scope(input_host) as ssh:
-				for source in input_paths:
+			with ppdata.ssh_scope(source_host) as ssh:
+				for source in source_paths:
 					rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 					rsync_del_command = '''rm -r {source}'''.format(source=source)
 					ssh.exec_command(rsync_copy_command)
-					set_move_table(s, dbi, input_host, source, output_host, output_dir)
+					set_move_table(s, dbi, source_host, source, dest_host, dest_path)
 					ssh.exec_command(rsync_del_command)
 	print('Completed transfer')
 
