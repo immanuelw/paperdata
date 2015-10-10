@@ -47,7 +47,7 @@ def calc_obs_data(dbi, host, path):
 	filesize = file_data.calc_size(host, path)
 	md5 = file_data.calc_md5sum(host, path)
 
-	source_host = host
+	init_host = host
 
 	timestamp = int(time.time())
 
@@ -76,7 +76,7 @@ def calc_obs_data(dbi, host, path):
 				'filesize': filesize,
 				'md5sum': md5,
 				'tape_index': None,
-				'source_host': source_host,
+				'init_host': init_host,
 				'is_tapeable': False,
 				'is_deletable': False,
 				'timestamp': timestamp}

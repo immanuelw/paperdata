@@ -91,7 +91,7 @@ def add_data(dbi, data_dbi):
 				if md5 is None:
 					md5 = file_data.calc_md5sum(host, path)
 
-				source_host = host
+				init_host = host
 
 				timestamp = int(time.time())
 
@@ -120,7 +120,7 @@ def add_data(dbi, data_dbi):
 							'filesize': filesize,
 							'md5sum': md5,
 							'tape_index': None,
-							'source_host': source_host,
+							'init_host': init_host,
 							'is_tapeable': True,
 							'is_deletable': False,
 							'timestamp': timestamp}

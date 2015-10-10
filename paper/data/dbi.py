@@ -64,7 +64,7 @@ class File(Base, ppdata.DictFix):
 	md5sum = Column(String(32))
 	tape_index = Column(String(100))
 	### maybe unnecessary fields
-	source_host = Column(String(100))
+	init_host = Column(String(100))
 	is_tapeable = Column(Boolean)
 	is_deletable = Column(Boolean)
 	timestamp = Column(BigInteger)
