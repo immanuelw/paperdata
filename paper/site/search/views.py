@@ -1,7 +1,5 @@
 from flask import render_template, flash, redirect, url_for, request, g, make_response
 from flask.ext.login import current_user
-import os
-import time
 import json
 from datetime import datetime
 from paper.site.flask_app import search_app as app, search_db as db

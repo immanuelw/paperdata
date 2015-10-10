@@ -1,8 +1,6 @@
 from flask import render_template, flash, redirect, url_for, request, g, make_response
 from flask.ext.login import current_user
-import os
 import time
-from datetime import datetime
 from paper.site.flask_app import admin_app as app, admin_db as db
 from paper.site.admin import models
 from paper.site import db_utils, misc_utils
@@ -192,8 +190,7 @@ def rtp_summary_table():
 			file_dict = file_info[julian_day]
 			sum_dict = summary_dict[julian_day]
 			year, month, day, _ = convert.jd2gcal(convert.MJD_0, julian_day - convert.MJD_0)
-			gd = datetime(year, month, day)
-			sum_dict['gregorian_day'] = gd.strftime('%Y-%m-%d') 
+			sum_dict['gregorian_day'] = '{year}-{month}-{day}'.format(year=year, month=month, day=day)
 			sum_dict['lst_range'] = file_dict['lst_range'] 
 			sum_dict['file_count'] = file_dict['count']
 			sum_dict['sa_host_path'] = file_dict['host_path']['sa_host_path']
