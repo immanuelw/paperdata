@@ -48,21 +48,23 @@ def email_space(table):
 	----------
 	table | str: table name
 	'''
+	start_email = 'paperfeed.paperdata@gmail.com'
+	start_pass = 'papercomesfrom1tree'
+
 	server = smtplib.SMTP('smtp.gmail.com', 587)
 	server.ehlo()
 	server.starttls()
 
 	#Next, log in to the server
-	server.login('paperfeed.paper@gmail.com', 'papercomesfrom1tree')
+	server.login(start_email, start_pass)
 
 	#Send the mail
 	header = 'From: PAPERBridge <paperfeed.paper@gmail.com>\nSubject: NOT ENOUGH SPACE ON FOLIO\n'
 	msgs = ''.join((header, '\nNot enough space for ', table, ' on folio'))
 
-	server.sendmail('paperfeed.paper@gmail.com', 'immwa@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paper@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paper@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
-	server.sendmail('paperfeed.paper@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
+	emails = ('immwa@sas.upenn.edu', 'jaguirre@sas.upenn.edu', 'saul.aryeh.kohn@gmail.com', 'jacobsda@sas.upenn.edu')
+	for user in emails:
+		server.sendmail(start_email, user, msgs)
 
 	server.quit()
 

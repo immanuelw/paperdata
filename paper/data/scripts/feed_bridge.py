@@ -14,9 +14,6 @@ import distill_files
 import move_files
 from sqlalchemy import func
 from sqlalchemy.sql import label
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email import Encoders
 
 ### Script to load paperdistiller with files from the paperfeed table
 ### Checks /data4 for space, moves entire days of data, then loads into paperdistiller
@@ -124,34 +121,6 @@ def find_data(dbi):
 
 	return feed_paths, feed_host, feed_filenames
 
-def email_paperfeed(files):
-	'''
-	emails people that files are being moved to feed
-
-	Parameters
-	----------
-	files | list[str]: files being moved
-	'''
-	server = smtplib.SMTP('smtp.gmail.com', 587)
-	server.ehlo()
-	server.starttls()
-
-	#Next, log in to the server
-	server.login('paperfeed.paper@gmail.com', 'papercomesfrom1tree')
-
-	header = 'From: PAPERFeed <paperfeed.paper@gmail.com>\nSubject: FILES ARE BEING MOVED\n'
-	msgs = header
-	#Send the mail
-	for filename in files:
-		msgs = ''.join(msgs, '\n', filename, ' is being moved.\n')
-
-	server.sendmail('paperfeed.paper@gmail.com', 'immwa@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paper@gmail.com', 'jaguirre@sas.upenn.edu', msgs)
-	server.sendmail('paperfeed.paper@gmail.com', 'saul.aryeh.kohn@gmail.com', msgs)
-	server.sendmail('paperfeed.paper@gmail.com', 'jacobsda@sas.upenn.edu', msgs)
-
-	server.quit()
-
 def feed_bridge(dbi):
 	'''
 	bridges feed and paperdistiller
@@ -175,8 +144,6 @@ def feed_bridge(dbi):
 		output_host = 'folio'
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
 		move_feed_files(dbi, input_host, input_paths, output_host, output_dir)
-		#EMAIL PEOPLE THAT DATA IS BEING MOVED AND LOADED
-		email_paperfeed(input_paths)
 		#ADD FILES TO PAPERDISTILLER ON LIST OF DATA IN NEW LOCATION
 		out_dir = os.path.join(output_dir, 'zen.*.uv')
 		obs_paths = glob.glob(out_dir)
