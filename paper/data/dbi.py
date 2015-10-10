@@ -85,11 +85,10 @@ class Feed(Base, ppdata.DictFix):
 
 class Log(Base, ppdata.DictFix):
 	__tablename__ = 'Log'
-	#__table_args__ = (PrimaryKeyConstraint('action', 'identifier', 'timestamp', name='action_time'),)
 	action = Column(String(100), nullable=False)
 	table = Column(String(100))
 	identifier = Column(String(200)) #the primary key that is used in other tables of the object being acted on
-	action_time = Column(String(200), primary_key=True)
+	log_id = Column(String(300), primary_key=True)
 	timestamp = Column(BigInteger)
 
 #def RTPFile(Base, ppdata.DictFix):
@@ -107,7 +106,7 @@ class Log(Base, ppdata.DictFix):
 #	new_host = Column(String(100))
 #	new_path = Column(String(100))
 #	timestamp = Column(BigInteger)
-#	observation = relationship(Rtp_Observation, backref=backref('files', uselist=True))
+#	observation = relationship(RTPObservation, backref=backref('files', uselist=True))
 
 #class RTPObservation(Base, ppdata.DictFix):
 #	__tablename__ = 'RTPObservation'
@@ -123,10 +122,10 @@ class Log(Base, ppdata.DictFix):
 
 #class RTPLog(Base, ppdata.DictFix):
 #	__tablename__ = 'RTPLog'
-#	__table_args__ = (PrimaryKeyConstraint('action', 'identifier', 'timestamp', name='action_time'),)
 #	action = Column(String(100), nullable=False)
 #	table = Column(String(100))
 #	identifier = Column(String(200)) #the primary key that is used in other tables of the object being acted on
+#	log_id = Column(String(300), primary_key=True)
 #	timestamp = Column(BigInteger)
 
 class DataBaseInterface(ppdata.DataBaseInterface):
