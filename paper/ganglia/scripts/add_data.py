@@ -1,20 +1,10 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Add files to pyganglia
-
-import sys
 import os
+import sys
 import psutil
 import time
 import uuid
 import paper as ppdata
 from paper.ganglia import dbi as pyg
-
-### Script to add info to pyganglia database
-### Adds information using dbi
-
-### Author: Immanuel Washington
-### Date: 5-06-15
 
 def two_round(num):
 	'''

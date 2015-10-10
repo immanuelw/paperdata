@@ -1,10 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Module to allow easier finding of data in scripts 
-
-### Author: Immanuel Washington
-### Date: 05-17-15
-
 from __future__ import print_function
 
 class Filesystem(object):

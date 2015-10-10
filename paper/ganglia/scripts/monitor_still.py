@@ -1,4 +1,3 @@
-#!/usr/global/paper/bin/python
 from __future__ import print_function
 from sqlalchemy import func
 import curses, time, os

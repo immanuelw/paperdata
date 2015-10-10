@@ -1,8 +1,3 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Load data into MySQL table 
-
-# import the MySQLdb and sys modules
 from __future__ import print_function
 import os
 import sys
@@ -10,12 +5,6 @@ import time
 import json
 import paper as ppdata
 from paper.ganglia import dbi as pyg
-
-### Script to Backup pyganglia database
-### Finds time and date and writes table into .csv file
-
-### Author: Immanuel Washington
-### Date: 8-20-14
 
 def json_data(dbo, dump_objects):
 	'''
