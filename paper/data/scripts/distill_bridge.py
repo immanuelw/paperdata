@@ -179,7 +179,7 @@ def paperbridge(dbi, data_dbi, auto=False):
 	memory_path = '/data4/paper/raw_to_tape/'
 
 	if memory.enough_memory(required_memory, memory_path):
-		input_host = raw_input('Source directory host: ')
+		source_host = raw_input('Source directory host: ')
 		#Add observations and paths from paperdistiller
 		movable_paths = add_data(dbi, data_dbi)
 		filetypes = movable_paths.keys()
@@ -188,8 +188,8 @@ def paperbridge(dbi, data_dbi, auto=False):
 			host_dirs[filetype]['host'] = raw_input('{filetype} destination directory host: '.format(filetype=filetype))
 			host_dirs[filetype]['dir'] = raw_input('{filetype} destination directory: '.format(filetype=filetype))
 
-		for filetype, paths in movable_paths:
-			move_files.move_files(dbi, input_host, paths, host_dirs[filetype]['host'], host_dirs[filetype]['dir'])
+		for filetype, source_paths in movable_paths:
+			move_files.move_files(dbi, source_host, source_paths, host_dirs[filetype]['host'], host_dirs[filetype]['dir'])
 
 	else:
 		table = 'paperdistiller'

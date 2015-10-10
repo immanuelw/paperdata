@@ -21,7 +21,7 @@ from sqlalchemy.sql import label
 ### Author: Immanuel Washington
 ### Date: 11-23-14
 
-def set_feed(s, dbi, source, output_host, output_dir, is_moved=True):
+def set_feed(s, dbi, source, dest_host, dest_path, is_moved=True):
 	'''
 	updates table for feed file
 
@@ -30,44 +30,44 @@ def set_feed(s, dbi, source, output_host, output_dir, is_moved=True):
 	s | object: session object
 	dbi | object: database interface object
 	source | str: source file
-	output_host | str: output host
-	output_dir | str: output directory
+	dest_host | str: output host
+	dest_path | str: output directory
 	is_moved | bool: checks whether to move to paperdistiller --defaults to False
 	'''
 	FEED = dbi.get_entry(s, 'Feed', source)
-	dbi.set_entry(s, FEED, 'host', output_host)
-	dbi.set_entry(s, FEED, 'base_path', output_dir)
+	dbi.set_entry(s, FEED, 'host', dest_host)
+	dbi.set_entry(s, FEED, 'base_path', dest_path)
 	dbi.set_entry(s, FEED, 'is_moved', is_moved)
 
-def move_feed_files(dbi, input_host, input_paths, output_host, output_dir):
+def move_feed_files(dbi, source_host, source_paths, dest_host, dest_path):
 	'''
 	moves files and adds to feed directory and table
 
 	Parameters
 	----------
 	dbi | object: database interface object
-	input_host | str: file host
-	input_paths | list[str]: file paths
+	source_host | str: file host
+	source_paths | list[str]: file paths
 	source | str: source file
-	output_host | str: output host
-	output_dir | str: output directory
+	dest_host | str: output host
+	dest_path | str: output directory
 	'''
 	#different from move_files, adds to feed
 	named_host = socket.gethostname()
-	destination = ':'.join((output_host, output_dir))
+	destination = ':'.join((dest_host, dest_path))
 	with dbi.session_scope() as s:
-		if named_host == input_host:
-			for source in input_paths:
+		if named_host == source_host:
+			for source in source_paths:
 				ppdata.rsync_copy(source, destination)
-				set_feed(s, dbi, source, output_host, output_dir)
+				set_feed(s, dbi, source, dest_host, dest_path)
 				shutil.rmtree(source)
 		else:
-			with ppdata.ssh_scope(input_host) as ssh:
-				for source in input_paths:
+			with ppdata.ssh_scope(source_host) as ssh:
+				for source in source_paths:
 					rsync_copy_command = '''rsync -ac {source} {destination}'''.format(source=source, destination=destination)
 					rsync_del_command = '''rm -r {source}'''.format(source=source)
 					ssh.exec_command(rsync_copy_command)
-					set_feed(s, dbi, source, output_host, output_dir)
+					set_feed(s, dbi, source, dest_host, dest_path)
 					ssh.exec_command(rsync_del_command)
 
 	print('Completed transfer')
@@ -104,22 +104,20 @@ def find_data(dbi):
 	Returns
 	-------
 	tuple:
-		list[str]: file paths to move
 		str: file host
-		list[str]: filenames to be moved
+		list[str]: file paths to move
 	'''
 	with dbi.session_scope() as s:
 		table = getattr(pdbi, 'Feed')
 		FEEDs = s.query(table).filter(getattr(table, 'is_moved') == False).filter(getattr(table, 'is_movable') == True).all()
 
 	#only move one day at a time
-	feed_host = getattr(FEEDs[0], 'host')
 	feed_day = getattr(FEEDs[0], 'julian_day')
+	feed_host = getattr(FEEDs[0], 'host')
 	feed_paths = tuple(os.path.join(getattr(FEED, 'path'), getattr(FEED, 'filename'))
 						for FEED in FEEDs if getattr(FEED, 'julian_day') == feed_day)
-	feed_filenames = tuple(getattr(FEED, 'filename') for FEED in FEEDs if getattr(FEED, 'julian_day') == feed_day)
 
-	return feed_paths, feed_host, feed_filenames
+	return feed_paths, feed_host
 
 def feed_bridge(dbi):
 	'''
@@ -132,20 +130,20 @@ def feed_bridge(dbi):
 	'''
 	#Minimum amount of memory to move a day ~3.1TiB
 	required_memory = 1112373311360
-	output_dir = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
+	dest_path = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
 
 	#Move if there is enough free memory
-	if memory.enough_memory(required_memory, output_dir):
+	if memory.enough_memory(required_memory, dest_path):
 		#check how many days are in each
 		count_days(dbi)
 		#FIND DATA
-		input_paths, input_host, input_filenames = find_data(dbi)
+		source_host, source_paths = find_data(dbi)
 		#pick directory to output to
-		output_host = 'folio'
+		dest_host = 'folio'
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
-		move_feed_files(dbi, input_host, input_paths, output_host, output_dir)
+		move_feed_files(dbi, source_host, source_paths, dest_host, dest_path)
 		#ADD FILES TO PAPERDISTILLER ON LIST OF DATA IN NEW LOCATION
-		out_dir = os.path.join(output_dir, 'zen.*.uv')
+		out_dir = os.path.join(dest_path, 'zen.*.uv')
 		obs_paths = glob.glob(out_dir)
 		distill_files.add_files_to_distill(obs_paths)
 	else:

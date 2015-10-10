@@ -44,26 +44,26 @@ def file2pol(path):
 	'''
 	return re.findall(r'\.(.{2})\.', path)[0]
 
-def add_files_to_distill(input_paths):
+def add_files_to_distill(source_paths):
 	'''
 	adds files to paperdistiller database
 
 	Parameters
 	----------
-	input_paths | list[str]: list of file paths
+	source_paths | list[str]: list of file paths
 	'''
 	#connect to the database
 	dbi = ddbi.DataBaseInterface()
 
 	#check that all files exist
-	for input_path in input_paths:
-		assert(input_path.startswith('/'))
-		assert(os.path.exists(input_path))
+	for source_path in source_paths:
+		assert(source_path.startswith('/'))
+		assert(os.path.exists(source_path))
 
 	#now run through all the files and build the relevant information for the db
 	# get the pols
-	pols = [file2pol(input_path) for input_path in input_paths]
-	jds = n.array([file2jd(input_path) for input_path in input_paths])
+	pols = [file2pol(source_path) for source_path in source_paths]
+	jds = n.array([file2jd(source_path) for source_path in source_paths])
 	nights = list(set(jds.astype(n.int)))
 
 	jds_onepol = n.sort([jd for i, jd in enumerate(jds) if pols[i] == pols[0] and jd.astype(int) == nights[0]])
@@ -77,21 +77,21 @@ def add_files_to_distill(input_paths):
 	for night in nights:
 		print('adding night', night)
 		obsinfo = []
-		nightfiles = [input_path for input_path in input_paths if int(float(file2jd(input_path))) == night]
+		nightfiles = [source_path for source_path in source_paths if int(float(file2jd(source_path))) == night]
 		print(len(nightfiles))
 		for pol in pols:
 			#filter off all pols but the one I'm currently working on
-			files = sorted([input_path for input_path in nightfiles if file2pol(input_path) == pol])
+			files = sorted([source_path for source_path in nightfiles if file2pol(source_path) == pol])
 			with dbi.session_scope() as s:
-				for i, input_path in enumerate(files):
+				for i, source_path in enumerate(files):
 					try:
-						dbi.get_entry(ddbi, s, 'observation', uv_data.jdpol2obsnum(float(file2jd(input_path)), file2pol(input_path), djd))
-						print(input_path, 'found in db, skipping')
+						dbi.get_entry(ddbi, s, 'observation', uv_data.jdpol2obsnum(float(file2jd(source_path)), file2pol(source_path), djd))
+						print(source_path, 'found in db, skipping')
 					except:
-						obsinfo.append({'julian_date': float(file2jd(input_path)),
-										'pol': file2pol(input_path),
+						obsinfo.append({'julian_date': float(file2jd(source_path)),
+										'pol': file2pol(source_path),
 										'host': socket.gethostname(),
-										'filename': input_path,
+										'filename': source_path,
 										'length': djd}) #note the db likes jd for all time units
 
 		for i, obs in enumerate(obsinfo):
@@ -118,5 +118,5 @@ if __name__ == '__main__':
 		path_str = sys.argv[1]
 	else:
 		path_str = raw_input('Input [wildcard included] paths for observations to add: ')
-	input_paths = glob.glob(path_str)
-	add_files_to_distill(input_paths)
+	source_paths = glob.glob(path_str)
+	add_files_to_distill(source_paths)

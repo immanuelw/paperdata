@@ -58,3 +58,4 @@ if __name__ == '__main__':
 		#restore_db(dbi, table='RTPFile')
 	add_files.update_obsnums(dbi)
 	add_files.connect_observations(dbi)
+	#add_files.update_md5(dbi)
