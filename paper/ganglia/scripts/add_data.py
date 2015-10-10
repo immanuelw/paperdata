@@ -52,6 +52,7 @@ def filesystem(ssh, host, path):
 		percent = fi.percent
 	else:
 		_, folio, _ = ssh.exec_command('df -B 1')
+
 		for output in folio.split('\n'):
 			filesystem = output.split(' ')[-1]
 			if filesystem in (path,):
@@ -62,12 +63,12 @@ def filesystem(ssh, host, path):
 
 	system_data = {'host': host,
 					'system': path,
-					'timestamp': int(time.time()),
 					'total_space': total,
 					'used_space': used,
 					'free_space': free,
+					'percent_space': percent,
 					'filesystem_id': str(uuid.uuid4()),
-					'percent_space': percent}
+					'timestamp': int(time.time())}
 
 	return system_data
 
@@ -88,6 +89,7 @@ def iostat(ssh, host):
 	iostat_data = {}
 	if ssh is None:
 		io = psutil.disk_io_counters(perdisk=True)
+
 		for device, value in io.items():
 			tps = None
 			read_s = round(value.read_count / float(value.read_time), 2)
@@ -96,14 +98,14 @@ def iostat(ssh, host):
 			bl_writes = value.write_bytes
 
 			iostat_data[device] = {'host': host,
-									'timestamp': timestamp,
 									'device': device,
 									'tps': tps,
 									'read_s': read_s,
 									'write_s': write_s,
 									'bl_reads': bl_reads,
+									'bl_writes': bl_writes,
 									'iostat_id': str(uuid.uuid4()),
-									'bl_writes': bl_writes}
+									'timestamp': timestamp}
 
 	else:
 		_, folio, _ = ssh.exec_command('iostat')
@@ -128,14 +130,14 @@ def iostat(ssh, host):
 			bl_writes = int(row[5])
 
 			iostat_data[device] = {'host': host,
-									'timestamp': timestamp,
 									'device': device,
 									'tps': tps,
 									'read_s': read_s,
 									'write_s': write_s,
 									'bl_reads': bl_reads,
+									'bl_writes': bl_writes,
 									'iostat_id': str(uuid.uuid4()),
-									'bl_writes': bl_writes}
+									'timestamp': timestamp}
 
 	return iostat_data
 
@@ -169,14 +171,14 @@ def ram_free(ssh, host):
 		swap_free = ram2.free
 
 	else:
-		stdin, folio, stderr = ssh.exec_command('free -b')
+		_, folio, _ = ssh.exec_command('free -b')
+
 		ram = []
 		for output in folio.split('\n'):
 			line = output[:].split(' ')
 			new_line = filter(lambda a: a not in [''], line)
 			ram.append(new_line)	
 
-		reram = []
 		for key, row in enumerate(ram[1:-1]):
 			if key == 0:
 				total = int(row[1])
@@ -194,7 +196,6 @@ def ram_free(ssh, host):
 				swap_free = int(row[3])
 
 	ram_data = {'host': host,
-				'timestamp': int(time.time()),
 				'total': total,
 				'used': used,
 				'free': free,
@@ -205,8 +206,9 @@ def ram_free(ssh, host):
 				'bc_free': bc_free,
 				'swap_total': swap_total,
 				'swap_used': swap_used,
+				'swap_free': swap_free,
 				'ram_id': str(uuid.uuid4()),
-				'swap_free': swap_free}
+				'timestamp': int(time.time())}
 
 	return ram_data
 
@@ -228,6 +230,7 @@ def cpu_perc(ssh, host):
 	cpu_data = {}
 	if ssh is None:
 		cpu_all = psutil.cpu_times_percent(interval=1, percpu=True)
+
 		for key, value in enumerate(cpu_all):
 			cpu = key
 			user_perc = value.user
@@ -237,25 +240,27 @@ def cpu_perc(ssh, host):
 			intr_s = None
 
 			cpu_data[key] = {'host': host,
-							'timestamp': timestamp,
 							'cpu': cpu,
 							'user_perc': user_perc,
 							'sys_perc': sys_perc,
 							'iowait_perc': iowait_perc,
 							'idle_perc': idle_perc,
+							'intr_s': intr_s,
 							'cpu_id': str(uuid.uuid4()),
-							'intr_s': intr_s}
+							'timestamp': timestamp}
 
 	else:
 		_, folio, _ = ssh.exec_command('mpstat -P ALL 1 1')
+
+		cpu_list = []
 		for output in folio.split('\n'):
-			if output in (folio.split('\n')[0], folio.split('\n')[1]):
-				continue
-			line = output[:].split(' ')
-			new_line = filter(lambda a: a not in [''], line)
-			if new_line[0] not in ['Average:']:
-				cpu.append(new_line)
-		for key, row in enumerate(cpu[3:]):
+			if output not in folio.split('\n')[:1]:
+				line = output[:].split(' ')
+				new_line = filter(lambda a: a not in [''], line)
+				if new_line[0] not in ['Average:']:
+					cpu_list.append(new_line)
+
+		for key, row in enumerate(cpu_list[3:]):
 			#skip first three lines
 			cpu = int(row[2])
 			user_perc = two_round(row[3])
@@ -265,14 +270,14 @@ def cpu_perc(ssh, host):
 			intr_s = two_round(row[11])
 
 			cpu_data[key] = {'host': host,
-							'timestamp': timestamp,
 							'cpu': cpu,
 							'user_perc': user_perc,
 							'sys_perc': sys_perc,
 							'iowait_perc': iowait_perc,
 							'idle_perc': idle_perc,
+							'intr_s': intr_s,
 							'cpu_id': str(uuid.uuid4()),
-							'intr_s': intr_s}
+							'timestamp': timestamp}
 
 	return cpu_data
 
