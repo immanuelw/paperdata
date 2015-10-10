@@ -7,16 +7,16 @@ import os
 import time
 import shutil
 import socket
-import smtplib
 import paper as ppdata
 from paper.data import dbi as pdbi
+import paper.memory as memory
 import distill_files
 import move_files
 from sqlalchemy import func
 from sqlalchemy.sql import label
 
 ### Script to load paperdistiller with files from the paperfeed table
-### Checks /data4 for space, moves entire days of data, then loads into paperdistiller
+### Checks /data4 for memory, moves entire days of data, then loads into paperdistiller
 
 ### Author: Immanuel Washington
 ### Date: 11-23-14
@@ -130,12 +130,12 @@ def feed_bridge(dbi):
 	----------
 	dbi | object: database interface object
 	'''
-	#Minimum amount of space to move a day ~3.1TiB
-	required_space = 1112373311360
+	#Minimum amount of memory to move a day ~3.1TiB
+	required_memory = 1112373311360
 	output_dir = '/data4/paper/feed/' #CHANGE WHEN KNOW WHERE DATA USUALLY IS STORED
 
-	#Move if there is enough free space
-	if move_files.enough_space(required_space, output_dir):
+	#Move if there is enough free memory
+	if memory.enough_memory(required_memory, output_dir):
 		#check how many days are in each
 		count_days(dbi)
 		#FIND DATA
@@ -150,7 +150,7 @@ def feed_bridge(dbi):
 		distill_files.add_files_to_distill(obs_paths)
 	else:
 		table = 'Feed'
-		move_files.email_space(table)
+		memory.email_memory(table)
 		time.sleep(21600)
 
 if __name__ == '__main__':

@@ -11,6 +11,7 @@ from collections import Counter
 import aipy as A
 from paper.data import dbi as pdbi, uv_data, file_data
 from paper.distiller import dbi as ddbi
+import paper.memory as memory
 import add_files, move_files
 
 ### Script to load infromation quickly from paperdistiller database into paper
@@ -173,11 +174,11 @@ def paperbridge(dbi, data_dbi, auto=False):
 	data_dbi | object: data database interface object
 	auto | bool: track whether to wait -- defaults to False
 	'''
-	#Calculate amount of space needed to move a day ~1.1TB
-	required_space = 1112661213184
-	space_path = '/data4/paper/raw_to_tape/'
+	#Calculate amount of memory needed to move a day ~1.1TB
+	required_memory = 1112661213184
+	memory_path = '/data4/paper/raw_to_tape/'
 
-	if move_files.enough_space(required_space, space_path):
+	if memory.enough_memory(required_memory, memory_path):
 		input_host = raw_input('Source directory host: ')
 		#Add observations and paths from paperdistiller
 		movable_paths = add_data(dbi, data_dbi)
@@ -192,7 +193,7 @@ def paperbridge(dbi, data_dbi, auto=False):
 
 	else:
 		table = 'paperdistiller'
-		move_files.email_space(table)
+		memory.email_memory(table)
 		if auto:
 			time.sleep(14400)
 

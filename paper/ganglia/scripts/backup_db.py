@@ -8,12 +8,6 @@ import os
 import sys
 import time
 import json
-import decimal
-import subprocess
-import smtplib
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEBase import MIMEBase
-from email import Encoders
 import paper as ppdata
 from paper.ganglia import dbi as pyg
 
