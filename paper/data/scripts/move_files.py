@@ -37,10 +37,10 @@ def null_check(dbi, source_host, source_paths):
 	bool: are there any files not in database -- True if there are None
 	'''
 	with dbi.session_scope() as s:
-		table = getattr(pdbi, 'File')
-		FILEs = s.query(table).filter(getattr(table, 'host') == source_host).all()
+		table = pdbi.File
+		FILEs = s.query(table).filter(table.host == source_host).all()
 	#all files on same host
-	paths = tuple(os.path.join(getattr(FILE, 'path'), getattr(FILE, 'filename')) for FILE in FILEs)
+	paths = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
 
 	#for each input file, check if in filenames
 	nulls = tuple(source_path for source_path in source_paths if source_path not in paths)
@@ -66,7 +66,7 @@ def set_move_table(s, dbi, source_host, source_path, dest_host, dest_path):
 	dbi.set_entry(s, FILE, 'host', dest_host)
 	dbi.set_entry(s, FILE, 'base_path', dest_path)
 	dbi.set_entry(s, FILE, 'timestamp', timestamp)
-	identifier = getattr(FILE, 'source')
+	identifier = FILE.source
 	log_data = {'action': 'move',
 				'table': 'File',
 				'identifier': identifier,

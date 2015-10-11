@@ -85,13 +85,12 @@ def count_days(dbi):
 	dbi | object: database interface object
 	'''
 	with dbi.session_scope() as s:
-		table = getattr(pdbi, 'Feed')
-		count_FEEDs = s.query(getattr(table, 'julian_day'), label('count', func.count(getattr(table, 'julian_day'))))\
-								.group_by(getattr(table, 'julian_day')).all()
+		table = pdbi.Feed
+		count_FEEDs = s.query(table.julian_day, label('count', func.count(table.julian_day))).group_by(table.julian_day).all()
 		all_FEEDs = s.query(table).all()
-		good_days = tuple(getattr(FEED, 'julian_day') for FEED in count_FEEDs if getattr(FEED, 'count') in (72, 288))
+		good_days = tuple(FEED.julian_day for FEED in count_FEEDs if FEED.count in (72, 288))
 
-		to_move = (getattr(FEED, 'source') for FEED in all_FEEDs if getattr(FEED, 'julian_day') in good_days)
+		to_move = (FEED.source for FEED in all_FEEDs if FEED.julian_day in good_days)
 
 		for path in to_move:
 			FEED = dbi.get_entry(s, 'Feed', path)
@@ -112,14 +111,13 @@ def find_data(dbi):
 		list[str]: file paths to move
 	'''
 	with dbi.session_scope() as s:
-		table = getattr(pdbi, 'Feed')
-		FEEDs = s.query(table).filter(getattr(table, 'is_moved') == False).filter(getattr(table, 'is_movable') == True).all()
+		table = pdbi.Feed
+		FEEDs = s.query(table).filter(table.is_moved == False).filter(table.is_movable == True).all()
 
 	#only move one day at a time
-	feed_day = getattr(FEEDs[0], 'julian_day')
-	feed_host = getattr(FEEDs[0], 'host')
-	feed_paths = tuple(os.path.join(getattr(FEED, 'base_path'), getattr(FEED, 'filename'))
-						for FEED in FEEDs if getattr(FEED, 'julian_day') == feed_day)
+	feed_day = FEEDs[0].julian_day
+	feed_host = FEEDs[0].host
+	feed_paths = tuple(os.path.join(FEED.base_path, FEED.filename) for FEED in FEEDs if FEED.julian_day == feed_day)
 
 	return feed_host, feed_paths
 

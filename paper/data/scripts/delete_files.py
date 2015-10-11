@@ -36,11 +36,10 @@ def delete_check(dbi, source_host):
 	list[str]: uv* file paths of files to be deleted
 	'''
 	with dbi.session_scope() as s:
-		table = getattr(pdbi, 'File')
-		FILEs = s.query(table).filter(getattr(table, 'delete_file') == True).filter(getattr(table, 'tape_index') != None)\
-								.filter(getattr(table, 'host') == source_host).all()
+		table = pdbi.File
+		FILEs = s.query(table).filter(table.delete_file == True).filter(table.tape_index != None).filter(table.host == source_host).all()
 	#all files on same host
-	paths = tuple(os.path.join(getattr(FILE, 'base_path'), getattr(FILE, 'filename')) for FILE in FILEs)
+	paths = tuple(os.path.join(FILE.base_path, FILE.filename) for FILE in FILEs)
 
 	return paths
 
@@ -64,7 +63,7 @@ def set_delete_table(s, dbi, source_host, source_path, dest_host, dest_path):
 	dbi.set_entry(s, FILE, 'base_path', dest_path)
 	dbi.set_entry(s, FILE, 'is_deletable', False)
 	dbi.set_entry(s, FILE, 'timestamp', timestamp)
-	identifier = getattr(FILE, 'source')
+	identifier = FILE.source
 	log_data = {'action': 'delete',
 				'table': 'file',
 				'identifier': identifier,

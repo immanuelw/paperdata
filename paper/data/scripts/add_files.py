@@ -114,9 +114,9 @@ def dupe_check(dbi, source_host, source_paths):
 	'''
 	with dbi.session_scope() as s:
 		#all files on same host
-		table = getattr(pdbi, 'File')
-		FILEs = s.query(table).filter(getattr(table, 'host') == source_host).all()
-		paths = tuple(os.path.join(getattr(FILE, 'base_path'), getattr(FILE, 'filename')) for FILE in FILEs)
+		table = pdbi.File
+		FILEs = s.query(table).filter(table.host == source_host).all()
+		paths = tuple(os.path.join(FILE.base_path, FILE.filename) for FILE in FILEs)
 
 	#for each input file, check if in sources
 	unique_paths = tuple(source_path for source_path in source_paths if source_path not in paths)
@@ -139,20 +139,20 @@ def set_obs(s, dbi, OBS, field):
 	object: edge observation object
 	'''
 	if field == 'prev_obs':
-		edge_num = getattr(OBS, 'obsnum') - 1
-		edge_time = getattr(OBS, 'time_start') - getattr(OBS, 'delta_time')
+		edge_num = OBS.obsnum - 1
+		edge_time = OBS.time_start - OBS.delta_time
 	elif field == 'next_obs':
-		edge_num = getattr(OBS, 'obsnum') + 1
-		edge_time = getattr(OBS, 'time_start') + getattr(OBS, 'delta_time')
+		edge_num = OBS.obsnum + 1
+		edge_time = OBS.time_start + OBS.delta_time
 
-	table = getattr(pdbi, 'Observation')
-	EDGE_OBS = s.query(table).filter(getattr(table, 'julian_date') == edge_time).one()
+	table = pdbi.Observation
+	EDGE_OBS = s.query(table).filter(table.julian_date == edge_time).one()
 	if EDGE_OBS is not None:
-		edge_obs = getattr(EDGE_OBS, 'obsnum')
+		edge_obs = EDGE_OBS.obsnum
 		dbi.set_entry(s, OBS, field, edge_obs)
 	else:
-		pol = getattr(OBS, 'polarization')
-		EDGE_OBS = s.query(table).filter(getattr(table, 'julian_date') == edge_time).filter(getattr(table, 'polarization') == pol).one()
+		pol = OBS.polarization
+		EDGE_OBS = s.query(table).filter(table.julian_date == edge_time).filter(table.polarization == pol).one()
 		if EDGE_OBS is not None:
 			edge_obs = EDGE_OBS.obsnum
 			dbi.set_entry(s, OBS, field, edge_obs)
@@ -168,8 +168,8 @@ def update_obsnums(dbi):
 	dbi | object: database interface object
 	'''
 	with dbi.session_scope() as s:
-		table = getattr(pdbi, 'Observation')
-		OBSs = s.query(table).filter(or_(getattr(table, 'prev_obs') == None, getattr(table, 'next_obs') == None)).all()
+		table = pdbi.Observation
+		OBSs = s.query(table).filter(or_(table.prev_obs == None, table.next_obs == None)).all()
 
 		for OBS in OBSs:
 			PREV_OBS = set_obs(s, dbi, OBS, 'prev_obs')
@@ -187,13 +187,13 @@ def connect_observations(dbi):
 	dbi | object: database interface object
 	'''
 	with dbi.session_scope() as s:
-		file_table = getattr(pdbi, 'File')
-		obs_table = getattr(pdbi, 'Observation')
-		FILEs = s.query(file_table).filter(getattr(file_table, 'observation') == None).all()
+		file_table = pdbi.File
+		obs_table = pdbi.Observation
+		FILEs = s.query(file_table).filter(file_table.observation == None).all()
 
 		for FILE in FILEs:		
 			#get the observation corresponding to this file
-			OBS = s.query(obs_table).get(getattr(FILE, 'obsnum'))
+			OBS = s.query(obs_table).get(FILE.obsnum)
 			dbi.set_entry(s, FILE, 'observation', OBS)  #associate the file with an observation
 
 def update_md5(dbi):
@@ -205,12 +205,12 @@ def update_md5(dbi):
 	dbi | object: database interface object
 	'''
 	with dbi.session_scope() as s:
-		table = getattr(pdbi, 'File')
-		FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
+		table = pdbi.File
+		FILEs = s.query(table).filter(table.md5sum == None).all()
 		for FILE in FILEs:
-			source = getattr(FILE, 'source')
+			source = FILE.source
 			timestamp = int(time.time())
-			dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), source))
+			dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(FILE.host, source))
 			dbi.set_entry(s, FILE, 'timestamp', timestamp)
 			log_data = {'action': 'update md5sum',
 						'table': 'File',

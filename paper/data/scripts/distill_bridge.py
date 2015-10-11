@@ -38,16 +38,16 @@ def add_data(dbi, data_dbi):
 	'''
 	with dbi.session_scope() as s:
 		#do stuff
-		table = getattr(ddbi, 'Observation')
+		table = ddbi.Observation
 		OBSs_all = s.query(table).all()
-		OBSs_complete = s.query(table).filter(getattr(table, 'status') == 'COMPLETE').all()
+		OBSs_complete = s.query(table).filter(table.status == 'COMPLETE').all()
 
-		julian_obs = {OBS: int(getattr(OBS, 'julian_date')) for OBS in OBSs_complete}
+		julian_obs = {OBS: int(OBS.julian_date) for OBS in OBSs_complete}
 		julian_days = tuple(jday for jday in julian_obs.values())
 		#dict of julian day as key, amount as value
 		count_jdays = Counter(julian_days)
 
-		all_days = tuple(int(getattr(OBS, 'julian_date')) for OBS in OBSs_all)
+		all_days = tuple(int(OBS.julian_date) for OBS in OBSs_all)
 		count_all_days = Counter(all_days)
 
 		#tuple list of all complete days
@@ -60,21 +60,21 @@ def add_data(dbi, data_dbi):
 
 			named_host = socket.gethostname()
 			for OBS in raw_OBSs:
-				table = getattr(ddbi, 'File')
-				FILE = s.query(table).filter(getattr(table, 'obsnum') == getattr(OBS, 'obsnum')).one()
+				table = ddbi.File
+				FILE = s.query(table).filter(table.obsnum == OBS.obsnum).one()
 
-				host = getattr(FILE, 'host')
-				path = getattr(FILE, 'filename')
+				host = FILE.host
+				path = FILE.filename
 				base_path, filename, filetype = file_data.file_names(path)
 				source = ':'.join((host, path))
 
-				obsnum = getattr(OBS, 'obsnum')
-				julian_date = getattr(OBS, 'julian_date')
+				obsnum = OBS.obsnum
+				julian_date = OBS.julian_date
 				if julian_date < 2456400:
 					polarization = 'all'
 				else:
-					polarization = getattr(OBS, 'pol')
-				length = getattr(OBS, 'length')
+					polarization = OBS.pol
+				length = OBS.length
 			
 				if named_host == host:
 					try:
@@ -90,7 +90,7 @@ def add_data(dbi, data_dbi):
 				era, julian_day, lst = uv_data.date_info(julian_date)
 
 				filesize = file_data.calc_size(host, path)
-				md5 = getattr(FILE, 'md5sum')
+				md5 = FILE.md5sum
 				if md5 is None:
 					md5 = file_data.calc_md5sum(host, path)
 

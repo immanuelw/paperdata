@@ -81,10 +81,10 @@ def dupe_check(dbi, source_host, source_paths):
 	list[str]: files not in feed table
 	'''
 	with dbi.session_scope() as s:
-		table = getattr(pdbi, 'Feed')
-		FEEDs = s.query(table).filter(getattr(table, 'host') == source_host).all()
+		table = pdbi.Feed
+		FEEDs = s.query(table).filter(table.host == source_host).all()
 	#all files on same host
-	all_paths = tuple(os.path.join(getattr(FEED, 'base_path'), os.path.join(FEED, 'filename')) for FEED in FEEDs)
+	all_paths = tuple(os.path.join(FEED.base_path, FEED.filename) for FEED in FEEDs)
 
 	#for each input file, check if in filenames
 	unique_paths = tuple(source_path for source_path in source_paths if source_path not in all_paths)
