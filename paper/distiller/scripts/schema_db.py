@@ -1,3 +1,10 @@
+'''
+paper.distiller.scripts.monitor_still
+
+generates schema file of paperdistiller database
+
+author | Immanuel Washington
+'''
 import os
 import paper.schema as schema
 from paper.distiller import distiller_db as ddb

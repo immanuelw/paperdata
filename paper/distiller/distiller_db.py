@@ -1,10 +1,15 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Module to creation of db schema
+'''
+paper.distiller.distiller_db
 
-### Author: Immanuel Washington
-### Date: 05-17-14
+author | Immanuel Washington
 
+Classes
+-------
+File -- attributes of named table
+Observation -- attributes of named table
+Neighbors -- attributes of named table
+Log -- attributes of named table
+'''
 from __future__ import print_function
 
 class File(object):

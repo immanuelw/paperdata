@@ -1,7 +1,15 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Load data into MySQL table 
+'''
+paper.distiller.scripts.backup_db
 
+backups paperdistiller database into json file
+
+author | Immanuel Washington
+
+Functions
+---------
+json_data -- dumps dictionaries to json file
+paperbackup -- backs up paperdistiller database
+'''
 from __future__ import print_function
 import sys
 import time
@@ -10,32 +18,6 @@ import json
 import decimal
 import paper as ppdata
 from paper.distiller import dbi as ddbi
-
-### Script to Backup paper database
-### Finds time and date and writes table into .csv file
-
-### Author: Immanuel Washington
-### Date: 8-20-14
-
-def to_dict(ser_data):
-	'''
-	creates a dict of database object's attributes
-
-	Parameters
-	----------
-	ser_data | object: database object
-
-	Returns
-	-------
-	dict: database object's attributes
-	'''
-	json_dict = ser_data.__dict__
-	try:
-		del json_dict['_sa_instance_state']
-	except(KeyError):
-		return None
-
-	return json_dict
 
 def json_data(dbo, dump_objects):
 	'''
@@ -47,7 +29,7 @@ def json_data(dbo, dump_objects):
 	dump_objects | list[object]: database objects query
 	'''
 	with open(dbo, 'w') as f:
-		data = [to_dict(ser_data) for ser_data in dump_objects.all()]
+		data = [ser_data.to_dict() for ser_data in dump_objects.all()]
 		json.dump(data, f, sort_keys=True, indent=1, default=ppdata.decimal_default)
 
 def paperbackup(dbi):

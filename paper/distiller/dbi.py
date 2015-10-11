@@ -1,3 +1,16 @@
+'''
+paper.distiller.dbi
+
+author | Immanuel Washington
+
+Classes
+-------
+File -- sqlalchemy table
+Observation -- sqlalchemy table
+Neighbors -- sqlalchemy table
+Log -- sqlalchemy table
+DataBaseInterface -- interface to paperdistiller database
+'''
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
 from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
 from sqlalchemy.orm import relationship, backref
@@ -7,7 +20,7 @@ import paper as ppdata
 Base = ppdata.Base
 logger = logging.getLogger('paper.distiller')
 
-FILE_PROCESSING_STAGES = ('NEW','UV_POT', 'UV', 'UVC', 'CLEAN_UV', 'UVCR', 'CLEAN_UVC',
+FILE_PROCESSING_STAGES = ('NEW', 'UV_POT', 'UV', 'UVC', 'CLEAN_UV', 'UVCR', 'CLEAN_UVC',
 							'ACQUIRE_NEIGHBORS', 'UVCRE', 'NPZ', 'UVCRR', 'NPZ_POT', 'CLEAN_UVCRE', 'UVCRRE',
 							'CLEAN_UVCRR', 'CLEAN_NPZ', 'CLEAN_NEIGHBORS', 'UVCRRE_POT', 'CLEAN_UVCRRE', 'CLEAN_UVCR','COMPLETE')`
 #############
@@ -16,7 +29,7 @@ FILE_PROCESSING_STAGES = ('NEW','UV_POT', 'UV', 'UVC', 'CLEAN_UV', 'UVCR', 'CLEA
 #
 #############
 
-class File(Base):
+class File(Base, ppdata.DictFix):
 	__tablename__ = 'file'
 	filenum = Column(Integer, primary_key=True)
 	filename = Column(String(100))
@@ -25,7 +38,7 @@ class File(Base):
 	observation = relationship(Observation, backref=backref('files', uselist=True))
 	md5sum = Column(Integer)
 
-class Observation(Base):
+class Observation(Base, ppdata.DictFix):
 	__tablename__ = 'observation'
 	julian_date = Column(Numeric(16, 8))
 	pol = Column(String(4))
@@ -43,12 +56,12 @@ class Observation(Base):
 									secondaryjoin=obsnum==neighbors.c.high_neighbor_id,
 									backref='low_neighbors')
 
-class Neighbors(Base):
+class Neighbors(Base, ppdata.DictFix):
 	__tablename__ = 'neighbors'
 	low_neighbor_id = Column(BigInteger, ForeignKey('observation.obsnum'), unique=True),
 	high_neighbor_id = Column(BigInteger, ForeignKey('observation.obsnum'), unique=True)
 
-class Log(Base):
+class Log(Base, ppdata.DictFix):
 	__tablename__ = 'log'
 	lognum = Column(Integer, primary_key=True)
 	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
@@ -58,6 +71,14 @@ class Log(Base):
 	logtext = Column(Text)
 
 class DataBaseInterface(ppdata.DataBaseInterface):
+	'''
+	Database Interface
+
+	Methods
+	-------
+	add_entry_dict -- adds entry to database using dict as kwarg
+	get_entry -- gets database object
+	'''
 	def __init__(self, configfile='~/paperdistiller.cfg'):
 		'''
 		Unique Interface for the paperdata database

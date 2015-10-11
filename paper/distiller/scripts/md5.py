@@ -1,15 +1,16 @@
-#!/usr/bin/python
-# -*- coding: utf-8 -*-
-# Create paper tables
+'''
+paper.distiller.scripts.md5
 
+updates md5sums of uv files without them
+
+author | Immanuel Washington
+
+Functions
+---------
+update_md5 -- updates md5sums of uv files
+'''
 from paper.data import file_data
 from paper.distiller import dbi as ddbi
-
-### Script to load md5sums into paper database
-### Loads md5sums
-
-### Author: Immanuel Washington
-### Date: 5-06-15
 
 def update_md5(dbi):
 	'''
