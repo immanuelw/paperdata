@@ -33,7 +33,7 @@ def create_user(database, first_name, last_name, email, username, password):
 			from paper.site.admin import models
 			from paper.site.flask_app import admin_db as db
 		password = password.encode('UTF-8')
-		user = getattr(models, 'User')(username=username, password=hashlib.sha512(password).hexdigest(), email=email,
+		user = models.User(username=username, password=hashlib.sha512(password).hexdigest(), email=email,
 							firstname=first_name, lastname=last_name)
 		db.session.add(user)
 

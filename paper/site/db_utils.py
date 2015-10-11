@@ -41,7 +41,7 @@ def get_dbi(database):
 		module = adbi
 		dbi = None
 		return dbi, module
-	dbi = getattr(module, 'DataBaseInterface')(configfile=configfile)
+	dbi = module.DataBaseInterface(configfile=configfile)
 
 	return dbi, module
 

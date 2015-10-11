@@ -16,8 +16,7 @@ def get_all_comments():
 	try:
 		threads = db_utils.query(database='admin', table='Thread', sort_tuples=(('last_updated', 'desc'),))
 		for thread in threads:
-			setattr(thread, 'comments',
-					db_utils.query(database='admin', table='Comment', field_tuples=(('thread_id', '==', getattr(thread, 'id')),)))
+			thread.comments = db_utils.query(database='admin', table='Comment', field_tuples=(('thread_id', '==', thread.id),)))
 	except:
 		return make_response('Threads not found', 500)
 
@@ -32,15 +31,11 @@ def thread_reply():
 		thread_id = request.form['thread_id']
 		text = request.form['text']
 
-		new_comment = getattr(models, 'Comment')()
-		setattr(new_comment, 'thread_id', thread_id)
-		setattr(new_comment, 'text', text)
-		setattr(new_comment, 'username', g.user.username)
-
+		new_comment = models.Comment(thread_id=thread_id, text=text, username=g.user.username)
 		db.session.add(new_comment)
 
 		thread = db_utils.query(database='admin', table='Thread', field_tuples=(('id', '==', thread_id),))
-		setattr(thread, 'last_updated', datetime.utcnow())
+		thread.last_updated = datetime.utcnow()
 
 		db.session.add(thread)
 		db.session.commit()
@@ -57,18 +52,18 @@ def new_thread():
 		title = request.form['title']
 		text = request.form['text']
 
-		new_thread = getattr(models, 'Thread')()
-		setattr(new_thread, 'title', title)
-		setattr(new_thread, 'username', g.user.username)
+		new_thread = models.Thread()
+		new_thread.title = title
+		new_thread.username = g.user.username
 
 		db.session.add(new_thread)
 		db.session.flush()
 		db.session.refresh(new_thread) # So we can get the new thread's id
 
-		first_comment = getattr(models, 'Comment')()
-		setattr(first_comment, 'text', text)
-		setattr(first_comment, 'username', g.user.username)
-		setattr(first_comment, 'thread_id', getattr(new_thread, 'id'))
+		first_comment = models.Comment()
+		first_comment.text = text
+		first_comment.username = g.user.username
+		first_comment.thread_id = new_thread.id
 
 		db.session.add(first_comment)
 		db.session.commit()
