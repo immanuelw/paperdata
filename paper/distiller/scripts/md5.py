@@ -21,7 +21,7 @@ def update_md5(dbi):
 	dbi | object: distiller database interface object
 	'''
 	with dbi.session_scope() as s:
-		table = getattr(ddbi, 'File')
+		table = ddbi.File
 		FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
 		for FILE in FILEs:
 			dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'filename')))

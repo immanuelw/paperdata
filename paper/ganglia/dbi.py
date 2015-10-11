@@ -119,8 +119,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 		creates the tables in the database.
 		'''
 		Base.metadata.bind = self.engine
-		table_name = getattr(sys.modules[__name__], 'Monitor')
-		table = getattr(table_name, '__table__')
+		table = Monitor.__table__
 		insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
 										after INSERT or UPDATE on Monitor \
 										FOR EACH ROW \

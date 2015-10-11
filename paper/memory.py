@@ -25,9 +25,7 @@ def enough_memory(required_memory, memory_path):
 	-------
 	bool: is there enough memory
 	'''
-	free_memory = getattr(psutil.disk_usage(memory_path), 'free')
-
-	return required_memory < free_memory
+	return required_memory < psutil.disk_usage(memory_path).free
 
 def email_memory(table):
 	'''
