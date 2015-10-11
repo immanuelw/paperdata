@@ -1,3 +1,15 @@
+'''
+paper.ganglia.scripts.backup_db
+
+backups ganglia database into json file
+
+author | Immanuel Washington
+
+Functions
+---------
+json_data -- dumps dictionaries to json file
+paperbackup -- backs up ganglia database
+'''
 from __future__ import print_function
 import os
 import sys

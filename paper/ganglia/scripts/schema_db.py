@@ -1,3 +1,10 @@
+'''
+paper.ganglia.scripts.monitor_still
+
+generates schema file of ganglia database
+
+author | Immanuel Washington
+'''
 import os
 import paper.schema as schema
 from paper.ganglia import ganglia_db as gdb

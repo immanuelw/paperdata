@@ -1,3 +1,11 @@
+'''
+paper.ganglia.scripts.monitor_still
+
+monitors still of paperdistiller database
+shows compression progress of uv* files
+
+author | Immanuel Washington
+'''
 from __future__ import print_function
 import os
 import curses
