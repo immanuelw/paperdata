@@ -1,7 +1,7 @@
 '''
 paper.memory
 
-author: Immanuel Washington
+author | Immanuel Washington
 
 Functions
 ---------

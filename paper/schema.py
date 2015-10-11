@@ -1,7 +1,7 @@
 '''
 paper.schema
 
-author = Immanuel Washington
+author | Immanuel Washington
 
 Functions
 ---------

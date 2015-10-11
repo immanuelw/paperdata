@@ -1,3 +1,16 @@
+'''
+paper.ganglia.ganglia_db
+
+author | Immanuel Washington
+
+Classes
+-------
+Filesystem -- attributes of named table
+Monitor -- attributes of named table
+Ram -- attributes of named table
+Iostat -- attributes of named table
+Cpu -- attributes of named table
+'''
 from __future__ import print_function
 
 class Filesystem(object):
