@@ -1,3 +1,20 @@
+'''
+paper.site.db_utils
+
+author | Immanuel Washington
+
+Functions
+---------
+get_dbi | gets database interface and module to use
+inspector | allows inspection of database through object
+get_table_names | gets table names in database
+get_column_names | gets names of fields in table
+make_clause | creates full sqlalchemy clause
+sort_clause | creates sort clause for query
+group_clause | creates group clause for query
+get_results | processes all clauses in query to output object list
+query | queries database
+'''
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 from paper.site.search import models as sdbi
@@ -205,9 +222,7 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples):
 		if sort_tuples is not None:
 			results = results.order_by(*sort_clause(table, sort_tuples))
 
-	results = results.all()
-
-	return results
+	return results.all()
 
 def query(data_source=None, database=None, table=None, field_tuples=None, sort_tuples=None, group_tuples=None):
 	'''

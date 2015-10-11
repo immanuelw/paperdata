@@ -1,3 +1,12 @@
+'''
+paper.site.user_command
+
+author | Immanuel Washington
+
+Functions
+---------
+create_user | creates user for website if does not exist
+'''
 from flask.ext.script import Command, Manager, Option
 import hashlib
 from sqlalchemy.exc import IntegrityError

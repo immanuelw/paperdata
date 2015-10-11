@@ -1,3 +1,17 @@
+'''
+paper.site.flask_app
+
+author | Immanuel Washington
+
+Functions
+---------
+search_app | creates flask app for search db
+search_lm | creates login manager for search db
+search_db | creates search db from sqlalchemy
+admin_app | creates flask app for admin db
+admin_lm | creates login manager for admin db
+admin_db | creates admin db from sqlalchemy
+'''
 from flask import Flask
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
