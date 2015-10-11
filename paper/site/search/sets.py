@@ -1,3 +1,20 @@
+'''
+paper.site.search.sets
+
+author | Immanuel Washington
+
+Functions
+---------
+insert_set_into_db | inserts set into database
+is_obs_flagged | checks if observation is flagged
+get_data_hours_in_set | adds amount of hours in set
+save_new_set | saves set to database
+upload_set | uploads set to database
+download_set | downloads set from website
+get_filters | gets filters
+get_sets | gets all sets in database
+delete_set | deletes set from database
+'''
 from paper.site.flask_app import search_app as app, search_db as db
 from paper.site.search import models
 from paper.site import db_utils, misc_utils

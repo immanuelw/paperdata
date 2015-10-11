@@ -1,3 +1,15 @@
+'''
+paper.site.search.histogram_utils
+
+author | Immanuel Washington
+
+Functions
+---------
+get_plot_bands | gets list of plot bands for a set
+get_observation_counts | gets counts of observations
+get_file_counts | gets counts of files
+get_obs_file_histogram | shows histogram of observations and files
+'''
 from paper.site import db_utils, misc_utils
 from flask import g, render_template
 import math

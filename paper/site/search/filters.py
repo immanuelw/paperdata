@@ -1,3 +1,13 @@
+'''
+paper.site.search.filters
+
+author | Immanuel Washington
+
+Functions
+---------
+set_hyperlink_filter | filters comment hyperlinks
+escape_single_quote_filter | fixes single quote error
+'''
 from paper.site.flask_app import search_app as app
 import re, urllib.parse
 

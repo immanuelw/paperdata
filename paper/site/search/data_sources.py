@@ -1,3 +1,22 @@
+'''
+paper.site.search.filters
+
+author | Immanuel Washington
+
+Functions
+---------
+get_tables | show tables
+get_columns | shows columns
+get_users_data_sources | gets user's data sources
+get_unsubscribed_data_sources | get all unsubscribed data sources
+update_active_data_sources | updates data sources' users
+subscribe_to_data_source | adds data source to user in database
+unsubscribe_from_data_source | removes data source from user in database
+get_graph_types | show graph types
+create_data_source | creates data source from data
+get_graph_data | gets graph data from sets
+separate_data_into_sets | splits data by fields into set
+'''
 from flask import render_template, request, g, make_response, jsonify
 import os
 import re
@@ -262,7 +281,6 @@ def get_graph_data(data_source_str, start_utc, end_utc, the_set):
 		for obs in results:
 			obs_dict = {'obs_time': obs.time_start, 'obsnum': obs.obsnum, 'obs_count': 1}
 			data[polarization][era_type].append(obs_dict)
-
 
 	else: #No set, so we need to separate the data into sets for low/high and EOR0/EOR1
 		data = separate_data_into_sets(data, data_source, start_utc, end_utc)
