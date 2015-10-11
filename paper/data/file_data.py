@@ -1,3 +1,17 @@
+'''
+paper.data.file_data
+
+author | Immanuel Washington
+
+Functions
+---------
+get_size | gets size of directory or file
+sizeof_fmt | converts amount of bytes into human readable format
+calc_size | gets human readable size of any directory or file
+get_md5sum | generates md5 checksum of file
+calc_md5sum | gets md5 checksum of any file
+file_names | breaks path into base directory, filename, and filetype
+'''
 from __future__ import print_function
 import os
 import hashlib

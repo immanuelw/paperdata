@@ -1,3 +1,18 @@
+'''
+paper.data.uv_data
+
+author | Immanuel Washington
+
+Functions
+---------
+five_round | rounds value to five decimal places
+jdpol2obsnum | generates unique observation number
+date_info | pulls information about observation from julian date
+is_edge | checks if observation is on edge of observing period
+calc_times | pulls time information from uv file object
+calc_npz_data | pulls relevant observation information from npz file
+calc_uv_data | pulls all relevant information from any uv* file
+'''
 from __future__ import print_function
 import os
 import sys

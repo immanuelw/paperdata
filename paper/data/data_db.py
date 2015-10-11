@@ -1,3 +1,18 @@
+'''
+paper.data.data_db
+
+author | Immanuel Washington
+
+Classes
+-------
+File | attributes of named table
+Observation | attributes of named table
+Feed | attributes of named table
+Log | attributes of named table
+RTPFile | attributes of named table
+RTPObservation | attributes of named table
+RTPLog | attributes of named table
+'''
 from __future__ import print_function
 
 class File(object):
