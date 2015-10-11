@@ -75,7 +75,7 @@ class File(Base, ppdata.DictFix):
 	filetype = Column(String(20)) #uv, uvcRRE, etc.
 	source = Column(String(200), primary_key=True)
 	###
-	obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
+	obsnum = Column(BigInteger, ForeignKey('Observation.obsnum'))
 	filesize = Column(Numeric(7,2))
 	md5sum = Column(String(32))
 	tape_index = Column(String(100))
