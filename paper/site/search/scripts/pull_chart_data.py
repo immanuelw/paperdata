@@ -1,9 +1,19 @@
-#!/flask/bin/python3.4
+'''
+paper.site.search.scripts.pull_chart_data
 
-import psycopg2
+pulls data from charts into database
+
+author | Immanuel Washington
+
+Functions
+---------
+write_to_log | prints message
+profile | times functions
+log_query_time | logs time query took to run
+update | pulls data into database
+'''
 import os
 import time
-import glob
 import requests
 from datetime import datetime
 from paper.site.search import models
@@ -147,10 +157,8 @@ def update():
 	db.session.commit()
 
 if __name__ == '__main__':
-
 	write_to_log('\n-- {timestamp} -- \n' .format(timestamp=datetime.now().strftime('%Y-%m-%dT%H:%M:%S.%f%z')))
 
-	# Establish the database connection
 	profiling_mark = datetime.now()
 
 	try:

@@ -1,3 +1,15 @@
+'''
+paper.site.admin.models
+
+author | Immanuel Washington
+
+Classes
+-------
+User | sqlalchemy table
+DataAmount | sqlalchemy table
+Thread | sqlalchemy table
+Comment | sqlalchemy table
+'''
 from paper.site.flask_app import admin_db as db
 from datetime import datetime
 

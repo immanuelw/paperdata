@@ -1,3 +1,20 @@
+'''
+paper.site.admin.views
+
+author | Immanuel Washington
+
+Functions
+---------
+index | shows main page
+data_amount | shows data amount table
+source_table | shows sources table
+filesystem | shows filesystem table
+rtp_summary_table | shows rtp summary table
+before_request | accesses database
+teardown_request | exits database
+profile | shows user profile
+user_page | shows user page
+'''
 from flask import render_template, flash, redirect, url_for, request, g, make_response
 from flask.ext.login import current_user
 import time
@@ -269,8 +286,8 @@ def user_page():
 	Returns
 	-------
 	html: user page
-		OR
-		html: redirect for login
+	OR
+	html: redirect for login
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:

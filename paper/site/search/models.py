@@ -1,3 +1,24 @@
+'''
+paper.site.search.models
+
+author | Immanuel Washington
+
+Classes
+-------
+SetSubscriptions | sqlalchemy table
+DataSourceSubscriptions | sqlalchemy table
+ActiveDataSources | sqlalchemy table
+User | sqlalchemy table
+Set | sqlalchemy table
+FlaggedSubset | sqlalchemy table
+FlaggedObsIds | sqlalchemy table
+DataAmount | sqlalchemy table
+Thread | sqlalchemy table
+Comment | sqlalchemy table
+GraphType | sqlalchemy table
+GraphDataSource | sqlalchemy table
+GraphDataSourceColumn | sqlalchemy table
+'''
 from paper.site.flask_app import search_db as db
 from datetime import datetime
 
@@ -7,13 +28,13 @@ class SetSubscriptions(db.Model):
 	set_id = db.Column(db.Integer, db.ForeignKey('Set.id'))
 	id = db.Column(db.Integer, primary_key=True)
 
-class Data_Source_Subscriptions(db.Model):
+class DataSourceSubscriptions(db.Model):
 	__tablename__ = 'DataSourceSubscriptions'
 	username =  db.Column(db.String(32), db.ForeignKey('User.username'))
 	data_source = db.Column(db.String(100), db.ForeignKey('GraphDataSource.name'))
 	id = db.Column(db.Integer, primary_key=True)
 
-class Active_Data_Sources(db.Model):
+class ActiveDataSources(db.Model):
 	__tablename__ = 'ActiveDataSources'
 	username =  db.Column(db.String(32), db.ForeignKey('User.username'))
 	data_source = db.Column(db.String(100), db.ForeignKey('GraphDataSource.name'))

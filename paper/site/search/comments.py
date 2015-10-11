@@ -1,3 +1,14 @@
+'''
+paper.site.search.comments
+
+author | Immanuel Washington
+
+Functions
+---------
+get_all_comments | displays all comments in database in descending order
+thread_reply | adds thread reply to database
+new_thread | creates new thread and adds to database
+'''
 from flask import render_template, g, make_response, request
 from paper.site.flask_app import search_app as app, search_db as db
 from paper.site.search import models
@@ -36,9 +47,9 @@ def thread_reply():
 
 		thread = db_utils.query(database='search', table='Thread', field_tuples=(('id', '==', thread_id),))
 		thread.last_updated = datetime.utcnow()
-
 		db.session.add(thread)
 		db.session.commit()
+
 		return make_response('Success', 200)
 	else:
 		return make_response('You need to be logged in to post a comment.', 401)
@@ -53,13 +64,11 @@ def new_thread():
 		text = request.form['text']
 
 		new_thread = models.Thread(title=title, username=g.user.username)
-
 		db.session.add(new_thread)
 		db.session.flush()
 		db.session.refresh(new_thread) # So we can get the new thread's id
 
 		first_comment = models.Comment(text=text, username=g.user.username, thread_id=new_thread.id)
-
 		db.session.add(first_comment)
 		db.session.commit()
 

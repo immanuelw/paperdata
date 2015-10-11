@@ -1,5 +1,12 @@
-from apscheduler.schedulers.blocking import BlockingScheduler
+'''
+paper.site.admin.scripts.run_background
+
+runs background pull script
+
+author | Immanuel Washington
+'''
 import os
+from apscheduler.schedulers.blocking import BlockingScheduler
 
 scheduler = BlockingScheduler()
 

@@ -1,3 +1,16 @@
+'''
+paper.site.admin.users
+
+author | Immanuel Washington
+
+Functions
+---------
+load_user | loads user
+login | logs into website
+signup | adds user to website
+logout | logs out of website
+delete_user | deletes user from database/website
+'''
 from flask import render_template, flash, redirect, url_for, request, g
 from flask.ext.login import login_user, logout_user
 from paper.site.flask_app import admin_app as app, admin_db as db, admin_lm as lm
