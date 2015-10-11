@@ -38,10 +38,10 @@ def data_amount():
 	data_time = hours_sadb = hours_paper = hours_with_data = 'N/A'
 
 	if data is not None:
-		data_time = getattr(data, 'created_on')
-		hours_sadb = getattr(data, 'hours_sadb')
-		hours_paper = getattr(data, 'hours_paperdata')
-		hours_with_data = getattr(data, 'hours_with_data')
+		data_time = data.created_on
+		hours_sadb = data.hours_sadb
+		hours_paper = data.hours_paperdata
+		hours_with_data = data.hours_with_data
 
 	return render_template('data_amount_table.html', data_time=data_time,
 							hours_sadb=hours_sadb, hours_paper=hours_paper,	hours_with_data=hours_with_data)
@@ -76,12 +76,12 @@ def source_table():
 
 	for source_name, source in source_tuples:
 		if source is not None:
-			source_time = int(time.time() - getattr(source, 'timestamp'))
+			source_time = int(time.time() - source.timestamp)
 
 			#limiting if seconds or minutes or hours shows up on last report
 			source_dict[source_name]['time_segment'] = misc_utils.str_val(source_time)
 			source_dict[source_name]['time'] = misc_utils.time_val(source_time)
-			source_dict[source_name]['day'] = getattr(source, 'julian_day')
+			source_dict[source_name]['day'] = source.julian_day
 
 	return render_template('source_table.html', source_names=source_names, source_dict=source_dict)
 
@@ -100,7 +100,7 @@ def filesystem():
 		systems = db_utils.query(database='ganglia', table='Filesystem',
 									sort_tuples=(('timestamp', 'desc'), ('host', 'asc')), group_tuples=('host',))
 
-		system_names = (getattr(system, 'host') for system in systems)
+		system_names = (system.host for system in systems)
 	except:
 		systems = (None,)
 		system_names = ('pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1')
@@ -113,9 +113,9 @@ def filesystem():
 
 	for system in systems:
 		if system is not None:
-			system_time = int(time.time() - getattr(system, 'timestamp'))
-			system_name = getattr(system, 'host')
-			used_perc = getattr(system, 'percent_space')
+			system_time = int(time.time() - system.timestamp)
+			system_name = system.host
+			used_perc = system.percent_space
 			this_sys = system_dict[system_name]
 
 			#limiting if seconds or minutes or hours shows up on last report
@@ -125,7 +125,7 @@ def filesystem():
 
 			#this_sys['stats'] = ' '.join((system_name, 'stats'))
 			#this_sys['free_perc'] = 100 - used_space
-			#used_space = getattr(system, 'used_space') / 1024.0 ** 3 #convert to GiB
+			#used_space = system.used_space / 1024.0 ** 3 #convert to GiB
 			#this_sys['used_space'] = ' '.join((str(used_space), 'GB'))
 
 	return render_template('filesystem_table.html', system_header=system_header, system_dict=system_dict)
@@ -144,7 +144,7 @@ def rtp_summary_table():
 
 	try:
 		rtp_obs = db_utils.query(database='paperdata', table='RTPObservation', sort_tuples=(('julian_day', 'desc'),))
-		files_list = (getattr(obs, 'files') for obs in rtp_obs)
+		files_list = (obs.files for obs in rtp_obs)
 		RTPFiles = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
 		file_list = [{var: getattr(RTPFile, var) for var in file_vars} for RTPFile in RTPFiles]
 	except:

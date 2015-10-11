@@ -43,7 +43,7 @@ def login():
 		password = password.encode('UTF-8')
 		if not u:
 			error = 'Invalid username/password combination.'
-		elif getattr(u, 'password') != hashlib.sha512(password).hexdigest():
+		elif u.password != hashlib.sha512(password).hexdigest():
 			error = 'Invalid username/password combination.'
 		else:
 			login_user(u)
@@ -82,8 +82,8 @@ def signup():
 		else:
 			real_pass = password.encode('UTF-8')
 
-			new_user = getattr(models, 'User')(username=username, password=hashlib.sha512(real_pass).hexdigest(),
-													email=email, firstname=fname, lastname=lname)
+			new_user = models.User(username=username, password=hashlib.sha512(real_pass).hexdigest(),
+									email=email, firstname=fname, lastname=lname)
 
 			db.session.add(new_user)
 			db.session.flush()
@@ -126,12 +126,12 @@ def delete_user():
 		field_tuple_base = (('username', '==', username),)
 
 		for aSet in setList:
-			field_tuples = field_tuple_base + (('id', '==', getattr(aSet, 'id')),)
+			field_tuples = field_tuple_base + (('id', '==', aSet.id),)
 
 			theSet = db_utils.query(database='admin', table='Set', field_tuples=field_tuples)[0]
 
 			if action == 'transfer':
-				setattr(theSet, 'username', g.user.username)
+				theSet.username = g.user.username
 
 			else: #destroy, cascade deletion
 				db.session.delete(theSet)
