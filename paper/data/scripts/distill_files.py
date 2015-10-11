@@ -1,3 +1,16 @@
+'''
+paper.data.scripts.distill_files
+
+adds files to paperdistiller database
+
+author | Immanuel Washington
+
+Functions
+---------
+file2jd | pulls julian date from filename
+file2pol | pulls polarization from filename
+add_files_to_distill | adds files to paperdistiller database after pulling some relevant information
+'''
 from __future__ import print_function
 import os
 import sys
@@ -10,7 +23,7 @@ from paper.distiller import dbi as ddbi
 
 def file2jd(path):
 	'''
-	pulls julian date from filename
+	pulls julian date from filename using regex
 
 	Parameters
 	----------
@@ -24,7 +37,7 @@ def file2jd(path):
 
 def file2pol(path):
 	'''
-	pulls polarization from filename
+	pulls polarization from filename using regex
 
 	Parameters
 	----------

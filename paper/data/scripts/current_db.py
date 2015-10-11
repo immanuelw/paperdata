@@ -1,9 +1,25 @@
+'''
+paper.data.scripts.current_db
+
+creates table depicting current summary of paperdata database
+
+author | Immanuel Washington
+
+Functions
+---------
+current_db | writes table summary of paperdata database into file
+'''
 import os
 import prettytable
 from paper.data import dbi as pdbi
 
-def main():
-	dbi = pdbi.DataBaseInterface()
+def current_db(dbi):
+	'''
+	writes table summary of paperdata database into file
+	summary contraining information about julian days, hosts, etc.
+
+	dbi | object: database interface object
+	'''
 	with dbi.session_scope() as s:
 		FILEs = s.query(pdbi.File).all()
 	out_vars = ('era', 'julian_day', 'host', 'base_path', 'filetype', 'init_host')
@@ -25,5 +41,5 @@ def main():
 		df.write(stuff)
 
 if __name__ == "__main__":
-	main()
-
+	dbi = pdbi.DataBaseInterface()
+	current_db(dbi)

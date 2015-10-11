@@ -1,3 +1,16 @@
+'''
+paper.data.scripts.move_files
+
+moves files and updates database with new host and path
+
+author | Immanuel Washington
+
+Functions
+---------
+null_check | checks to see if files to be moved all exist in database
+set_move_table | updates database with moved file status
+move_files | parses list of files then moves them
+'''
 from __future__ import print_function
 import os
 import sys
@@ -63,7 +76,7 @@ def set_move_table(s, dbi, source_host, source_path, dest_host, dest_path):
 
 def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_path=None):
 	'''
-	move files
+	move files by rsyncing them and checking md5sum through rsync option
 
 	Parameters
 	----------

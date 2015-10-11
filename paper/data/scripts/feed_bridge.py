@@ -1,3 +1,18 @@
+'''
+paper.data.scripts.feed_bridge
+
+adds files to the paperdistiller database and updates the feed table
+
+author | Immanuel Washington
+
+Functions
+---------
+set_feed_table | updates database with feed file status
+move_feed_files | parses list of files then moves them
+count_days | counts the amount of files in each julian day and updates feed table
+find_data | finds files which can be added to paperdistiller
+feed_bridge | finds files to move, adds to paperdistiller after move
+'''
 from __future__ import print_function
 import os
 import time
@@ -103,10 +118,10 @@ def find_data(dbi):
 	#only move one day at a time
 	feed_day = getattr(FEEDs[0], 'julian_day')
 	feed_host = getattr(FEEDs[0], 'host')
-	feed_paths = tuple(os.path.join(getattr(FEED, 'path'), getattr(FEED, 'filename'))
+	feed_paths = tuple(os.path.join(getattr(FEED, 'base_path'), getattr(FEED, 'filename'))
 						for FEED in FEEDs if getattr(FEED, 'julian_day') == feed_day)
 
-	return feed_paths, feed_host
+	return feed_host, feed_paths
 
 def feed_bridge(dbi):
 	'''

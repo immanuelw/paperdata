@@ -1,3 +1,10 @@
+'''
+paper.data.scripts.test_db
+
+runs tests for most relevant functions of paper pipeline
+
+author | Immanuel Washington
+'''
 from __future__ import print_function
 import os
 import glob
@@ -5,7 +12,7 @@ import shutil
 from paper.data import dbi as pdbi
 import add_files
 import backup_db
-import restore_db_db
+import restore_db
 import move_files
 import delete_files
 

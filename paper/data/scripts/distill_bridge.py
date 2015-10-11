@@ -1,3 +1,15 @@
+'''
+paper.data.scripts.distill_bridge
+
+pulls info about files and their related observations from the paperdistiller database, then adds to the paperdata database
+
+author | Immanuel Washington
+
+Functions
+---------
+add_data | adds info from paperdistiller to paperdata
+paperbridge | moves files that have completed compression to preferred directory
+'''
 import os
 import sys
 import copy

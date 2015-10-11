@@ -1,5 +1,5 @@
 '''
-paper.ganglia.scripts.monitor_still
+paper.ganglia.scripts.schema_db
 
 generates schema file of ganglia database
 

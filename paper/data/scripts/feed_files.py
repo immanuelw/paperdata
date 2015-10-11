@@ -1,3 +1,17 @@
+'''
+paper.data.scripts.feed_files
+
+adds files to feed table in paperdata database
+
+author | Immanuel Washington
+
+Functions
+---------
+gen_feed_data | pulls relevant field information from uv file
+dupe_check | checks to see any files to be added already exist in database
+add_feeds_to_db | adds entries to feed table
+add_feeds | parses list of files then adds them to paperdata database
+'''
 from __future__ import print_function
 import sys
 import os

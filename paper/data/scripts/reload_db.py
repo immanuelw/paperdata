@@ -1,3 +1,14 @@
+'''
+paper.data.scripts.reload_db
+
+crawls host for all files that should/can be loaded into the paperdata database, then adds them
+
+author | Immanuel Washington
+
+Functions
+---------
+find_paths | finds all possible uv* files to be added
+'''
 import os
 import socket
 import paper as ppdata

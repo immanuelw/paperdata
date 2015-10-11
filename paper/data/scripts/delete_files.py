@@ -1,11 +1,23 @@
+'''
+paper.data.scripts.delete_files
+
+copies files to cold storage and then deletes from main host
+
+author | Immanuel Washington
+
+Functions
+---------
+delete_check | checks for which files should and can be deleted
+set_delete_table | updates database with deleted file status
+delete_files | parses list of files then copies and deletes them
+'''
 from __future__ import print_function
-import sys
-import time
-import subprocess
-import glob
-import socket
 import os
+import sys
+import glob
 import shutil
+import socket
+import time
 import uuid
 import paper as ppdata
 from paper.data import dbi as pdbi

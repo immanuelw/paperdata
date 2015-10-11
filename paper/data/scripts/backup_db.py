@@ -1,3 +1,15 @@
+'''
+paper.data.scripts.backup_db
+
+backups paperdata database into json file
+
+author | Immanuel Washington
+
+Functions
+---------
+json_data | dumps dictionaries to json file
+paperbackup | backs up paperdata database
+'''
 from __future__ import print_function
 import sys
 import time

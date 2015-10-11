@@ -1,3 +1,14 @@
+'''
+paper.data.scripts.restore_db
+
+restores paperdata database from backup json file
+
+author | Immanuel Washington
+
+Functions
+---------
+restore_db | converts json file into python dicts, then loads into paperdata database
+'''
 from __future__ import print_function
 import sys
 import glob

@@ -1,3 +1,21 @@
+'''
+paper.data.scripts.add_files
+
+pulls info about files and their related observations, then adds to the paperdata database
+
+author | Immanuel Washington
+
+Functions
+---------
+calc_obs_data | pulls observation and file data from files
+dupe_check | checks database for duplicate files
+set_obs | sets edge information for observations
+update_obsnums | updates observation previous and next obsnums
+connect_observations | connects observations with files in database
+update_md5 | updates md5 checksums if needed
+add_files_to_db | pulls file and observation data and adds to database
+add_files | parses list of files and adds data to database
+'''
 from __future__ import print_function
 import os
 import sys

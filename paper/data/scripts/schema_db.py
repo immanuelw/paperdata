@@ -1,3 +1,10 @@
+'''
+paper.data.scripts.schema_db
+
+generates schema file of paperdata database
+
+author | Immanuel Washington
+'''
 import os
 import paper.schema as schema
 from paper.data import data_db as pdb
