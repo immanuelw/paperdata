@@ -15,10 +15,9 @@ def get_plot_bands(the_set):
 	-------
 	dict: start, end, and color of flagged subset of set object
 	'''
-	flagged_subsets = db_utils.query(database='search', table='FlaggedSubset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),))
+	flagged_subsets = db_utils.query(database='search', table='FlaggedSubset', field_tuples=(('set_id', '==', the_set.id),))
 
-	plot_bands = [{'from': int(getattr(flagged_subset, 'start')), 'to': int(getattr(flagged_subset, 'end')), 'color': 'yellow'}
-					for flagged_subset in flagged_subsets]
+	plot_bands = [{'from': int(flagged_subset.start), 'to': int(flagged_subset.end), 'color': 'yellow'} for flagged_subset in flagged_subsets]
 
 	return plot_bands
 
@@ -50,17 +49,10 @@ def get_observation_counts(start_utc, end_utc, set_pol, set_era_type):
 	obs_count = {pol_str: {era_type_str: 0 for era_type_str in era_type_strs} for pol_str in pol_strs}
 
 	for obs in response:
-		polarization = getattr(obs, 'polarization')
-		era_type = getattr(obs, 'era_type')
+		obs_map[obs.polarization][obs.era_type].append({'obs_time': obs.time_start, 'obsnum': obs.obsnum})
+		obs_count[obs.polarization][obs.era_type] += 1
 
-		# Actual UTC time of the obs (for the graph)
-		obs_time = getattr(obs, 'time_start')
-		obsnum = getattr(obs, 'obsnum')
-
-		obs_map[polarization][era_type].append({'obs_time': obs_time, 'obsnum': obsnum})
-		obs_count[polarization][era_type] += 1
-
-	return (obs_count, obs_map)
+	return obs_count, obs_map
 
 def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_host=None, set_filetype=None):
 	'''
@@ -90,7 +82,7 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)))
 
 		all_obs_list = rtp_obs_list + paper_obs_list
-		files_list = (getattr(obs, 'files') for obs in all_obs_list)
+		files_list = (obs.files for obs in all_obs_list)
 		response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
 	except:
 		response = (None,)
@@ -103,20 +95,13 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 
 	for file_obj in response:
 		if not file_obj is None:
-			host = getattr(file_obj, 'host')
-			filetype = getattr(file_obj, 'filetype')
-
 			if (set_host and set_host != host) and (set_filetype and set_filetype != filetype):
 				continue
 
-			file_obs = getattr(file_obj, 'observation')
-			obsnum = getattr(file_obs, 'obsnum')
-			julian_date = getattr(file_obs, 'julian_date')
+			file_map[file_obj.host][file_obj.filetype].append({'file_date': file_obj.julian_date, 'obsnum': file_obj.obsnum})
+			file_count[file_obj.host][file_obj.filetype] += 1
 
-			file_map[host][filetype].append({'file_date': julian_date, 'obsnum': obsnum})
-			file_count[host][filetype] += 1
-
-	return (file_count, file_map)
+	return file_count, file_map
 
 def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 	'''
@@ -146,14 +131,8 @@ def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 
 	for obs in response:
 		if not obs is None:
-			polarization = getattr(obs, 'polarization')
-			era_type = getattr(obs, 'era_type')
-
-			obs_date = getattr(obs, 'julian_date')
-			obsnum = getattr(obs, 'obsnum')
-
-			obs_map[polarization][era_type].append({'obs_date': obs_date, 'obsnum': obsnum})
-			obs_count[polarization][era_type] += 1
+			obs_map[obs.polarization][obs.era_type].append({'obs_date': obs.julian_date, 'obsnum': obs.obsnum})
+			obs_count[obs.polarization][obs.era_type] += 1
 
 	file_count, file_map = get_file_counts(start_utc, end_utc, host_strs, filetype_strs)
 

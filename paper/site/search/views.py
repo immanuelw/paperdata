@@ -115,19 +115,18 @@ def get_graph():
 
 		plot_bands = histogram_utils.get_plot_bands(the_set)
 
-		set_start, set_end = getattr(the_set, 'start'), getattr(the_set, 'end')
+		set_start, set_end = the_set.start, the_set.end
 		start_datetime, end_datetime = db_utils.get_datetime_from_utc(set_start, set_end)
 
 		start_time_str_short = start_datetime.strftime('%Y-%m-%d %H:%M')
 		end_time_str_short = end_datetime.strftime('%Y-%m-%d %H:%M')
 
 		if graph_type_str == 'Obs_File':
-			set_polarization, set_era_type = getattr(the_set, 'polarization'), getattr(the_set, 'era_type')
-			set_host, set_filetype = getattr(the_set, 'host'), getattr(the_set, 'filetype')
+			set_polarization, set_era_type = the_set.polarization, the_set.era_type
+			set_host, set_filetype = the_set.host, the_set.filetype
 			obs_count, obs_map = histogram_utils.get_observation_counts(set_start, set_end, set_polarization, set_era_type)
 			file_count, file_map = histogram_utils.get_file_counts(set_start, set_end, set_host=set_host, set_filetype=set_filetype)
 			range_end = end_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') # For the function in histogram_utils.js
-			which_data_set = data_sources.which_data_set(the_set)
 			obs_count = json.dumps(obs_count)
 			obs_map = json.dumps(obs_map)
 			file_count = json.dumps(file_count)
@@ -135,17 +134,14 @@ def get_graph():
 			return render_template('setView.html', the_set=the_set, is_set=True,
 									obs_counts=obs_count, obs_map=obs_map, file_counts=file_count, file_map=file_map,
 									plot_bands=plot_bands, start_time_str_short=start_time_str_short,
-									end_time_str_short=end_time_str_short, range_end=range_end,
-									which_data_set=which_data_set)
+									end_time_str_short=end_time_str_short, range_end=range_end)
 		else:
 			graph_data = data_sources.get_graph_data(data_source_str, set_start, set_end, the_set)
 			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
-			which_data_set = data_sources.which_data_set(the_set)
 			return render_template('graph.html',
 									data_source_str=data_source_str, graph_data=graph_data, plot_bands=plot_bands,
 									template_name=template_name, is_set=True, data_source_str_nospace=data_source_str_nospace,
-									width_slider=data_source.width_slider, the_set=the_set,
-									which_data_set=which_data_set, start_time_str_short=start_time_str_short,
+									width_slider=data_source.width_slider, the_set=the_set, start_time_str_short=start_time_str_short,
 									end_time_str_short=end_time_str_short)
 
 @app.route('/obs_table', methods = ['POST'])
@@ -196,7 +192,7 @@ def file_table():
 		all_obs_list = db_utils.query(database='paperdata', table='Observation', 
 										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 										sort_tuples=(('time_start', 'asc'),))
-		files_list = (getattr(obs, 'files') for obs in all_obs_list)
+		files_list = (obs.files for obs in all_obs_list)
 		file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
 
 		log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response]
@@ -255,7 +251,7 @@ def profile():
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
-			user = db_utils.query(database='search', table='User',	field_tuples=(('username', '==', g.user.username),),)[0]
+			user = db_utils.query(database='search', table='User', field_tuples=(('username', '==', g.user.username),),)[0]
 			setList = db_utils.query(database='search', table='Set', field_tuples=(('username', '==', g.user.username),))[0]
 		except:
 			user = (None,)
@@ -278,7 +274,7 @@ def user_page():
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
-			user = db_utils.query(database='search', table='User',	field_tuples=(('username', '==', g.user.username),))[0]
+			user = db_utils.query(database='search', table='User', field_tuples=(('username', '==', g.user.username),))[0]
 			userList = db_utils.query(database='search', table='User')[0]
 			setList = db_utils.query(database='search', table='Set')[0]
 		except:
@@ -325,20 +321,11 @@ def data_summary_table():
 
 	for obs in response:
 		if not obs is None:
-			polarization = getattr(obs, 'polarization')
-			era_type = getattr(obs, 'era_type')
+			obs_map[obs.polarization][obs.era_type]['obs_count'] += 1
+			obs_map[obs.polarization][obs.era_type]['obs_hours'] += (obs.time_end - obs.time_start) / 3600.0
 
-			# Actual UTC time of the obs (for the graph)
-			obs_start = getattr(obs, 'time_start')
-			obs_end = getattr(obs, 'time_end')
-
-			obs_map[polarization][era_type]['obs_count'] += 1
-			obs_map[polarization][era_type]['obs_hours'] += (obs_end - obs_start) / 3600.0
-
-			for paper_file in getattr(obs, 'files'):
-				host = getattr(paper_file, 'host')
-				filetype = getattr(paper_file, 'filetype')
-				file_map[host][filetype]['file_count'] += 1
+			for paper_file in obs.files:
+				file_map[paper_file.host][paper_file.filetype]['file_count'] += 1
 
 	all_obs_strs = pol_strs + era_type_strs
 	obs_total = {all_obs_str: {'count': 0, 'hours': 0} for all_obs_str in all_obs_strs}

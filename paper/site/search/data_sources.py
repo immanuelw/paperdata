@@ -269,27 +269,6 @@ def get_graph_data(data_source_str, start_utc, end_utc, the_set):
 
 	return data
 
-def which_data_set(the_set):
-	'''
-	selects filters from set object
-
-	Parameters
-	----------
-	the_set | object: set object
-
-	Returns
-	-------
-	list: filter values
-	'''
-	polarization = the_set.polarization
-	era_type = the_set.era_type
-	host = the_set.host
-	filetype = the_set.filetype
-
-	which_data = (polarization, era_type, host, filetype)
-
-	return which_data
-
 def separate_data_into_sets(data, data_source, start_utc, end_utc):
 	'''
 	get graph data from data source sets

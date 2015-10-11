@@ -59,28 +59,27 @@ def update():
 	profiling_mark = datetime.now()
 
 	#total hours in SADB
-	total_sadb_hours = sum(getattr(OBS, 'length') for OBS in db_utils.query(database='sadb', table='observation',
+	total_sadb_hours = sum(OBS.length for OBS in db_utils.query(database='sadb', table='Observation',
                             field_tuples=(('length', '!=', None),))) / 3600.0
 
 	log_query_time('total_sadb_hours')
 
 	#total hours in paper
-	total_paperdata_hours = sum(getattr(OBS, 'length') for OBS in db_utils.query(database='paperdata', table='observation',
+	total_paperdata_hours = sum(OBS.length) for OBS in db_utils.query(database='paperdata', table='Observation',
                             field_tuples=(('length', '!=', None),))) / 3600.0
 
 	log_query_time('total_paperdata_hours')
 
 	#total that has data in observations
-	sadb_obs_rows = db_utils.query(database='sadb', table='observation',
+	sadb_obs_rows = db_utils.query(database='sadb', table='Observation',
 									field_tuples=(('files', '!=', None),), sort_tuples=(('obsnum', 'asc'),))
 
 	#make tuple of length and file_count for sadb_obs_rows
-	sadb_obs_rows = tuple((getattr(sadb_obs, 'length'), getattr(sadb_obs, 'obsnum'), len(getattr(saddb_obs, 'files')))
-							for sadb_obs in sadb_obs_rows)
+	sadb_obs_rows = tuple((sadb_obs.length, sadb_obs.obsnum, len(sadb_obs.files)) for sadb_obs in sadb_obs_rows)
 
 	log_query_time('sadb_obs_rows')
 
-	paperdata_files_rows = db_utils.query(database='paperdata', table='file', sort_tuples=(('obsnum', 'asc'),))
+	paperdata_files_rows = db_utils.query(database='paperdata', table='File', sort_tuples=(('obsnum', 'asc'),))
 
 	log_query_time('paperdata_files_rows')
 
@@ -130,7 +129,7 @@ def update():
 	data_transfer_total = sum(db_utils.query(database='paperdata', table='rtp_file',
 												field_tuples=(('timestamp', '>=', time.time() - time_secs), ('transferred', '==', True)),
 												output_vars=('filesize',)))
-	data_transfer_total = sum(getattr(FILE, 'filesize') for FILE in db_utils.query(database='paperdata', table='rtp_file',
+	data_transfer_total = sum(FILE.filesize for FILE in db_utils.query(database='paperdata', table='RTPFile',
 							field_tuples=(('timestamp', '>=', time.time() - time_secs), ('transferred', '==', True))))
 	#in MB per second
 	data_transfer_rate = data_transfer_total / time_secs
@@ -142,9 +141,8 @@ def update():
 	write_to_log('Total Hours that have data = {time}'.format(time=round(total_data_hours), 6))
 	write_to_log('Data transfer rate = {time}'.format(time=round(data_transfer_rate), 6))
 
-	graph_datum = getattr(models, 'Data_Amount')(hours_scheduled=total_sadb_hours, hours_observed=total_paperdata_hours,
-												hours_with_data=total_data_hours, data_transfer_rate=data_transfer_rate)
-
+	graph_datum = models.DataAmount(hours_scheduled=total_sadb_hours, hours_observed=total_paperdata_hours,
+									hours_with_data=total_data_hours, data_transfer_rate=data_transfer_rate)
 	db.session.add(graph_datum)
 	db.session.commit()
 

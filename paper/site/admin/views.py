@@ -62,7 +62,7 @@ def source_table():
 		corr_source = db_utils.query(database='paperdata', table='RTPFile', field_tuples=(('transferred', '==', None),),
 										sort_tuples=sort_tuples)[0]
 
-		rtp_source = db_utils.query(database='paperdata', table='RTPFile',	field_tuples=(('transferred', '==', True),),
+		rtp_source = db_utils.query(database='paperdata', table='RTPFile', field_tuples=(('transferred', '==', True),),
 									sort_tuples=sort_tuples)[0]
 
 		paper_source = db_utils.query(database='paperdata', table='Observation', sort_tuples=sort_tuples)[0]
@@ -251,7 +251,7 @@ def profile():
 	'''
 	if (g.user is not None and g.user.is_authenticated()):
 		try:
-			user = db_utils.query(database='admin', table='User',	field_tuples=(('username', '==', g.user.username),),)[0]
+			user = db_utils.query(database='admin', table='User', field_tuples=(('username', '==', g.user.username),),)[0]
 			setList = db_utils.query(database='admin', table='Set', field_tuples=(('username', '==', g.user.username),))[0]
 		except:
 			user = (None,)

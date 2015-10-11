@@ -19,37 +19,20 @@ def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era_
 	total_data_hrs | int: total data hours
 	flagged_data_hrs | int: flagged data hours
 	'''
-	new_set = getattr(models, 'Set')()
-	setattr(new_set, 'username', g.user.username)
-	setattr(new_set, 'name', name)
-	setattr(new_set, 'start', start)
-	setattr(new_set, 'end', end)
-	setattr(new_set, 'polarization', polarization)
-	setattr(new_set, 'era_type', era_type)
-	setattr(new_set, 'host', host)
-	setattr(new_set, 'filetype', filetype)
-	setattr(new_set, 'total_data_hrs', total_data_hrs)
-	setattr(new_set, 'flagged_data_hrs', flagged_data_hrs)
-
+	new_set = models.Set(username=g.user.username, name=name, start=start, end=end, polarization=polarization, era_type=era_type,
+							host=host, filetype=filetype, total_data_hrs=total_data_hrs, flagged_data_hrs)
 	db.session.add(new_set)
 	db.session.flush()
 	db.session.refresh(new_set) # So we can get the set's id
 
 	for flagged_range_dict in flagged_range_dicts:
-		flagged_subset = getattr(models, 'Flagged_Subset')()
-		setattr(flagged_subset, 'set_id', getattr(new_set, 'id'))
-		setattr(flagged_subset, 'start', flagged_range_dict['start_utc'])
-		setattr(flagged_subset, 'end', flagged_range_dict['end_utc'])
-
+		flagged_subset = models.FlaggedSubset(set_id=new_set.id, start=flagged_range_dict['start_utc'], end=flagged_range_dict['end_utc'])
 		db.session.add(flagged_subset)
 		db.session.flush()
 		db.session.refresh(flagged_subset) # So we can get the id
 
 		for obs_id in flagged_range_dict['flaggedRange']:
-			flagged_obs_id = getattr(models, 'Flagged_Obs_Ids')()
-			setattr(flagged_obs_id, 'obs_id', obs_id)
-			setattr(flagged_obs_id, 'flagged_subset_id', getattr(flagged_subset, 'id'))
-
+			flagged_obs_id = models.FlaggedObsIds(obs_id=obs_id, flagged_subset_id=flagged_subset.id)
 			db.session.add(flagged_obs_id)
 
 	db.session.commit()
@@ -88,7 +71,8 @@ def get_data_hours_in_set(start, end, polarization, era_type, flagged_range_dict
 
 	Returns
 	-------
-	int: total amount of data hours
+	tuple:
+		int: total amount of data hours
 		int: total amount of flagged data hours
 	'''
 	total_data_hrs = flagged_data_hrs = 0
@@ -99,14 +83,12 @@ def get_data_hours_in_set(start, end, polarization, era_type, flagged_range_dict
 										('era_type', None if era_type == 'all' else '==', era_type)),
 										sort_tuples=(('time_start', 'asc'),),)
 	for times in all_obs_ids_tuples:
-		time_start = getattr(time, 'time_start')
-		time_end = getattr(time, 'time_end')
-		data_hrs = (time_start - time_end) / 3600
+		data_hrs = (times.time_start - times.time_end) / 3600
 		total_data_hrs += data_hrs
 		if is_obs_flagged(obs_id, flagged_range_dicts):
 			flagged_data_hrs += data_hrs
 
-	return (total_data_hrs, flagged_data_hrs)
+	return total_data_hrs, flagged_data_hrs
 
 @app.route('/save_new_set', methods=['POST'])
 def save_new_set():
@@ -209,7 +191,7 @@ def upload_set():
 											('era_type', None if era_type == 'all' else '==', era_type)),
 											sort_tuples=(('time_start', 'asc'),))
 
-		all_obs_ids = [getattr(obs, 'obsnum') for obs in all_obs_ids_tuples]
+		all_obs_ids = [obs.obsnum for obs in all_obs_ids_tuples]
 
 		last_index = 0
 
@@ -251,9 +233,9 @@ def download_set():
 	the_set = db_utils.query(database='search', table='Set', field_tuples=(('id', '==', set_id),),)[0]
 
 	if the_set is not None:
-		flagged_subsets = db_utils.query(database='search', table='FlaggedSubset', field_tuples=(('set_id', '==', getattr(the_set, 'id')),),)
-		polarization = getattr(the_set, 'polarization')
-		era_type = getattr(the_set, 'era_type')
+		flagged_subsets = db_utils.query(database='search', table='FlaggedSubset', field_tuples=(('set_id', '==', the_set.id),),)
+		polarization = the_set.polarization
+		era_type = the_set.era_type
 		if arg_type == 'obs':
 			output_vars = ('obsnum', 'julian_date', 'polarization', 'era_type', 'length', 'time_start', 'time_end')
 
@@ -263,7 +245,7 @@ def download_set():
 										('era_type', None if era_type == 'all' else '==', era_type)),
 										sort_tuples=(('time_start', 'asc'),))
 
-			info_dict = {getattr(obs_obj, 'obsnum'): {var: getattr(obs_obj, var) for var in output_vars} for obs_obj in obs_objs}
+			info_dict = {obs_obj.obsnum: {var: getattr(obs_obj, var) for var in output_vars} for obs_obj in obs_objs}
 
 		elif arg_type == 'file':
 			obs_objs = db_utils.query(database='paperdata', table='Observation',
@@ -271,15 +253,15 @@ def download_set():
 										('polarization', None if polarization == 'all' else '==', polarization),
 										('era_type', None if era_type == 'all' else '==', era_type)),
 										sort_tuples=(('time_start', 'asc'),))
-			host = getattr(the_set, 'host')
-			filetype = getattr(the_set, 'filetype')
+			host = the_set.host
+			filetype = the_set.filetype
 
 			output_vars = ('host', 'base_path', 'filename', 'obsnum', 'filesize', 'md5sum', 'write_to_tape', 'delete_file')
 
-			file_list = (obs_file for obs in obs_objs for obs_file in getattr(obs, 'files'))
-			file_objs = (file_obj for file_obj in file_list if getattr(file_obj, 'host') == host and getattr(file_obj, 'filetype') == filetype)
+			file_list = (obs_file for obs in obs_objs for obs_file in obs.files)
+			file_objs = (file_obj for file_obj in file_list if file_obj.host == host and file_obj.filetype == filetype)
 
-			info_dict = {getattr(file_obj, 'source'): {var: getattr(file_obj, var) for var in output_vars} for file_obj in file_objs}
+			info_dict = {file_obj.source: {var: getattr(file_obj, var) for var in output_vars} for file_obj in file_objs}
 
 		return jsonify(info_dict)
 	else:

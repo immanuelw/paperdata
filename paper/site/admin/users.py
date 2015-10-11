@@ -20,6 +20,7 @@ def load_user(id):
 	object: user object
 	'''
 	user = db_utils.query(database='admin', table='User', field_tuples=(('username', '==', id),))[0]
+
 	return user
 
 @app.route('/login', methods = ['GET', 'POST'])
@@ -49,6 +50,7 @@ def login():
 			login_user(u)
 			flash('You were logged in', 'flash')
 			return redirect(url_for('index'))
+
 	return render_template('login.html', error=error)
 
 @app.route('/signup', methods= ['GET', 'POST'])
@@ -84,7 +86,6 @@ def signup():
 
 			new_user = models.User(username=username, password=hashlib.sha512(real_pass).hexdigest(),
 									email=email, firstname=fname, lastname=lname)
-
 			db.session.add(new_user)
 			db.session.flush()
 			db.session.refresh(new_user)
@@ -95,6 +96,7 @@ def signup():
 			login_user(u)
 			flash('You were logged in', 'flash')
 			return redirect(url_for('index'))
+
 	return render_template('signup.html', error=error)
 
 @app.route('/logout')
@@ -108,6 +110,7 @@ def logout():
 	'''
 	logout_user()
 	flash('You were logged out', 'flash')
+
 	return redirect(url_for('index'))
 
 @app.route('/delete_user', methods=['POST'])
@@ -132,13 +135,11 @@ def delete_user():
 
 			if action == 'transfer':
 				theSet.username = g.user.username
-
 			else: #destroy, cascade deletion
 				db.session.delete(theSet)
 			db.session.commit()
 
 		u = db_utils.query(database='admin', table='User', field_tuples=(('username', '==', username),))[0]
-
 		db.session.delete(u)
 		db.session.commit()
 
