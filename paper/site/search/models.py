@@ -3,20 +3,20 @@ from datetime import datetime
 
 class SetSubscriptions(db.Model):
 	__tablename__ = 'SetSubscriptions'
-	username =  db.Column(db.String(32), db.ForeignKey('user.username'))
-	set_id = db.Column(db.Integer, db.ForeignKey('set.id'))
+	username =  db.Column(db.String(32), db.ForeignKey('User.username'))
+	set_id = db.Column(db.Integer, db.ForeignKey('Set.id'))
 	id = db.Column(db.Integer, primary_key=True)
 
 class Data_Source_Subscriptions(db.Model):
 	__tablename__ = 'DataSourceSubscriptions'
-	username =  db.Column(db.String(32), db.ForeignKey('user.username'))
-	data_source = db.Column(db.String(100), db.ForeignKey('graph_data_source.name'))
+	username =  db.Column(db.String(32), db.ForeignKey('User.username'))
+	data_source = db.Column(db.String(100), db.ForeignKey('GraphDataSource.name'))
 	id = db.Column(db.Integer, primary_key=True)
 
 class Active_Data_Sources(db.Model):
 	__tablename__ = 'ActiveDataSources'
-	username =  db.Column(db.String(32), db.ForeignKey('user.username'))
-	data_source = db.Column(db.String(100), db.ForeignKey('graph_data_source.name'))
+	username =  db.Column(db.String(32), db.ForeignKey('User.username'))
+	data_source = db.Column(db.String(100), db.ForeignKey('GraphDataSource.name'))
 	id = db.Column(db.Integer, primary_key=True)
 
 class User(db.Model):
@@ -29,9 +29,9 @@ class User(db.Model):
 	first_name = db.Column(db.String(50), nullable=False)
 	last_name = db.Column(db.String(50), nullable=False)
 	owned_sets = db.relationship('Set', backref='user')
-	subscribed_sets = db.relationship('Set', secondary=Set_Subscriptions.__table__)
-	subscribed_data_sources = db.relationship('Graph_Data_Source', secondary=Data_Source_Subscriptions.__table__)
-	active_data_sources = db.relationship('Graph_Data_Source', secondary=Active_Data_Sources.__table__)
+	subscribed_sets = db.relationship('Set', secondary=SetSubscriptions.__table__)
+	subscribed_data_sources = db.relationship('GraphDataSource', secondary=DataSourceSubscriptions.__table__)
+	active_data_sources = db.relationship('GraphDataSource', secondary=ActiveDataSources.__table__)
 	admin = db.Column(db.Boolean, default=False)
 
 	def __init__(self, username, password, email, first_name, last_name):
@@ -59,7 +59,7 @@ class User(db.Model):
 class Set(db.Model):
 	__tablename__ = 'Set'
 	id = db.Column(db.Integer, primary_key=True)
-	username = db.Column(db.String(32), db.ForeignKey('user.username'))
+	username = db.Column(db.String(32), db.ForeignKey('User.username'))
 	name = db.Column(db.String(50))
 	start = db.Column(db.Integer)
 	end = db.Column(db.Integer)
@@ -82,7 +82,7 @@ class FlaggedObsIds(db.Model):
 	__tablename__ = 'FlaggedObsIds'
 	id = db.Column(db.Integer, primary_key=True)
 	obs_id = db.Column(db.Integer)
-	flagged_subset_id = db.Column(db.Integer, db.ForeignKey('flagged_subset.id', ondelete='CASCADE'))
+	flagged_subset_id = db.Column(db.Integer, db.ForeignKey('FlaggedSubset.id', ondelete='CASCADE'))
 
 class DataAmount(db.Model):
 	__tablename__ = 'DataAmount'
@@ -116,7 +116,7 @@ class Thread(db.Model):
 class Comment(db.Model):
 	__tablename__ = 'Comment'
 	id = db.Column(db.Integer, primary_key=True)
-	thread_id = db.Column(db.Integer, db.ForeignKey('thread.id'))
+	thread_id = db.Column(db.Integer, db.ForeignKey('Thread.id'))
 	text = db.Column(db.String(1000), nullable=False)
 	username = db.Column(db.String(32))
 	created_on = db.Column(db.DateTime, default=datetime.utcnow)
@@ -128,7 +128,7 @@ class GraphType(db.Model):
 class GraphDataSource(db.Model):
 	__tablename__ = 'GraphDataSource'
 	name = db.Column(db.String(100), primary_key=True)
-	graph_type = db.Column(db.String(100), db.ForeignKey('graph_type.name'))
+	graph_type = db.Column(db.String(100), db.ForeignKey('GraphType.name'))
 	host = db.Column(db.String(100))
 	database = db.Column(db.String(100))
 	table = db.Column(db.String(100))
@@ -138,5 +138,5 @@ class GraphDataSource(db.Model):
 class GraphDataSourceColumn(db.Model):
 	__tablename__ = 'GraphDataSourceColumn'
 	id = db.Column(db.Integer, primary_key=True)
-	graph_data_source = db.Column(db.String(100), db.ForeignKey('graph_data_source.name'))
+	graph_data_source = db.Column(db.String(100), db.ForeignKey('GraphDataSource.name'))
 	name = db.Column(db.String(100))

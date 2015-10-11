@@ -210,28 +210,17 @@ def create_data_source():
 			return jsonify(error=True,
 				message='The column {column} does not exist in that table or is not a numeric column.'.format(column=missing_columns[0]))
 		
-		graph_data_source = getattr(models, 'GraphDataSource')()
-		setattr(graph_data_source, 'name', data_source_name)
-		setattr(graph_data_source, 'graph_type', graph_type)
-		setattr(graph_data_source, 'host', host)
-		setattr(graph_data_source, 'database', database)
-		setattr(graph_data_source, 'table', table)
-		setattr(graph_data_source, 'obs_column', obs_column)
-		setattr(graph_data_source, 'width_slider', include_width_slider)
-
+		graph_data_source = models.GraphDataSource(name=data_source_name, graph_type=graph_type, host=host, database=database,
+													table=table, obs_column=obs_column, width_slider=include_width_slider)
 		db.session.add(graph_data_source)
 		db.session.flush()
 
 		for column in columns:
-			graph_data_source_column = getattr(models, 'Graph_Data_Source_Column')()
-			setattr(graph_data_source_column, 'name', column)
-			setattr(graph_data_source_column, 'GraphDataSource', data_source_name)
-
+			graph_data_source_column = models.GraphDataSourceColumn(name=column, graph_data_source=data_source_name)
 			db.session.add(graph_data_source_column)
 
 		g.user.subscribed_data_sources.append(graph_data_source)
 		db.session.add(g.user)
-
 		db.session.commit()
 
 		return jsonify(error=False)
@@ -259,10 +248,10 @@ def get_graph_data(data_source_str, start_utc, end_utc, the_set):
 	data = {pol_str: {era_type: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
 
 	if the_set is not None:
-		polarization = getattr(the_set, 'polarization')
-		era_type = getattr(the_set, 'era_type')
-		host = getattr(the_set, 'host')
-		filetype = getattr(the_set, 'filetype')
+		polarization = the_set.polarization
+		era_type = the_set.era_type
+		host = the_set.host
+		filetype = the_set.filetype
 
 		results = db_utils.query(data_source=data_source,
 									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
@@ -271,9 +260,7 @@ def get_graph_data(data_source_str, start_utc, end_utc, the_set):
 									sort_tuples=(('time_start', 'asc'),))
 
 		for obs in results:
-			obs_time = getattr(obs, 'time_start')
-			obsnum = getattr(obs, 'obsnum')
-			obs_dict = {'obs_time': obs_time, 'obsnum': obsnum, 'obs_count': 1}
+			obs_dict = {'obs_time': obs.time_start, 'obsnum': obs.obsnum, 'obs_count': 1}
 			data[polarization][era_type].append(obs_dict)
 
 
@@ -294,13 +281,12 @@ def which_data_set(the_set):
 	-------
 	list: filter values
 	'''
-	polarization = getattr(the_set, 'polarization')
-	era =  getattr(the_set, 'era')
-	era_type = getattr(the_set, 'era_type')
-	host = getattr(the_set, 'host')
-	filetype =  getattr(the_set, 'filetype')
+	polarization = the_set.polarization
+	era_type = the_set.era_type
+	host = the_set.host
+	filetype = the_set.filetype
 
-	which_data = (polarization, era, era_type, host, filetype)
+	which_data = (polarization, era_type, host, filetype)
 
 	return which_data
 
@@ -324,14 +310,7 @@ def separate_data_into_sets(data, data_source, start_utc, end_utc):
 									sort_tuples=(('time_start', 'asc'),))
 
 	for obs in obsid_results:
-		polarization = getattr(obs, 'polarization')
-		era_type = getattr(obs, 'era_type')
-
-		# Actual UTC time of the obs (for the graph)
-		obs_time = getattr(obs, 'time_start')
-		obsnum = getattr(obs, 'obsnum')
-
-		obs_dict = {'obs_time': obs_time, 'obsnum': obsnum, 'obs_count': 1}
-		data[polarization][era_type].append(obs_dict)
+		obs_dict = {'obs_time': obs.time_start, 'obsnum': obs.obsnum, 'obs_count': 1}
+		data[obs.polarization][obs.era_type].append(obs_dict)
 
 	return data
