@@ -37,7 +37,7 @@ if __name__ == '__main__':
 	i = 0
 	stat = ['\\','|','/','-','.']
 	try:
-		table = getattr(ddbi, 'Observation')
+		table = ddbi.Observation
 		while True:
 			timestamp = int(time.time())
 			#creates base list
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 				totalobs = s.query(table).count()
 				stdscr.addstr(curline, 0, 'Number of observations currently in the database: {totalobs}'.format(totalobs=totalobs))
 				curline += 1
-				OBSs = s.query(table).filter(getattr(table, 'status') != 'NEW').filter(getattr(table, 'status') != 'COMPLETE').all()
+				OBSs = s.query(table).filter(table.status != 'NEW').filter(table.status != 'COMPLETE').all()
 				#OBSs = s.query(table).all()
 				stdscr.addstr(curline, 0, 'Number of observations currently being processed {num}'.format(num=len(OBSs))
 				curline += 1
@@ -60,13 +60,13 @@ if __name__ == '__main__':
 				statusscr.addstr(0, 0 ,'  ----  Still Idle  ----   ')
 				for j, OBS in enumerate(OBSs):
 					try:
-						obsnum = getattr(OBS, 'obsnum')
+						obsnum = OBS.obsnum
 						FILE = dbi.get_entry(ddbi, s, 'file', obsnum)
-						host = getattr(FILE, 'host')
-						base_path, filename = os.path.split(getattr(FILE, 'filename'))
-						status = getattr(OBS, 'status')
-						still_host = getattr(OBS, 'stillhost')
-						current_pid = getattr(OBS, 'currentpid')
+						host = FILE.host
+						base_path, filename = os.path.split(FILE.filename)
+						status = OBS.status
+						still_host = OBS.stillhost
+						current_pid = OBS.currentpid
 					except:
 						host, base_path, filename = 'host', '/path/to/', 'zen.2345672.23245.uv'
 						status = 'WTF'
