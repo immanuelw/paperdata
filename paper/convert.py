@@ -11,10 +11,10 @@ degrees_to_hours
 radians_to_hours
 decimal_to_sexagesimal
 sexagesimal_to_decimal
-fpart -- fractional part of value
-ipart -- integer part of value
-gcal2jd -- gregorian time date to julian date
-jd2gcal -- julian date to gregorian time date
+fpart | fractional part of value
+ipart | integer part of value
+gcal2jd | gregorian time date to julian date
+jd2gcal | julian date to gregorian time date
 time_to_decimal
 decimal_to_time
 date_to_juliandate

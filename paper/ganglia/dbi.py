@@ -5,12 +5,12 @@ author | Immanuel Washington
 
 Classes
 -------
-Filesystem -- sqlalchemy table
-Monitor -- sqlalchemy table
-Ram -- sqlalchemy table
-Iostat -- sqlalchemy table
-Cpu -- sqlalchemy table
-DataBaseInterface -- interface to ganglia database
+Filesystem | sqlalchemy table
+Monitor | sqlalchemy table
+Ram | sqlalchemy table
+Iostat | sqlalchemy table
+Cpu | sqlalchemy table
+DataBaseInterface | interface to ganglia database
 '''
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
 from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
@@ -99,10 +99,10 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 
 	Methods
 	-------
-	create_db -- creates all defined tables
-	drop_db -- drops all tables from database
-	add_entry_dict -- adds entry to database using dict as kwarg
-	get_entry -- gets database object
+	create_db | creates all defined tables
+	drop_db | drops all tables from database
+	add_entry_dict | adds entry to database using dict as kwarg
+	get_entry | gets database object
 	'''
 	def __init__(self, configfile='~/ganglia.cfg'):
 		'''

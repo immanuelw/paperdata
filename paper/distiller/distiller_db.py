@@ -5,10 +5,10 @@ author | Immanuel Washington
 
 Classes
 -------
-File -- attributes of named table
-Observation -- attributes of named table
-Neighbors -- attributes of named table
-Log -- attributes of named table
+File | attributes of named table
+Observation | attributes of named table
+Neighbors | attributes of named table
+Log | attributes of named table
 '''
 from __future__ import print_function
 

@@ -7,7 +7,7 @@ author | Immanuel Washington
 
 Functions
 ---------
-update_md5 -- updates md5sums of uv files
+update_md5 | updates md5sums of uv files
 '''
 from paper.data import file_data
 from paper.distiller import dbi as ddbi

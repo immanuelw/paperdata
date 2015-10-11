@@ -5,7 +5,7 @@ author | Immanuel Washington
 
 Functions
 ---------
-schema_db -- creates a text file containing a table-like represetation of a database
+schema_db | creates a text file containing a table-like represetation of a database
 '''
 from __future__ import print_function
 import sys

@@ -7,12 +7,12 @@ author | Immanuel Washington
 
 Functions
 ---------
-two_round -- rounds to two decimal places
-filesystem -- gathers info for table
-iostat -- gathers info for table
-ram_free -- gathers info for table
-cpu_perc -- gathers info for table
-add_data -- adds data to ganglia database
+two_round | rounds to two decimal places
+filesystem | gathers info for table
+iostat | gathers info for table
+ram_free | gathers info for table
+cpu_perc | gathers info for table
+add_data | adds data to ganglia database
 '''
 import os
 import sys

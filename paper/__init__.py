@@ -5,29 +5,29 @@ author | Immanuel Washington
 
 Functions
 ---------
-decimal_default -- json fix for decimal types
-rsync_copy -- pythonic rsync
-ssh_scope -- ssh connection
+decimal_default | json fix for decimal types
+rsync_copy | pythonic rsync
+ssh_scope | ssh connection
 
 Classes
 -------
-DictFix -- adds dictionary to sqlalchemy objects
-DataBaseInterface -- interface to database through sqlalchemy
+DictFix | adds dictionary to sqlalchemy objects
+DataBaseInterface | interface to database through sqlalchemy
 
 Modules
 -------
-convert -- time conversions
-memory -- memory checking
-schema -- schema table creation
+convert | time conversions
+memory | memory checking
+schema | schema table creation
 
 Subpackages
 -----------
-calibrate -- calibration and conversion uv files into timestream hdf5 files
-data -- (main subpackage) adding, updating, moving, and deleting files, observations, and entries in the paperdata database
-dev -- dev version of data subpackage, for testing new features
-distiller -- access to paperdistiller database and its features
-ganglia -- logging of and access to host information
-site -- websites built on flask for accessing the paperdata database
+calibrate | calibration and conversion uv files into timestream hdf5 files
+data | (main subpackage) adding, updating, moving, and deleting files, observations, and entries in the paperdata database
+dev | dev version of data subpackage, for testing new features
+distiller | access to paperdistiller database and its features
+ganglia | logging of and access to host information
+site | websites built on flask for accessing the paperdata database
 '''
 
 import os
@@ -116,7 +116,7 @@ class DictFix(object):
 
 	Methods
 	-------
-	to_dict -- creates python dict of fields from sqlalchemy object
+	to_dict | creates python dict of fields from sqlalchemy object
 	'''
 	def to_dict(self):
 		'''
@@ -139,13 +139,13 @@ class DataBaseInterface(object):
 
 	Methods
 	-------
-	session_scope -- context manager for session connection to database
-	drop_db -- drops all tables from database
-	create_table -- creates individual table in database
-	add_entry -- adds entry object to database
-	add_entry_dict -- adds entry to database using dict as kwarg
-	get_entry -- gets database object
-	set_entry -- updates database entry field with new value
+	session_scope | context manager for session connection to database
+	drop_db | drops all tables from database
+	create_table | creates individual table in database
+	add_entry | adds entry object to database
+	add_entry_dict | adds entry to database using dict as kwarg
+	get_entry | gets database object
+	set_entry | updates database entry field with new value
 	'''
 	def __init__(self, configfile='~/paperdata.cfg'):
 		'''

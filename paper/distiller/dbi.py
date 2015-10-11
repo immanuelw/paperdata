@@ -5,11 +5,11 @@ author | Immanuel Washington
 
 Classes
 -------
-File -- sqlalchemy table
-Observation -- sqlalchemy table
-Neighbors -- sqlalchemy table
-Log -- sqlalchemy table
-DataBaseInterface -- interface to paperdistiller database
+File | sqlalchemy table
+Observation | sqlalchemy table
+Neighbors | sqlalchemy table
+Log | sqlalchemy table
+DataBaseInterface | interface to paperdistiller database
 '''
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
 from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
@@ -76,8 +76,8 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 
 	Methods
 	-------
-	add_entry_dict -- adds entry to database using dict as kwarg
-	get_entry -- gets database object
+	add_entry_dict | adds entry to database using dict as kwarg
+	get_entry | gets database object
 	'''
 	def __init__(self, configfile='~/paperdistiller.cfg'):
 		'''

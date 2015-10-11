@@ -7,8 +7,8 @@ author | Immanuel Washington
 
 Functions
 ---------
-json_data -- dumps dictionaries to json file
-paperbackup -- backs up ganglia database
+json_data | dumps dictionaries to json file
+paperbackup | backs up ganglia database
 '''
 from __future__ import print_function
 import os
