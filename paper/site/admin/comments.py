@@ -52,18 +52,13 @@ def new_thread():
 		title = request.form['title']
 		text = request.form['text']
 
-		new_thread = models.Thread()
-		new_thread.title = title
-		new_thread.username = g.user.username
+		new_thread = models.Thread(title=title, username=g.user.username)
 
 		db.session.add(new_thread)
 		db.session.flush()
 		db.session.refresh(new_thread) # So we can get the new thread's id
 
-		first_comment = models.Comment()
-		first_comment.text = text
-		first_comment.username = g.user.username
-		first_comment.thread_id = new_thread.id
+		first_comment = models.Comment(text=text, username=g.user.username, thread_id=new_thread.id)
 
 		db.session.add(first_comment)
 		db.session.commit()
