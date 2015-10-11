@@ -182,24 +182,17 @@ def calc_npz_data(dbi, filename):
 		return (None,) * 7
 	
 	jdate = '.'.join((filename.split('.')[1], filename.split('.')[2]))
-	julian_date = round(float(jdate, 5))
+	julian_date = five_round(jdate)
 
 	with dbi.session_scope() as s:
 		if len(filename.split('.')) == 5:
 			polarization = 'all'
 		elif len(filename.split('.')) == 6:
 			polarization = filename.split('.')[3]
-		table = getattr(pdbi, 'Observation')
-		OBS = s.query(table).filter(getattr(table, 'julian_date') == julian_date)\
-							.filter(getattr(table, 'polarization') == polarization).one()
+		table = pdbi.Observation
+		OBS = s.query(table).filter(table.julian_date == julian_date).filter(table.polarization == polarization).one()
 
-		time_start = getattr(OBS, 'time_start')
-		time_end = getattr(OBS, 'time_end')
-		delta_time = getattr(OBS, 'delta_time')
-		length = getattr(OBS, 'length')
-		obsnum = getattr(OBS, 'obsnum')
-
-	return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
+	return OBS.time_start, OBS.time_end, OBS.delta_time, julian_date, polarization, OBS.length, OBS.obsnum
 
 def calc_uv_data(host, path):
 	'''
@@ -239,7 +232,7 @@ def calc_uv_data(host, path):
 			time_start, time_end, delta_time, length = calc_times(uv)
 
 			#indicates julian date
-			julian_date = round(uv['time'], 5)
+			julian_date = five_round(uv['time'])
 
 			pol_dict = pdbi.str2pol
 			#assign letters to each polarization
@@ -269,7 +262,7 @@ def calc_uv_data(host, path):
 						sftp.put(uv_data_script, moved_script)
 
 			_, uv_dat, _ = ssh.exec_command(uv_comm)
-			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [round(float(info), 5) if key in (0, 1, 2, 3, 5)
+			time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [five_round(info) if key in (0, 1, 2, 3, 5)
 																							else int(info) if key in (6,)
 																							else info
 																							for key, info in enumerate(uv_dat.read().split(','))]
