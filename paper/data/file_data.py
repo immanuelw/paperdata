@@ -198,19 +198,15 @@ def source_info(ask=True):
 	str: source host
 	list[str]: list of source paths
 	'''
-	if len(sys.argv) == 2:
-		source_host = sys.argv[1].split(':')[0]
-		if source_host == sys.argv[1]:
-			print('Needs host')
-			sys.exit()
-		source_paths_str = sys.argv[1].split(':')[1]
-	elif len(sys.argv) == 3:
-		source_host = sys.argv[1]
-		source_paths_str = sys.argv[2]
-
 	if ask:
 		source_host = raw_input('Source directory host: ')
 		source_paths_str = raw_input('Source directory path: ')
+	else:
+		try:
+			source_host, source_paths_str = sys.argv[1].split(':')
+		except:
+			print('Wrong format for host and paths')
+			return
 
 	source_paths = parse_sources(source_host, source_paths_str)
 
