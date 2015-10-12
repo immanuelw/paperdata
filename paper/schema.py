@@ -34,7 +34,7 @@ def schema_db(xdb, schema_file):
 								var_class.db_descr[field]['key'], var_class.db_descr[field]['description']]
 			x.add_row(full_item)
 			stuff = x.get_string()
-		with open(filename, 'ab') as df:
+		with open(schema_file, 'ab') as df:
 			df.write(stuff)
 			df.write('\n')
 
