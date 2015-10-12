@@ -233,7 +233,7 @@ def get_catalog(srcs=None, cutoff=None, catalogs=['helm','misc']):
 			srclist += this_srcs
 	cat = a.fit.SrcCatalog(srclist)
 	#Add specials.  All fixed radio sources must be in catalog,  for completeness
-	if not srcs is None:
+	if srcs is not None:
 		for src in srcs:
 			if src in src_prms.keys():
 				if src in specials:

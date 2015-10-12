@@ -106,7 +106,7 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 	file_count = {host_str: {filetype_str: 0 for filetype_str in filetype_strs} for host_str in host_strs}
 
 	for file_obj in response:
-		if not file_obj is None:
+		if file_obj is not None:
 			if (set_host and set_host != host) and (set_filetype and set_filetype != filetype):
 				continue
 
@@ -142,7 +142,7 @@ def get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str):
 	obs_count = {pol_str: {era_type_str: 0 for era_type_str in era_type_strs} for pol_str in pol_strs}
 
 	for obs in response:
-		if not obs is None:
+		if obs is not None:
 			obs_map[obs.polarization][obs.era_type].append({'obs_date': obs.julian_date, 'obsnum': obs.obsnum})
 			obs_count[obs.polarization][obs.era_type] += 1
 

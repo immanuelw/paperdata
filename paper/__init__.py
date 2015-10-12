@@ -156,7 +156,7 @@ class DataBaseInterface(object):
 		----------
 		configfile | Optional[str]: configuration file --defaults to ~/paperdata.cfg
 		'''
-		if not configfile is None:
+		if configfile is not None:
 			config = configparser.ConfigParser()
 			configfile = os.path.expanduser(configfile)
 			if os.path.exists(configfile):

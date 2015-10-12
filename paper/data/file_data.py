@@ -161,10 +161,14 @@ def file_names(path):
 
 	return base_path, filename, filetype
 
-def source_info():
+def source_info(ask=True):
 	'''
 	gets source information including host and path string from command line
 	if None, asks user to supply
+
+	Parameters
+	----------
+	ask | bool: get host and paths string from user or not
 
 	Returns
 	-------
@@ -180,7 +184,8 @@ def source_info():
 	elif len(sys.argv) == 3:
 		source_host = sys.argv[1]
 		source_paths_str = sys.argv[2]
-	else:
+
+	if ask:
 		source_host = raw_input('Source directory host: ')
 		source_paths_str = raw_input('Source directory path: ')
 
