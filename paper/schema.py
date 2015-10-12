@@ -21,22 +21,18 @@ def schema_db(xdb, schema_file):
 	xdb | object: module containing the schema data
 	schema_file | str: path of output file for schema
 	'''
-	with open(schema_file, 'wb') as df:
+	with open(schema_file, 'wb') as sf:
 		print('Starting ..')
-	var_classes = xdb.all_classes
-
-	for var_class in var_classes:
-		x = prettytable.PrettyTable(['Field', 'Type', 'Default', 'Key', 'Description'])
-		with open(schema_file, 'ab') as df:
-			df.write(var_class.table + '\n')
-		for field in var_class.db_list:
-			full_item = [field, var_class.db_descr[field]['type'], var_class.db_descr[field]['default'],
-								var_class.db_descr[field]['key'], var_class.db_descr[field]['description']]
-			x.add_row(full_item)
-			stuff = x.get_string()
-		with open(schema_file, 'ab') as df:
-			df.write(stuff)
-			df.write('\n')
+		for var_class in xdb.all_classes:
+			schema_table = prettytable.PrettyTable(['Field', 'Type', 'Default', 'Key', 'Description'])
+			sf.write(''.join((var_class.table, '\n')))
+			for field in var_class.db_list:
+				full_item = [field, var_class.db_descr[field]['type'], var_class.db_descr[field]['default'],
+									var_class.db_descr[field]['key'], var_class.db_descr[field]['description']]
+				schema_table.add_row(full_item)
+				stuff = schema_table.get_string()
+			sf.write(stuff)
+			sf.write('\n')
 
 	print('Done!')
 
