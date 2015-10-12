@@ -145,8 +145,8 @@ def feed_bridge(dbi):
 		#MOVE DATA AND UPDATE PAPERFEED TABLE THAT FILES HAVE BEEN MOVED, AND THEIR NEW PATHS
 		move_feed_files(dbi, source_host, source_paths, dest_host, dest_path)
 		#ADD FILES TO PAPERDISTILLER ON LIST OF DATA IN NEW LOCATION
-		out_dir = os.path.join(dest_path, 'zen.*.uv')
-		obs_paths = glob.glob(out_dir)
+		dest_dir = os.path.join(dest_path, 'zen.*.uv')
+		obs_paths = glob.glob(dest_dir)
 		distill_files.add_files_to_distill(obs_paths)
 	else:
 		table = 'Feed'

@@ -96,8 +96,8 @@ def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_pa
 			source_paths = sorted(glob.glob(raw_input('Source directory path: ')))
 		else:
 			with ppdata.ssh_scope(host) as ssh:
-				source_paths = raw_input('Source directory path: ')
-				_, path_out, _ = ssh.exec_command('ls -d {source_paths}'.format(source_paths=source_paths))
+				source_paths_str = raw_input('Source directory path: ')
+				_, path_out, _ = ssh.exec_command('ls -d {source_paths_str}'.format(source_paths_str=source_paths_str))
 				source_paths = sorted(path_out.read().split('\n')[:-1])
 	
 	nulls = null_check(source_host, source_paths)

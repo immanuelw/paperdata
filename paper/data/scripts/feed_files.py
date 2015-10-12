@@ -107,7 +107,7 @@ def add_feeds_to_db(dbi, source_host, source_paths):
 			dbi.add_entry_dict(s, 'Feed', feed_data)
 			dbi.add_entry_dict(s, 'Log', log_data)
 
-def add_feeds(dbi, source_host, source_paths):
+def add_feeds(dbi, source_host, source_paths_str):
 	'''
 	generates list of input files, check for duplicates, add information to database
 
@@ -115,7 +115,7 @@ def add_feeds(dbi, source_host, source_paths):
 	----------
 	dbi | object: database interface object
 	source_host | str: file host
-	source_paths | str: file paths string
+	source_paths_str | str: file paths string
 	'''
 	named_host = socket.gethostname()
 	if named_host == source_host:
@@ -123,7 +123,7 @@ def add_feeds(dbi, source_host, source_paths):
 	else:
 		with ppdata.ssh_scope(source_host) as ssh:
 			source_paths = raw_input('Source directory path: ')
-			_, path_out, _ = ssh.exec_command('ls -d {source_paths}'.format(source_paths=source_paths))
+			_, path_out, _ = ssh.exec_command('ls -d {source_paths_str}'.format(source_paths_str=source_paths_str))
 			source_paths = path_out.read().split('\n')[:-1]
 
 	dest_host = 'folio'
@@ -137,13 +137,13 @@ if __name__ == '__main__':
 		if source_host == sys.argv[1]:
 			print('Needs host')
 			sys.exit()
-		source_paths = sys.argv[1].split(':')[1]
+		source_paths_str = sys.argv[1].split(':')[1]
 	elif len(sys.argv) == 3:
 		source_host = sys.argv[1]
-		source_paths = sys.argv[2]
+		source_paths_str = sys.argv[2]
 	else:
 		source_host = raw_input('Source directory host: ')
-		source_paths = raw_input('Source directory path: ')
+		source_paths_str = raw_input('Source directory path: ')
 
 	dbi = pdbi.DataBaseInterface()
-	add_feeds(dbi, source_host, source_paths)
+	add_feeds(dbi, source_host, source_paths_str)

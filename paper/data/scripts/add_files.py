@@ -248,7 +248,7 @@ def add_files_to_db(dbi, source_host, source_paths):
 			except:
 				print('Failed to load in log ', base_path, filename)
 
-def add_files(dbi, source_host, source_paths):
+def add_files(dbi, source_host, source_paths_str):
 	'''
 	generates list of input files, check for duplicates, add information to database
 
@@ -256,7 +256,7 @@ def add_files(dbi, source_host, source_paths):
 	----------
 	dbi | object: database interface object
 	source_host | str: host of files
-	source_paths | str: string to indicate paths of uv* files
+	source_paths_str | str: string to indicate paths of uv* files
 	'''
 	named_host = socket.gethostname()
 	if named_host == source_host:
@@ -282,13 +282,13 @@ if __name__ == '__main__':
 		if source_host == sys.argv[1]:
 			print('Needs host')
 			sys.exit()
-		source_paths = sys.argv[1].split(':')[1]
+		source_paths_str = sys.argv[1].split(':')[1]
 	elif len(sys.argv) == 3:
 		source_host = sys.argv[1]
-		source_paths = sys.argv[2]
+		source_paths_str = sys.argv[2]
 	else:
 		source_host = raw_input('Source directory host: ')
-		source_paths = raw_input('Source directory path: ')
+		source_paths_str = raw_input('Source directory path: ')
 
 	dbi = pdbi.DataBaseInterface()
-	add_files(dbi, source_host, source_paths)
+	add_files(dbi, source_host, source_paths_str)
