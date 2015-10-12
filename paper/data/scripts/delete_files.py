@@ -83,9 +83,9 @@ def delete_files(dbi, source_host, source_paths, dest_host, dest_path):
 	dest_host | str: output host
 	dest_path | str: output directory
 	'''
-	named_host = socket.gethostname()
 	destination = ':'.join((dest_host, dest_path))
 	with dbi.session_scope() as s:
+		named_host = socket.gethostname()
 		if named_host == source_host:
 			for source_path in source_paths:
 				ppdata.rsync_copy(source_path, destination)
