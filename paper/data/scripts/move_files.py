@@ -90,8 +90,7 @@ def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_pa
 	dest_path = raw_input('Destination directory: ') if dest_path is None else dest_path
 
 	if source_host is None or source_paths is None:
-		source_host, source_paths_str = file_data.source_info()
-		source_paths = file_data.parse_sources(source_host, source_paths_str)
+		source_host, source_paths = file_data.source_info()
 
 	nulls = null_check(source_host, source_paths)
 	if not nulls:

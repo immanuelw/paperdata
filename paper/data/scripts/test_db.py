@@ -17,21 +17,20 @@ import move_files
 import delete_files
 
 if __name__ == '__main__':
-	print('finding files to test...')
-	test_path_str = os.path.expanduser('~/test_data/zen*.uvcRRE')
-	test_paths = glob.glob(test_path_str)
-
 	print('instantiating database interface object...')
 	dbi = pdbi.DataBaseInterface(configfile=os.path.expanduser('~/paperdata/test.cfg'))
 	
 	print('creating db...')
 	dbi.create_db()
 
+	print('finding files to test...')
+	test_paths_str = os.path.expanduser('~/test_data/zen*.uvcRRE')
+	test_paths = glob.glob(test_paths_str)
+
 	print('adding files to db...')
 	source_host = 'folio'
-	source_paths = test_paths
 
-	add_files.add_files(dbi, source_host, source_paths)
+	add_files.add_files(dbi, source_host, test_paths)
 	add_files.update_obsnums(dbi)
 	add_files.connect_observations(dbi)
 

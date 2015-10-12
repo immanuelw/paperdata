@@ -29,13 +29,13 @@ def find_paths(input_host):
 		list: .npz files
 	'''
 	named_host = socket.gethostname()
-	input_paths = []
+	uv_paths = []
 	npz_paths = []
 	if input_host == named_host:
 		for root, dirs, files in os.walk('/'):
 			for direc in dirs:
 				if direc.endswith('uv') or direc.endswith('uvcRRE'):
-					input_paths.append(os.path.join(root, direc))
+					uv_paths.append(os.path.join(root, direc))
 			for file_path in files:
 				if file_path.endswith('npz'):
 					npz_paths.append(os.path.join(root, file_path))
@@ -45,11 +45,11 @@ def find_paths(input_host):
 			_, all_paths, _ = ssh.exec_command(find)
 		for path in all_paths.split('\n'):
 			if direc.endswith('uv') or direc.endswith('uvcRRE'):
-				 input_paths.append(path)
+				 uv_paths.append(path)
 			elif file_path.endswith('npz'):
 				 npz_paths.append(path)
 
-	return sorted(input_paths), sorted(npz_paths)
+	return sorted(uv_paths), sorted(npz_paths)
 
 if __name__ == '__main__':
 	if len(sys.argv) == 2:
@@ -58,5 +58,4 @@ if __name__ == '__main__':
 		input_host = raw_input('Source directory host: ')
 
 	for paths in find_paths(input_host):
-		paths = sorted(add_files.dupe_check(input_host, all_paths))
 		add_files.add_files(input_host, paths)

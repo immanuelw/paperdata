@@ -246,7 +246,7 @@ def add_files_to_db(dbi, source_host, source_paths):
 			except:
 				print('Failed to load in log ', base_path, filename)
 
-def add_files(dbi, source_host, source_paths_str):
+def add_files(dbi, source_host, source_paths):
 	'''
 	generates list of input files, check for duplicates, add information to database
 
@@ -254,9 +254,8 @@ def add_files(dbi, source_host, source_paths_str):
 	----------
 	dbi | object: database interface object
 	source_host | str: host of files
-	source_paths_str | str: string to indicate paths of uv* files
+	source_paths | list[str]: list of paths of uv* files
 	'''
-	source_paths = file_data.parse_sources(source_host, source_paths_str)
 	source_paths = sorted(dupe_check(dbi, source_host, source_paths))
 
 	npz_paths = [npz_path for npz_path in source_paths if npz_path.endswith('.npz')]
@@ -268,6 +267,6 @@ def add_files(dbi, source_host, source_paths_str):
 	#update_md5(dbi)
 
 if __name__ == '__main__':
-	source_host, source_path_str = file_data.source_info()
+	source_host, source_paths = file_data.source_info()
 	dbi = pdbi.DataBaseInterface()
-	add_files(dbi, source_host, source_paths_str)
+	add_files(dbi, source_host, source_paths)

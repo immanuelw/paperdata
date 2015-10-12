@@ -85,7 +85,7 @@ def add_data(dbi, data_dbi):
 					time_start, time_end, delta_time, _  = uv_data.calc_times(uv)
 
 				else:
-					time_start, time_end, delta_time, _, _, _, _ = add_files.calc_uv_data(host, path)
+					time_start, time_end, delta_time, _, _, _, _ = uv_data.calc_uv_data(host, path)
 
 				era, julian_day, lst = uv_data.date_info(julian_date)
 

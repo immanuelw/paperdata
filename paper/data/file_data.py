@@ -161,36 +161,6 @@ def file_names(path):
 
 	return base_path, filename, filetype
 
-def source_info(ask=True):
-	'''
-	gets source information including host and path string from command line
-	if None, asks user to supply
-
-	Parameters
-	----------
-	ask | bool: get host and paths string from user or not
-
-	Returns
-	-------
-	str: source host
-	str: source paths string (includes wildcards)
-	'''
-	if len(sys.argv) == 2:
-		source_host = sys.argv[1].split(':')[0]
-		if source_host == sys.argv[1]:
-			print('Needs host')
-			sys.exit()
-		source_paths_str = sys.argv[1].split(':')[1]
-	elif len(sys.argv) == 3:
-		source_host = sys.argv[1]
-		source_paths_str = sys.argv[2]
-
-	if ask:
-		source_host = raw_input('Source directory host: ')
-		source_paths_str = raw_input('Source directory path: ')
-
-	return source_host, source_paths_str
-
 def parse_sources(source_host, source_paths_str):
 	'''
 	parses source path string and gets list of sources
@@ -213,6 +183,38 @@ def parse_sources(source_host, source_paths_str):
 			source_paths = path_out.read().split('\n')[:-1]
 
 	return source_paths
+
+def source_info(ask=True):
+	'''
+	gets source information including host and paths from command line
+	if None, asks user to supply
+
+	Parameters
+	----------
+	ask | bool: get host and paths string from user or not
+
+	Returns
+	-------
+	str: source host
+	list[str]: list of source paths
+	'''
+	if len(sys.argv) == 2:
+		source_host = sys.argv[1].split(':')[0]
+		if source_host == sys.argv[1]:
+			print('Needs host')
+			sys.exit()
+		source_paths_str = sys.argv[1].split(':')[1]
+	elif len(sys.argv) == 3:
+		source_host = sys.argv[1]
+		source_paths_str = sys.argv[2]
+
+	if ask:
+		source_host = raw_input('Source directory host: ')
+		source_paths_str = raw_input('Source directory path: ')
+
+	source_paths = parse_sources(source_host, source_paths_str)
+
+	return source_host, source_paths
 
 if __name__ == '__main__':
 	print('Not a script file, just a module')

@@ -105,7 +105,7 @@ def add_feeds_to_db(dbi, source_host, source_paths):
 			dbi.add_entry_dict(s, 'Feed', feed_data)
 			dbi.add_entry_dict(s, 'Log', log_data)
 
-def add_feeds(dbi, source_host, source_paths_str):
+def add_feeds(dbi, source_host, source_paths):
 	'''
 	generates list of input files, check for duplicates, add information to database
 
@@ -113,13 +113,12 @@ def add_feeds(dbi, source_host, source_paths_str):
 	----------
 	dbi | object: database interface object
 	source_host | str: file host
-	source_paths_str | str: file paths string
+	source_paths | list[str]: list of file paths
 	'''
-	source_paths = file_data.parse_sources(source_host, source_paths_str)
 	source_paths = dupe_check(dbi, source_host, source_paths)
 	add_feeds_to_db(dbi, source_host, source_paths)
 
 if __name__ == '__main__':
-	source_host, source_paths_str = file_data.source_info()
+	source_host, source_paths = file_data.source_info()
 	dbi = pdbi.DataBaseInterface()
 	add_feeds(dbi, source_host, source_paths_str)
