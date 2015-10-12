@@ -32,10 +32,11 @@ site | websites built on flask for accessing the paperdata database
 
 import os
 import sys
-import paramiko
-import logging
-import subprocess
 import decimal
+import json
+import logging
+import paramiko
+import subprocess
 from contextlib import contextmanager
 from sqlalchemy import exc
 from sqlalchemy.orm import sessionmaker
@@ -60,6 +61,19 @@ def decimal_default(obj):
 	'''
 	if isinstance(obj, decimal.Decimal):
 		return float(obj)
+
+def json_data(backup_path, dump_objects):
+	'''
+	dumps list of objects into a json file
+
+	Parameters
+	----------
+	backup_path | str: filename
+	dump_objects | list[object]: database objects query
+	'''
+	with open(backup_path, 'w') as bkup:
+		data = [ser_data.to_dict() for ser_data in dump_objects.all()]
+		json.dump(data, bkup, sort_keys=True, indent=1, default=decimal_default)
 
 def rsync_copy(source, destination):
 	'''

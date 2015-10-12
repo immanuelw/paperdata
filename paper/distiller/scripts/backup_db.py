@@ -11,26 +11,11 @@ json_data | dumps dictionaries to json file
 paperbackup | backs up paperdistiller database
 '''
 from __future__ import print_function
+import os
 import sys
 import time
-import os
-import json
-import decimal
 import paper as ppdata
 from paper.distiller import dbi as ddbi
-
-def json_data(dbo, dump_objects):
-	'''
-	dumps list of objects into a json file
-
-	Parameters
-	----------
-	dbo | str: filename
-	dump_objects | list[object]: database objects query
-	'''
-	with open(dbo, 'w') as f:
-		data = [ser_data.to_dict() for ser_data in dump_objects.all()]
-		json.dump(data, f, sort_keys=True, indent=1, default=ppdata.decimal_default)
 
 def paperbackup(dbi):
 	'''
@@ -49,19 +34,18 @@ def paperbackup(dbi):
 	table_sorts = {'Observation': {'first': 'julian_date', 'second': 'pol'},
 					'File': {'first': 'obsnum', 'second': 'filename'},
 					'Log': {'first': 'obsnum', 'second': 'timestamp'}}
-	s = dbi.Session()
-	print(timestamp)
-	for table in tables:
-		db_file = '{table}_{timestamp}.json'.format(table=table.lower(), timestamp=timestamp)
-		dbo = os.path.join(backup_dir, db_file)
-		print(db_file)
-		table = table.lower()
-		DB_table = getattr(ddbi, table)
-		DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
-												getattr(DB_table, table_sorts[table]['second']).asc())
-		json_data(dbo, DB_dump)
-		print('Table data backup saved')
-	s.close()
+	with dbi.session_scope() as s:
+		print(timestamp)
+		for table in tables:
+			db_file = '{table}_{timestamp}.json'.format(table=table.lower(), timestamp=timestamp)
+			backup_path = os.path.join(backup_dir, db_file)
+			print(db_file)
+			table = table.lower()
+			DB_table = getattr(ddbi, table)
+			DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
+													getattr(DB_table, table_sorts[table]['second']).asc())
+			ppdata.json_data(backup_path, DB_dump)
+			print('Table data backup saved')
 
 if __name__ == '__main__':
 	dbi = ddbi.DataBaseInterface()
