@@ -47,12 +47,13 @@ def email_memory(table):
 
 	#Send the mail
 	header = 'From: PAPERBridge <paperfeed.paper@gmail.com>\nSubject: NOT ENOUGH SPACE ON FOLIO\n'
-	msgs = ''.join((header, '\nNot enough memory for ', table, ' on folio'))
+	msg = ''.join((header, '\nNot enough memory for ', table, ' on folio'))
 
 	emails = ('immwa@sas.upenn.edu', 'jaguirre@sas.upenn.edu', 'saul.aryeh.kohn@gmail.com', 'jacobsda@sas.upenn.edu')
 	for user in emails:
-		server.sendmail(start_email, user, msgs)
+		server.sendmail(start_email, user, msg)
 
 	server.quit()
+
 if __name__ == '__main__':
 	print('This is a module')
