@@ -9,6 +9,6 @@ import os
 import paper.schema as schema
 from paper.ganglia import ganglia_db as gdb
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 	filename = os.path.expanduser('~/paperdata/paper/ganglia/src/schema.txt')
 	schema.schema_db(gdb, filename)
