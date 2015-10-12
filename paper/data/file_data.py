@@ -11,9 +11,13 @@ calc_size | gets human readable size of any directory or file
 get_md5sum | generates md5 checksum of file
 calc_md5sum | gets md5 checksum of any file
 file_names | breaks path into base directory, filename, and filetype
+source_info | gets source host and paths string from command line or user input
+parse_sources | pulls list of paths from source paths str
 '''
 from __future__ import print_function
 import os
+import sys
+import glob
 import hashlib
 import socket
 import paper as ppdata
@@ -156,6 +160,54 @@ def file_names(path):
 	filetype = filename.split('.')[-1]
 
 	return base_path, filename, filetype
+
+def source_info():
+	'''
+	gets source information including host and path string from command line
+	if None, asks user to supply
+
+	Returns
+	-------
+	str: source host
+	str: source paths string (includes wildcards)
+	'''
+	if len(sys.argv) == 2:
+		source_host = sys.argv[1].split(':')[0]
+		if source_host == sys.argv[1]:
+			print('Needs host')
+			sys.exit()
+		source_paths_str = sys.argv[1].split(':')[1]
+	elif len(sys.argv) == 3:
+		source_host = sys.argv[1]
+		source_paths_str = sys.argv[2]
+	else:
+		source_host = raw_input('Source directory host: ')
+		source_paths_str = raw_input('Source directory path: ')
+
+	return source_host, source_paths_str
+
+def parse_sources(source_host, source_paths_str):
+	'''
+	parses source path string and gets list of sources
+
+	Parameters
+	----------
+	source_host | str: host of files
+	source_paths_str | str: string to indicate paths of uv* files
+
+	Returns
+	-------
+	list[str]: list of source paths
+	'''
+	named_host = socket.gethostname()
+	if named_host == source_host:
+		source_paths = glob.glob(source_paths_str)
+	else:
+		with ppdata.ssh_scope(source_host) as ssh:
+			_, path_out, _ = ssh.exec_command('ls -d {source_paths_str}'.format(source_paths_str=source_paths_str))
+			source_paths = path_out.read().split('\n')[:-1]
+
+	return source_paths
 
 if __name__ == '__main__':
 	print('Not a script file, just a module')

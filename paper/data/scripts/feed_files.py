@@ -21,7 +21,7 @@ import socket
 import uuid
 import aipy as A
 import paper as ppdata
-from paper.data import dbi as pdbi
+from paper.data import dbi as pdbi, file_data
 
 def gen_feed_data(host, path):
 	'''
@@ -117,33 +117,11 @@ def add_feeds(dbi, source_host, source_paths_str):
 	source_host | str: file host
 	source_paths_str | str: file paths string
 	'''
-	named_host = socket.gethostname()
-	if named_host == source_host:
-		source_paths = glob.glob(source_paths)
-	else:
-		with ppdata.ssh_scope(source_host) as ssh:
-			source_paths = raw_input('Source directory path: ')
-			_, path_out, _ = ssh.exec_command('ls -d {source_paths_str}'.format(source_paths_str=source_paths_str))
-			source_paths = path_out.read().split('\n')[:-1]
-
-	dest_host = 'folio'
-	feed_output = '/data4/paper/feed/'
+	source_paths = file_data.parse_sources(source_host, source_paths_str)
 	source_paths = dupe_check(dbi, source_host, source_paths)
 	add_feeds_to_db(dbi, source_host, source_paths)
 
 if __name__ == '__main__':
-	if len(sys.argv) == 2:
-		source_host = sys.argv[1].split(':')[0]
-		if source_host == sys.argv[1]:
-			print('Needs host')
-			sys.exit()
-		source_paths_str = sys.argv[1].split(':')[1]
-	elif len(sys.argv) == 3:
-		source_host = sys.argv[1]
-		source_paths_str = sys.argv[2]
-	else:
-		source_host = raw_input('Source directory host: ')
-		source_paths_str = raw_input('Source directory path: ')
-
+	source_host, source_paths_str = file_data.source_info()
 	dbi = pdbi.DataBaseInterface()
 	add_feeds(dbi, source_host, source_paths_str)

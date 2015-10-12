@@ -19,9 +19,7 @@ add_files | parses list of files and adds data to database
 from __future__ import print_function
 import os
 import sys
-import glob
 import time
-import socket
 import uuid
 import paper as ppdata
 from paper.data import dbi as pdbi, uv_data, file_data
@@ -258,37 +256,18 @@ def add_files(dbi, source_host, source_paths_str):
 	source_host | str: host of files
 	source_paths_str | str: string to indicate paths of uv* files
 	'''
-	named_host = socket.gethostname()
-	if named_host == source_host:
-		source_paths = glob.glob(source_paths)
-	else:
-		with ppdata.ssh_scope(source_host) as ssh:
-			source_paths = raw_input('Source directory path: ')
-			_, path_out, _ = ssh.exec_command('ls -d {source_paths}'.format(source_paths=source_paths))
-			source_paths = path_out.read().split('\n')[:-1]
-
+	source_paths = file_data.parse_sources(source_host, source_paths_str)
 	source_paths = sorted(dupe_check(dbi, source_host, source_paths))
+
 	npz_paths = [npz_path for npz_path in source_paths if npz_path.endswith('.npz')]
-	source_paths = [source_path for source_path in source_paths if not source_path.endswith('.npz')]
-	add_files_to_db(dbi, source_host, source_paths)
+	uv_paths = [uv_path for uv_path in source_paths if not uv_path.endswith('.npz')]
+	add_files_to_db(dbi, source_host, uv_paths)
 	add_files_to_db(dbi, source_host, npz_paths)
 	update_obsnums(dbi)
 	connect_observations(dbi)
 	#update_md5(dbi)
 
 if __name__ == '__main__':
-	if len(sys.argv) == 2:
-		source_host = sys.argv[1].split(':')[0]
-		if source_host == sys.argv[1]:
-			print('Needs host')
-			sys.exit()
-		source_paths_str = sys.argv[1].split(':')[1]
-	elif len(sys.argv) == 3:
-		source_host = sys.argv[1]
-		source_paths_str = sys.argv[2]
-	else:
-		source_host = raw_input('Source directory host: ')
-		source_paths_str = raw_input('Source directory path: ')
-
+	source_host, source_path_str = file_data.source_info()
 	dbi = pdbi.DataBaseInterface()
 	add_files(dbi, source_host, source_paths_str)
