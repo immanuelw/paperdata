@@ -266,13 +266,12 @@ def calc_uv_data(host, path):
 																							else int(info) if key in (6,)
 																							else info
 																							for key, info in enumerate(uv_dat.read().split(','))]
+
 	return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
 if __name__ == '__main__':
 	source_host = sys.argv[1]
 	source_path = sys.argv[2]
-	if len(sys.argv) == 4:
-		mode = sys.argv[3]
 
 	uv_data = calc_uv_data(source_host, source_path)
 	if uv_data is None:
