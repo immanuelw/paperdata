@@ -15,9 +15,9 @@ RTPLog | sqlalchemy table
 DataBaseInterface | interface to data database
 '''
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
-from sqlalchemy import event, DDL, UniqueConstraint, PrimaryKeyConstraint
+from sqlalchemy import event, DDL
 from sqlalchemy.orm import relationship, backref
-import os, sys, logging
+import logging
 import paper as ppdata
 
 Base = ppdata.Base
