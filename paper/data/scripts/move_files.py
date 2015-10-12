@@ -20,7 +20,7 @@ import shutil
 import time
 import uuid
 import paper as ppdata
-from paper.data import dbi as pdbi
+from paper.data import dbi as pdbi, file_data
 
 def null_check(dbi, source_host, source_paths):
 	'''
@@ -86,28 +86,21 @@ def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_pa
 	dest_host | str: output host --defaults to None
 	dest_path | str: output directory --defaults to None
 	'''
-	named_host = socket.gethostname()
-	source_host = raw_input('Source directory host: ') if source_host is None else source_host
 	dest_host = raw_input('Destination directory host: ') if dest_host is None else dest_host
 	dest_path = raw_input('Destination directory: ') if dest_path is None else dest_path
 
-	if source_paths is None:
-		if named_host == source_host:
-			source_paths = sorted(glob.glob(raw_input('Source directory path: ')))
-		else:
-			with ppdata.ssh_scope(host) as ssh:
-				source_paths_str = raw_input('Source directory path: ')
-				_, path_out, _ = ssh.exec_command('ls -d {source_paths_str}'.format(source_paths_str=source_paths_str))
-				source_paths = sorted(path_out.read().split('\n')[:-1])
-	
+	if source_host is None or source_paths is None:
+		source_host, source_paths_str = file_data.source_info()
+		source_paths = file_data.parse_sources(source_host, source_paths_str)
+
 	nulls = null_check(source_host, source_paths)
 	if not nulls:
-		#if any file not in db -- don't move anything
 		print('File(s) not in database')
 		return
 
 	destination = ':'.join((dest_host, dest_path))
 	with dbi.session_scope() as s:
+		named_host = socket.gethostname()
 		if named_host == source_host:
 			for source_path in source_paths:
 				ppdata.rsync_copy(source_path, destination)

@@ -13,11 +13,9 @@ add_feeds_to_db | adds entries to feed table
 add_feeds | parses list of files then adds them to paperdata database
 '''
 from __future__ import print_function
-import sys
 import os
+import sys
 import time
-import glob
-import socket
 import uuid
 import aipy as A
 import paper as ppdata
