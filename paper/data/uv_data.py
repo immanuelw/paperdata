@@ -6,7 +6,7 @@ author | Immanuel Washington
 Functions
 ---------
 five_round | rounds value to five decimal places
-jdpol2obsnum | generates unique observation number
+jdpol_to_obsnum | generates unique observation number
 date_info | pulls information about observation from julian date
 is_edge | checks if observation is on edge of observing period
 calc_times | pulls time information from uv file object
@@ -35,7 +35,7 @@ def five_round(num):
 	'''
 	return round(num, 5)
 
-def jdpol2obsnum(jd, pol, djd):
+def jdpol_to_obsnum(jd, pol, djd):
 	'''
 	calculates unique observation number for observations
 
@@ -50,11 +50,11 @@ def jdpol2obsnum(jd, pol, djd):
 	int: a unique integer index for observation
 	'''
 	dublinjd = jd - 2415020  #use Dublin Julian Date
-	obsint = int(dublinjd/djd)  #divide up by length of obs
-	polnum = A.miriad.str2pol[pol]+10
-	assert(obsint < 2**31)
+	obsint = int(dublinjd / djd)  #divide up by length of obs
+	polnum = pdbi.str_to_pol[pol] + 10
+	assert(obsint < 2 ** 31)
 
-	return int(obsint + polnum*(2**32))
+	return int(obsint + polnum * (2 ** 32))
 
 def date_info(julian_date):
 	'''
@@ -234,7 +234,7 @@ def calc_uv_data(host, path):
 			#indicates julian date
 			julian_date = five_round(uv['time'])
 
-			pol_dict = pdbi.str2pol
+			pol_dict = pdbi.str_to_pol
 			#assign letters to each polarization
 			if uv['npol'] == 1:
 				polarization = pol_dict[uv['pol']]
@@ -243,7 +243,7 @@ def calc_uv_data(host, path):
 
 			#gives each file unique id
 			if length > 0:
-				obsnum = jdpol2obsnum(julian_date, polarization, length)
+				obsnum = jdpol_to_obsnum(julian_date, polarization, length)
 			else:
 				obsnum = None
 

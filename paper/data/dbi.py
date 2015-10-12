@@ -29,18 +29,18 @@ logger = logging.getLogger('paper.data')
 #
 #########
 
-str2pol = {	'I' :  1,   # Stokes Paremeters
-			'Q' :  2,
-			'U' :  3,
-			'V' :  4,
-			'rr': -1,   # Circular Polarizations
-			'll': -2,
-			'rl': -3,
-			'lr': -4,
-			'xx': -5,   # Linear Polarizations
-			'yy': -6,
-			'xy': -7,
-			'yx': -8}
+str_to_pol = {	'I' :  1,   # Stokes Paremeters
+				'Q' :  2,
+				'U' :  3,
+				'V' :  4,
+				'rr': -1,   # Circular Polarizations
+				'll': -2,
+				'rl': -3,
+				'lr': -4,
+				'xx': -5,   # Linear Polarizations
+				'yy': -6,
+				'xy': -7,
+				'yx': -8}
 
 #############
 #

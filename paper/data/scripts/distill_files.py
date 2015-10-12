@@ -7,8 +7,8 @@ author | Immanuel Washington
 
 Functions
 ---------
-file2jd | pulls julian date from filename
-file2pol | pulls polarization from filename
+file_to_jd | pulls julian date from filename
+file_to_pol | pulls polarization from filename
 add_files_to_distill | adds files to paperdistiller database after pulling some relevant information
 '''
 from __future__ import print_function
@@ -21,7 +21,7 @@ import numpy as n
 from paper.data import uv_data
 from paper.distiller import dbi as ddbi
 
-def file2jd(path):
+def file_to_jd(path):
 	'''
 	pulls julian date from filename using regex
 
@@ -35,7 +35,7 @@ def file2jd(path):
 	'''
 	return re.findall(r'\d+\.\d+', path)[0]
 
-def file2pol(path):
+def file_to_pol(path):
 	'''
 	pulls polarization from filename using regex
 
@@ -67,8 +67,8 @@ def add_files_to_distill(source_paths):
 
 	#now run through all the files and build the relevant information for the db
 	# get the pols
-	pols = [file2pol(source_path) for source_path in source_paths]
-	jds = n.array([file2jd(source_path) for source_path in source_paths])
+	pols = [file_to_pol(source_path) for source_path in source_paths]
+	jds = n.array([file_to_jd(source_path) for source_path in source_paths])
 	nights = list(set(jds.astype(n.int)))
 
 	jds_onepol = n.sort([jd for i, jd in enumerate(jds) if pols[i] == pols[0] and jd.astype(int) == nights[0]])
@@ -82,19 +82,20 @@ def add_files_to_distill(source_paths):
 	for night in nights:
 		print('adding night', night)
 		obsinfo = []
-		nightfiles = [source_path for source_path in source_paths if int(float(file2jd(source_path))) == night]
+		nightfiles = [source_path for source_path in source_paths if int(float(file_to_jd(source_path))) == night]
 		print(len(nightfiles))
 		for pol in pols:
 			#filter off all pols but the one I'm currently working on
-			files = sorted([source_path for source_path in nightfiles if file2pol(source_path) == pol])
+			files = sorted([source_path for source_path in nightfiles if file_to_pol(source_path) == pol])
 			with dbi.session_scope() as s:
 				for i, source_path in enumerate(files):
 					try:
-						dbi.get_entry(ddbi, s, 'observation', uv_data.jdpol2obsnum(float(file2jd(source_path)), file2pol(source_path), djd))
+						dbi.get_entry(ddbi, s, 'observation',
+										uv_data.jdpol_to_obsnum(float(file_to_jd(source_path)), file_to_pol(source_path), djd))
 						print(source_path, 'found in db, skipping')
 					except:
-						obsinfo.append({'julian_date': float(file2jd(source_path)),
-										'pol': file2pol(source_path),
+						obsinfo.append({'julian_date': float(file_to_jd(source_path)),
+										'pol': file_to_pol(source_path),
 										'host': socket.gethostname(),
 										'filename': source_path,
 										'length': djd}) #note the db likes jd for all time units
