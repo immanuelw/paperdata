@@ -6,6 +6,7 @@ author | Immanuel Washington
 Functions
 ---------
 decimal_default | json fix for decimal types
+json_data | dumps objects into json file
 rsync_copy | pythonic rsync
 ssh_scope | ssh connection
 
