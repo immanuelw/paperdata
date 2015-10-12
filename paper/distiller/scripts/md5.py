@@ -22,9 +22,9 @@ def update_md5(dbi):
 	'''
 	with dbi.session_scope() as s:
 		table = ddbi.File
-		FILEs = s.query(table).filter(getattr(table, 'md5sum') == None).all()
+		FILEs = s.query(table).filter(table.md5sum == None).all()
 		for FILE in FILEs:
-			dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(getattr(FILE, 'host'), getattr(FILE, 'filename')))
+			dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(FILE.host, FILE.filename))
 
 if __name__ == '__main__':
 	dbi = ddbi.DataBaseInterface()
