@@ -206,7 +206,7 @@ def rtp_summary_table():
 		if not julian_day is None:
 			file_dict = file_info[julian_day]
 			sum_dict = summary_dict[julian_day]
-			year, month, day, _ = convert.jd2gcal(convert.MJD_0, julian_day - convert.MJD_0)
+			year, month, day, _ = convert.jd_to_gcal(convert.MJD_0, julian_day - convert.MJD_0)
 			sum_dict['gregorian_day'] = '{year}-{month}-{day}'.format(year=year, month=month, day=day)
 			sum_dict['lst_range'] = file_dict['lst_range'] 
 			sum_dict['file_count'] = file_dict['count']

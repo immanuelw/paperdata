@@ -12,7 +12,7 @@ get_jd_from_datetime | calculates start and end julian dates from datetimes
 get_utc_from_datetime | calculates utc time from datetime
 '''
 from datetime import datetime
-from paper.convert import gcal2jd
+from paper.convert import gcal_to_jd
 
 def time_val(value):
 	'''
@@ -83,9 +83,9 @@ def get_jd_from_datetime(start_time=None, end_time=None):
 	if isinstance(end_time, str):
 		end_time = datetime.strptime(end_time, '%Y-%m-%dT%H:%M:%S')
 	if start_time is not None:
-		time_start = gcal2jd(start_time.year, start_time.month, start_time.day, start_time.hour, start_time.minute, start_time.second)
+		time_start = gcal_to_jd(start_time.year, start_time.month, start_time.day, start_time.hour, start_time.minute, start_time.second)
 	if end_time is not None:
-		time_end = gcal2jd(end_time.year, end_time.month, end_time.day, end_time.hour, end_time.minute, end_time.second)
+		time_end = gcal_to_jd(end_time.year, end_time.month, end_time.day, end_time.hour, end_time.minute, end_time.second)
 	if time_end is None:
 		return time_start
 

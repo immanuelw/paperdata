@@ -13,8 +13,8 @@ decimal_to_sexagesimal
 sexagesimal_to_decimal
 fpart | fractional part of value
 ipart | integer part of value
-gcal2jd | gregorian time date to julian date
-jd2gcal | julian date to gregorian time date
+gcal_to_jd | gregorian time date to julian date
+jd_to_gcal | julian date to gregorian time date
 time_to_decimal
 decimal_to_time
 date_to_juliandate
@@ -177,7 +177,7 @@ def ipart(x):
 	'''
 	return math.modf(x)[1]
 
-def gcal2jd(year, month, day, hour=None, minute=None, second=None):
+def gcal_to_jd(year, month, day, hour=None, minute=None, second=None):
 	'''
 	converts gregorian date into julian date
 
@@ -218,7 +218,7 @@ def gcal2jd(year, month, day, hour=None, minute=None, second=None):
 
 	return MJD_0, round(jd, 5)
 
-def jd2gcal(jd1, jd2):
+def jd_to_gcal(jd1, jd2):
 	'''
 	convert julian date into partial gregorian date
 
