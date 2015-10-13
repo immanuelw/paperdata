@@ -11,6 +11,7 @@ degrees_to_hours
 radians_to_hours
 decimal_to_sexagesimal
 sexagesimal_to_decimal
+ipart | integer part of number as float
 gcal_to_jd | gregorian time date to julian date
 jd_to_gcal | julian date to gregorian time date
 time_to_decimal
@@ -180,6 +181,12 @@ def sexagesimal_to_decimal(hd, minutes, seconds):
 	10.1
 	'''
 	return hd + minutes / 60. + seconds / 3600.
+
+def ipart(num):
+	'''
+	gets integer part of number as float
+	'''
+	return float(int(num))
 
 def gcal_to_jd(year, month, day, hour=None, minute=None, second=None):
 	'''
