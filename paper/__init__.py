@@ -117,7 +117,7 @@ def ssh_scope(host, username=None):
 			ssh.connect(host, key_filename=key_filename)
 			yield ssh
 		except:
-			return None
+			yield None
 	finally:
 		ssh.close()
 
