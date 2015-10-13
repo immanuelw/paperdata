@@ -25,6 +25,11 @@ def time_val(value):
 	Returns
 	-------
 	float: numerical time value divided
+
+	>>> time_val(143)
+	143
+	>>> time_val(675)
+	11
 	'''
 	time_val = 1 if value < 500 else 60 if value < 3600 else 3600 if value < 86400 else 86400
 
@@ -41,6 +46,11 @@ def str_val(value):
 	Returns
 	-------
 	str: time unit
+
+	>>> time_val(143)
+	seconds ago
+	>>> time_val(675)
+	minutes ago
 	'''
 	str_val = 'seconds' if value < 500 else 'minutes' if value < 3600 else 'hours' if value < 86400 else 'days'
 	str_val = ' '.join((str_val, 'ago'))
@@ -73,8 +83,11 @@ def get_jd_from_datetime(start_time=None, end_time=None):
 
 	Returns
 	-------
+	tuple:
+		float: time start of julian date
+		float: time end of julian date
+	OR
 	float: time start of julian date
-	float: time end of julian date
 	'''
 	time_start = None
 	time_end = None
