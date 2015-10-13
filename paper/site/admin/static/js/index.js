@@ -45,6 +45,9 @@ $(function() {
 		dataType: 'html'
 	});
 
+	getComments();
+});
+
 function abortRequestIfPending(request) {
 	if (request) {
 		request.abort();
