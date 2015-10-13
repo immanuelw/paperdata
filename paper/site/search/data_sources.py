@@ -171,7 +171,7 @@ def get_graph_types():
 	'''
 	get all graph types
 	'''
-	graph_types = db_utils.query(database='search', table='GraphType', field_tuples=(('name', '!=', 'Obs_File'),)
+	graph_types = db_utils.query(database='search', table='GraphType', field_tuples=(('name', '!=', 'Obs_File'),))
 
 	return render_template('graph_type_list.html', graph_types=graph_types)
 

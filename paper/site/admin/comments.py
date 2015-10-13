@@ -27,7 +27,7 @@ def get_all_comments():
 	try:
 		threads = db_utils.query(database='admin', table='Thread', sort_tuples=(('last_updated', 'desc'),))
 		for thread in threads:
-			thread.comments = db_utils.query(database='admin', table='Comment', field_tuples=(('thread_id', '==', thread.id),)))
+			thread.comments = db_utils.query(database='admin', table='Comment', field_tuples=(('thread_id', '==', thread.id),))
 	except:
 		return make_response('Threads not found', 500)
 

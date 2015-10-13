@@ -37,7 +37,7 @@ def insert_set_into_db(name, start, end, flagged_range_dicts, polarization, era_
 	flagged_data_hrs | int: flagged data hours
 	'''
 	new_set = models.Set(username=g.user.username, name=name, start=start, end=end, polarization=polarization, era_type=era_type,
-							host=host, filetype=filetype, total_data_hrs=total_data_hrs, flagged_data_hrs)
+							host=host, filetype=filetype, total_data_hrs=total_data_hrs, flagged_data_hrs=flagged_data_hrs)
 	db.session.add(new_set)
 	db.session.flush()
 	db.session.refresh(new_set) # So we can get the set's id

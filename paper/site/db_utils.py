@@ -19,8 +19,8 @@ from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 from paper.site.search import models as sdbi
 from paper.site.admin import models as adbi
-from paper.site.search.flask_app import db
-from paper.site.admin.flask_app import db
+from paper.site.flask_app import search_db as sdb
+from paper.site.flask_app import admin_db as adb
 from sqlalchemy import or_
 from sqlalchemy.engine import reflection
 import socket
