@@ -23,10 +23,11 @@ def current_db(dbi):
 	with dbi.session_scope() as s:
 		FILEs = s.query(pdbi.File).all()
 	out_vars = ('era', 'julian_day', 'host', 'base_path', 'filetype', 'init_host')
-	current = ((getattr(FILE, out_var) for out_var in out_vars) for FILE in FILEs)
+	current = (getattr(FILE, out_var) for out_var in out_vars for FILE in FILEs)
 
 	count = {}
 	for entry in current:
+		print(entry)
 		if entry in count.keys():
 			count[entry] += 1
 		else:
