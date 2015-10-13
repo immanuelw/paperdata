@@ -7,6 +7,8 @@ Modules
 -------
 dbi | paperdata database interface
 data_db | paperdata database tables schema
+file_data | shared file metadata parsing functions
+uv_data | shared uv file data parsing functions
 
 Scripts
 -------

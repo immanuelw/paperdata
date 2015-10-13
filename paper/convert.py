@@ -11,8 +11,6 @@ degrees_to_hours
 radians_to_hours
 decimal_to_sexagesimal
 sexagesimal_to_decimal
-fpart | fractional part of value
-ipart | integer part of value
 gcal_to_jd | gregorian time date to julian date
 jd_to_gcal | julian date to gregorian time date
 time_to_decimal
@@ -76,6 +74,9 @@ def hours_to_degrees(angle):
 	Returns
 	-------
 	float: angle in degrees
+
+	>>> hours_to_degrees(5.1)
+	76.5
 	'''
 	return angle * 15.
 
@@ -90,6 +91,9 @@ def hours_to_radians(angle):
 	Returns
 	-------
 	float: angle in radians
+
+	>>> hours_to_radians(5.1)
+	1.3351768777756621
 	'''
 	return np.radians(hours_to_degrees(angle))
 
@@ -104,6 +108,9 @@ def degrees_to_hours(angle):
 	Returns
 	-------
 	float: angle in decimal hours
+
+	>>> degrees_to_hours(12)
+	0.8
 	'''
 	return angle / 15.
 
@@ -118,6 +125,9 @@ def radians_to_hours(angle):
 	Returns
 	-------
 	float: angle in decimal hours
+
+	>>> radians_to_hours(12)
+	45.836623610465857
 	'''
 	return degrees_to_hours(np.degrees(angle))
 
@@ -140,6 +150,9 @@ def decimal_to_sexagesimal(decimal):
 		int: degrees
 		int: arcminutes
 		float: arcseconds
+
+	>>> decimal_to_sexagesimal(10.1)
+	(10, 5, 59.999999999998721)
 	'''
 	fractional, integral = np.modf(decimal)
 	min_fractional, minutes = np.modf(fractional * 60)
@@ -162,20 +175,11 @@ def sexagesimal_to_decimal(hd, minutes, seconds):
 	Returns
 	-------
 	float: decimal hours or degrees
+
+	>>> sexagesimal_to_decimal(10, 5, 59.999999999998721)
+	10.1
 	'''
 	return hd + minutes / 60. + seconds / 3600.
-
-def fpart(x):
-	'''
-	returns fractional part of given number
-	'''
-	return math.modf(x)[0]
-
-def ipart(x):
-	'''
-	returns integer part of given number
-	'''
-	return math.modf(x)[1]
 
 def gcal_to_jd(year, month, day, hour=None, minute=None, second=None):
 	'''
@@ -195,6 +199,9 @@ def gcal_to_jd(year, month, day, hour=None, minute=None, second=None):
 	tuple:
 		float: modified jd,
 		float(5): julian date
+
+	>>> gcal_to_jd(1993, 10, 25, 2, 0, 5)
+	(2400000.5, 49285.08339)
 	'''
 	year = int(year)
 	month = int(month)
@@ -234,6 +241,9 @@ def jd_to_gcal(jd1, jd2):
 		int: month
 		int: day
 		float: fractional value of the gregorian day
+
+	>>> jd_to_gcal(2400000.5, 49285.08339)
+	(1993, 10, 25, 0.08338999999978114)
 	'''
 	from math import modf
 
@@ -270,7 +280,7 @@ def jd_to_gcal(jd1, jd2):
 
 def time_to_decimal(time):
 	'''
-	converts a time or datetime object into decimal time
+	converts a time/datetime object into decimal time
 
 	Parameters
 	----------
@@ -294,8 +304,11 @@ def decimal_to_time(hours):
 	Returns
 	-------
 	object: datetime.time
+
+	>>> decimal_to_time(17.6)
+	datetime.time(17, 36)
 	'''
-	hours, minutes, seconds = base.decimal_to_sexagesimal(hours)
+	hours, minutes, seconds = decimal_to_sexagesimal(hours)
 	seconds_frac, seconds = math.modf(seconds)
 	seconds = int(seconds)
 	microseconds = int(seconds_frac * 1e6)
@@ -318,6 +331,9 @@ def date_to_juliandate(year, month, day):
 	Returns
 	-------
 	float(5): The Julian Date for the given year, month, and day
+
+	>>> date_to_juliandate(1993, 10, 25)
+	2449285.5
 	'''
 	year1 = year
 	month1 = month
@@ -371,6 +387,9 @@ def juliandate_to_modifiedjd(juliandate):
 	Returns
 	-------
 	float: the Modified Julian Date
+
+	>>> juliandate_to_modifiedjd(2449285.5)
+	49285.0
 	'''
 	return juliandate - 2400000.5
 
@@ -385,6 +404,9 @@ def modifiedjd_to_juliandate(modifiedjd):
 	Returns
 	-------
 	float: Julian Date
+
+	>>> modifiedjd_to_juliandate(49285.0)
+	2449285.5
 	'''
 	return modifiedjd + 2400000.5
 
@@ -415,6 +437,9 @@ def juliandate_to_gmst(juliandate):
 	Returns
 	-------
 	float: decimal hours in GMST
+
+	>>> juliandate_to_gmst(2455903.0)
+	17.060789746482214
 	'''
 	jd0 = int(juliandate - .5) + .5  # Julian Date of previous midnight
 	h = (juliandate - jd0) * 24.  # Hours since mightnight
@@ -439,6 +464,9 @@ def utc_to_gmst(dt):
 	Returns
 	-------
 	float: decimal hours in GMST
+
+	>>> utc_to_gmst(datetime.datetime(2011, 12, 7, 12, 0))
+	17.060789746482214
 	'''
 	jd = datetime_to_juliandate(dt)
 
@@ -484,6 +512,9 @@ def juliandate_to_utc(juliandate):
 	Returns
 	-------
 	object: datetime object in UTC time
+
+	>>> juliandate_to_utc(2455903.0)
+	datetime.datetime(2011, 12, 7, 12, 0)
 	'''
 	juliandate += .5
 	jd_frac, jd_int = math.modf(juliandate)
@@ -534,6 +565,9 @@ def modifiedjd_to_utc(modifiedjd):
 	Returns
 	-------
 	object: datetime object in UTC time
+
+	>>> modifiedjd_to_utc(49285.0)
+	datetime.datetime(1993, 10, 25, 0, 0)
 	'''
 	juliandate = modifiedjd_to_juliandate(modifiedjd)
 
@@ -552,8 +586,10 @@ def gmst_to_lst(hours, longitude):
 	-------
 	float: decimal hours in LST
 
+	>>> gmst_to_lst(14, 20)
+	15.333333333333334
 	'''
-	longitude_time = angles.degrees_to_hours(longitude)
+	longitude_time = degrees_to_hours(longitude)
 	lst = hours + longitude_time
 	lst %= 24
 
@@ -571,8 +607,11 @@ def lst_to_gmst(hours, longitude):
 	Returns
 	-------
 	float: decimal hours in GMST
+
+	>>> lst_to_gmst(15, 60)
+	11.0
 	'''
-	longitude_time = angles.degrees_to_hours(longitude)
+	longitude_time = degrees_to_hours(longitude)
 	gmst = hours - longitude_time
 	gmst %= 24
 
