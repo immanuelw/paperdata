@@ -18,12 +18,19 @@ import restore_db
 import move_files
 import delete_files
 
-if __name__ == '__main__':
+def module_test():
+	'''
+	runs doctest on modules
+	'''
 	print('testing modules')
 	doctest.testmod(convert)
 	doctest.testmod(file_data)
 	doctest.testmod(uv_data)
 
+def script_test():
+	'''
+	runs tests of scripts
+	'''
 	print('instantiating database interface object...')
 	dbi = pdbi.DataBaseInterface(configfile=os.path.expanduser('~/paperdata/test.cfg'))
 	
@@ -82,4 +89,8 @@ if __name__ == '__main__':
 	print('deleting copied files...')
 	shutil.rmtree(del_dir)
 
-	print('Test Complete!')
+	print('Script test Complete!')
+
+if __name__ == '__main__':
+	module_test()
+	script_test()
