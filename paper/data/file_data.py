@@ -79,7 +79,7 @@ def calc_size(host, path):
 	-------
 	float: size of directory or file in MB
 
-	>>> calc_size('folio', '/home/immwa/zen/test.uv')
+	>>> calc_size('folio', '/home/immwa/zen.test.uv')
 	...
 	'''
 	named_host = socket.gethostname()

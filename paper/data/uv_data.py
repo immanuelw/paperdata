@@ -106,7 +106,14 @@ def is_edge(prev_obs, next_obs):
 
 	Returns
 	-------
-	bool: on the edge of a julian day
+	bool: on the edge of a julian day or None
+
+	>>> is_edge(None, None)
+	...
+	>>> is_edge(None, object)
+	True
+	>>> is_edge(object, object)
+	False
 	'''
 	if (prev_obs, next_obs) == (None, None):
 		is_edge = None
