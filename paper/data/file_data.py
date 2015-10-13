@@ -137,7 +137,7 @@ def calc_md5sum(host, path):
 	-------
 	str: md5 checksum
 
-	>>> calc_md5sum('folio', '/home/immwa/zen.text.uv')
+	>>> calc_md5sum('folio', '/home/immwa/zen.test.uv')
 	...
 	'''
 	named_host = socket.gethostname()
@@ -172,7 +172,7 @@ def file_names(path):
 		str: extension/filetype
 
 	>>> file_names('/home/immwa/zen.test.uv')
-	('/home/immwa/', 'zen.test.uv', 'uv')
+	('/home/immwa', 'zen.test.uv', 'uv')
 	'''
 	base_path, filename = os.path.split(path)
 	filetype = filename.split('.')[-1]

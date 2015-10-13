@@ -53,7 +53,7 @@ def jdpol_to_obsnum(jd, pol, djd):
 	int: a unique integer index for observation
 
 	>>> jdpol_to_obsnum(2456600, 'xx', 0.00696)
-	...
+	21480810617
 	'''
 	dublinjd = jd - 2415020  #use Dublin Julian Date
 	obsint = int(dublinjd / djd)  #divide up by length of obs
@@ -79,7 +79,7 @@ def date_info(julian_date):
 		float(1): lst hours rounded to one decimal place
 
 	>>> date_info(2456604.16671)
-	(64, 2456604, ...)
+	(128, 2456604, 20.8)
 	'''
 	if julian_date < 2456100:
 		era = 32
