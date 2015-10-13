@@ -32,6 +32,9 @@ def five_round(num):
 	Returns
 	-------
 	float(5): number
+
+	>>> five_round(2455903.1667113231)
+	2455903.16671
 	'''
 	return round(num, 5)
 
@@ -48,6 +51,9 @@ def jdpol_to_obsnum(jd, pol, djd):
 	Returns
 	-------
 	int: a unique integer index for observation
+
+	>>> jdpol_to_obsnum(2456600, 'xx', 0.00696)
+	...
 	'''
 	dublinjd = jd - 2415020  #use Dublin Julian Date
 	obsint = int(dublinjd / djd)  #divide up by length of obs
@@ -71,6 +77,9 @@ def date_info(julian_date):
 		int: era of julian date
 		int: julian day
 		float(1): lst hours rounded to one decimal place
+
+	>>> date_info(2456604.16671)
+	(64, 2456604, ...)
 	'''
 	if julian_date < 2456100:
 		era = 32

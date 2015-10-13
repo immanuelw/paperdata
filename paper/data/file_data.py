@@ -33,6 +33,9 @@ def get_size(path):
 	Returns
 	-------
 	int: amount of bytes
+
+	>>> get_size('/home/immwa/zen.test.uv/')
+	...
 	'''
 	total_size = 0
 	for dirpath, dirnames, filenames in os.walk(path):
@@ -53,6 +56,9 @@ def sizeof_fmt(num):
 	Returns
 	-------
 	float: amount of MB to 1 decimal place
+
+	>>> sizeof_fmt(1048576)
+	1.0
 	'''
 	for byte_size in ('KB', 'MB'):
 		num /= 1024.0
@@ -72,6 +78,9 @@ def calc_size(host, path):
 	Returns
 	-------
 	float: size of directory or file in MB
+
+	>>> calc_size('folio', '/home/immwa/zen/test.uv')
+	...
 	'''
 	named_host = socket.gethostname()
 	if named_host == host:
@@ -95,6 +104,9 @@ def get_md5sum(path):
 	Returns
 	-------
 	str: 32-bit hex integer md5 checksum
+
+	>>> get_md5sum('/home/immwa/zen.test.uv')
+	...
 	'''
 	path = path.split(':')[-1]
 	BLOCKSIZE = 65536
@@ -124,6 +136,9 @@ def calc_md5sum(host, path):
 	Returns
 	-------
 	str: md5 checksum
+
+	>>> calc_md5sum('folio', '/home/immwa/zen.text.uv')
+	...
 	'''
 	named_host = socket.gethostname()
 	if named_host == host:
@@ -155,6 +170,9 @@ def file_names(path):
 		str: base path
 		str: directory/file name
 		str: extension/filetype
+
+	>>> file_names('/home/immwa/zen.test.uv')
+	('/home/immwa/', 'zen.test.uv', 'uv')
 	'''
 	base_path, filename = os.path.split(path)
 	filetype = filename.split('.')[-1]
