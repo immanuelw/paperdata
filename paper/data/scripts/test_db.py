@@ -7,9 +7,11 @@ author | Immanuel Washington
 '''
 from __future__ import print_function
 import os
+import doctest
 import glob
 import shutil
-from paper.data import dbi as pdbi
+from paper.data import dbi as pdbi, uv_data, file_data
+from paper import convert
 import add_files
 import backup_db
 import restore_db
@@ -17,6 +19,11 @@ import move_files
 import delete_files
 
 if __name__ == '__main__':
+	print('testing modules')
+	doctest.testmod(convert)
+	doctest.testmod(file_data)
+	doctest.testmod(uv_data)
+
 	print('instantiating database interface object...')
 	dbi = pdbi.DataBaseInterface(configfile=os.path.expanduser('~/paperdata/test.cfg'))
 	
