@@ -172,7 +172,7 @@ def file_names(path):
 		str: extension/filetype
 
 	>>> file_names('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
-	('/home/immwa', 'zen.2456617.17386.xx.uvcRRE', 'uvcRRE')
+	('/home/immwa/test_data', 'zen.2456617.17386.xx.uvcRRE', 'uvcRRE')
 	'''
 	base_path, filename = os.path.split(path)
 	filetype = filename.split('.')[-1]
