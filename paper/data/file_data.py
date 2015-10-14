@@ -35,7 +35,7 @@ def get_size(path):
 	int: amount of bytes
 
 	>>> get_size('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
-	...
+	215132692
 	'''
 	total_size = 0
 	for dirpath, dirnames, filenames in os.walk(path):
@@ -80,7 +80,7 @@ def calc_size(host, path):
 	float: size of directory or file in MB
 
 	>>> calc_size('folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
-	...
+	205.2
 	'''
 	named_host = socket.gethostname()
 	if named_host == host:
@@ -106,7 +106,7 @@ def get_md5sum(path):
 	str: 32-bit hex integer md5 checksum
 
 	>>> get_md5sum('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
-	...
+	'7d5ac942dd37c4ddfb99728359e42331'
 	'''
 	path = path.split(':')[-1]
 	BLOCKSIZE = 65536
@@ -115,7 +115,7 @@ def get_md5sum(path):
 		afile = open(path, 'rb')
 	except(IOError):
 		fname = os.path.join(path, 'visdata')
-		afile = open(path, 'rb')
+		afile = open(fname, 'rb')
 	buf = afile.read(BLOCKSIZE)
 	while len(buf) > 0:
 		hasher.update(buf)
@@ -138,7 +138,7 @@ def calc_md5sum(host, path):
 	str: md5 checksum
 
 	>>> calc_md5sum('folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
-	...
+	'7d5ac942dd37c4ddfb99728359e42331'
 	'''
 	named_host = socket.gethostname()
 	if named_host == host:
