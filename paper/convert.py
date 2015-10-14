@@ -185,6 +185,14 @@ def sexagesimal_to_decimal(hd, minutes, seconds):
 def ipart(num):
 	'''
 	gets integer part of number as float
+
+	Parameters
+	----------
+	num | float: number
+
+	Returns
+	-------
+	float: number as a float rounded to 0 decimal places
 	'''
 	return float(int(num))
 
