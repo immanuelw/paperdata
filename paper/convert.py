@@ -193,6 +193,9 @@ def ipart(num):
 	Returns
 	-------
 	float: number as a float rounded to 0 decimal places
+
+	>>> ipart(15.63423)
+	15.0
 	'''
 	return float(int(num))
 
