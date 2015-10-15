@@ -17,6 +17,7 @@ from __future__ import print_function
 import os
 import sys
 import socket
+import paper as ppdata
 from paper.data import dbi as pdbi
 import paper.convert as convert
 import aipy as A
@@ -136,10 +137,13 @@ def calc_times(uv):
 		float(5): time start
 		float(5): time end
 		float(5): delta time
-		float(5): length of uv file object
+		float(5): length of uv file observation
 	OR
 	tuple:
 		None for very field
+
+	>>> calc_times(A.miriad.UV('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'))
+	(2456617.17386, 2456617.18032, 0.0005, 0.00696)
 	'''
 	time_start = 0
 	time_end = 0
@@ -188,17 +192,19 @@ def calc_npz_data(dbi, filename):
 		float(5): julian date
 		str: polarization
 		float(5): length
-		int: obsnum of uv file object
+		int: obsnum of uv file observation
 	OR
 	tuple:
 		None for every field if no corresponding observation found
+
+	>>> calc_npz_data(pdbi.DataBaseInterface(), '/home/immwa/test_data/zen.2455906.53332.uvcRE.npz')
+	(2455906.53332, 2455906.54015, 0.00012, 2455906.53332, 'all', 0.00696, 17185743685)
 	'''
 	filetype = filename.split('.')[-1]
 	if filetype not in ('npz',):
 		return (None,) * 7
 	
-	jdate = '.'.join((filename.split('.')[1], filename.split('.')[2]))
-	julian_date = five_round(jdate)
+	julian_date = five_round(ppdata.file_to_jd(filename))
 
 	with dbi.session_scope() as s:
 		if len(filename.split('.')) == 5:
@@ -228,7 +234,7 @@ def calc_uv_data(host, path):
 		float(5): julian date
 		str: polarization
 		float(5): length
-		int: obsnum of uv file object
+		int: obsnum of uv file observation
 	OR
 	tuple:
 		None for every field if no corresponding observation found
