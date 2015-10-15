@@ -118,7 +118,7 @@ def add_files_to_distill(source_paths):
 
 		try:
 			with dbi.session_scope() as s:
-				for info_dict in obs_info:
+				for info_dict in obsinfo:
 					dbi.add_entry_dict(ddbi, s, 'observation', info_dict)
 				#dbi.add_observations(obsinfo)
 		except:

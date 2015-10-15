@@ -7,7 +7,7 @@ author | Immanuel Washington
 
 Functions
 ---------
-calc_obs_data | pulls observation and file data from files
+calc_obs_info | pulls observation and file data from files
 dupe_check | checks database for duplicate files
 set_obs | sets edge information for observations
 update_obsnums | updates observation previous and next obsnums
@@ -25,7 +25,7 @@ import paper as ppdata
 from paper.data import dbi as pdbi, uv_data, file_data
 from sqlalchemy import or_
 
-def calc_obs_data(dbi, host, path):
+def calc_obs_info(dbi, host, path):
 	'''
 	generates all relevant data from uv* file
 
@@ -42,7 +42,7 @@ def calc_obs_data(dbi, host, path):
 		dict: file values
 		dict: log values
 
-	>>> calc_obs_data(pdbi.DataBaseInterface(), 'folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
+	>>> calc_obs_info(pdbi.DataBaseInterface(), 'folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
 	({...}, {...}, {...})
 	'''
 	base_path, filename, filetype = file_data.file_names(path)
@@ -62,7 +62,7 @@ def calc_obs_data(dbi, host, path):
 
 	timestamp = int(time.time())
 
-	obs_data = {'obsnum': obsnum,
+	obs_info = {'obsnum': obsnum,
 				'julian_date': julian_date,
 				'polarization': polarization,
 				'julian_day': julian_day,
@@ -78,7 +78,7 @@ def calc_obs_data(dbi, host, path):
 				'is_edge': None,
 				'timestamp': timestamp}
 
-	file_data = {'host': host,
+	file_info = {'host': host,
 				'base_path': base_path,
 				'filename': filename,
 				'filetype': filetype,
@@ -92,13 +92,13 @@ def calc_obs_data(dbi, host, path):
 				'is_deletable': False,
 				'timestamp': timestamp}
 
-	log_data = {'action': 'add by scan',
+	log_info = {'action': 'add by scan',
 				'table': None,
 				'identifier': source,
 				'log_id': str(uuid.uuid4()),
 				'timestamp': timestamp}
 
-	return obs_data, file_data, log_data
+	return obs_info, file_info, log_info
 
 def dupe_check(dbi, source_host, source_paths):
 	'''
@@ -236,17 +236,17 @@ def add_files_to_db(dbi, source_host, source_paths):
 		for source_path in source_paths:
 			base_path = os.path.dirname(source_path)
 			filename = os.path.basename(source_path)
-			obs_data, file_data, log_data = calc_obs_data(source_host, source_path)
+			obs_info, file_info, log_info = calc_obs_info(source_host, source_path)
 			try:
-				dbi.add_entry_dict(s, 'Observation', obs_data)
+				dbi.add_entry_dict(s, 'Observation', obs_info)
 			except:
 				print('Failed to load in obs ', base_path, filename)
 			try:
-				dbi.add_entry_dict(s, 'File', file_data)
+				dbi.add_entry_dict(s, 'File', file_info)
 			except:
 				print('Failed to load in file ', base_path, filename)
 			try:
-				dbi.add_entry_dict(s, 'Log', log_data)
+				dbi.add_entry_dict(s, 'Log', log_info)
 			except:
 				print('Failed to load in log ', base_path, filename)
 
