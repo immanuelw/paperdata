@@ -198,7 +198,7 @@ def calc_npz_data(dbi, filename):
 		None for every field if no corresponding observation found
 
 	>>> calc_npz_data(pdbi.DataBaseInterface(), '/home/immwa/test_data/zen.2455906.53332.uvcRE.npz')
-	(2455906.53332, 2455906.54015, 0.00012, 2455906.53332, 'all', 0.00696, 17185743685)
+	(Decimal('2455906.53332'), Decimal('2455906.54015'), Decimal('0.00012'), 2455906.53332, 'all', Decimal('0.00696'), 17185743685L)
 	'''
 	filetype = filename.split('.')[-1]
 	if filetype not in ('npz',):
