@@ -18,6 +18,7 @@ from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, 
 from sqlalchemy import event, DDL
 from sqlalchemy.orm import relationship, backref
 import logging
+import re
 import paper as ppdata
 
 Base = ppdata.Base

@@ -5,6 +5,8 @@ author | Immanuel Washington
 
 Functions
 ---------
+file_to_jd | pulls julian date from filename
+file_to_pol | pulls polarization from filename
 decimal_default | json fix for decimal types
 json_data | dumps objects into json file
 rsync_copy | pythonic rsync
@@ -37,6 +39,7 @@ import decimal
 import json
 import logging
 import paramiko
+import re
 import subprocess
 from contextlib import contextmanager
 from sqlalchemy import exc
@@ -47,6 +50,40 @@ try:
 	import configparser
 except:
 	import ConfigParser as configparser
+
+def file_to_jd(path):
+	'''
+	pulls julian date from filename using regex
+
+	Parameters
+	----------
+	path | str: path of file
+
+	Returns
+	-------
+	str: julian date
+
+	>>> file_to_jd('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
+	'2456617.17386'
+	'''
+	return re.findall(r'\d+\.\d+', path)[0]
+
+def file_to_pol(path):
+	'''
+	pulls polarization from filename using regex
+
+	Parameters
+	----------
+	path | str: path of file
+
+	Returns
+	-------
+	str: polarization
+
+	>>> file_to_pol('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
+	'xx'
+	'''
+	return re.findall(r'\.(.{2})\.', path)[0]
 
 def decimal_default(obj):
 	'''

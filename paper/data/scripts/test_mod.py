@@ -10,13 +10,9 @@ Functions
 module_test | runs doctests on modules
 '''
 from __future__ import print_function
-import os
 import doctest
-import glob
-import shutil
-from paper.data import dbi as pdbi, uv_data, file_data
+from paper.data import uv_data, file_data
 from paper import convert
-import add_files, distill_files
 
 def module_test():
 	'''
@@ -26,8 +22,6 @@ def module_test():
 	doctest.testmod(convert)
 	doctest.testmod(file_data)
 	doctest.testmod(uv_data)
-	doctest.testmod(add_files)
-	doctest.testmod(distill_files)
 
 if __name__ == '__main__':
 	module_test()

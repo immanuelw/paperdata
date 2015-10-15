@@ -232,6 +232,9 @@ def calc_uv_data(host, path):
 	OR
 	tuple:
 		None for every field if no corresponding observation found
+
+	>>> calc_uv_data('folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
+	(2456617.17386, 2456617.18032, 0.0005, 2456617.18069, 'xx', 0.00696, 21480813086)
 	'''
 	named_host = socket.gethostname()
 	if named_host == host:
