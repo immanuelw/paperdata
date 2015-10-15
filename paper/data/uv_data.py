@@ -163,10 +163,10 @@ def calc_times(uv):
 	else:
 		delta_time = -(time_start - time_end) / (n_times)
 
-		length = five_round(n_times * delta_time)
-		time_start = five_round(time_start)
-		time_end = five_round(time_end)
-		delta_time = five_round(delta_time)
+	length = five_round(n_times * delta_time)
+	time_start = five_round(time_start)
+	time_end = five_round(time_end)
+	delta_time = five_round(delta_time)
 
 	return time_start, time_end, delta_time, length
 
