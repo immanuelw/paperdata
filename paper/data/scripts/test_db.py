@@ -15,22 +15,12 @@ import os
 import doctest
 import glob
 import shutil
-from paper.data import dbi as pdbi, uv_data, file_data
-from paper import convert
+from paper.data import dbi as pdbi
 import add_files
 import backup_db
 import restore_db
 import move_files
 import delete_files
-
-def module_test():
-	'''
-	runs doctest on modules
-	'''
-	print('testing modules')
-	doctest.testmod(convert)
-	doctest.testmod(file_data)
-	doctest.testmod(uv_data)
 
 def script_test():
 	'''
@@ -97,5 +87,4 @@ def script_test():
 	print('Script test Complete!')
 
 if __name__ == '__main__':
-	module_test()
 	script_test()
