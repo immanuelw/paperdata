@@ -31,7 +31,10 @@ def file_to_jd(path):
 
 	Returns
 	-------
-	float(5): julian date
+	str: julian date
+
+	>>> file_to_jd('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
+	'2456617.17386'
 	'''
 	return re.findall(r'\d+\.\d+', path)[0]
 
@@ -46,6 +49,9 @@ def file_to_pol(path):
 	Returns
 	-------
 	str: polarization
+
+	>>> file_to_pol('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
+	'xx'
 	'''
 	return re.findall(r'\.(.{2})\.', path)[0]
 

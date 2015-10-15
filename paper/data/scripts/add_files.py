@@ -31,6 +31,7 @@ def calc_obs_data(dbi, host, path):
 
 	Parameters
 	----------
+	dbi | object: database interface object
 	host | str: host of system
 	path | str: path of uv* file
 
@@ -40,6 +41,9 @@ def calc_obs_data(dbi, host, path):
 		dict: observation values
 		dict: file values
 		dict: log values
+
+	>>> calc_obs_data(pdbi.DataBaseInterface(), 'folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
+	({...}, {...}, {...})
 	'''
 	base_path, filename, filetype = file_data.file_names(path)
 	source = ':'.join((host, path))
