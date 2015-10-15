@@ -26,4 +26,5 @@ reload_db | crawls folio for all uv files in case of catastrophic database failu
 restore_db | restores database from backup
 schema_db | schema file generation
 test_db | tests most scripts for pipeline
+test_mod | runs tests for doctests of paper pipeline
 '''

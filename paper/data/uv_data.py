@@ -250,10 +250,9 @@ def calc_uv_data(host, path):
 			#indicates julian date
 			julian_date = five_round(uv['time'])
 
-			pol_dict = pdbi.str_to_pol
 			#assign letters to each polarization
 			if uv['npol'] == 1:
-				polarization = pol_dict[uv['pol']]
+				polarization = pdbi.pol_to_str[uv['pol']]
 			elif uv['npol'] == 4:
 				polarization = 'all'
 
