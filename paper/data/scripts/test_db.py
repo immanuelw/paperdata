@@ -7,7 +7,6 @@ author | Immanuel Washington
 
 Functions
 ---------
-module_test | runs doctests on modules
 script_test | runs script functions on test uv files
 '''
 from __future__ import print_function
