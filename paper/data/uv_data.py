@@ -214,7 +214,7 @@ def calc_npz_data(dbi, filename):
 		table = pdbi.Observation
 		OBS = s.query(table).filter(table.julian_date == julian_date).filter(table.polarization == polarization).one()
 
-	return OBS.time_start, OBS.time_end, OBS.delta_time, julian_date, polarization, OBS.length, OBS.obsnum
+		return OBS.time_start, OBS.time_end, OBS.delta_time, julian_date, polarization, OBS.length, OBS.obsnum
 
 def calc_uv_data(host, path):
 	'''
