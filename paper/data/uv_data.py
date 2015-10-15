@@ -204,7 +204,7 @@ def calc_npz_data(dbi, filename):
 	if filetype not in ('npz',):
 		return (None,) * 7
 	
-	julian_date = five_round(ppdata.file_to_jd(filename))
+	julian_date = five_round(float(ppdata.file_to_jd(filename)))
 
 	with dbi.session_scope() as s:
 		if len(filename.split('.')) == 5:
