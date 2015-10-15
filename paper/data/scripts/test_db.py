@@ -32,7 +32,7 @@ def script_test():
 	dbi.create_db()
 
 	print('finding files to test...')
-	test_paths_str = os.path.expanduser('~/test_data/zen*.uvcRRE')
+	test_paths_str = os.path.expanduser('~/test_data/zen*.uv*')
 	test_paths = glob.glob(test_paths_str)
 
 	print('adding files to db...')
