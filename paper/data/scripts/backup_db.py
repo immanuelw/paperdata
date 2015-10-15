@@ -17,16 +17,17 @@ import time
 import paper as ppdata
 from paper.data import dbi as pdbi
 
-def paperbackup(dbi):
+def paperbackup(dbi, db):
 	'''
 	backups database by loading into json files, named by timestamp
 
 	Parameters
 	----------
 	dbi | object: database interface object
+	db | str: name of directory to place backups into
 	'''
 	timestamp = int(time.time())
-	backup_dir = os.path.join('/data4/paper/paperdata_backup', str(timestamp))
+	backup_dir = '/data4/paper/{db}_backup/{timestamp}'.format(db=db, timestamp=timestamp)
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 
@@ -51,4 +52,4 @@ def paperbackup(dbi):
 
 if __name__ == '__main__':
 	dbi = pdbi.DataBaseInterface()
-	paperbackup(dbi)
+	paperbackup(dbi, db='paperdata')

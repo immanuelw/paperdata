@@ -43,7 +43,7 @@ def script_test():
 	add_files.connect_observations(dbi)
 
 	print('backing up db...')
-	backup_db.paperbackup(dbi)
+	backup_db.paperbackup(dbi, db='papertest')
 
 	print('dropping db...')
 	dbi.drop_db(pdbi.Base)
