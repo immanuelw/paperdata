@@ -114,7 +114,7 @@ def get_graph():
 		else:
 			return make_response('No data source', 500)
 			#graph_data = data_sources.get_graph_data(data_source_str, start_utc, end_utc, None)
-			#data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
+			#data_source_str_nospace = data_source_str.replace(' ', 'NNN')
 			#return render_template('graph.html',
 			#						data_source_str=data_source_str, graph_data=graph_data,
 			#						plot_bands=[], template_name=template_name, is_set=False,
