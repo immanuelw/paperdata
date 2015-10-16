@@ -15,7 +15,6 @@ profile | shows user profile
 user_page | shows user page
 data_summary_table | shows data summary table
 '''
-from __future__ import unicode_literals
 from flask import render_template, flash, redirect, url_for, request, g, make_response
 from flask.ext.login import current_user
 import json
@@ -155,7 +154,7 @@ def get_graph():
 									end_time_str_short=end_time_str_short, range_end=range_end)
 		else:
 			graph_data = data_sources.get_graph_data(data_source_str, set_start, set_end, the_set)
-			data_source_str_nospace = data_source_str.replace(' ', 'ಠ_ಠ')
+			data_source_str_nospace = data_source_str.replace(' ', 'NNN')
 			return render_template('graph.html',
 									data_source_str=data_source_str, graph_data=graph_data, plot_bands=plot_bands,
 									template_name=template_name, is_set=True, data_source_str_nospace=data_source_str_nospace,
