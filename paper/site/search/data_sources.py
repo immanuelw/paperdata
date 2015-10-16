@@ -200,7 +200,7 @@ def create_data_source():
 		if len(data_source_name) == 0:
 			return jsonify(error=True, message='Name cannot be empty.')
 
-		# The data source name (with spaces replaced by ಠ_ಠ) is used as
+		# The data source name (with spaces replaced by NNN) is used as
 		# a JavaScript variable name and as an ID in HTML, so it needs
 		# to obey the rules for those identifiers, minus a few
 		# options such as $ since they would need to be escaped in
