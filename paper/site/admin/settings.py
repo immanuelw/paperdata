@@ -3,11 +3,10 @@ paper.site.admin.settings
 
 author | Immanuel Washington
 '''
-# We need a key to use Sessions (which aren't really being used yet, but we will need them in the future).
-SECRET_KEY = "secretkey"
-
 import os
+SECRET_KEY = 'secretkey'
+
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
+SQLALCHEMY_DATABASE_URI = 'postgres:///postgres'
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'migrations')
