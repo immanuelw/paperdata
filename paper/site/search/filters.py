@@ -9,7 +9,11 @@ set_hyperlink_filter | filters comment hyperlinks
 escape_single_quote_filter | fixes single quote error
 '''
 from paper.site.flask_app import search_app as app
-import re, urllib.parse
+import re
+try:
+	from urllib.parse import quote as urlparse
+except:
+	from urlparse import urlparse
 
 # Sets should be inserted into comments using the special syntax
 # @set(set name). This string will be replaced by a hyperlink to the
@@ -49,7 +53,7 @@ def set_hyperlink_filter(comment):
 		set_name = comment[expr.start() + len(EXPR_START_TEXT) : closing_paren_index]
 		set_name_stripped = set_name.strip() # Set names aren't allowed to have leading/trailing whitespace.
 
-		set_name_escaped_for_url = urllib.parse.quote(set_name_stripped)
+		set_name_escaped_for_url = urlparse(set_name_stripped)
 
 		link = ''.join(('<a href="/set/', set_name_escaped_for_url, '" target="_blank">', set_name, '</a>'))
 
