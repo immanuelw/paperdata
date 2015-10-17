@@ -59,14 +59,15 @@ def set_delete_table(s, dbi, source_host, source_path, dest_host, dest_path):
 	source = ':'.join((source_host, source_path))
 	timestamp = int(time.time())
 	FILE = dbi.get_entry(s, 'File', source)
-	dbi.set_entry(s, FILE, 'host', dest_host)
-	dbi.set_entry(s, FILE, 'base_path', dest_path)
-	dbi.set_entry(s, FILE, 'is_deletable', False)
-	dbi.set_entry(s, FILE, 'timestamp', timestamp)
-	identifier = FILE.source
+	delete_dict = {'host': dest_host,
+					'base_path': dest_path,
+					'is_deletable': False,
+					'timestamp': timestamp}
+	dbi.set_entry_dict(s, FILE, delete_dict)
+
 	log_data = {'action': 'delete',
 				'table': 'file',
-				'identifier': identifier,
+				'identifier': FILE.source,
 				'log_id': str(uuid.uuid4()),
 				'timestamp': timestamp}
 	dbi.add_entry_dict(s, 'Log', log_data)

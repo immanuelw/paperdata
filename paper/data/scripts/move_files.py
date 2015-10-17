@@ -63,13 +63,14 @@ def set_move_table(s, dbi, source_host, source_path, dest_host, dest_path):
 	source = ':'.join((source_host, source_path))
 	timestamp = int(time.time())
 	FILE = dbi.get_entry(s, 'File', source)
-	dbi.set_entry(s, FILE, 'host', dest_host)
-	dbi.set_entry(s, FILE, 'base_path', dest_path)
-	dbi.set_entry(s, FILE, 'timestamp', timestamp)
-	identifier = FILE.source
+	move_dict = {'host': dest_host,
+				'base_path': dest_path,
+				'timestamp': timestamp}
+	dbi.set_entry_dict(s, FILE, move_dict)
+
 	log_data = {'action': 'move',
 				'table': 'File',
-				'identifier': identifier,
+				'identifier': FILE.source,
 				'log_id': str(uuid.uuid4()),
 				'timestamp': timestamp}
 	dbi.add_entry_dict(s, 'Log', log_data)

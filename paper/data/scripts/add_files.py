@@ -209,14 +209,15 @@ def update_md5(dbi):
 		for FILE in FILEs:
 			source = FILE.source
 			timestamp = int(time.time())
-			dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(FILE.host, source))
-			dbi.set_entry(s, FILE, 'timestamp', timestamp)
+			md5_dict = {'md5sum': file_data.calc_md5sum(FILE.host, source),
+						'timestamp': timestamp}
+			dbi.set_entry_dict(s, FILE, md5_dict)
+
 			log_data = {'action': 'update md5sum',
 						'table': 'File',
 						'identifier': source,
 						'log_id': str(uuid.uuid4()),
 						'timestamp': timestamp}
-
 			dbi.add_entry(s, 'Log', log_data)
 
 def add_files_to_db(dbi, source_host, source_paths):

@@ -40,9 +40,11 @@ def set_feed(s, dbi, source_path, dest_host, dest_path, is_moved=True):
 	is_moved | bool: checks whether to move to paperdistiller --defaults to False
 	'''
 	FEED = dbi.get_entry(s, 'Feed', source_path)
-	dbi.set_entry(s, FEED, 'host', dest_host)
-	dbi.set_entry(s, FEED, 'base_path', dest_path)
-	dbi.set_entry(s, FEED, 'is_moved', is_moved)
+	feed_dict = {'host': dest_host,
+				'base_path': dest_path,
+				'is_moved': True,
+				'timestamp': int(time.time())}
+	dbi.set_entry_dict(s, FEED, feed_dict)
 
 def move_feed_files(dbi, source_host, source_paths, dest_host, dest_path):
 	'''
