@@ -344,3 +344,17 @@ class DataBaseInterface(object):
 		'''
 		setattr(ENTRY, field, new_value)
 		self.add_entry(s, ENTRY)
+
+	def set_entry_dict(self, s, ENTRY, entry_dict):
+		'''
+		sets values of any entry
+
+		Parameters
+		----------
+		s | object: session object
+		ENTRY | object: entry object
+		entry_dict | dict: dict of attributes for object
+		'''
+		for field, new_value in entry_dict.items():
+			setattr(ENTRY, field, new_value)
+		self.add_entry(s, ENTRY)
