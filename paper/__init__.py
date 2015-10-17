@@ -198,6 +198,7 @@ class DataBaseInterface(object):
 	add_entry_dict | adds entry to database using dict as kwarg
 	get_entry | gets database object
 	set_entry | updates database entry field with new value
+	set_entry_dict | updates database entry fields with new values using input dict
 	'''
 	def __init__(self, configfile='~/paperdata.cfg'):
 		'''
