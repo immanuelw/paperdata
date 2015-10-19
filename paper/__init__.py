@@ -83,7 +83,10 @@ def file_to_pol(path):
 	>>> file_to_pol('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
 	'xx'
 	'''
-	return re.findall(r'\.(.{2})\.', path)[0]
+	pol = re.findall(r'\.(.{2})\.', path)
+	polarization = 'all' if len(pol) == 0 else pol[0]
+
+	return polarization
 
 def decimal_default(obj):
 	'''
