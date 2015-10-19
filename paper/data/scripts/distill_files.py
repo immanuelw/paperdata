@@ -38,7 +38,7 @@ def add_files_to_distill(source_paths):
 	#now run through all the files and build the relevant information for the db
 	# get the pols
 	pols = [ppdata.file_to_pol(source_path) for source_path in source_paths]
-	jds = n.array([ppdata.file_to_jd(source_path) for source_path in source_paths])
+	jds = n.array([str(ppdata.file_to_jd(source_path)) for source_path in source_paths])
 	nights = list(set(jds.astype(n.int)))
 
 	jds_onepol = n.sort([jd for i, jd in enumerate(jds) if pols[i] == pols[0] and jd.astype(int) == nights[0]])
@@ -52,7 +52,7 @@ def add_files_to_distill(source_paths):
 	for night in nights:
 		print('adding night', night)
 		obsinfo = []
-		nightfiles = [source_path for source_path in source_paths if int(float(ppdata.file_to_jd(source_path))) == night]
+		nightfiles = [source_path for source_path in source_paths if int(ppdata.file_to_jd(source_path)) == night]
 		print(len(nightfiles))
 		for pol in pols:
 			#filter off all pols but the one I'm currently working on
@@ -61,10 +61,10 @@ def add_files_to_distill(source_paths):
 				for i, source_path in enumerate(files):
 					try:
 						dbi.get_entry(ddbi, s, 'observation',
-										uv_data.jdpol_to_obsnum(float(ppdata.file_to_jd(source_path)), ppdata.file_to_pol(source_path), djd))
+										uv_data.jdpol_to_obsnum(ppdata.file_to_jd(source_path), ppdata.file_to_pol(source_path), djd))
 						print(source_path, 'found in db, skipping')
 					except:
-						obsinfo.append({'julian_date': float(ppdata.file_to_jd(source_path)),
+						obsinfo.append({'julian_date': ppdata.file_to_jd(source_path),
 										'pol': ppdata.file_to_pol(source_path),
 										'host': socket.gethostname(),
 										'filename': source_path,

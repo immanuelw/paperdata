@@ -64,9 +64,9 @@ def file_to_jd(path):
 	str: julian date
 
 	>>> file_to_jd('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
-	'2456617.17386'
+	2456617.17386
 	'''
-	return re.findall(r'\d+\.\d+', path)[0]
+	return round(float(re.findall(r'\d+\.\d+', path)[0]), 5)
 
 def file_to_pol(path):
 	'''
