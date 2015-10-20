@@ -40,8 +40,7 @@ def byte_size(path):
 	total_size = 0
 	for base_path, _, filenames in os.walk(path):
 		for filename in filenames:
-			source_path = os.path.join(base_path, filename)
-			total_size += os.path.getsize(source_path)
+			total_size += os.path.getsize(os.path.join(base_path, filename))
 
 	return total_size
 
@@ -55,7 +54,7 @@ def human_size(num):
 
 	Returns
 	-------
-	float: amount of MB to 1 decimal place
+	float(1): amount of MB to 1 decimal place
 
 	>>> human_size(1048576)
 	1.0
@@ -103,13 +102,12 @@ def get_md5sum(path):
 	>>> get_md5sum('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
 	'7d5ac942dd37c4ddfb99728359e42331'
 	'''
-	path = path.split(':')[-1]
-	BLOCKSIZE = 65536
-	hasher = hashlib.md5()
 	vis_file = os.path.join(path, 'visdata')
 	uv_file = path if os.path.isdir(path) else vis_file if os.path.isfile(visfile)
+	hasher = hashlib.md5()
 
 	with open(uv_file, 'rb') as hash_file:
+		BLOCKSIZE = 65536
 		buf = hash_file.read(BLOCKSIZE)
 		while len(buf) > 0:
 			hasher.update(buf)
@@ -207,6 +205,9 @@ def source_info(ask=True):
 	tuple:
 		str: source host
 		list[str]: list of source paths
+	OR
+	tuple:
+		None for every field if no corresponding observation found
 	'''
 	if ask:
 		source_host = raw_input('Source directory host: ')
@@ -216,7 +217,7 @@ def source_info(ask=True):
 			source_host, source_paths_str = sys.argv[1].split(':')
 		except:
 			print('Wrong format for host and paths')
-			return
+			return (None,) * 2
 
 	source_paths = parse_sources(source_host, source_paths_str)
 

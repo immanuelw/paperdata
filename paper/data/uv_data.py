@@ -145,7 +145,7 @@ def calc_times(uv):
 	c_time = 0
 
 	try:
-		for (uvw, t, (i, j)), d in uv.all():
+		for (_, t, (_, _)), _ in uv.all():
 			if time_start == 0 or t < time_start:
 				time_start = t
 			if time_end == 0 or t > time_end:
@@ -156,10 +156,7 @@ def calc_times(uv):
 	except:
 		return (None,) * 4
 
-	if n_times > 1:
-		delta_time = -(time_start - time_end) / (n_times - 1)
-	else:
-		delta_time = -(time_start - time_end) / (n_times)
+	delta_time = -(time_start - time_end) / (n_times - 1)
 
 	length = five_round(n_times * delta_time)
 	time_start = five_round(time_start)
@@ -175,7 +172,7 @@ def calc_npz_data(dbi, filename):
 	Parameters
 	----------
 	dbi | object: database interface object
-	filename | str: filename of npz file [Ex: zen.2456640.24456.xx.uvcRE.npz OR zen.2456243.24456.uvcRE.npz]
+	filename | str: filename of npz file
 
 	Returns
 	-------
