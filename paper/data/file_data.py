@@ -145,8 +145,7 @@ def calc_md5sum(host, path):
 					with sftp.file(path, mode='r') as remote_path:
 						md5 = remote_path.check('md5', block_size=65536)
 			except(IOError):
-				vis_path = os.path.join(path, 'visdata')
-				_, md5_out, _ = ssh.exec_command('md5sum {vis_path}'.format(vis_path=vis_path))
+				_, md5_out, _ = ssh.exec_command('md5sum {vis_path}'.format(vis_path=os.path.join(path, 'visdata')))
 				md5 = md5_out.read().split()[0]
 
 	return md5
