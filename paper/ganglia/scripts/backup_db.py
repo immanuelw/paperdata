@@ -30,20 +30,16 @@ def paperbackup(dbi):
 	if not os.path.isdir(backup_dir):
 		os.mkdir(backup_dir)
 
-	tables = ('Filesystem', 'Monitor', 'Iostat', 'Ram', 'Cpu')
-	table_sorts = {'Filesystem': {'first': 'timestamp', 'second': 'host', 'third': 'system'},
-					'Monitor': {'first': 'timestamp', 'second': 'host', 'third': 'filename'},
-					'Iostat': {'first': 'timestamp', 'second': 'host', 'third': 'device'},
-					'Ram': {'first': 'timestamp', 'second': 'host', 'third': 'total'},
-					'Cpu': {'first': 'timestamp', 'second': 'host', 'third': 'cpu'}}
+	tables = {'Filesystem': 'system', 'Monitor': 'filename', 'Iostat': 'device', 'Ram': 'total', 'Cpu': 'cpu'}
+	table_sorts = {table_name: {'first': 'timestamp', 'second': 'host', 'third': third_sort} for table_name, third_sort in tables.keys()}
 	with dbi.session_scope as s:
 		print(timestamp)
-		for table in tables:
+		for table in tables.keys():
 			db_file = '{table}_{timestamp}.json'.format(table=table.lower(), timestamp=timestamp)
 			backup_path = os.path.join(backup_dir, db_file)
 			print(db_file)
 
-			DB_table = getattr(pyg, table.title())
+			DB_table = getattr(pyg, table)
 			DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
 												getattr(DB_table, table_sorts[table]['second']).asc(),
 												getattr(DB_table, table_sorts[table]['third']).asc())
