@@ -32,7 +32,6 @@ distiller | access to paperdistiller database and its features
 ganglia | logging of and access to host information
 site | websites built on flask for accessing the paperdata database
 '''
-
 import os
 import sys
 import decimal
