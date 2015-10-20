@@ -49,6 +49,8 @@ def add_files_to_distill(source_paths):
 	print('found the following pols', pols)
 	print('found the following nights', nights)
 
+	host = socket.gethostname()
+
 	for night in nights:
 		print('adding night', night)
 		obsinfo = []
@@ -56,9 +58,9 @@ def add_files_to_distill(source_paths):
 		print(len(nightfiles))
 		for pol in pols:
 			#filter off all pols but the one I'm currently working on
-			files = sorted([source_path for source_path in nightfiles if ppdata.file_to_pol(source_path) == pol])
+			paths = sorted(source_path for source_path in nightfiles if ppdata.file_to_pol(source_path) == pol)
 			with dbi.session_scope() as s:
-				for i, source_path in enumerate(files):
+				for source_path in paths:
 					try:
 						dbi.get_entry(ddbi, s, 'observation',
 										uv_data.jdpol_to_obsnum(ppdata.file_to_jd(source_path), ppdata.file_to_pol(source_path), djd))
@@ -66,7 +68,7 @@ def add_files_to_distill(source_paths):
 					except:
 						obsinfo.append({'julian_date': ppdata.file_to_jd(source_path),
 										'pol': ppdata.file_to_pol(source_path),
-										'host': socket.gethostname(),
+										'host': host,
 										'filename': source_path,
 										'length': djd}) #note the db likes jd for all time units
 
@@ -84,7 +86,6 @@ def add_files_to_distill(source_paths):
 			with dbi.session_scope() as s:
 				for info_dict in obsinfo:
 					dbi.add_entry_dict(ddbi, s, 'observation', info_dict)
-				#dbi.add_observations(obsinfo)
 		except:
 			print('problem!')
 	print('done')
