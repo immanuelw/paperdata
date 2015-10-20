@@ -12,7 +12,6 @@ add_data | adds info from paperdistiller to paperdata
 paperbridge | moves files that have completed compression to preferred directory
 '''
 import os
-import sys
 import copy
 import time
 import socket
@@ -85,7 +84,7 @@ def add_data(dbi, data_dbi):
 				julian_date = OBS.julian_date
 				polarization = 'all' if julian_date < 2456400 else OBS.pol
 
-				if named_host == host:
+				if host == named_host:
 					try:
 						uv = A.miriad.UV(path)
 					except:

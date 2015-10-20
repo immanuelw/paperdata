@@ -103,6 +103,7 @@ def count_days(dbi):
 def find_data(dbi):
 	'''
 	finds data to move from feed table
+	moves only one day at a time
 
 	Parameters
 	----------
@@ -118,7 +119,6 @@ def find_data(dbi):
 		table = pdbi.Feed
 		FEEDs = s.query(table).filter(table.is_moved == False).filter(table.is_movable == True).all()
 
-		#only move one day at a time
 		feed_host = FEEDs[0].host
 		feed_paths = tuple(os.path.join(FEED.base_path, FEED.filename) for FEED in FEEDs if FEED.julian_day == FEEDs[0].julian_day)
 

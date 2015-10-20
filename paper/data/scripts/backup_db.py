@@ -12,7 +12,6 @@ paperbackup | backs up paperdata database
 '''
 from __future__ import print_function
 import os
-import sys
 import time
 import paper as ppdata
 from paper.data import dbi as pdbi

@@ -7,13 +7,12 @@ author | Immanuel Washington
 
 Functions
 ---------
-null_check | checks to see if files to be moved all exist in database
+exist_check | checks to see if files to be moved all exist in database
 set_move_table | updates database with moved file status
 move_files | parses list of files then moves them
 '''
 from __future__ import print_function
 import os
-import sys
 import glob
 import socket
 import shutil
@@ -22,7 +21,7 @@ import uuid
 import paper as ppdata
 from paper.data import dbi as pdbi, file_data
 
-def null_check(dbi, source_host, source_paths):
+def exist_check(dbi, source_host, source_paths):
 	'''
 	checks if file(s) is(are) in database
 
@@ -34,16 +33,14 @@ def null_check(dbi, source_host, source_paths):
 
 	Returns
 	-------
-	bool: are there any files not in database -- True if there are None
+	bool: are all files in the database
 	'''
 	with dbi.session_scope() as s:
 		table = pdbi.File
 		FILEs = s.query(table).filter(table.host == source_host).all()
 		paths = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
 
-	nulls = tuple(source_path for source_path in source_paths if source_path not in paths)
-		
-	return len(nulls) == 0
+	return all(source_path in paths for source_path in source_paths)
 
 def set_move_table(s, dbi, source_host, source_path, dest_host, dest_path):
 	'''
@@ -91,15 +88,14 @@ def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_pa
 	if source_host is None or source_paths is None:
 		source_host, source_paths = file_data.source_info()
 
-	is_dupe = null_check(source_host, source_paths)
-	if not is_dupe:
+	is_existent = exist_check(source_host, source_paths)
+	if not is_existent:
 		print('File(s) not in database')
 		return
 
 	destination = ':'.join((dest_host, dest_path))
 	with dbi.session_scope() as s:
-		named_host = socket.gethostname()
-		if named_host == source_host:
+		if source_host == socket.gethostname():
 			for source_path in source_paths:
 				ppdata.rsync_copy(source_path, destination)
 				set_move_table(s, dbi, source_host, source_path, dest_host, dest_path)

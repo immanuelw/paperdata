@@ -13,7 +13,6 @@ delete_files | parses list of files then copies and deletes them
 '''
 from __future__ import print_function
 import os
-import sys
 import glob
 import shutil
 import socket
@@ -85,8 +84,7 @@ def delete_files(dbi, source_host, source_paths, dest_host, dest_path):
 	'''
 	destination = ':'.join((dest_host, dest_path))
 	with dbi.session_scope() as s:
-		named_host = socket.gethostname()
-		if named_host == source_host:
+		if source_host == socket.gethostname():
 			for source_path in source_paths:
 				ppdata.rsync_copy(source_path, destination)
 				set_delete_table(s, dbi, source_host, source_path, dest_host, dest_path)

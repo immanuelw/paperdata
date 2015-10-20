@@ -14,7 +14,6 @@ add_feeds | parses list of files then adds them to paperdata database
 '''
 from __future__ import print_function
 import os
-import sys
 import time
 import uuid
 import aipy as A
