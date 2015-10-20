@@ -95,6 +95,7 @@ def calc_obs_info(dbi, host, path):
 def dupe_check(dbi, source_host, source_paths):
 	'''
 	checks for duplicate paths and removes to not waste time if possible
+	checks for paths only on same host
 
 	Parameters
 	----------
@@ -107,12 +108,10 @@ def dupe_check(dbi, source_host, source_paths):
 	list[str]: paths that are not already in database
 	'''
 	with dbi.session_scope() as s:
-		#all files on same host
 		table = pdbi.File
 		FILEs = s.query(table).filter(table.host == source_host).all()
 		paths = tuple(os.path.join(FILE.base_path, FILE.filename) for FILE in FILEs)
 
-	#for each input file, check if in sources
 	unique_paths = tuple(source_path for source_path in source_paths if source_path not in paths)
 		
 	return unique_paths
@@ -168,7 +167,6 @@ def update_obsnums(dbi):
 		for OBS in OBSs:
 			PREV_OBS = set_obs(s, dbi, OBS, 'prev_obs')
 			NEXT_OBS = set_obs(s, dbi, OBS, 'next_obs')
-			#sets edge 
 			is_edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
 			dbi.set_entry(s, OBS, 'is_edge', is_edge)
 
@@ -186,9 +184,8 @@ def connect_observations(dbi):
 		FILEs = s.query(file_table).filter(file_table.observation == None).all()
 
 		for FILE in FILEs:		
-			#get the observation corresponding to this file
 			OBS = s.query(obs_table).get(FILE.obsnum)
-			dbi.set_entry(s, FILE, 'observation', OBS)  #associate the file with an observation
+			dbi.set_entry(s, FILE, 'observation', OBS)
 
 def update_md5(dbi):
 	'''
@@ -227,21 +224,19 @@ def add_files_to_db(dbi, source_host, source_paths):
 	'''
 	with dbi.session_scope() as s:
 		for source_path in source_paths:
-			base_path = os.path.dirname(source_path)
-			filename = os.path.basename(source_path)
 			obs_info, file_info, log_info = calc_obs_info(source_host, source_path)
 			try:
 				dbi.add_entry_dict(s, 'Observation', obs_info)
 			except:
-				print('Failed to load in obs ', base_path, filename)
+				print('Failed to load in obs ', source_path)
 			try:
 				dbi.add_entry_dict(s, 'File', file_info)
 			except:
-				print('Failed to load in file ', base_path, filename)
+				print('Failed to load in file ', source_path)
 			try:
 				dbi.add_entry_dict(s, 'Log', log_info)
 			except:
-				print('Failed to load in log ', base_path, filename)
+				print('Failed to load in log ', source_path)
 
 def add_files(dbi, source_host, source_paths):
 	'''
