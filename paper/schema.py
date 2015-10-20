@@ -38,4 +38,3 @@ def schema_db(xdb, schema_file):
 
 if __name__ == "__main__":
 	print('This is a module only!')
-
