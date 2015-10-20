@@ -106,16 +106,14 @@ def get_md5sum(path):
 	path = path.split(':')[-1]
 	BLOCKSIZE = 65536
 	hasher = hashlib.md5()
-	try:
-		afile = open(path, 'rb')
-	except(IOError):
-		filename = os.path.join(path, 'visdata')
-		afile = open(filename, 'rb')
+	vis_file = os.path.join(path, 'visdata')
+	uv_file = path if os.path.isdir(path) else vis_file if os.path.isfile(visfile)
 
-	buf = afile.read(BLOCKSIZE)
-	while len(buf) > 0:
-		hasher.update(buf)
-		buf = afile.read(BLOCKSIZE)
+	with open(uv_file, 'rb') as hash_file:
+		buf = hash_file.read(BLOCKSIZE)
+		while len(buf) > 0:
+			hasher.update(buf)
+			buf = hash_file.read(BLOCKSIZE)
 
 	return hasher.hexdigest()
 
