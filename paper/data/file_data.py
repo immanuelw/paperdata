@@ -5,8 +5,8 @@ author | Immanuel Washington
 
 Functions
 ---------
-get_size | gets size of directory or file
-sizeof_fmt | converts amount of bytes into human readable format
+byte_size | gets size of directory or file
+human_size | converts amount of bytes into human friendly MB
 calc_size | gets human readable size of any directory or file
 get_md5sum | generates md5 checksum of file
 calc_md5sum | gets md5 checksum of any file
@@ -22,7 +22,7 @@ import hashlib
 import socket
 import paper as ppdata
 
-def get_size(path):
+def byte_size(path):
 	'''
 	output byte size of directory or file
 
@@ -34,18 +34,18 @@ def get_size(path):
 	-------
 	int: amount of bytes
 
-	>>> get_size('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
+	>>> byte_size('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
 	215132692
 	'''
 	total_size = 0
-	for dirpath, dirnames, filenames in os.walk(path):
-		for f in filenames:
-			fp = os.path.join(dirpath, f)
-			total_size += os.path.getsize(fp)
+	for base_path, _, filenames in os.walk(path):
+		for filename in filenames:
+			source_path = os.path.join(base_path, filename)
+			total_size += os.path.getsize(source_path)
 
 	return total_size
 
-def sizeof_fmt(num):
+def human_size(num):
 	'''
 	converts bytes to MB
 
@@ -57,13 +57,10 @@ def sizeof_fmt(num):
 	-------
 	float: amount of MB to 1 decimal place
 
-	>>> sizeof_fmt(1048576)
+	>>> human_size(1048576)
 	1.0
 	'''
-	for byte_size in ('KB', 'MB'):
-		num /= 1024.0
-
-	return round(num, 1)
+	return round(num / 1024. / 1024., 1)
 
 def calc_size(host, path):
 	'''
@@ -82,16 +79,14 @@ def calc_size(host, path):
 	>>> calc_size('folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
 	205.2
 	'''
-	named_host = socket.gethostname()
-	if named_host == host:
-		size = sizeof_fmt(get_size(path))
+	if host == socket.gethostname():
+		size_bytes = byte_size(path)
 	else:
 		with ppdata.ssh_scope(host) as ssh:
 			with ssh.open_sftp() as sftp:
 				size_bytes = sftp.stat(path).st_size
-				size = sizeof_fmt(size_bytes)
 
-	return size
+	return human_size(size_bytes)
 
 def get_md5sum(path):
 	'''
@@ -114,8 +109,9 @@ def get_md5sum(path):
 	try:
 		afile = open(path, 'rb')
 	except(IOError):
-		fname = os.path.join(path, 'visdata')
-		afile = open(fname, 'rb')
+		filename = os.path.join(path, 'visdata')
+		afile = open(filename, 'rb')
+
 	buf = afile.read(BLOCKSIZE)
 	while len(buf) > 0:
 		hasher.update(buf)
@@ -140,8 +136,7 @@ def calc_md5sum(host, path):
 	>>> calc_md5sum('folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
 	'7d5ac942dd37c4ddfb99728359e42331'
 	'''
-	named_host = socket.gethostname()
-	if named_host == host:
+	if host == socket.gethostname():
 		md5 = get_md5sum(path)
 	else:
 		with ppdata.ssh_scope(host) as ssh:
@@ -192,8 +187,7 @@ def parse_sources(source_host, source_paths_str):
 	-------
 	list[str]: list of source paths
 	'''
-	named_host = socket.gethostname()
-	if named_host == source_host:
+	if source_host == socket.gethostname():
 		source_paths = glob.glob(source_paths_str)
 	else:
 		with ppdata.ssh_scope(source_host) as ssh:
@@ -213,8 +207,9 @@ def source_info(ask=True):
 
 	Returns
 	-------
-	str: source host
-	list[str]: list of source paths
+	tuple:
+		str: source host
+		list[str]: list of source paths
 	'''
 	if ask:
 		source_host = raw_input('Source directory host: ')
