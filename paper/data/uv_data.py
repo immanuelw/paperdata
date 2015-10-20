@@ -82,13 +82,7 @@ def date_info(julian_date):
 	>>> date_info(2456604.16671)
 	(128, 2456604, 20.8)
 	'''
-	if julian_date < 2456100:
-		era = 32
-	elif julian_date < 2456400:
-		era = 64
-	else:
-		era = 128
-
+	era = 32 if julian_date < 2456100 else 64 if julian_date < 2456400 else 128
 	julian_day = int(julian_date)
 
 	gmst = convert.juliandate_to_gmst(julian_date)
@@ -204,7 +198,7 @@ def calc_npz_data(dbi, filename):
 	if filetype not in ('npz',):
 		return (None,) * 7
 	
-	julian_date = five_round(float(ppdata.file_to_jd(filename)))
+	julian_date = ppdata.file_to_jd(filename)
 
 	with dbi.session_scope() as s:
 		polarization = filename.split('.')[3] if len(filename.split('.')) == 6 else 'all'
@@ -242,7 +236,6 @@ def calc_uv_data(host, path):
 	named_host = socket.gethostname()
 	if named_host == host:
 		filetype = path.split('.')[-1]
-		#allows uv access
 		if filetype not in ('uv', 'uvcRRE'):
 			return (None,) * 7
 		else:
@@ -252,21 +245,10 @@ def calc_uv_data(host, path):
 				return (None,) * 7
 
 			time_start, time_end, delta_time, length = calc_times(uv)
-
-			#indicates julian date
 			julian_date = five_round(uv['time'])
+			polarization = pdbi.pol_to_str[uv['pol']] if uv['npol'] == 4 else 'all' if uv['npol'] == 4
 
-			#assign letters to each polarization
-			if uv['npol'] == 1:
-				polarization = pdbi.pol_to_str[uv['pol']]
-			elif uv['npol'] == 4:
-				polarization = 'all'
-
-			#gives each file unique id
-			if length > 0:
-				obsnum = jdpol_to_obsnum(julian_date, polarization, length)
-			else:
-				obsnum = None
+			obsnum = jdpol_to_obsnum(julian_date, polarization, length) if length > 0 else None
 
 	else:
 		uv_data_script = os.path.expanduser('~/paperdata/paper/data/uv_data.py')
