@@ -8,6 +8,7 @@ author | Immanuel Washington
 '''
 from __future__ import print_function
 import os
+import copy
 import curses
 import time
 from paper.distiller import dbi as ddbi
@@ -87,6 +88,16 @@ if __name__ == '__main__':
 					#check for new filenames
 					source = ':'.join((still_host, os.path.join(base_path, filename)))
 					full_stats = '&'.join((source, status))
+					entry_dict = {'host': still_host,
+									'base_path': base_path,
+									'filename': filename,
+									'source': source,
+									'status': status,
+									'full_stats': full_stats,
+									'del_time': None,
+									'time_start': None,
+									'time_end': None,
+									'timestamp': timestamp}
 
 					if filename not in file_dict['pid'].keys():
 						file_dict['pid'].update({filename: current_pid})
@@ -95,49 +106,34 @@ if __name__ == '__main__':
 
 					if file_dict['pid'][filename] != current_pid:
 						file_dict['end'].update({filename: int(time.time())})
-						entry_dict = {'host': still_host,
-										'base_path': base_path,
-										'filename': filename,
-										'source': source,
-										'status': status,
-										'full_stats': full_stats,
-										'del_time': -1,
+						pid_entry = copy.deepcopy(entry_dict)
+						change_pid = {'del_time': -1,
 										'time_start': file_dict['start'][filename],
-										'time_end': file_dict['end'][filename],
-										'timestamp': timestamp}
-						file_log.append(entry_dict)
+										'time_end': file_dict['end'][filename]}
+						pid_entry.update(change_pid)
+
+						file_log.append(pid_entry)
 						file_dict['pid'].update({filename: current_pid})
 						file_dict['start'].update({filename: int(time.time())})
 						file_dict['end'].update({filename: -1})
 
 					if filename not in file_dict['status'].keys():
 						file_dict['status'].update({filename: status})
-						entry_dict = {'host': still_host,
-										'base_path': base_path,
-										'filename': filename,
-										'source': source,
-										'status': status,
-										'full_stats': full_stats,
-										'del_time': 0,
+						status_entry = copy.deepcopy(entry_dict)
+						change_status = {'del_time': 0,
 										'time_start': file_dict['start'][filename],
-										'time_end': file_dict['end'][filename],
-										'timestamp': timestamp}
-						file_log.append(entry_dict)
+										'time_end': file_dict['end'][filename]}
+						status_entry.update(change_status)
+						file_log.append(status_entry)
 						file_dict['time'].update({filename: int(time.time())})
 
-					#write output log
 					if file_dict['status'][filename] != status:
-						entry_dict = {'host': still_host,
-										'base_path': base_path,
-										'filename': file_name,
-										'source': source,
-										'status': status,
-										'full_stats': full_stats,
-										'del_time': int(time.time() - file_dict['time'][filename]),
+						status_entry = copy.deepcopy(entry_dict)
+						change_status = {'del_time': int(time.time() - file_dict['time'][filename]),
 										'time_start': file_dict['start'][filename],
-										'time_end': file_dict['end'][filename],
-										'timestamp': timestamp}
-						file_log.append(entry_dict)
+										'time_end': file_dict['end'][filename]}
+						status_entry.update(change_status)
+						file_log.append(status_entry)
 						file_dict['status'].update({filename: status})
 						file_dict['time'].update({filename: int(time.time())})
 
