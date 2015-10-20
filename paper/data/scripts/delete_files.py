@@ -38,8 +38,7 @@ def delete_check(dbi, source_host):
 	with dbi.session_scope() as s:
 		table = pdbi.File
 		FILEs = s.query(table).filter(table.delete_file == True).filter(table.tape_index != None).filter(table.host == source_host).all()
-	#all files on same host
-	paths = tuple(os.path.join(FILE.base_path, FILE.filename) for FILE in FILEs)
+		paths = tuple(os.path.join(FILE.base_path, FILE.filename) for FILE in FILEs)
 
 	return paths
 

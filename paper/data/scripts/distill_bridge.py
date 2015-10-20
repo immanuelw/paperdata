@@ -7,6 +7,7 @@ author | Immanuel Washington
 
 Functions
 ---------
+get_observations | pulls observation objects from paperdistiller to be added to paperdata
 add_data | adds info from paperdistiller to paperdata
 paperbridge | moves files that have completed compression to preferred directory
 '''
@@ -23,6 +24,34 @@ from paper.distiller import dbi as ddbi
 import paper.memory as memory
 import add_files, move_files
 
+def get_observations(s):
+	'''
+	gets all observation objects in distiller database if completed for that julian day
+
+	Parameters
+	----------
+	s | object: session object
+
+	Returns
+	-------
+	list[object]: list of observation objects
+	'''
+	table = ddbi.Observation
+	OBSs_all = s.query(table).all()
+	OBSs_complete = s.query(table).filter(table.status == 'COMPLETE').all()
+
+	julian_obs = {OBS: int(OBS.julian_date) for OBS in OBSs_complete}
+	julian_days = tuple(jday for jday in julian_obs.values())
+	count_jdays = Counter(julian_days)
+
+	all_days = tuple(int(OBS.julian_date) for OBS in OBSs_all)
+	count_all_days = Counter(all_days)
+
+	complete_jdays = tuple(day for day, amount in count_jdays.items() if amount == count_all_days[day])
+	raw_OBSs = tuple(OBS for OBS, jday in julian_obs.items() if jday in complete_jdays)
+
+	return raw_OBSs
+
 def add_data(dbi, data_dbi):
 	'''
 	transfer data from paperdistiller database to create data for paperdata tables
@@ -37,25 +66,10 @@ def add_data(dbi, data_dbi):
 	dict: movable paths for each filetype
 	'''
 	with dbi.session_scope() as s:
-		#do stuff
-		table = ddbi.Observation
-		OBSs_all = s.query(table).all()
-		OBSs_complete = s.query(table).filter(table.status == 'COMPLETE').all()
-
-		julian_obs = {OBS: int(OBS.julian_date) for OBS in OBSs_complete}
-		julian_days = tuple(jday for jday in julian_obs.values())
-		#dict of julian day as key, amount as value
-		count_jdays = Counter(julian_days)
-
-		all_days = tuple(int(OBS.julian_date) for OBS in OBSs_all)
-		count_all_days = Counter(all_days)
-
-		#tuple list of all complete days
-		complete_jdays = tuple(day for day, amount in count_jdays.items() if amount == count_all_days[day])
-		raw_OBSs = tuple(OBS for OBS, jday in julian_obs.items() if jday in complete_jdays)
+		raw_OBSs = get_observations(s)
 
 		with data_dbi.session_scope() as sess:
-			#need to keep dict of list of files to move of each type -- (host, path, filename, filetype)
+			#need to keep dict of list of files to move of each type
 			movable_paths = {'uv':[], 'uvcRRE':[], 'npz':[]}
 
 			named_host = socket.gethostname()
@@ -68,14 +82,9 @@ def add_data(dbi, data_dbi):
 				base_path, filename, filetype = file_data.file_names(path)
 				source = ':'.join((host, path))
 
-				obsnum = OBS.obsnum
 				julian_date = OBS.julian_date
-				if julian_date < 2456400:
-					polarization = 'all'
-				else:
-					polarization = OBS.pol
-				length = OBS.length
-			
+				polarization = 'all' if julian_date < 2456400 else OBS.pol
+
 				if named_host == host:
 					try:
 						uv = A.miriad.UV(path)
@@ -83,29 +92,25 @@ def add_data(dbi, data_dbi):
 						continue
 
 					time_start, time_end, delta_time, _  = uv_data.calc_times(uv)
-
 				else:
 					time_start, time_end, delta_time, _, _, _, _ = uv_data.calc_uv_data(host, path)
 
 				era, julian_day, lst = uv_data.date_info(julian_date)
 
-				filesize = file_data.calc_size(host, path)
 				md5 = FILE.md5sum
 				if md5 is None:
 					md5 = file_data.calc_md5sum(host, path)
 
-				init_host = host
-
 				timestamp = int(time.time())
 
-				obs_info = {'obsnum': obsnum,
+				obs_info = {'obsnum': OBS.obsnum,
 							'julian_date': julian_date,
 							'polarization': polarization,
 							'julian_day': julian_day,
 							'lst': lst,
 							'era': era,
 							'era_type': None,
-							'length': length,
+							'length': OBS.length,
 							'time_start': time_start,
 							'time_end': time_end,
 							'delta_time': delta_time,
@@ -119,11 +124,11 @@ def add_data(dbi, data_dbi):
 							'filename': filename,
 							'filetype': filetype,
 							'source': source,
-							'obsnum': obsnum,
-							'filesize': filesize,
+							'obsnum': OBS.obsnum,
+							'filesize': file_data.calc_size(host, path),
 							'md5sum': md5,
 							'tape_index': None,
-							'init_host': init_host,
+							'init_host': host,
 							'is_tapeable': True,
 							'is_deletable': False,
 							'timestamp': timestamp}
@@ -144,24 +149,26 @@ def add_data(dbi, data_dbi):
 				if os.path.isdir(compr_path):
 					compr_filetype = 'uvcRRE'
 					compr_info = copy.deepcopy(raw_info)
-					compr_info['filename'] = compr_filename
-					compr_info['filetype'] = compr_filetype
-					compr_info['filesize'] = file_data.calc_size(host, base_path, compr_filename)
-					compr_info['md5sum'] = file_data.calc_md5sum(host, base_path, compr_filename)
-					compr_info['is_tapeable'] = False
+					compr_entry = {'filename': compr_filename,
+									'filetype': compr_filetype,
+									'filesize': file_data.calc_size(host, base_path, compr_filename),
+									'md5sum': file_data.calc_md5sum(host, base_path, compr_filename),
+									'is_tapeable': False}
+					compr_info.update(compr_entry)
 					data_dbi.add_entry_dict(sess, 'File', compr_info)
 					movable_paths[compr_filetype].append(compr_path)
 
 				npz_filename = ''.join((filename, 'cRE.npz'))
 				npz_path = os.path.join(base_path, npz_filename)
-				if os.path.isdir(npz_path):
+				if os.path.isfile(npz_path):
 					npz_filetype = 'npz'
 					npz_info = copy.deepcopy(raw_info)
-					npz_info['filename'] = npz_filename
-					npz_info['filetype'] = npz_filetype
-					npz_info['filesize'] = file_data.calc_size(host, base_path, npz_filename)
-					npz_info['md5sum'] = file_data.calc_md5sum(host, base_path, npz_filename)
-					npz_info['is_tapeable'] = False
+					npz_entry = {'filename': npz_filename,
+								'filetype': npz_filetype,
+								'filesize': file_data.calc_size(host, base_path, npz_filename),
+								'md5sum': file_data.calc_md5sum(host, base_path, npz_filename),
+								'is_tapeable': False}
+					npz_info.update(npz_entry)
 					data_dbi.add_entry_dict(sess, 'File', npz_info)
 					movable_paths[npz_filetype].append(npz_path)
 

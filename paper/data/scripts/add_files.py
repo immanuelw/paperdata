@@ -52,11 +52,6 @@ def calc_obs_info(dbi, host, path):
 
 	era, julian_day, lst = uv_data.date_info(julian_date)
 
-	filesize = file_data.calc_size(host, path)
-	md5 = file_data.calc_md5sum(host, path)
-
-	init_host = host
-
 	timestamp = int(time.time())
 
 	obs_info = {'obsnum': obsnum,
@@ -81,10 +76,10 @@ def calc_obs_info(dbi, host, path):
 				'filetype': filetype,
 				'source': source,
 				'obsnum': obsnum,
-				'filesize': filesize,
-				'md5sum': md5,
+				'filesize': file_data.calc_size(host, path),
+				'md5sum': file_data.calc_md5sum(host, path),
 				'tape_index': None,
-				'init_host': init_host,
+				'init_host': host,
 				'is_tapeable': False,
 				'is_deletable': False,
 				'timestamp': timestamp}
