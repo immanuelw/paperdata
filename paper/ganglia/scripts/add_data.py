@@ -14,6 +14,7 @@ ram_free | gathers info for table
 cpu_perc | gathers info for table
 add_data | adds data to ganglia database
 '''
+from __future__ import division
 import os
 import sys
 import psutil
@@ -59,13 +60,13 @@ def filesystem(ssh, host, path):
 	else:
 		_, folio, _ = ssh.exec_command('df -B 1')
 
-		for output in folio.split('\n'):
-			filesystem = output.split(' ')[-1]
+		for output in folio.splitlines():
+			filesystem = output.split()[-1]
 			if filesystem in (path,):
-				total = int(output.split(' ')[-4])
-				used = int(output.split(' ')[-3])
-				free = int(output.split(' ')[-2])
-				percent = int(output.split(' ')[-1].split('%')[-1])
+				total = int(output.split()[-4])
+				used = int(output.split()[-3])
+				free = int(output.split()[-2])
+				percent = int(output.split()[-1].split('%')[-1])
 
 	system_data = {'host': host,
 					'system': path,
@@ -98,8 +99,8 @@ def iostat(ssh, host):
 
 		for device, value in io.items():
 			tps = None
-			read_s = round(value.read_count / float(value.read_time), 2)
-			write_s = round(value.write_count / float(value.write_time), 2)
+			read_s = two_round(value.read_count / value.read_time)
+			write_s = two_round(value.write_count / value.write_time)
 			bl_reads = value.read_bytes
 			bl_writes = value.write_bytes
 
@@ -117,12 +118,12 @@ def iostat(ssh, host):
 		_, folio, _ = ssh.exec_command('iostat')
 
 		folio_use = []
-		folio_name = folio.split('\n')[0].split(' ')[2].strip('()')
+		folio_name = folio.splitlines()[0].split()[2].strip('()')
 		devices = ('sda', 'sda1', 'sda2','dm-0', 'dm-1')
-		for output in folio.split('\n'):
-			device = output.split(' ')[0]
+		for output in folio.splitlines():
+			device = output.split()[0]
 			if device in devices:
-				line = output[:].split(' ')
+				line = output[:].split()
 				new_line = filter(lambda a: a not in [''], line)
 				folio_use.append(new_line)
 
@@ -180,8 +181,8 @@ def ram_free(ssh, host):
 		_, folio, _ = ssh.exec_command('free -b')
 
 		ram = []
-		for output in folio.split('\n'):
-			line = output[:].split(' ')
+		for output in folio.splitlines():
+			line = output[:].split()
 			new_line = filter(lambda a: a not in [''], line)
 			ram.append(new_line)	
 
@@ -238,20 +239,13 @@ def cpu_perc(ssh, host):
 		cpu_all = psutil.cpu_times_percent(interval=1, percpu=True)
 
 		for key, value in enumerate(cpu_all):
-			cpu = key
-			user_perc = value.user
-			sys_perc = value.system
-			iowait_perc = value.iowait
-			idle_perc = value.idle
-			intr_s = None
-
 			cpu_data[key] = {'host': host,
-							'cpu': cpu,
-							'user_perc': user_perc,
-							'sys_perc': sys_perc,
-							'iowait_perc': iowait_perc,
-							'idle_perc': idle_perc,
-							'intr_s': intr_s,
+							'cpu': key,
+							'user_perc': value.user,
+							'sys_perc': value.sys,
+							'iowait_perc': value.iowait,
+							'idle_perc': value.idle,
+							'intr_s': None,
 							'cpu_id': str(uuid.uuid4()),
 							'timestamp': timestamp}
 
@@ -259,29 +253,21 @@ def cpu_perc(ssh, host):
 		_, folio, _ = ssh.exec_command('mpstat -P ALL 1 1')
 
 		cpu_list = []
-		for output in folio.split('\n'):
-			if output not in folio.split('\n')[:1]:
-				line = output[:].split(' ')
+		for output in folio.splitlines():
+			if output not in folio.splitlines()[:1]:
+				line = output[:].split()
 				new_line = filter(lambda a: a not in [''], line)
 				if new_line[0] not in ['Average:']:
 					cpu_list.append(new_line)
 
 		for key, row in enumerate(cpu_list[3:]):
-			#skip first three lines
-			cpu = int(row[2])
-			user_perc = two_round(row[3])
-			sys_perc = two_round(row[5])
-			iowait_perc = two_round(row[6])
-			idle_perc = two_round(row[10])
-			intr_s = two_round(row[11])
-
 			cpu_data[key] = {'host': host,
-							'cpu': cpu,
-							'user_perc': user_perc,
-							'sys_perc': sys_perc,
-							'iowait_perc': iowait_perc,
-							'idle_perc': idle_perc,
-							'intr_s': intr_s,
+							'cpu': int(row[2]),
+							'user_perc': two_round(row[3]),
+							'sys_perc': two_round(row[5]),
+							'iowait_perc': two_round(row[6]),
+							'idle_perc': two_round(row[10]),
+							'intr_s': two_round(row[11]),
 							'cpu_id': str(uuid.uuid4()),
 							'timestamp': timestamp}
 
