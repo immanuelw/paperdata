@@ -39,10 +39,8 @@ def null_check(dbi, source_host, source_paths):
 	with dbi.session_scope() as s:
 		table = pdbi.File
 		FILEs = s.query(table).filter(table.host == source_host).all()
-	#all files on same host
-	paths = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
+		paths = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
 
-	#for each input file, check if in filenames
 	nulls = tuple(source_path for source_path in source_paths if source_path not in paths)
 		
 	return len(nulls) == 0
@@ -93,8 +91,8 @@ def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_pa
 	if source_host is None or source_paths is None:
 		source_host, source_paths = file_data.source_info()
 
-	nulls = null_check(source_host, source_paths)
-	if not nulls:
+	is_dupe = null_check(source_host, source_paths)
+	if not is_dupe:
 		print('File(s) not in database')
 		return
 

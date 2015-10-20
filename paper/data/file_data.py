@@ -152,7 +152,7 @@ def calc_md5sum(host, path):
 			except(IOError):
 				vis_path = os.path.join(path, 'visdata')
 				_, md5_out, _ = ssh.exec_command('md5sum {vis_path}'.format(vis_path=vis_path))
-				md5 = md5_out.read().split(' ')[0]
+				md5 = md5_out.read().split()[0]
 
 	return md5
 
@@ -198,7 +198,7 @@ def parse_sources(source_host, source_paths_str):
 	else:
 		with ppdata.ssh_scope(source_host) as ssh:
 			_, path_out, _ = ssh.exec_command('ls -d {source_paths_str}'.format(source_paths_str=source_paths_str))
-			source_paths = path_out.read().split('\n')[:-1]
+			source_paths = path_out.read().splitlines()[:-1]
 
 	return source_paths
 

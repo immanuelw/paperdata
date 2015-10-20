@@ -10,6 +10,7 @@ Functions
 find_paths | finds all possible uv* files to be added
 '''
 import os
+import sys
 import socket
 import paper as ppdata
 import add_files
@@ -28,10 +29,9 @@ def find_paths(input_host):
 		list: uv* files
 		list: .npz files
 	'''
-	named_host = socket.gethostname()
 	uv_paths = []
 	npz_paths = []
-	if input_host == named_host:
+	if input_host == socket.gethostname():
 		for root, dirs, files in os.walk('/'):
 			for direc in dirs:
 				if direc.endswith('uv') or direc.endswith('uvcRRE'):
@@ -43,7 +43,7 @@ def find_paths(input_host):
 		with ppdata.login_ssh(input_host) as ssh:
 			find = '''find / -name '*.uv' -o -name '*.uvcRRE' -o -name '*.npz' 2>/dev/null'''
 			_, all_paths, _ = ssh.exec_command(find)
-		for path in all_paths.split('\n'):
+		for path in all_paths.splitlines():
 			if direc.endswith('uv') or direc.endswith('uvcRRE'):
 				 uv_paths.append(path)
 			elif file_path.endswith('npz'):

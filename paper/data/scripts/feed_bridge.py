@@ -119,9 +119,8 @@ def find_data(dbi):
 		FEEDs = s.query(table).filter(table.is_moved == False).filter(table.is_movable == True).all()
 
 		#only move one day at a time
-		feed_day = FEEDs[0].julian_day
 		feed_host = FEEDs[0].host
-		feed_paths = tuple(os.path.join(FEED.base_path, FEED.filename) for FEED in FEEDs if FEED.julian_day == feed_day)
+		feed_paths = tuple(os.path.join(FEED.base_path, FEED.filename) for FEED in FEEDs if FEED.julian_day == FEEDs[0].julian_day)
 
 	return feed_host, feed_paths
 

@@ -36,7 +36,6 @@ def gen_feed_data(host, path):
 		dict: feed values
 		dict: log values
 	'''
-	#allows uv access
 	try:
 		uv = A.miriad.UV(path)
 	except:
@@ -81,10 +80,8 @@ def dupe_check(dbi, source_host, source_paths):
 	with dbi.session_scope() as s:
 		table = pdbi.Feed
 		FEEDs = s.query(table).filter(table.host == source_host).all()
-	#all files on same host
-	all_paths = tuple(os.path.join(FEED.base_path, FEED.filename) for FEED in FEEDs)
+		all_paths = tuple(os.path.join(FEED.base_path, FEED.filename) for FEED in FEEDs)
 
-	#for each input file, check if in filenames
 	unique_paths = tuple(source_path for source_path in source_paths if source_path not in all_paths)
 		
 	return unique_paths

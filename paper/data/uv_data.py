@@ -207,10 +207,7 @@ def calc_npz_data(dbi, filename):
 	julian_date = five_round(float(ppdata.file_to_jd(filename)))
 
 	with dbi.session_scope() as s:
-		if len(filename.split('.')) == 5:
-			polarization = 'all'
-		elif len(filename.split('.')) == 6:
-			polarization = filename.split('.')[3]
+		polarization = filename.split('.')[3] if len(filename.split('.')) == 6 else 'all'
 		table = pdbi.Observation
 		OBS = s.query(table).filter(table.julian_date == julian_date).filter(table.polarization == polarization).one()
 
