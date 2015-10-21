@@ -336,12 +336,18 @@ def data_summary_table():
 	file_map = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
 
 	for obs in response:
-		if not obs is None:
-			obs_map[obs.polarization][obs.era_type]['obs_count'] += 1
-			obs_map[obs.polarization][obs.era_type]['obs_hours'] += (obs.time_end - obs.time_start) / 3600.0
+		if obs.polarization is not None:
+			era_type = 'none' if obs.era_type is None else obs.era_type
+			obs_map[obs.polarization][era_type]['obs_count'] += 1
+			obs_map[obs.polarization][era_type]['obs_hours'] += (obs.time_end - obs.time_start) / 3600
 
-			for paper_file in obs.files:
+			
+			obs_files = db_utils.query(database='paperdata', table='File',
+										field_tuples=(('obsnum', '==', obs.obsnum),))
+			for paper_file in obs_files:
 				file_map[paper_file.host][paper_file.filetype]['file_count'] += 1
+			#for paper_file in obs.files:
+			#	file_map[paper_file.host][paper_file.filetype]['file_count'] += 1
 
 	all_obs_strs = pol_strs + era_type_strs
 	obs_total = {all_obs_str: {'count': 0, 'hours': 0} for all_obs_str in all_obs_strs}

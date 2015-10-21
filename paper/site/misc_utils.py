@@ -66,8 +66,8 @@ def get_set_strings():
 	list[str]: set strings for polarization, era_type, host, and filetype
 	'''
 	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
-	era_type_strs = ('all',)
-	host_strs = ('all', 'pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1')
+	era_type_strs = ('all', 'none')
+	host_strs = ('all', 'pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1', 'node16')
 	filetype_strs = ('all', 'uv', 'uvcRRE', 'npz')
 
 	return pol_strs, era_type_strs, host_strs, filetype_strs
