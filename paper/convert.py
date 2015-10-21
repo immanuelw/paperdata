@@ -219,7 +219,7 @@ def gcal_to_jd(year, month, day, hour=None, minute=None, second=None):
 		float(5): julian date
 
 	>>> gcal_to_jd(1993, 10, 25, 2, 0, 5)
-	(2400000.5, 49285.08339)
+	2449285.58339
 	'''
 	year = int(year)
 	month = int(month)
@@ -241,7 +241,7 @@ def gcal_to_jd(year, month, day, hour=None, minute=None, second=None):
 	if second:
 		jd += second / (24.0 * 60 * 60)
 
-	return MJD_0, round(jd, 5)
+	return MJD_0 + round(jd, 5)
 
 def jd_to_gcal(jd1, jd2):
 	'''

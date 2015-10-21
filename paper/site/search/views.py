@@ -319,8 +319,7 @@ def data_summary_table():
 	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
 	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
 
-	start_utc =  misc_utils.get_jd_from_datetime(startdatetime)
-	end_utc =  misc_utils.get_jd_from_datetime(enddatetime)
+	start_utc, end_utc =  misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
 
 	response = db_utils.query(database='paperdata', table='Observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),

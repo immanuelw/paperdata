@@ -87,10 +87,9 @@ def add_data(dbi, data_dbi):
 				if host == named_host:
 					try:
 						uv = A.miriad.UV(path)
+						time_start, time_end, delta_time, _  = uv_data.calc_times(uv)
 					except:
 						continue
-
-					time_start, time_end, delta_time, _  = uv_data.calc_times(uv)
 				else:
 					time_start, time_end, delta_time, _, _, _, _ = uv_data.calc_uv_data(host, path)
 
