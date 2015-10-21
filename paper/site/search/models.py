@@ -95,7 +95,7 @@ class Set(db.Model):
 class FlaggedSubset(db.Model):
 	__tablename__ = 'FlaggedSubset'
 	id = db.Column(db.Integer, primary_key=True)
-	set_id = db.Column(db.Integer, db.ForeignKey('set.id', ondelete='CASCADE'))
+	set_id = db.Column(db.Integer, db.ForeignKey('Set.id', ondelete='CASCADE'))
 	start = db.Column(db.Integer)
 	end = db.Column(db.Integer)
 
