@@ -8,5 +8,6 @@ SECRET_KEY = 'secretkey'
 
 basedir = os.path.abspath(os.path.dirname(__file__))
 
-SQLALCHEMY_DATABASE_URI = 'postgres:///postgres'
+#SQLALCHEMY_DATABASE_URI = 'postgres://postgres'
+SQLALCHEMY_DATABASE_URI = 'postgres://immwa:immwa3978@localhost:5432/heralive'
 SQLALCHEMY_MIGRATE_REPO = os.path.join(basedir, 'migrations')
