@@ -324,12 +324,6 @@ def data_summary_table():
 	response = db_utils.query(database='paperdata', table='Observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
 								sort_tuples=(('time_start', 'asc'),))
-	#try:
-	#	response = db_utils.query(database='paperdata', table='Observation',
-	#								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-	#								sort_tuples=(('time_start', 'asc'),))
-	#except:
-	#	response = (None,)
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = misc_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
@@ -341,7 +335,6 @@ def data_summary_table():
 			obs_map[obs.polarization][era_type]['obs_count'] += 1
 			obs_map[obs.polarization][era_type]['obs_hours'] += (obs.time_end - obs.time_start) / 3600
 
-			
 			obs_files = db_utils.query(database='paperdata', table='File',
 										field_tuples=(('obsnum', '==', obs.obsnum),))
 			for paper_file in obs_files:
