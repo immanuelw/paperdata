@@ -173,8 +173,7 @@ def obs_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
-	start_utc = misc_utils.get_jd_from_datetime(starttime)
-	end_utc = misc_utils.get_jd_from_datetime(endtime)
+	start_utc, end_utc = misc_utils.get_jd_from_datetime(starttime, endtime)
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 	try:
@@ -200,8 +199,7 @@ def file_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
-	start_utc = misc_utils.get_jd_from_datetime(starttime)
-	end_utc = misc_utils.get_jd_from_datetime(endtime)
+	start_utc, end_utc = misc_utils.get_jd_from_datetime(starttime, endtime)
 
 	output_vars = ('host', 'source', 'obsnum', 'filesize')
 
@@ -319,7 +317,7 @@ def data_summary_table():
 	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
 	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
 
-	start_utc, end_utc =  misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
 
 	response = db_utils.query(database='paperdata', table='Observation',
 								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
