@@ -10,15 +10,15 @@
 		</tr>
 	</thead>
 	<tbody>
-		<tr>
-			{% for era_type in era_type_strs %}
+		{% for era_type in era_type_strs %}
+			<tr>
 				<th>{{ era_type }}</th>
 					{% for pol in pol_strs %}
 						<td>{{ obs_map[pol][era_type]['obs_hours'] | round(1) }} ({{ obs_map[pol][era_type]['obs_count'] }})</td>
 					{% endfor %}
 				<td>{{ obs_total[era_type]['hours'] | round(1) }} ({{ obs_total[era_type]['count'] }})</td>
 			{% endfor %}
-		</tr>
+			</tr>
 		<tr>
 			<th>Total</th>
 			{% for pol in pol_strs %}

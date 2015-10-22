@@ -24,6 +24,7 @@ from paper.site.search import models, histogram_utils, data_sources
 from paper.site import db_utils, misc_utils
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
+from sqlalchemy import func
 
 @app.route('/')
 @app.route('/index')
@@ -319,26 +320,24 @@ def data_summary_table():
 
 	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
 
-	response = db_utils.query(database='paperdata', table='Observation',
-								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-								sort_tuples=(('time_start', 'asc'),))
-
 	pol_strs, era_type_strs, host_strs, filetype_strs = misc_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
 	file_map = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
 
-	for obs in response:
-		if obs.polarization is not None:
-			era_type = 'none' if obs.era_type is None else obs.era_type
-			obs_map[obs.polarization][era_type]['obs_count'] += 1
-			obs_map[obs.polarization][era_type]['obs_hours'] += (obs.time_end - obs.time_start) / 3600
+	dbi = pdbi.DataBaseInterface()
+	with dbi.session_scope() as s:
+		obs_table = pdbi.Observation
+		response = s.query(obs_table.polarization, obs_table.era_type, func.sum(obs_table.length) * 24, func.count(obs_table))\
+							.filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
+							.group_by(obs_table.polarization, obs_table.era_type).all()
+		for polarization, era_type, length, count in response:
+			obs_map[polarization][str(era_type)].update({'obs_count': count , 'obs_hours': length})
 
-			obs_files = db_utils.query(database='paperdata', table='File',
-										field_tuples=(('obsnum', '==', obs.obsnum),))
-			for paper_file in obs_files:
-				file_map[paper_file.host][paper_file.filetype]['file_count'] += 1
-			#for paper_file in obs.files:
-			#	file_map[paper_file.host][paper_file.filetype]['file_count'] += 1
+		file_table = pdbi.File
+		response = s.query(file_table.host, file_table.filetype, func.count(file_table)).group_by(file_table.host, file_table.filetype).all()
+		for host, filetype, count in response:
+			file_map[host][filetype].update({'file_count': count})
+
 
 	all_obs_strs = pol_strs + era_type_strs
 	obs_total = {all_obs_str: {'count': 0, 'hours': 0} for all_obs_str in all_obs_strs}
