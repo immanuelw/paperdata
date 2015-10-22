@@ -13,6 +13,7 @@ make_clause | creates full sqlalchemy clause
 sort_clause | creates sort clause for query
 group_clause | creates group clause for query
 get_results | processes all clauses in query to output object list
+make_sess | creates database session
 query | queries database
 '''
 from paper.data import dbi as pdbi
@@ -224,6 +225,28 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples):
 
 	return results.all()
 
+def make_sess(database=None):
+	'''
+	gets database interface session object
+
+	Parameters
+	----------
+	database | Optional[str]: database name --defaults to None
+
+	Returns
+	-------
+	object: session object
+	'''
+
+	if database == 'search':
+		s = sdb.session
+	elif database == 'admin':
+		s = adb.session
+	else:
+		s = dbi.Session()
+
+	return s
+
 def query(data_source=None, database=None, table=None, field_tuples=None, sort_tuples=None, group_tuples=None):
 	'''
 	pulls list of object from database after filtering query
@@ -251,12 +274,7 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 		dbi, module = get_dbi(getattr(data_source, 'database'))
 		table = getattr(data_source, 'table')
 
-	if database == 'search':
-		s = sdb.session
-	elif database == 'admin':
-		s = adb.session
-	else:
-		s = dbi.Session()
+	s = make_sess(database)
 	results = get_results(s=s, table=table, field_tuples=field_tuples, sort_tuples=sort_tuples, group_tuples=group_tuples)
 	s.close()
 
