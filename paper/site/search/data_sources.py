@@ -278,11 +278,9 @@ def get_graph_data(data_source_str, start_utc, end_utc, the_set):
 									('era_type', None if era_type == 'all' else '==', era_type)),
 									sort_tuples=(('time_start', 'asc'),))
 
-		for obs in results:
-			obs_dict = {'obs_time': obs.time_start, 'obsnum': obs.obsnum, 'obs_count': 1}
-			data[polarization][era_type].append(obs_dict)
+		data[polarization][era_type] = [{'obs_time': obs.time_start, 'obsnum': obs.obsnum, 'obs_count': 1} for obs in results]
 
-	else: #No set, so we need to separate the data into sets for low/high and EOR0/EOR1
+	else: #No set, so we need to separate the data into sets
 		data = separate_data_into_sets(data, data_source, start_utc, end_utc)
 
 	return data
@@ -307,7 +305,6 @@ def separate_data_into_sets(data, data_source, start_utc, end_utc):
 									sort_tuples=(('time_start', 'asc'),))
 
 	for obs in obsid_results:
-		obs_dict = {'obs_time': obs.time_start, 'obsnum': obs.obsnum, 'obs_count': 1}
-		data[obs.polarization][obs.era_type].append(obs_dict)
+		data[obs.polarization][obs.era_type].append({'obs_time': obs.time_start, 'obsnum': obs.obsnum, 'obs_count': 1})
 
 	return data
