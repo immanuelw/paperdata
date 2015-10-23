@@ -14,7 +14,6 @@ import paper as ppdata
 from paper.data import dbi as pdbi
 from paper.site import db_utils, misc_utils
 from flask import g, render_template
-import math
 import json
 
 def get_plot_bands(the_set):
