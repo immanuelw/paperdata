@@ -114,9 +114,11 @@ def get_file_counts(start_utc, end_utc, host_strs=None, filetype_strs=None, set_
 			for obs in obs_response:
 				for file_obj in obs.files:
 					if file_obj is not None:
+						host = file_obj.host
+						filetype = file_obj.filetype
 						if (set_host and set_host != host) and (set_filetype and set_filetype != filetype):
 							continue
-						file_map[file_obj.host][file_obj.filetype].append({'file_date': file_obj.observation.julian_date,
+						file_map[host][filetype].append({'file_date': file_obj.observation.julian_date,
 																			'obsnum': file_obj.obsnum})
 			file_count = {host_str: {filetype_str: len(file_map[host_str][filetype_str])
 							for filetype_str in filetype_strs} for host_str in host_strs}
