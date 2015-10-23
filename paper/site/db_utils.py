@@ -225,13 +225,14 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples):
 
 	return results.all()
 
-def make_sess(database=None):
+def make_sess(database=None, dbi=None):
 	'''
 	gets database interface session object
 
 	Parameters
 	----------
 	database | Optional[str]: database name --defaults to None
+	dbi | Optional[object]: database interface object --defaults to None
 
 	Returns
 	-------
@@ -274,7 +275,7 @@ def query(data_source=None, database=None, table=None, field_tuples=None, sort_t
 		dbi, module = get_dbi(getattr(data_source, 'database'))
 		table = getattr(data_source, 'table')
 
-	s = make_sess(database)
+	s = make_sess(database, dbi)
 	results = get_results(s=s, table=table, field_tuples=field_tuples, sort_tuples=sort_tuples, group_tuples=group_tuples)
 	s.close()
 

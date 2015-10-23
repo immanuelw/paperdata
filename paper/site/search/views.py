@@ -19,6 +19,7 @@ from flask import render_template, flash, redirect, url_for, request, g, make_re
 from flask.ext.login import current_user
 import json
 from datetime import datetime
+import paper as ppdata
 from paper.site.flask_app import search_app as app, search_db as db
 from paper.site.search import models, histogram_utils, data_sources
 from paper.site import db_utils, misc_utils
@@ -106,8 +107,7 @@ def get_graph():
 		start_datetime = datetime.strptime(start_time_str, '%Y-%m-%dT%H:%M:%SZ')
 		end_datetime = datetime.strptime(end_time_str, '%Y-%m-%dT%H:%M:%SZ')
 
-		start_utc = misc_utils.get_jd_from_datetime(start_datetime)
-		end_utc = misc_utils.get_jd_from_datetime(start_datetime)
+		start_utc, end_utc = misc_utils.get_jd_from_datetime(start_datetime, end_datetime)
 
 		if graph_type_str == 'Obs_File':
 			return histogram_utils.get_obs_file_histogram(start_utc, end_utc, start_time_str, end_time_str)
@@ -142,13 +142,13 @@ def get_graph():
 		if graph_type_str == 'Obs_File':
 			set_polarization, set_era_type = the_set.polarization, the_set.era_type
 			set_host, set_filetype = the_set.host, the_set.filetype
-			obs_count, obs_map = histogram_utils.get_observation_counts(set_start, set_end, set_polarization, set_era_type)
+			obs_count, obs_map = histogram_utils.get_observation_counts(set_start, set_end, set_pol=set_polarization, set_era_type=set_era_type)
 			file_count, file_map = histogram_utils.get_file_counts(set_start, set_end, set_host=set_host, set_filetype=set_filetype)
 			range_end = end_datetime.strftime('%Y-%m-%dT%H:%M:%SZ') # For the function in histogram_utils.js
 			obs_count = json.dumps(obs_count)
-			obs_map = json.dumps(obs_map)
+			obs_map = json.dumps(obs_map, default=ppdata.decimal_default)
 			file_count = json.dumps(file_count)
-			file_map = json.dumps(file_map)
+			file_map = json.dumps(file_map, default=ppdata.decimal_default)
 			return render_template('setView.html', the_set=the_set, is_set=True,
 									obs_counts=obs_count, obs_map=obs_map, file_counts=file_count, file_map=file_map,
 									plot_bands=plot_bands, start_time_str_short=start_time_str_short,

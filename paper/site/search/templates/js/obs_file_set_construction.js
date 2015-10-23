@@ -7,14 +7,14 @@ var flaggedObsRanges = plot_bands;
 var currentObsData = {'polarization': '{{ the_set.polarization }}', 'era_type': '{{ the_set.era_type }}'};
 var currentFileData = {'host': '{{ the_set.host }}', 'filetype': '{{ the_set.filetype }}'};
 {% else %}
-//var flaggedObsDict = {'all': {'all': []}};
-//var flaggedFileDict = {'all': {'all': []}};
+//var flaggedObsDict = {'all': {'None': []}};
+//var flaggedFileDict = {'folio': {'uv': []}};
 var flaggedObsDict = obs_dict;
-var flaggedObsRanges = flaggedObsDict['all']['all'];
-var currentObsData = {'polarization': 'all', 'era_type': 'all'};
+var flaggedObsRanges = flaggedObsDict['all']['None'];
+var currentObsData = {'polarization': 'all', 'era_type': 'None'};
 var flaggedFileDict = file_dict;
-var flaggedFileRanges = flaggedFileDict['all']['all'];
-var currentFileData = {'host': 'all', 'filetype': 'all'};
+var flaggedFileRanges = flaggedFileDict['folio']['uv'];
+var currentFileData = {'host': 'folio', 'filetype': 'uv'};
 {% endif %}
 var clickDragMode = 'zoom';
 
