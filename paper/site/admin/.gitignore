@@ -10,3 +10,4 @@ flask
 eorlive
 *.egg-info
 ex.py
+settings.py
