@@ -1,5 +1,5 @@
 '''
-paper.site.admin.settings
+paper.site.search.settings
 
 author | Immanuel Washington
 '''
