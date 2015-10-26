@@ -174,13 +174,18 @@ def obs_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
+	polarization = request.form['polarization']
+	era_type = request.form['era_type']
+
 	start_utc, end_utc = misc_utils.get_jd_from_datetime(starttime, endtime)
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 	try:
 		response = db_utils.query(database='paperdata', table='Observation', 
-								field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-								sort_tuples=(('time_start', 'asc'),))
+									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
+									('polarization', None if polarization == 'any' else '==', polarization),
+									('era_type', None if era_type == 'all' else '==', era_type)),
+									sort_tuples=(('time_start', 'asc'),))
 		log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response]
 	except:
 		log_list = []
@@ -200,18 +205,23 @@ def file_table():
 	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
 	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
 
+	host = request.form['host']
+	filetype = request.form['filetype']
+
 	start_utc, end_utc = misc_utils.get_jd_from_datetime(starttime, endtime)
 
 	output_vars = ('host', 'source', 'obsnum', 'filesize')
 
 	try:
-		all_obs_list = db_utils.query(database='paperdata', table='Observation', 
-										field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc)),
-										sort_tuples=(('time_start', 'asc'),))
-		files_list = (obs.files for obs in all_obs_list)
-		file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
+		dbi = pdbi.DataBaseInterface()
+		table = pdbi.Observation
+		with dbi.session_scope() as s:
+			all_obs_list = s.query(table).filter(table.time_start >= start_utc).filter(table.time_end <= end_utc)\
+											.order_by(table.time_start.asc()).all()
+			files_list = (obs.files for obs in all_obs_list)
+			file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
 
-		log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response]
+			log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response]
 	except:
 		log_list = []
 
@@ -314,6 +324,11 @@ def data_summary_table():
 	#table that shows on side of website under login
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
+
+	#polarization = request.form['polarization']
+	#era_type = request.form['era_type']
+	#host = request.form['host']
+	#filetype = request.form['filetype']
 
 	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
 	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')

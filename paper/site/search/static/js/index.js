@@ -33,9 +33,6 @@ $(function() {
 
 	//global ajax vars
 	window.setRequest = null;
-	window.dataAmountRequest = null;
-	window.sourceRequest = null;
-	window.filesystemRequest = null;
 	window.dataSummaryTableRequest = null;
 
 	// Set up the tabs.
@@ -143,10 +140,23 @@ function getObservations(loadTab) {
 	var startUTC = startDate.toISOString().slice(0, 19) + 'Z';
 	var endUTC = endDate.toISOString().slice(0, 19) + 'Z';
 
+	var polarization = $('#polarization_dropdown').val();
+	var era_type = $('#era_type_dropdown').val();
+	var host = $('#host_dropdown').val();
+	var filetype = $('#filetype_dropdown').val();
+
+	window.obsTableRequest = $.ajax({
+	};
+
 	window.dataSummaryTableRequest = $.ajax({
 		type: 'POST',
 		url: '/data_summary_table',
-		data: {'starttime': startUTC, 'endtime': endUTC},
+		data: {'starttime': startUTC,
+				'endtime': endUTC,
+				'polarization': polarization,
+				'era_type': era_type,
+				'host': host,
+				'filetype': filetype},
 		success: function(data) {
 			$('#summary_table').html(data);
 		},
