@@ -1,0 +1,48 @@
+{% block content %}
+<table class='table table-striped table-bordered table-responsive' style='margin:0;'>
+	<tr>
+		<th colspan='3'>obscontroller_log for {{ start_time }} - {{ end_time }}</th>
+	</tr>
+</table>
+<table class='table table-striped table-bordered table-responsive' style='margin:0;'>
+	<tr>
+		<th colspan='3'>recvstatuspolice_log for {{ start_time }} - {{ end_time }}</th>
+	</tr>
+</table>
+<table class='table table-striped table-bordered table-responsive'>
+	<thead>
+		<tr>
+			<th style='width:25%'>Reference time</th>
+			<th style='width:25%'>Obs id</th>
+			<th style='width:50%'>Comment</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for error in obscontroller_error_list %}
+		<tr>
+			<td>{{ error[0] | int }}</td>
+			<td>{{ error[1] }}</td>
+			<td>{{ error[2] }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+<table class='table table-striped table-bordered table-responsive'>
+	<thead>
+		<tr>
+			<th style='width:25%'>Reference time</th>
+			<th style='width:25%'>Obs id</th>
+			<th style='width:50%'>Comment</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for error in recvstatuspolice_error_list %}
+		<tr>
+			<td>{{ error[0] | int }}</td>
+			<td>{{ error[1] }}</td>
+			<td>{{ error[2] }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}

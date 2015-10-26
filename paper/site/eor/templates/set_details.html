@@ -1,0 +1,25 @@
+<table id='set_details' class='tableClass setDetails'>
+	<tr class='rowClass'>
+		<th class='cellClass'>{{ the_set.name }}</th>
+		<td class='cellClass'>Creator: {{ the_set.username }}</td>
+		<td class='cellClass'>Polarization: {{ the_set.polarization }}</td>
+		<td class='cellClass'>Era Type: {{ the_set.era_type }}</td>
+		<td class='cellClass'>Host: {{ the_set.host }}</td>
+		<td class='cellClass'>Filetype: {{ the_set.filetype }}</td>
+		<td class='cellClass'>
+			Data hours: {{ the_set.total_data_hrs | round(2) }} ({{ the_set.flagged_data_hrs | round(2) }} flagged)
+		</td>
+		<td class='cellClass'><button type='button' onclick='downloadObs()'>Download obs</button></td>
+		<td class='cellClass'><button type='button' onclick='downloadFile()'>Download file</button></td>
+	</tr>
+</table>
+<script>
+
+function downloadObs() {
+	window.open('/download_set?set_id={{the_set.id}}?arg_type=obs', '_blank');
+};
+
+function downloadFile() {
+	window.open('/download_set?set_id={{the_set.id}}?arg_type=file', '_blank');
+};
+</script>

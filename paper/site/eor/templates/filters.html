@@ -1,0 +1,90 @@
+{% block body %}
+<table>
+	<tr>
+		<td>
+			Created by:
+		</td>
+		<td>
+			<select id='user_setlist_dropdown'>
+				<option value='' selected>All</option>
+				{% for user in users %}
+					<option value='{{user.username}}'>{{user.username}}</option>
+				{% endfor %}
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Polarization:
+		</td>
+		<td>
+			<select id='polarization_setlist_dropdown'>
+				<option value='all' selected>all</option>
+				<option value='xx'>xx</option>
+				<option value='xy'>xy</option>
+				<option value='yx'>yx</option>
+				<option value='yy'>yy</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Era Type:
+		</td>
+		<td>
+			<select id='era_type_setlist_dropdown'>
+				<option value='all' selected>all</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Host:
+		</td>
+		<td>
+			<select id='host_setlist_dropdown'>
+				<option value='all' selected>all</option>
+				<option value='pot1'>pot1</option>
+				<option value='pot2'>pot2</option>
+				<option value='pot3'>pot3</option>
+				<option value='folio'>folio</option>
+				<option value='pot8'>pot8</option>
+				<option value='nas1'>nas1</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Filetype:
+		</td>
+		<td>
+			<select id='filetype_setlist_dropdown'>
+				<option value='all' selected>all</option>
+				<option value='uv'>raw</option>
+				<option value='uvcRRE'>compressed</option>
+				<option value='npz'>flags</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Sort:
+		</td>
+		<td>
+			<select id='sort_setlist_dropdown'>
+				<option value='' selected>None</option>
+				<option value='hours'>Data hrs (desc)</option>
+				<option value='time'>Most recent</option>
+			</select>
+		</td>
+	</tr>
+	<tr>
+		<td>
+			<button type='button' onclick='applyFiltersAndSort()'>Go</button>
+		</td>
+		<td>
+			<input type='checkbox' id='range_filter'>In current range</input>
+		</td>
+	</tr>
+</table>
+{% endblock %}

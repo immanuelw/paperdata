@@ -1,0 +1,226 @@
+{% block body %}
+<div id='main_content_div'>
+	<button id='backbutton' onclick='obs_file.backToHistogram()'>Back to histogram</button>
+	<div id='obs_table'></div>
+	<div id='file_table'></div>
+	<div id='obs_file'></div>
+	<div id='set_construction_panel'>
+		{% include 'set_construction_panel.html' %}
+	</div>
+</div>
+<script type='text/javascript'>
+var obs_file = (function($) {
+	var dataSourceObj = {};
+	var observation_counts = {{ obs_counts | tojson }};
+	var observation_counts_copy = {{ obs_counts | tojson }};
+	var file_counts = {{ file_counts | tojson }};
+	var file_counts_copy = {{ file_counts | tojson }};
+	var plot_bands = {{ plot_bands | tojson }};
+	var obs_map = {{ obs_map | tojson }};
+	var file_map = {{ file_map | tojson }};
+
+	{% include 'js/obs_file_set_construction.js' %}
+
+	var backToHistogram = function() {
+		$('#backbutton').hide();
+		$('#obs_table').hide();
+		$('#file_table').hide();
+		$('#obs_file').show();
+		$('#set_construction_panel').show();
+	};
+	dataSourceObj.backToHistogram = backToHistogram;
+
+	$(function() {
+		$('#backbutton').hide();
+		$('#obs_table').hide();
+		$('#file_table').hide();
+
+		$('#obs_file').highcharts('StockChart', {
+			colors: [
+				'#7cb5ec',
+				'#FF0000',
+				'#90ed7d',
+				'#f7a35c',
+				'#8085e9',
+				'#f15c80',
+				'#e4d354',
+				'#8085e8',
+				'#8d4653',
+				'#91e8e1'
+			],
+			credits: {
+				enabled: false,
+			},
+			chart: {
+				zoomType: 'x',
+				events: {
+					selection: function(event) {
+						if (clickDragMode === 'flag') {
+							event.preventDefault();
+							flagClickAndDraggedRange(event);
+						}
+					}
+				}
+			},
+			legend: {
+				enabled: true
+			},
+			plotOptions: {
+				column: {
+					dataGrouping: {
+						groupPixelWidth: 80,
+						forced: true
+					},
+					pointPlacement: 'between',
+					groupPadding: 0.1,
+					pointPadding: 0,
+					events: {
+						click: function(event) {
+							if (this.name === 'observations' || this.name === 'files') {
+								var columnLimits = getColumnRangeLimits(event, this.xAxis.series[1]);
+								var startTime = columnLimits.startTime, endTime = columnLimits.endTime;
+
+								$('#obs_file').hide();
+								$('#set_construction_panel').hide();
+								$('#obs_table').hide();
+								$('#file_table').hide();
+								if (this.name === 'observations') {
+									$('#obs_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+									$('#obs_table').show();
+
+									$.ajax({
+										type: 'POST',
+										url: '/obs_table',
+										data: {
+											'starttime': startTime,
+											'endtime': endTime
+										},
+										success: function(data) {
+											$('#obs_table').html(data);
+											$('#backbutton').show();
+										},
+										error: function(xhr, ajaxOptions, thrownError) {
+											backToHistogram();
+										},
+										dataType: 'html'
+									});
+								}
+								else if (this.name === 'files') {
+									$('#file_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+									$('#file_table').show();
+
+									$.ajax({
+										type: 'POST',
+										url: '/file_table',
+										data: {
+											'starttime': startTime,
+											'endtime': endTime
+										},
+										success: function(data) {
+											$('#file_table').html(data);
+											$('#backbutton').show();
+										},
+										error: function(xhr, ajaxOptions, thrownError) {
+											backToHistogram();
+										},
+										dataType: 'html'
+									});
+								}
+							}
+						}
+					}
+				}
+			},
+			rangeSelector: {
+				buttons: [{
+					type: 'second',
+					count: 1,
+					text: '1s'
+				}, {
+					type: 'minute',
+					count: 1,
+					text: '1min'
+				}, {
+					type: 'minute',
+					count: 60,
+					text: '1hr'
+				}, {
+					type: 'day',
+					count: 1,
+					text: '1d'
+				}, {
+					type: 'week',
+					count: 1,
+					text: '1w'
+				}, {
+					type: 'month',
+					count: 1,
+					text: '1mo'
+				}, {
+					type: 'month',
+					count: 3,
+					text: '3mo'
+				}, {
+					type: 'month',
+					count: 6,
+					text: '6mo'
+				}, {
+					type: 'ytd',
+					count: 1,
+					text: 'YTD'
+				}, {
+					type: 'year',
+					count: 1,
+					text: '1y'
+				}, {
+					type: 'all',
+					count: 1,
+					text: 'all'
+				}],
+				selected: 10
+			},
+			title: {
+				text: 'Observation & File Count'
+			},
+			xAxis: {
+				ordinal: false
+			},
+			yAxis: {
+				title: {
+					text: 'Number of Observations/Files'
+				},
+				min: 0,
+				allowDecimals: false
+			},
+			series: [{
+				type: 'column',
+				name: 'observations',
+				data: observation_counts
+			},
+			{
+				type: 'column',
+				name: 'files',
+				data: file_counts
+			}]
+		}, function(chart) {
+			_chart = chart;
+			setup();
+		});
+	});
+
+	var sliderChanged = function(slider) {
+		var newOptions = {
+			dataGrouping: {
+				groupPixelWidth: slider.value
+			}
+		};
+
+		_chart.series[0].update(newOptions, false); // Don't redraw chart.
+		_chart.series[1].update(newOptions);
+	};
+	dataSourceObj.sliderChanged = sliderChanged;
+
+	return dataSourceObj;
+}(jQuery));
+</script>
+{% endblock %}

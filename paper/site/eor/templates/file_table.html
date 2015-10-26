@@ -1,0 +1,27 @@
+{% block content %}
+<table class='table table-striped table-bordered table-responsive' style='margin:0;'>
+	<tr>
+		<th colspan='3'>File log for {{ start_time }} - {{ end_time }}</th>
+	</tr>
+</table>
+<table class='table table-striped table-bordered table-responsive'>
+	<thead>
+		<tr>
+			<th style='width:10%'>Host</th>
+			<th style='width:50%'>Full Path</th>
+			<th style='width:30%'>Obsnum</th>
+			<th style='width:10%'>Filesize (MB)</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for paper_file in log_list %}
+		<tr>
+			<td>{{ paper_file['host'] }}</td>
+			<td>{{ paper_file['source'] }}</td>
+			<td>{{ paper_file['obsnum'] }}</td>
+			<td>{{ paper_file['filesize'] }}</td>
+		</tr>
+		{% endfor %}
+	</tbody>
+</table>
+{% endblock %}
