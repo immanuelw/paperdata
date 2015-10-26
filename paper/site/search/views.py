@@ -177,6 +177,8 @@ def obs_table():
 	polarization = request.form['polarization']
 	era_type = request.form['era_type']
 
+	fixed_et = None if era_type is 'None' else era_type
+
 	start_utc, end_utc = misc_utils.get_jd_from_datetime(starttime, endtime)
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
@@ -186,7 +188,8 @@ def obs_table():
 									('polarization', None if polarization == 'any' else '==', polarization),
 									('era_type', None if era_type == 'all' else '==', era_type)),
 									sort_tuples=(('time_start', 'asc'),))
-		log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response]
+		log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response
+					if obs.polarization == polarization and obs.era_type == fixed_et]
 	except:
 		log_list = []
 
@@ -221,7 +224,8 @@ def file_table():
 			files_list = (obs.files for obs in all_obs_list)
 			file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
 
-			log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response]
+			log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response
+						if paper_file.host == host and paper_file.filetype == filetype]
 	except:
 		log_list = []
 
