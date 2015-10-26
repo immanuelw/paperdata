@@ -34,7 +34,10 @@ $(function() {
 	//global ajax vars
 	window.setRequest = null;
 	window.dataSummaryTableRequest = null;
+	window.obsTableRequest = null;
+	window.fileTableRequest = null;
 
+	/*
 	// Set up the tabs.
 	$('#tabs').tabs({
 		beforeLoad: function(event, ui) {
@@ -68,6 +71,7 @@ $(function() {
 		},
 		dataType: 'html'
 	});
+	*/
 
 	getObservations(false /* Don't load the first tab, it's already being loaded */);
 	getComments();
@@ -91,6 +95,8 @@ function abortRequestIfPending(request) {
 
 function getObservations(loadTab) {
 	window.dataSummaryTableRequest = abortRequestIfPending(window.dataSummaryTableRequest);
+	window.obsTableRequest = abortRequestIfPending(window.obsTableRequest);
+	window.fileTableRequest = abortRequestIfPending(window.fileTableRequest);
 
 	var start = $('#datepicker_start').val();
 	var end = $('#datepicker_end').val();
@@ -116,6 +122,7 @@ function getObservations(loadTab) {
 		return;
 	}
 
+	/*
 	// Load the currently selected tab if it's not already being loaded.
 	if (loadTab) {
 		$('#tabs > ul > li').each(function(index) {
@@ -133,8 +140,10 @@ function getObservations(loadTab) {
 		$('#set_or_date_range_label').html('date range');
 		$('#set_details').hide();
 	}
-
+	*/
 	$('#summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+	$('#obs_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+	$('#file_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 	// Make each date into a string of the format 'YYYY-mm-ddTHH:MM:SSZ', which is the format used in the local database.
 	var startUTC = startDate.toISOString().slice(0, 19) + 'Z';
@@ -146,17 +155,43 @@ function getObservations(loadTab) {
 	var filetype = $('#filetype_dropdown').val();
 
 	window.obsTableRequest = $.ajax({
-	};
+		type: 'POST',
+		url: '/obs_table',
+		data: {'starttime': startUTC,
+				'endtime': endUTC,
+				'polarization': polarization,
+				'era_type': era_type,
+		};
+		success: function(data) {
+			$('#obs_table').html(data);
+		},
+		dataType: 'html'
+	});
+
+	window.fileTableRequest = $.ajax({
+		type: 'POST',
+		url: '/file_table',
+		data: {'starttime': startUTC,
+				'endtime': endUTC,
+				'host': host,
+				'filetype': filetype,
+		};
+		success: function(data) {
+			$('#file_table').html(data);
+		},
+		dataType: 'html'
+	});
 
 	window.dataSummaryTableRequest = $.ajax({
 		type: 'POST',
 		url: '/data_summary_table',
 		data: {'starttime': startUTC,
 				'endtime': endUTC,
-				'polarization': polarization,
-				'era_type': era_type,
-				'host': host,
-				'filetype': filetype},
+				//'polarization': polarization,
+				//'era_type': era_type,
+				//'host': host,
+				//'filetype': filetype,
+		},
 		success: function(data) {
 			$('#summary_table').html(data);
 		},
