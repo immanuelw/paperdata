@@ -212,7 +212,8 @@ def get_results(s, table, field_tuples, sort_tuples, group_tuples):
 	if field_tuples is not None:
 		clause_gen = (make_clause(table, field_name, equivalency, value) for field_name, equivalency, value in field_tuples)
 		for clause in clause_gen:
-			results = results.filter(clause)
+			if clause is not None:
+				results = results.filter(clause)
 	if group_tuples is not None:
 		if sort_tuples is not None:
 			order_first = results.order_by(*sort_clause(table, sort_tuples)).subquery()

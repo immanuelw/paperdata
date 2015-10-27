@@ -8,8 +8,8 @@
 #error_table, #obs_table, #file_table table {
 	table-layout: fixed;
 	float: left;
-	width: 50%;
-	max-width: 50%;
+	width: 100%;
+	max-width: 100%;
 	word-wrap: break-word;
 }
 
