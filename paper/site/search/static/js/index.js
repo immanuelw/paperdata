@@ -138,6 +138,7 @@ function saveTable(table) {
 				'era_type': era_type,
 			},
 			success: function(data) {
+				//window.location = '/save_obs';
 				$('#save_obs').html(data);
 			},
 			dataType: 'json'
