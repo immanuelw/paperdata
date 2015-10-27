@@ -17,7 +17,7 @@ profile | shows user profile
 user_page | shows user page
 data_summary_table | shows data summary table
 '''
-from flask import render_template, flash, redirect, url_for, request, g, make_response, Response
+from flask import render_template, flash, redirect, url_for, request, g, make_response, Response, jsonify
 from flask.ext.login import current_user
 import json
 from datetime import datetime
@@ -233,7 +233,7 @@ def save_obs():
 	except:
 		entry_list = []
 
-	return Response(json.dumps(entry_list), mimetype='application/json')
+	return Response(json.dumps(entry_list, sort_keys=True, indent=1, default=ppdata.decimal_default), mimetype='application/json')
 
 @app.route('/file_table', methods = ['POST'])
 def file_table():
@@ -305,7 +305,7 @@ def save_files():
 	except:
 		entry_list = []
 
-	return Response(json.dumps(entry_list), mimetype='application/json')
+	return Response(json.dumps(entry_list, sort_keys=True, indent=1, default=ppdata.decimal_default), mimetype='application/json')
 
 @app.before_request
 def before_request():
