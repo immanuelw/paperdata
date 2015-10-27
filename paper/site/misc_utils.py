@@ -63,7 +63,11 @@ def get_set_strings():
 
 	Returns
 	-------
-	list[str]: set strings for polarization, era_type, host, and filetype
+	tuple:
+		list[str]: set strings for polarization
+		list[str]: set strings for era type
+		list[str]: set strings for host
+		list[str]: set strings for filetype
 	'''
 	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
 	era_type_strs = ('all', 'None')
@@ -71,6 +75,26 @@ def get_set_strings():
 	filetype_strs = ('all', 'uv', 'uvcRRE', 'npz')
 
 	return pol_strs, era_type_strs, host_strs, filetype_strs
+
+def get_dropdowns():
+	'''
+	output a list of tuples which indicate dropdown strings and values other than default value
+
+	Returns
+	-------
+	tuple:
+		tuple[str]: keys and values for polarization
+		tuple[str]: keys and values for era type
+		tuple[str]: keys and values for host
+		tuple[str]: keys and values for filetype
+	'''
+	pol_dropdown = (('all', 'all'), ('xx', 'xx'), ('xy', 'xy'), ('yx', 'yx'), ('yy', 'yy'), ('any', 'any'))
+	era_type_dropdown = (('None', 'None'), ('all', 'all'),)
+	host_dropdown = (('folio', 'folio'), ('all', 'all'), ('pot1', 'pot1'), ('pot2', 'pot2'),
+						('pot3', 'pot3'), ('pot8', 'pot8'), ('nas1', 'nas1'), ('node16', 'node16'))
+	filetype_dropdown = (('uv', 'raw'), ('all', 'all'), ('uvcRRE', 'compressed'), ('npz', 'flags'))
+
+	return pol_dropdown, era_type_dropdown, host_dropdown, filetype_dropdown
 
 def get_jd_from_datetime(start_time=None, end_time=None):
 	'''

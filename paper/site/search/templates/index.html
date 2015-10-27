@@ -35,55 +35,59 @@
 					<tr>
 						<td>
 							Polarization:
-						</td>
-						<td>
 							<select id='polarization_dropdown'>
-								<option value='all' selected>all</option>
-								<option value='xx'>xx</option>
-								<option value='xy'>xy</option>
-								<option value='yx'>yx</option>
-								<option value='yy'>yy</option>
-								<option value='any'>any</option>
+								{% for polarization, name in polarization_dropdown %}
+									{% if polarization == 'all' %}
+									<option value={{ polarization }} selected>{{ name }}</option>
+									{% else %}
+									<option value={{ polarization }}>{{ name }}</option>
+									{% endif %}
+								{% endfor %}
 							</select>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							Era Type:
-						</td>
-						<td>
 							<select id='era_type_dropdown'>
-								<option value='None' selected>None</option>
-								<option value='all'>all</option>
+								{% for era_type, name in era_type_dropdown %}
+									{% if era_type == 'None' %}
+									<option value={{ era_type }} selected>{{ name }}</option>
+									{% else %}
+									<option value={{ era_type }}>{{ name }}</option>
+									{% endif %}
+								{% endfor %}
 							</select>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							Host:
-						</td>
-						<td>
 							<select id='host_dropdown'>
-								<option value='folio' selected>folio</option>
-								<option value='all'>all</option>
-								<option value='pot1'>pot1</option>
-								<option value='pot2'>pot2</option>
-								<option value='pot3'>pot3</option>
-								<option value='pot8'>pot8</option>
-								<option value='nas1'>nas1</option>
+								{% for host, name in host_dropdown %}
+									{% if host == 'folio' %}
+									<option value={{ host }} selected>{{ name }}</option>
+									{% else %}
+									<option value={{ host }}>{{ name }}</option>
+									{% endif %}
+								{% endfor %}
 							</select>
 						</td>
 					</tr>
 					<tr>
 						<td>
 							Filetype:
-						</td>
-						<td>
 							<select id='filetype_dropdown'>
-								<option value='uv' selected>raw</option>
-								<option value='uvcRRE'>compressed</option>
-								<option value='npz'>flags</option>
-								<option value='all'>all</option>
+								{% for filetype, name in filetype_dropdown %}
+									{% if filetype == 'uv' %}
+									<option value={{ filetype }} selected>{{ name }}</option>
+									{% else %}
+									<option value={{ filetype }}>{{ name }}</option>
+									{% endif %}
+								{% endfor %}
+							</select>
+						</td>
+					</tr>
 				</div>
 				<div id='observations_main'></div>
 				<br>

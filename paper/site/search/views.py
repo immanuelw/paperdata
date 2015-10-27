@@ -45,7 +45,7 @@ def index(setName=None):
 	html: index
 	'''
 	active_data_sources = []
-
+	polarization_dropdown, era_type_dropdown, host_dropdown, filetype_dropdown = misc_utils.get_dropdowns()
 	if g.user is not None and g.user.is_authenticated():
 		active_data_sources = g.user.active_data_sources
 
@@ -60,15 +60,17 @@ def index(setName=None):
 			end_time_str_short = end_datetime.strftime('%Y/%m/%d %H:%M')
 
 			return render_template('index.html', the_set=the_set,
-									start_time_str_full=start_time_str_full,
-									end_time_str_full=end_time_str_full,
-									start_time_str_short=start_time_str_short,
-									end_time_str_short=end_time_str_short,
-									active_data_sources=active_data_sources)
+									start_time_str_full=start_time_str_full, end_time_str_full=end_time_str_full,
+									start_time_str_short=start_time_str_short, end_time_str_short=end_time_str_short,
+									active_data_sources=active_data_sources,
+									polarization_dropdown=polarization_dropdown, era_type_dropdown=era_type_dropdown,
+									host_dropdown=host_dropdown, filetype_dropdown=filetype_dropdown)
 		else:
 			flash('That set doesn\'t exist', 'error')
 
-	return render_template('index.html', active_data_sources=active_data_sources)
+	return render_template('index.html', active_data_sources=active_data_sources,
+							polarization_dropdown=polarization_dropdown, era_type_dropdown=era_type_dropdown,
+							host_dropdown=host_dropdown, filetype_dropdown=filetype_dropdown)
 
 @app.route('/get_graph')
 def get_graph():

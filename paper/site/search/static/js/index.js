@@ -37,7 +37,6 @@ $(function() {
 	window.obsTableRequest = null;
 	window.fileTableRequest = null;
 
-	/*
 	// Set up the tabs.
 	$('#tabs').tabs({
 		beforeLoad: function(event, ui) {
@@ -60,6 +59,7 @@ $(function() {
 		}
 	});
 
+	/*
 	$('#filter_dropdown_div').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 	$.ajax({
@@ -122,7 +122,9 @@ function getObservations(loadTab) {
 		return;
 	}
 
-	/*
+	$('#obs_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+	$('#file_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+
 	// Load the currently selected tab if it's not already being loaded.
 	if (loadTab) {
 		$('#tabs > ul > li').each(function(index) {
@@ -140,10 +142,8 @@ function getObservations(loadTab) {
 		$('#set_or_date_range_label').html('date range');
 		$('#set_details').hide();
 	}
-	*/
+
 	$('#summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
-	$('#obs_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
-	$('#file_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 	// Make each date into a string of the format 'YYYY-mm-ddTHH:MM:SSZ', which is the format used in the local database.
 	var startUTC = startDate.toISOString().slice(0, 19) + 'Z';
@@ -161,7 +161,7 @@ function getObservations(loadTab) {
 				'endtime': endUTC,
 				'polarization': polarization,
 				'era_type': era_type,
-		};
+		},
 		success: function(data) {
 			$('#obs_table').html(data);
 		},
@@ -175,7 +175,7 @@ function getObservations(loadTab) {
 				'endtime': endUTC,
 				'host': host,
 				'filetype': filetype,
-		};
+		},
 		success: function(data) {
 			$('#file_table').html(data);
 		},
