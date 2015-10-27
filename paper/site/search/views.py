@@ -8,14 +8,16 @@ Functions
 index | shows main page
 get_graph | plots graph
 obs_table | shows observation table
+save_obs | generates observation json file
 file_table | shows file table
+save_files | generates file json file
 before_request | accesses database
 teardown_request | exits database
 profile | shows user profile
 user_page | shows user page
 data_summary_table | shows data summary table
 '''
-from flask import render_template, flash, redirect, url_for, request, g, make_response
+from flask import render_template, flash, redirect, url_for, request, g, make_response, Response
 from flask.ext.login import current_user
 import json
 from datetime import datetime
@@ -184,21 +186,54 @@ def obs_table():
 	era_type = request.form['era_type']
 
 	fixed_et = None if era_type == 'None' else era_type
-
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
+
 	try:
 		response = db_utils.query(database='paperdata', table='Observation', 
 									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 									('polarization', None if polarization == 'any' else '==', polarization),
 									('era_type', None if era_type in ('all', 'None') else '==', era_type)),
 									sort_tuples=(('time_start', 'asc'),))
-		log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response
-					if obs.polarization == polarization and obs.era_type == fixed_et]
+		log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response]
 	except:
 		log_list = []
 
 	return render_template('obs_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime, end_time=endtime)
+
+@app.route('/save_obs', methods = ['POST'])
+def save_obs():
+	'''
+	saves observations as json
+
+	Returns
+	-------
+	html: json file
+	'''
+	starttime = request.form['starttime']
+	endtime = request.form['endtime']
+
+	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
+	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
+	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+
+	polarization = request.form['polarization']
+	era_type = request.form['era_type']
+
+	fixed_et = None if era_type == 'None' else era_type
+
+	try:
+		response = db_utils.query(database='paperdata', table='Observation', 
+									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
+									('polarization', None if polarization == 'any' else '==', polarization),
+									('era_type', None if era_type in ('all', 'None') else '==', era_type)),
+									sort_tuples=(('time_start', 'asc'),))
+
+		entry_list = [obs.to_dict() for obs in response]
+	except:
+		entry_list = []
+
+	return Response(json.dumps(entry_list), mimetype='application/json')
 
 @app.route('/file_table', methods = ['POST'])
 def file_table():
@@ -237,6 +272,40 @@ def file_table():
 
 	return render_template('file_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime, end_time=endtime)
+
+@app.route('/save_files', methods = ['POST'])
+def save_files():
+	'''
+	saves file metadata as json
+
+	Returns
+	-------
+	html: json file
+	'''
+	starttime = request.form['starttime']
+	endtime = request.form['endtime']
+
+	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
+	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
+	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+
+	host = request.form['host']
+	filetype = request.form['filetype']
+
+	try:
+		dbi = pdbi.DataBaseInterface()
+		table = pdbi.Observation
+		with dbi.session_scope() as s:
+			all_obs_list = s.query(table).filter(table.time_start >= start_utc).filter(table.time_end <= end_utc)\
+											.order_by(table.time_start.asc()).all()
+			files_list = (obs.files for obs in all_obs_list)
+			file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
+
+			entry_list = [paper_file.to_dict() for paper_file in response if paper_file.host == host and paper_file.filetype == filetype]
+	except:
+		entry_list = []
+
+	return Response(json.dumps(entry_list), mimetype='application/json')
 
 @app.before_request
 def before_request():

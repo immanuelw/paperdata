@@ -74,7 +74,9 @@
 					</select>
 				</div>
 				<div id='obs_table'></div>
+				<button type='button' onclick='saveTable("obs")' class='replyButton' style='margin-top:12px;'>Save Observations</button>
 				<div id='file_table'></div>
+				<button type='button' onclick='saveTable("files")' class='replyButton' style='margin-top:12px;'>Save Files</button>
 				{% if the_set %}
 					{% include 'set_details.html' %}
 				{% endif %}

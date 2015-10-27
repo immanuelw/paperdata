@@ -93,6 +93,75 @@ function abortRequestIfPending(request) {
 	return request;
 };
 
+function saveTable(table) {
+	window.saveTableRequest = abortRequestIfPending(window.saveTableRequest);
+	var start = $('#datepicker_start').val();
+	var end = $('#datepicker_end').val();
+	re = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
+
+	// Update the sessionStorage
+	sessionStorage.startDate = start;
+	sessionStorage.endDate = end;
+
+	var startDate, endDate;
+
+	if (start.match(re)) {
+		startDate = getDate(start);
+	} else {
+		alert('Invalid datetime format: ' + start);
+		return;
+	}
+
+	if (end.match(re)) {
+		endDate = getDate(end);
+	} else {
+		alert('Invalid datetime format: ' + end);
+		return;
+	}
+
+	var startUTC = startDate.toISOString().slice(0, 19) + 'Z';
+	var endUTC = endDate.toISOString().slice(0, 19) + 'Z';
+
+	var polarization = $('#polarization_dropdown').val();
+	var era_type = $('#era_type_dropdown').val();
+	var host = $('#host_dropdown').val();
+	var filetype = $('#filetype_dropdown').val();
+
+	if (table === 'obs') {
+		window.saveTableRequest = $.ajax({
+			type: 'POST',
+			url: '/save_obs',
+			data: {
+				'starttime': startUTC,
+				'endtime': endUTC,
+				'polarization': polarization,
+				'era_type': era_type,
+			},
+			success: function(data) {
+				$('#save_obs').html(data);
+			},
+			dataType: 'json'
+		});
+	} else if (table === 'files') {
+		window.saveTableRequest = $.ajax({
+			type: 'POST',
+			url: '/save_files',
+			data: {
+				'starttime': startUTC,
+				'endtime': endUTC,
+				'host': host,
+				'filetype': filetype,
+			},
+			success: function(data) {
+				$('#save_files').html(data);
+			},
+			dataType: 'json'
+		});
+	} else {
+		return;
+	};
+};
+
 function getObservations(loadTab) {
 	window.dataSummaryTableRequest = abortRequestIfPending(window.dataSummaryTableRequest);
 	window.obsTableRequest = abortRequestIfPending(window.obsTableRequest);
@@ -157,10 +226,11 @@ function getObservations(loadTab) {
 	window.obsTableRequest = $.ajax({
 		type: 'POST',
 		url: '/obs_table',
-		data: {'starttime': startUTC,
-				'endtime': endUTC,
-				'polarization': polarization,
-				'era_type': era_type,
+		data: {
+			'starttime': startUTC,
+			'endtime': endUTC,
+			'polarization': polarization,
+			'era_type': era_type,
 		},
 		success: function(data) {
 			$('#obs_table').html(data);
@@ -171,10 +241,11 @@ function getObservations(loadTab) {
 	window.fileTableRequest = $.ajax({
 		type: 'POST',
 		url: '/file_table',
-		data: {'starttime': startUTC,
-				'endtime': endUTC,
-				'host': host,
-				'filetype': filetype,
+		data: {
+			'starttime': startUTC,
+			'endtime': endUTC,
+			'host': host,
+			'filetype': filetype,
 		},
 		success: function(data) {
 			$('#file_table').html(data);
@@ -185,12 +256,13 @@ function getObservations(loadTab) {
 	window.dataSummaryTableRequest = $.ajax({
 		type: 'POST',
 		url: '/data_summary_table',
-		data: {'starttime': startUTC,
-				'endtime': endUTC,
-				//'polarization': polarization,
-				//'era_type': era_type,
-				//'host': host,
-				//'filetype': filetype,
+		data: {
+			'starttime': startUTC,
+			'endtime': endUTC,
+			//'polarization': polarization,
+			//'era_type': era_type,
+			//'host': host,
+			//'filetype': filetype,
 		},
 		success: function(data) {
 			$('#summary_table').html(data);
