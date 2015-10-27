@@ -73,47 +73,8 @@
 						{% endfor %}
 					</select>
 				</div>
-				<div id='observations_main'></div>
-				<br>
-				<div id='tabs'>
-					<ul>
-					{% if g.user and g.user.is_authenticated() %}
-						{% for data_source in active_data_sources %}
-							<li>
-								{% if the_set %}
-								<a href='/get_graph?graphType={{data_source.graph_type}}&dataSource={{data_source.name}}&set={{the_set.name}}'>
-								{% else %}
-								<a href='/get_graph?graphType={{data_source.graph_type}}&dataSource={{data_source.name}}'>
-								{% endif %}
-									{{data_source.name}}
-								</a>
-							</li>
-						{% endfor %}
-						{% if active_data_sources | length == 0 %}
-							<li>
-								<a href='#no-active-data-sources'>No active data sources</a>
-							</li>
-						{% endif %}
-					{% else %} <!-- Not logged in, just see the histogram -->
-						<li>
-							{% if the_set %}
-							<a href='/get_graph?graphType=Obs_File&dataSource=Obs_File&set={{the_set.name}}'>
-							{% else %}
-							<a href='/get_graph?graphType=Obs_File&dataSource=Obs_File'>
-							{% endif %}
-								Obs &amp; File
-							</a>
-						</li>
-					{% endif %}
-					</ul>
-					{% if g.user and g.user.is_authenticated() and active_data_sources | length == 0 %}
-						<div id='no-active-data-sources'>
-							<a href='/profile' style='color:#428bca;'>
-								Activate data sources on your profile page
-							</a>
-						</div>
-					{% endif %}
-				</div>
+				<div id='obs_table'></div>
+				<div id='file_table'></div>
 				{% if the_set %}
 					{% include 'set_details.html' %}
 				{% endif %}

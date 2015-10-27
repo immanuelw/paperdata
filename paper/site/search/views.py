@@ -173,22 +173,24 @@ def obs_table():
 	-------
 	html: observation table
 	'''
-	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
-	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
+	starttime = request.form['starttime']
+	endtime = request.form['endtime']
+
+	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
+	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
+	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
 
 	polarization = request.form['polarization']
 	era_type = request.form['era_type']
 
-	fixed_et = None if era_type is 'None' else era_type
-
-	start_utc, end_utc = misc_utils.get_jd_from_datetime(starttime, endtime)
+	fixed_et = None if era_type == 'None' else era_type
 
 	output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 	try:
 		response = db_utils.query(database='paperdata', table='Observation', 
 									field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
 									('polarization', None if polarization == 'any' else '==', polarization),
-									('era_type', None if era_type == 'all' else '==', era_type)),
+									('era_type', None if era_type in ('all', 'None') else '==', era_type)),
 									sort_tuples=(('time_start', 'asc'),))
 		log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response
 					if obs.polarization == polarization and obs.era_type == fixed_et]
@@ -196,7 +198,7 @@ def obs_table():
 		log_list = []
 
 	return render_template('obs_table.html', log_list=log_list, output_vars=output_vars,
-							start_time=starttime.strftime('%Y-%m-%dT%H:%M:%SZ'), end_time=endtime.strftime('%Y-%m-%dT%H:%M:%SZ'))
+							start_time=starttime, end_time=endtime)
 
 @app.route('/file_table', methods = ['POST'])
 def file_table():
@@ -207,13 +209,15 @@ def file_table():
 	-------
 	html: file table
 	'''
-	starttime = datetime.utcfromtimestamp(int(request.form['starttime']) / 1000)
-	endtime = datetime.utcfromtimestamp(int(request.form['endtime']) / 1000)
+	starttime = request.form['starttime']
+	endtime = request.form['endtime']
+
+	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
+	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
+	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
 
 	host = request.form['host']
 	filetype = request.form['filetype']
-
-	start_utc, end_utc = misc_utils.get_jd_from_datetime(starttime, endtime)
 
 	output_vars = ('host', 'source', 'obsnum', 'filesize')
 
@@ -232,7 +236,7 @@ def file_table():
 		log_list = []
 
 	return render_template('file_table.html', log_list=log_list, output_vars=output_vars,
-							start_time=starttime.strftime('%Y-%m-%dT%H:%M:%SZ'), end_time=endtime.strftime('%Y-%m-%dT%H:%M:%SZ'))
+							start_time=starttime, end_time=endtime)
 
 @app.before_request
 def before_request():
@@ -327,7 +331,6 @@ def data_summary_table():
 	-------
 	html: summary table
 	'''
-	#table that shows on side of website under login
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
