@@ -201,7 +201,7 @@ def obs_table():
 	return render_template('obs_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime, end_time=endtime)
 
-@app.route('/save_obs', methods = ['GET', 'POST'])
+@app.route('/save_obs', methods = ['POST'])
 def save_obs():
 	'''
 	saves observations as json
@@ -274,7 +274,7 @@ def file_table():
 	return render_template('file_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime, end_time=endtime)
 
-@app.route('/save_files', methods = ['GET', 'POST'])
+@app.route('/save_files', methods = ['POST'])
 def save_files():
 	'''
 	saves file metadata as json
