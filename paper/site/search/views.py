@@ -201,7 +201,7 @@ def obs_table():
 	return render_template('obs_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime, end_time=endtime)
 
-@app.route('/save_obs', methods = ['POST'])
+@app.route('/save_obs', methods = ['GET', 'POST'])
 def save_obs():
 	'''
 	saves observations as json
@@ -233,7 +233,8 @@ def save_obs():
 	except:
 		entry_list = []
 
-	return Response(json.dumps(entry_list, sort_keys=True, indent=4, default=ppdata.decimal_default), mimetype='application/json')
+	return Response(response=json.dumps(entry_list, sort_keys=True, indent=4, default=ppdata.decimal_default),
+					status=200, mimetype='application/json', headers={'Content-Disposition': 'attachment; filename=obs.json'})
 
 @app.route('/file_table', methods = ['POST'])
 def file_table():
@@ -273,7 +274,7 @@ def file_table():
 	return render_template('file_table.html', log_list=log_list, output_vars=output_vars,
 							start_time=starttime, end_time=endtime)
 
-@app.route('/save_files', methods = ['POST'])
+@app.route('/save_files', methods = ['GET', 'POST'])
 def save_files():
 	'''
 	saves file metadata as json
@@ -305,7 +306,8 @@ def save_files():
 	except:
 		entry_list = []
 
-	return Response(json.dumps(entry_list, sort_keys=True, indent=4, default=ppdata.decimal_default), mimetype='application/json')
+	return Response(response=json.dumps(entry_list, sort_keys=True, indent=4, default=ppdata.decimal_default),
+					status=200, mimetype='application/json')
 
 @app.before_request
 def before_request():

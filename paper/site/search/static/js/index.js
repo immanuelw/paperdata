@@ -158,6 +158,7 @@ function saveTable(table) {
 			dataType: 'json'
 		});
 	} else {
+		alert('Invalid json');
 		return;
 	};
 };
