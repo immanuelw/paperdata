@@ -8,6 +8,7 @@ Functions
 time_val | processes time to be human readable
 str_val | processes time to give human readable unit
 get_set_strings | acquires all possible values for set strings
+get_dropdowns | acquires keys and values for dropdown lists
 get_jd_from_datetime | calculates start and end julian dates from datetimes
 get_utc_from_datetime | calculates utc time from datetime
 '''
