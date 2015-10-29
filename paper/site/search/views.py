@@ -5,6 +5,7 @@ author | Immanuel Washington
 
 Functions
 ---------
+time_fix | fixes times for observation input
 index | shows main page
 get_graph | plots graph
 obs_table | shows observation table
@@ -28,6 +29,39 @@ from paper.site import db_utils, misc_utils
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 from sqlalchemy import func
+
+def time_fix(jdstart, jdend, starttime=None, endtime=None):
+	'''
+	fixes times for observations
+
+	Parameters
+	----------
+	jdstart | str: starting time of julian date
+	jdend | str: ending time of julian date
+	starttime | str: string of start time --defaults to None
+	endtime | str: string of end time --defaults to None
+
+	Returns
+	-------
+	tuple:
+		float(5): julian date start time
+		float(5): julian date end time
+	'''
+	try:
+		jd_start = round(float(jdstart), 5)
+		jd_end = round(float(jdend), 5)
+	except:
+		jd_start = None
+		jd_end = None
+
+	if jd_start == None:
+		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
+		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
+		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	else:
+		start_utc, end_utc = jd_start, jd_end
+
+	return start_utc, end_utc
 
 @app.route('/')
 @app.route('/index')
@@ -178,19 +212,10 @@ def obs_table():
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
-	try:
-		jd_start = round(float(request.form['jd_start']), 5)
-		jd_end = round(float(request.form['jd_end']), 5)
-	except:
-		jd_start = None
-		jd_end = None
+	jdstart = request.form['jd_start']
+	jdend = request.form['jd_end']
 
-	if jd_start == None:
-		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
-		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
-	else:
-		start_utc, end_utc = jd_start, jd_end
+	start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
 
 	polarization = request.form['polarization']
 	era_type = request.form['era_type']
@@ -222,19 +247,10 @@ def save_obs():
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
-	try:
-		jd_start = round(float(request.form['jd_start']), 5)
-		jd_end = round(float(request.form['jd_end']), 5)
-	except:
-		jd_start = None
-		jd_end = None
+	jdstart = request.form['jd_start']
+	jdend = request.form['jd_end']
 
-	if jd_start == None:
-		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
-		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
-	else:
-		start_utc, end_utc = jd_start, jd_end
+	start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
 
 	polarization = request.form['polarization']
 	era_type = request.form['era_type']
@@ -267,19 +283,10 @@ def file_table():
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
-	try:
-		jd_start = round(float(request.form['jd_start']), 5)
-		jd_end = round(float(request.form['jd_end']), 5)
-	except:
-		jd_start = None
-		jd_end = None
+	jdstart = request.form['jd_start']
+	jdend = request.form['jd_end']
 
-	if jd_start == None:
-		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
-		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
-	else:
-		start_utc, end_utc = jd_start, jd_end
+	start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
 
 	host = request.form['host']
 	filetype = request.form['filetype']
@@ -323,19 +330,10 @@ def save_files():
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
-	try:
-		jd_start = round(float(request.form['jd_start']), 5)
-		jd_end = round(float(request.form['jd_end']), 5)
-	except:
-		jd_start = None
-		jd_end = None
+	jdstart = request.form['jd_start']
+	jdend = request.form['jd_end']
 
-	if jd_start == None:
-		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
-		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
-	else:
-		start_utc, end_utc = jd_start, jd_end
+	start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
 
 	host = request.form['host']
 	filetype = request.form['filetype']
@@ -452,19 +450,10 @@ def data_summary_table():
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
-	try:
-		jd_start = round(float(request.form['jd_start']), 5)
-		jd_end = round(float(request.form['jd_end']), 5)
-	except:
-		jd_start = None
-		jd_end = None
+	jdstart = request.form['jd_start']
+	jdend = request.form['jd_end']
 
-	if jd_start == None:
-		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
-		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
-	else:
-		start_utc, end_utc = jd_start, jd_end
+	start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = misc_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
