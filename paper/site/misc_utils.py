@@ -73,7 +73,7 @@ def get_set_strings():
 	pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
 	era_type_strs = ('all', 'None')
 	host_strs = ('all', 'pot1', 'pot2', 'pot3', 'folio', 'pot8', 'nas1', 'node16')
-	filetype_strs = ('all', 'uv', 'uvcRRE', 'npz')
+	filetype_strs = ('uv', 'uvcRRE', 'npz')
 
 	return pol_strs, era_type_strs, host_strs, filetype_strs
 

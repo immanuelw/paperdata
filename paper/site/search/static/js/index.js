@@ -99,6 +99,9 @@ function saveTable(table) {
 	var end = $('#datepicker_end').val();
 	re = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
 
+	var jd_start = $('#jd_start').val();
+	var jd_end = $('#jd_end').val();
+
 	// Update the sessionStorage
 	sessionStorage.startDate = start;
 	sessionStorage.endDate = end;
@@ -173,6 +176,9 @@ function getObservations(loadTab) {
 	var end = $('#datepicker_end').val();
 	re = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
 
+	var jd_start = $('#jd_start').val();
+	var jd_end = $('#jd_end').val();
+
 	// Update the sessionStorage
 	sessionStorage.startDate = start;
 	sessionStorage.endDate = end;
@@ -231,6 +237,8 @@ function getObservations(loadTab) {
 		data: {
 			'starttime': startUTC,
 			'endtime': endUTC,
+			'jd_start': jd_start,
+			'jd_end': jd_end,
 			'polarization': polarization,
 			'era_type': era_type,
 		},
@@ -246,6 +254,8 @@ function getObservations(loadTab) {
 		data: {
 			'starttime': startUTC,
 			'endtime': endUTC,
+			'jd_start': jd_start,
+			'jd_end': jd_end,
 			'host': host,
 			'filetype': filetype,
 		},
@@ -261,10 +271,8 @@ function getObservations(loadTab) {
 		data: {
 			'starttime': startUTC,
 			'endtime': endUTC,
-			//'polarization': polarization,
-			//'era_type': era_type,
-			//'host': host,
-			//'filetype': filetype,
+			'jd_start': jd_start,
+			'jd_end': jd_end,
 		},
 		success: function(data) {
 			$('#summary_table').html(data);

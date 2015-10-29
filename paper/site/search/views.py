@@ -178,9 +178,19 @@ def obs_table():
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
-	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
-	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	try:
+		jd_start = round(float(request.form['jd_start']), 5)
+		jd_end = round(float(request.form['jd_end']), 5)
+	except:
+		jd_start = None
+		jd_end = None
+
+	if jd_start == None:
+		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
+		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
+		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	else:
+		start_utc, end_utc = jd_start, jd_end
 
 	polarization = request.form['polarization']
 	era_type = request.form['era_type']
@@ -198,8 +208,7 @@ def obs_table():
 	except:
 		log_list = []
 
-	return render_template('obs_table.html', log_list=log_list, output_vars=output_vars,
-							start_time=starttime, end_time=endtime)
+	return render_template('obs_table.html', log_list=log_list, output_vars=output_vars, start_time=starttime, end_time=endtime)
 
 @app.route('/save_obs', methods = ['POST'])
 def save_obs():
@@ -213,9 +222,19 @@ def save_obs():
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
-	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
-	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	try:
+		jd_start = round(float(request.form['jd_start']), 5)
+		jd_end = round(float(request.form['jd_end']), 5)
+	except:
+		jd_start = None
+		jd_end = None
+
+	if jd_start == None:
+		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
+		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
+		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	else:
+		start_utc, end_utc = jd_start, jd_end
 
 	polarization = request.form['polarization']
 	era_type = request.form['era_type']
@@ -248,9 +267,19 @@ def file_table():
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
-	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
-	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	try:
+		jd_start = round(float(request.form['jd_start']), 5)
+		jd_end = round(float(request.form['jd_end']), 5)
+	except:
+		jd_start = None
+		jd_end = None
+
+	if jd_start == None:
+		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
+		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
+		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	else:
+		start_utc, end_utc = jd_start, jd_end
 
 	host = request.form['host']
 	filetype = request.form['filetype']
@@ -266,13 +295,21 @@ def file_table():
 			files_list = (obs.files for obs in all_obs_list)
 			file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
 
-			log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response
-						if paper_file.host == host and paper_file.filetype == filetype]
+			if host == 'all' and filetype == 'all':
+				log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response]
+			elif host == 'all' and filetype != 'all':
+				log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response
+							if paper_file.filetype == filetype]
+			elif host != 'all' and filetype == 'all':
+				log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response
+							if paper_file.host == host]
+			else:
+				log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response
+							if paper_file.host == host and paper_file.filetype == filetype]
 	except:
 		log_list = []
 
-	return render_template('file_table.html', log_list=log_list, output_vars=output_vars,
-							start_time=starttime, end_time=endtime)
+	return render_template('file_table.html', log_list=log_list, output_vars=output_vars, start_time=starttime, end_time=endtime)
 
 @app.route('/save_files', methods = ['POST'])
 def save_files():
@@ -286,9 +323,21 @@ def save_files():
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
-	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
-	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	try:
+		jd_start = round(float(request.form['jd_start']), 5)
+		jd_end = round(float(request.form['jd_end']), 5)
+	except:
+		jd_start = None
+		jd_end = None
+
+	if jd_start == None:
+		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
+		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
+		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	else:
+		start_utc, end_utc = jd_start, jd_end
+
+	print(start_utc, end_utc)
 
 	host = request.form['host']
 	filetype = request.form['filetype']
@@ -422,7 +471,7 @@ def data_summary_table():
 	dbi = pdbi.DataBaseInterface()
 	with dbi.session_scope() as s:
 		obs_table = pdbi.Observation
-		response = s.query(obs_table.polarization, obs_table.era_type, func.sum(obs_table.length) * 24, func.count(obs_table))\
+		response = s.query(obs_table.polarization, obs_table.era_type, func.sum(obs_table.length), func.count(obs_table))\
 							.filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
 							.group_by(obs_table.polarization, obs_table.era_type).all()
 		for polarization, era_type, length, count in response:
@@ -432,7 +481,6 @@ def data_summary_table():
 		response = s.query(file_table.host, file_table.filetype, func.count(file_table)).group_by(file_table.host, file_table.filetype).all()
 		for host, filetype, count in response:
 			file_map[host][filetype].update({'file_count': count})
-
 
 	all_obs_strs = pol_strs + era_type_strs
 	obs_total = {all_obs_str: {'count': 0, 'hours': 0} for all_obs_str in all_obs_strs}
@@ -454,6 +502,13 @@ def data_summary_table():
 			file_count = file_map[host][filetype]['file_count']
 			file_total[filetype]['count'] += file_count
 			file_total[host]['count'] += file_count
+
+	#gets rid of useless columns
+	no_obs = {era_type: {'obs_count': 0, 'obs_hours': 0} for era_type in era_type_strs}
+	pol_strs = tuple(pol for pol, era_type_dict in obs_map.items() if era_type_dict != no_obs)
+
+	no_files = {filetype: {'file_count': 0} for filetype in filetype_strs}
+	host_strs = tuple(host for host, filetype_dict in file_map.items() if filetype_dict != no_files)
 
 	return render_template('summary_table.html',
 							pol_strs=pol_strs, era_type_strs=era_type_strs, host_strs=host_strs, filetype_strs=filetype_strs,

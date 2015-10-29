@@ -31,11 +31,17 @@
 					</span>
 					</span>
 				</div>
+				<div>
+					<span>JD Start:</span>
+					<input type='text' id='jd_start'>
+					<span>JD end:</span>
+					<input type='text' id='jd_end'>
+				</div>
 				<div id='limiters'>
 					Polarization:
 					<select id='polarization_dropdown'>
 						{% for polarization, name in polarization_dropdown %}
-							{% if polarization == 'all' %}
+							{% if polarization == 'any' %}
 							<option value={{ polarization }} selected>{{ name }}</option>
 							{% else %}
 							<option value={{ polarization }}>{{ name }}</option>
