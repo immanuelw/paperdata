@@ -31,6 +31,24 @@ $(function() {
 		sessionStorage.endDate = nowStr;
 	}
 
+	var jd_startPicker = $('#jd_start');
+	var jd_endPicker = $('#jd_end');
+
+	if (jd_startPicker.val().length > 0 && jd_endPicker.val().length > 0) {
+		// The date pickers have already been filled with values, which means we're viewing a set.
+		// Nothing needs to be done.
+	} else if (sessionStorage.jd_start && sessionStorage.jd_end) {
+		jd_startPicker.val(sessionStorage.jd_start);
+		jd_endPicker.val(sessionStorage.jd_end);
+	} else {
+		var nothing = '';
+		jd_startPicker.val(nothing);
+		jd_endPicker.val(nothing);
+
+		sessionStorage.jd_start = nothing;
+		sessionStorage.jd_end = nothing;
+	}
+
 	//global ajax vars
 	window.setRequest = null;
 	window.dataSummaryTableRequest = null;
@@ -105,6 +123,9 @@ function saveTable(table) {
 	// Update the sessionStorage
 	sessionStorage.startDate = start;
 	sessionStorage.endDate = end;
+
+	sessionStorage.jd_start = jd_start;
+	sessionStorage.jd_end = jd_end;
 
 	var startDate, endDate;
 
@@ -182,6 +203,9 @@ function getObservations(loadTab) {
 	// Update the sessionStorage
 	sessionStorage.startDate = start;
 	sessionStorage.endDate = end;
+
+	sessionStorage.jd_start = jd_start;
+	sessionStorage.jd_end = jd_end;
 
 	var startDate, endDate;
 
