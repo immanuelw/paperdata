@@ -337,8 +337,6 @@ def save_files():
 	else:
 		start_utc, end_utc = jd_start, jd_end
 
-	print(start_utc, end_utc)
-
 	host = request.form['host']
 	filetype = request.form['filetype']
 
@@ -454,15 +452,19 @@ def data_summary_table():
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
 
-	#polarization = request.form['polarization']
-	#era_type = request.form['era_type']
-	#host = request.form['host']
-	#filetype = request.form['filetype']
+	try:
+		jd_start = round(float(request.form['jd_start']), 5)
+		jd_end = round(float(request.form['jd_end']), 5)
+	except:
+		jd_start = None
+		jd_end = None
 
-	startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
-	enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-
-	start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	if jd_start == None:
+		startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
+		enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
+		start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+	else:
+		start_utc, end_utc = jd_start, jd_end
 
 	pol_strs, era_type_strs, host_strs, filetype_strs = misc_utils.get_set_strings()
 	obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
