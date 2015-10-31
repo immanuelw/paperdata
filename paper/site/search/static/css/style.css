@@ -11,6 +11,7 @@
 	width: 100%;
 	max-width: 100%;
 	word-wrap: break-word;
+	text-align: center;
 }
 
 #summary_table th, #summary_table td {
@@ -19,6 +20,7 @@
 
 #summary_table table {
 	width: 100%;
+	text-align: center;
 }
 
 .scrolledList {
