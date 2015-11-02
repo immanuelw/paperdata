@@ -1,1 +1,1 @@
-docker run -v /home/yatsu/paperdata:/paperdata -i -t heralive:latest
+docker run -v /home/yatsu/paperdata:/paperdata --name paperlive -i -t heralive:latest
