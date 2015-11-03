@@ -13,7 +13,7 @@ from __future__ import print_function
 import sys
 import glob
 import json
-from paper.data import dbi as pdbi, data_db as pdb
+from paper.data import dbi as pdbi
 import add_files
 import sqlalchemy.exc
 
