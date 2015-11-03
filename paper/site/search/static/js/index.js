@@ -52,6 +52,7 @@ $(function() {
 	//global ajax vars
 	window.setRequest = null;
 	window.dataSummaryTableRequest = null;
+	window.daySummaryTableRequest = null;
 	window.obsTableRequest = null;
 	window.fileTableRequest = null;
 
@@ -190,6 +191,7 @@ function saveTable(table) {
 
 function getObservations(loadTab) {
 	window.dataSummaryTableRequest = abortRequestIfPending(window.dataSummaryTableRequest);
+	window.daySummaryTableRequest = abortRequestIfPending(window.daySummaryTableRequest);
 	window.obsTableRequest = abortRequestIfPending(window.obsTableRequest);
 	window.fileTableRequest = abortRequestIfPending(window.fileTableRequest);
 
@@ -245,6 +247,7 @@ function getObservations(loadTab) {
 	}
 
 	$('#summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+	$('#day_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 	// Make each date into a string of the format 'YYYY-mm-ddTHH:MM:SSZ', which is the format used in the local database.
 	var startUTC = startDate.toISOString().slice(0, 19) + 'Z';
@@ -300,6 +303,21 @@ function getObservations(loadTab) {
 		},
 		success: function(data) {
 			$('#summary_table').html(data);
+		},
+		dataType: 'html'
+	});
+
+	window.daySummaryTableRequest = $.ajax({
+		type: 'POST',
+		url: '/day_summary_table',
+		data: {
+			'starttime': startUTC,
+			'endtime': endUTC,
+			'jd_start': jd_start,
+			'jd_end': jd_end,
+		},
+		success: function(data) {
+			$('#day_summary_table').html(data);
 		},
 		dataType: 'html'
 	});

@@ -17,6 +17,7 @@ teardown_request | exits database
 profile | shows user profile
 user_page | shows user page
 data_summary_table | shows data summary table
+day_summary_table | shows day summary table
 '''
 from flask import render_template, flash, redirect, url_for, request, g, make_response, Response
 from flask.ext.login import current_user
@@ -441,7 +442,7 @@ def data_summary_table():
 
 	Returns
 	-------
-	html: summary table
+	html: data summary table
 	'''
 	starttime = request.form['starttime']
 	endtime = request.form['endtime']
@@ -500,3 +501,30 @@ def data_summary_table():
 	return render_template('summary_table.html',
 							pol_strs=pol_strs, era_type_strs=era_type_strs, host_strs=host_strs, filetype_strs=filetype_strs,
 							obs_map=obs_map, obs_total=obs_total, file_map=file_map, file_total=file_total)
+
+@app.route('/day_summary_table', methods=['POST'])
+def day_summary_table():
+	'''
+	summary of data in main databases
+
+	Returns
+	-------
+	html: day summary table
+	'''
+	starttime = request.form['starttime']
+	endtime = request.form['endtime']
+
+	jdstart = request.form['jd_start']
+	jdend = request.form['jd_end']
+
+	start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
+
+	dbi = pdbi.DataBaseInterface()
+	with dbi.session_scope() as s:
+		obs_table = pdbi.Observation
+		response = s.query(obs_table.julian_day, func.count(obs_table))\
+							.filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
+							.group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
+		day_map = tuple((julian_day, count) for julian_day, count in response)
+
+	return render_template('day_summary_table.html', day_map=day_map)

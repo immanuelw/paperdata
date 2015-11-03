@@ -14,11 +14,14 @@
 	text-align: center;
 }
 
-#summary_table th, #summary_table td {
+#summary_table, #day_summary_table th {
 	text-align: center;
 }
 
-#summary_table table {
+#summary_table, #day_summary_table td {
+	text-align: center;
+}
+#summary_table, #day_summary_table table {
 	width: 100%;
 	text-align: center;
 }
