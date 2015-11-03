@@ -1,1 +1,1 @@
-sudo docker build -t heralive .
+sudo docker build -t papersearch .

@@ -1,2 +1,2 @@
-docker start paperlive
-docker attach paperlive
+docker start searchlive
+docker attach searchlive
