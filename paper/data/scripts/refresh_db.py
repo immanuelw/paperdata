@@ -135,7 +135,7 @@ def update_md5(dbi):
 						'timestamp': timestamp}
 			dbi.add_entry(s, 'Log', log_data)
 
-def update_paths(dbi):
+def update_sources(dbi):
 	'''
 	fixes database files and directories that have been moved/deleted
 
@@ -169,7 +169,7 @@ def refresh_db(dbi):
 	----------
 	dbi | object: database interface object
 	'''
-	update_paths(dbi)
+	update_sources(dbi)
 	update_md5(dbi)
 	update_obsnums(dbi)
 	connect_observations(dbi)
