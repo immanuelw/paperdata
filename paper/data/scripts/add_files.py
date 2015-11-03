@@ -9,21 +9,15 @@ Functions
 ---------
 calc_obs_info | pulls observation and file data from files
 dupe_check | checks database for duplicate files
-set_obs | sets edge information for observations
-update_obsnums | updates observation previous and next obsnums
-connect_observations | connects observations with files in database
-update_md5 | updates md5 checksums if needed
 add_files_to_db | pulls file and observation data and adds to database
 add_files | parses list of files and adds data to database
 '''
 from __future__ import print_function
 import os
-import sys
 import time
 import uuid
-import paper as ppdata
 from paper.data import dbi as pdbi, uv_data, file_data
-from sqlalchemy import or_
+import refresh_db
 
 def calc_obs_info(dbi, host, path):
 	'''
@@ -116,102 +110,6 @@ def dupe_check(dbi, source_host, source_paths):
 		
 	return unique_paths
 
-def set_obs(s, dbi, OBS, field):
-	'''
-	finds edge observation for each observation by finding previous and next
-
-	Parameters
-	----------
-	s | object: session object
-	dbi | object: database interface object
-	OBS | object: observation object
-	field | str: field to update
-
-	Returns
-	-------
-	object: edge observation object
-	'''
-	if field == 'prev_obs':
-		edge_num = OBS.obsnum - 1
-		edge_time = OBS.time_start - OBS.delta_time
-	elif field == 'next_obs':
-		edge_num = OBS.obsnum + 1
-		edge_time = OBS.time_start + OBS.delta_time
-
-	table = pdbi.Observation
-	EDGE_OBS = s.query(table).filter(table.julian_date == edge_time).one()
-	if EDGE_OBS is not None:
-		edge_obs = EDGE_OBS.obsnum
-		dbi.set_entry(s, OBS, field, edge_obs)
-	else:
-		pol = OBS.polarization
-		EDGE_OBS = s.query(table).filter(table.julian_date == edge_time).filter(table.polarization == pol).one()
-		if EDGE_OBS is not None:
-			edge_obs = EDGE_OBS.obsnum
-			dbi.set_entry(s, OBS, field, edge_obs)
-
-	return EDGE_OBS
-
-def update_obsnums(dbi):
-	'''
-	updates edge attribute of all obsnums
-
-	Parameters
-	----------
-	dbi | object: database interface object
-	'''
-	with dbi.session_scope() as s:
-		table = pdbi.Observation
-		OBSs = s.query(table).filter(or_(table.prev_obs == None, table.next_obs == None)).all()
-
-		for OBS in OBSs:
-			PREV_OBS = set_obs(s, dbi, OBS, 'prev_obs')
-			NEXT_OBS = set_obs(s, dbi, OBS, 'next_obs')
-			is_edge = uv_data.is_edge(PREV_OBS, NEXT_OBS)
-			dbi.set_entry(s, OBS, 'is_edge', is_edge)
-
-def connect_observations(dbi):
-	'''
-	connects file with observation object
-
-	Parameters
-	----------
-	dbi | object: database interface object
-	'''
-	with dbi.session_scope() as s:
-		file_table = pdbi.File
-		obs_table = pdbi.Observation
-		FILEs = s.query(file_table).filter(file_table.observation == None).all()
-
-		for FILE in FILEs:		
-			OBS = s.query(obs_table).get(FILE.obsnum)
-			dbi.set_entry(s, FILE, 'observation', OBS)
-
-def update_md5(dbi):
-	'''
-	updates md5sums for all files without in database
-
-	Parameters
-	----------
-	dbi | object: database interface object
-	'''
-	with dbi.session_scope() as s:
-		table = pdbi.File
-		FILEs = s.query(table).filter(table.md5sum == None).all()
-		for FILE in FILEs:
-			source = FILE.source
-			timestamp = int(time.time())
-			md5_dict = {'md5sum': file_data.calc_md5sum(FILE.host, source),
-						'timestamp': timestamp}
-			dbi.set_entry_dict(s, FILE, md5_dict)
-
-			log_data = {'action': 'update md5sum',
-						'table': 'File',
-						'identifier': source,
-						'log_id': str(uuid.uuid4()),
-						'timestamp': timestamp}
-			dbi.add_entry(s, 'Log', log_data)
-
 def add_files_to_db(dbi, source_host, source_paths):
 	'''
 	adds files to the database
@@ -254,9 +152,7 @@ def add_files(dbi, source_host, source_paths):
 	uv_paths = [uv_path for uv_path in source_paths if not uv_path.endswith('.npz')]
 	add_files_to_db(dbi, source_host, uv_paths)
 	add_files_to_db(dbi, source_host, npz_paths)
-	update_obsnums(dbi)
-	connect_observations(dbi)
-	#update_md5(dbi)
+	#refresh_db.refresh_db(dbi)
 
 if __name__ == '__main__':
 	source_host, source_paths = file_data.source_info()
