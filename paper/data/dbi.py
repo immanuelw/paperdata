@@ -157,7 +157,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 	add_entry_dict | adds entry to database using dict as kwarg
 	get_entry | gets database object
 	'''
-	def __init__(self, configfile='~/paperdata.cfg'):
+	def __init__(self, configfile='~/paperdata/paperdata.cfg'):
 		'''
 		Unique Interface for the paperdata database
 

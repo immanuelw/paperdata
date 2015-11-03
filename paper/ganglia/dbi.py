@@ -104,7 +104,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 	add_entry_dict | adds entry to database using dict as kwarg
 	get_entry | gets database object
 	'''
-	def __init__(self, configfile='~/ganglia.cfg'):
+	def __init__(self, configfile='~/paperdata/ganglia.cfg'):
 		'''
 		Unique Interface for the ganglia database
 

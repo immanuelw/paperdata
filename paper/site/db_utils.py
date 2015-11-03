@@ -43,14 +43,10 @@ def get_dbi(database):
 	host = socket.gethostname()
 	if database == 'paperdata':
 		module = pdbi
-		configfile = '/mnt/paperdata/paperdata.cfg'
-		if host == 'seharu':
-			configfile = '~/paperdata/paperdata.cfg'
+		configfile = '~/paperdata/paperdata.cfg'
 	elif database == 'ganglia':
 		module = pyg
-		configfile = '/mnt/paperdata/ganglia.cfg'
-		if host == 'seharu':
-			configfile = '~/paperdata/ganglia.cfg'
+		configfile = '~/paperdata/ganglia.cfg'
 	elif database == 'search':
 		module = sdbi
 		dbi = None

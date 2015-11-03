@@ -202,7 +202,7 @@ class DataBaseInterface(object):
 	set_entry | updates database entry field with new value
 	set_entry_dict | updates database entry fields with new values using input dict
 	'''
-	def __init__(self, configfile='~/paperdata.cfg'):
+	def __init__(self, configfile='~/paperdata/paperdata.cfg'):
 		'''
 		Connect to the database and make a session creator
 		superclass of DBI for paperdata, paperdev, and ganglia databases
