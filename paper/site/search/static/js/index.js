@@ -78,22 +78,7 @@ $(function() {
 		}
 	});
 
-	/*
-	$('#filter_dropdown_div').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
-
-	$.ajax({
-		type: 'GET',
-		url: '/get_filters',
-		success: function(data) {
-			$('#filter_dropdown_div').html(data);
-			applyFiltersAndSort();
-		},
-		dataType: 'html'
-	});
-	*/
-
 	getObservations(false /* Don't load the first tab, it's already being loaded */);
-	getComments();
 });
 
 function getDateTimeString(now) {
@@ -246,7 +231,6 @@ function getObservations(loadTab) {
 
 	if (loadTab) { // The user pressed the 'Get observations' button, so they're viewing a date range now.
 		$('#set_or_date_range_label').html('date range');
-		$('#set_details').hide();
 	}
 
 	$('#data_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
@@ -326,22 +310,6 @@ function getObservations(loadTab) {
 	});
 };
 
-function getComments() {
-	$('#comments_div').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
-
-	$.ajax({
-		type: 'GET',
-		url: '/get_all_comments',
-		success: function(data) {
-			$('#comments_div').html(data);
-			$('#comments_list').collapsible({
-				animate: false
-			});
-		},
-		dataType: 'html'
-	});
-};
-
 function getDate(datestr) {
 	var year = datestr.substring(0, 4);
 	var month = datestr.substring(5, 7);
@@ -349,38 +317,4 @@ function getDate(datestr) {
 	var hour = datestr.substring(11, 13);
 	var minute = datestr.substring(14, 16);
 	return new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
-};
-
-var applyFiltersAndSort = function() {
-	var user = $('#user_setlist_dropdown').val();
-	var polarization = $('#polarization_setlist_dropdown').val();
-	var era_type = $('#era_type_setlist_dropdown').val();
-	var host = $('#host_setlist_dropdown').val();
-	var filetype = $('#filetype_setlist_dropdown').val();
-	var sort = $('#sort_setlist_dropdown').val();
-	var ranged = $('#range_filter').prop('checked');
-
-	var set_controls = {
-		'user': user,
-		'polarization': polarization,
-		'era_type': era_type,
-		'host': host,
-		'filetype': filetype,
-		'sort': sort,
-		'ranged': ranged
-	};
-
-	var start = $('#datepicker_start').val();
-	var end = $('#datepicker_end').val();
-
-	var startDate, endDate;
-
-	startDate = getDate(start);
-	endDate = getDate(end);
-
-	// Make each date into a string of the format 'YYYY-mm-ddTHH:MM:SSZ', which is the format used in the local database.
-	var startUTC = startDate.toISOString().slice(0, 19) + 'Z';
-	var endUTC = endDate.toISOString().slice(0, 19) + 'Z';
-
-	renderSets(set_controls, startUTC, endUTC, false);
 };

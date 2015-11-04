@@ -1,4 +1,4 @@
-#error_table, #obs_table, #file_table, #set_construction_div, #comments_div {
+#error_table, #obs_table, #file_table {
 	width: 100%;
 	max-width: 100%;
 	max-height: 400px;
