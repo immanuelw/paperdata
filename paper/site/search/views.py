@@ -345,15 +345,14 @@ def save_files():
 		with dbi.session_scope() as s:
 			all_obs_list = s.query(table).filter(table.time_start >= start_utc).filter(table.time_end <= end_utc)\
 											.order_by(table.time_start.asc()).all()
-			files_list = (obs.files for obs in all_obs_list)
-			file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
+			file_response = (file_obj for obs in all_obs_list for file_obj in obs.files)
 
-			entry_list = [paper_file.to_dict() for paper_file in response if paper_file.host == host and paper_file.filetype == filetype]
+			entry_list = [paper_file.to_dict() for paper_file in file_response if paper_file.host == host and paper_file.filetype == filetype]
 	except:
 		entry_list = []
 
 	return Response(response=json.dumps(entry_list, sort_keys=True, indent=4, default=ppdata.decimal_default),
-					status=200, mimetype='application/json')
+					status=200, mimetype='application/json', headers={'Content-Disposition': 'attachment; filename=file.json'})
 
 @app.before_request
 def before_request():

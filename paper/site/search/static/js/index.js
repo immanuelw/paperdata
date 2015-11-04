@@ -159,12 +159,13 @@ function saveTable(table) {
 			data: {
 				'starttime': startUTC,
 				'endtime': endUTC,
+				'jd_start': jd_start,
+				'jd_end': jd_end,
 				'polarization': polarization,
 				'era_type': era_type,
 			},
 			success: function(data) {
-				//window.location = '/save_obs';
-				$('#save_obs').html(data);
+				window.alert(JSON.stringify(data));
 			},
 			dataType: 'json'
 		});
@@ -175,18 +176,20 @@ function saveTable(table) {
 			data: {
 				'starttime': startUTC,
 				'endtime': endUTC,
+				'jd_start': jd_start,
+				'jd_end': jd_end,
 				'host': host,
 				'filetype': filetype,
 			},
 			success: function(data) {
-				$('#save_files').html(data);
+				window.alert(JSON.stringify(data));
 			},
 			dataType: 'json'
 		});
 	} else {
 		alert('Invalid json');
 		return;
-	};
+	}
 };
 
 function getObservations(loadTab) {
