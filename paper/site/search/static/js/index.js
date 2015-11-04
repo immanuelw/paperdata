@@ -249,7 +249,7 @@ function getObservations(loadTab) {
 		$('#set_details').hide();
 	}
 
-	$('#summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+	$('#data_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 	$('#day_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
 	// Make each date into a string of the format 'YYYY-mm-ddTHH:MM:SSZ', which is the format used in the local database.
@@ -305,7 +305,7 @@ function getObservations(loadTab) {
 			'jd_end': jd_end,
 		},
 		success: function(data) {
-			$('#summary_table').html(data);
+			$('#data_summary_table').html(data);
 		},
 		dataType: 'html'
 	});

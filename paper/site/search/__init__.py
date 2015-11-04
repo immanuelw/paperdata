@@ -5,15 +5,9 @@ author | Immanuel Washington
 
 Modules
 -------
-comments | comment views
-data_sources | data source functions
-filters | text filters
-histogram_utils | histogram functions
 manage | manager variables
 models | sqlalchemy table models
-sets | set functions
 settings | setting variables
-users | user functions
 views | views for website
 
 Scripts

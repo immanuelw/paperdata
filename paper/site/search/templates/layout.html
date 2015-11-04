@@ -14,23 +14,9 @@
 				<a href="{{ url_for('index') }}">PaperSearch</a>
 			</span>
 			<span class='nav_right'>
-				<a href="{{ url_for('index') }}">home</a> |
-				{% if not g.user.is_authenticated() %}
-				<a href="{{ url_for('login') }}">log in</a> |
-				<a href="{{ url_for('signup') }}">sign up</a>
-				{% else %}
-				<span>logged in as {{ g.user.username }} | </span>
-				<span><a href="{{ url_for('profile') }}">profile</a> | </span>
-				<a href="{{ url_for('user_page') }}">users</a> |
-				<a href="{{ url_for('logout') }}">log out</a>
-				{% endif %}
+				<a href="{{ url_for('index') }}">home</a>
 			</span>
 		</div>
-		{% with messages = get_flashed_messages(with_categories=true) %}
-			{% for category, message in messages %}
-				<div class="{{ category }}">{{ message }}</div>
-			{% endfor %}
-		{% endwith %}
 		{% block body %}{% endblock %}
 	</div>
 </body>
