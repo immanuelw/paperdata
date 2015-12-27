@@ -1,4 +1,4 @@
-web: gunicorn --pythonpath search run_app:app --log-file=- & sh background.sh
+web: gunicorn --pythonpath paper.site.search.scripts run_app:app --log-file=- & sh background.sh
 init: python -m search.manage db init
 migrate: python -m search.manage db migrate
 upgrade: python -m search.manage db upgrade
