@@ -19,6 +19,7 @@ day_summary_table | shows day summary table
 from flask import render_template, flash, redirect, url_for, request, g, make_response, Response
 from flask.ext.login import current_user
 import json
+import time
 from datetime import datetime
 import paper as ppdata
 from paper.site.flask_app import search_app as app, search_db as db
@@ -172,24 +173,18 @@ def file_table():
 
 	try:
 		dbi = pdbi.DataBaseInterface()
-		table = pdbi.Observation
+		obs_table = pdbi.Observation
+		file_table = pdbi.File
 		with dbi.session_scope() as s:
-			all_obs_list = s.query(table).filter(table.time_start >= start_utc).filter(table.time_end <= end_utc)\
-											.order_by(table.time_start.asc()).all()
-			files_list = (obs.files for obs in all_obs_list)
-			file_response = (file_obj for file_obj_list in files_list for file_obj in file_obj_list)
+			all_obs_list = s.query(file_table).join(obs_table).filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
 
-			if host == 'all' and filetype == 'all':
-				log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response]
-			elif host == 'all' and filetype != 'all':
-				log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response
-							if paper_file.filetype == filetype]
-			elif host != 'all' and filetype == 'all':
-				log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response
-							if paper_file.host == host]
-			else:
-				log_list = [{var: getattr(paper_file, var) for var in output_vars} for paper_file in file_response
-							if paper_file.host == host and paper_file.filetype == filetype]
+			if host != 'all':
+				all_obs_list = all_obs_list.filter(file_table.host == host)
+			if filetype != 'all':
+				all_obs_list = all_obs_list.filter(file_table.filetype == filetype)
+
+			log_list = [{var: getattr(paper_file, var) for var in output_vars}
+						for paper_file in all_obs_list.order_by(obs_table.time_start.asc()).all()]
 	except:
 		log_list = []
 
