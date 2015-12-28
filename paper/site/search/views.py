@@ -212,13 +212,17 @@ def save_files():
 
 	try:
 		dbi = pdbi.DataBaseInterface()
-		table = pdbi.Observation
+		obs_table = pdbi.Observation
+		file_table = pdbi.File
 		with dbi.session_scope() as s:
-			all_obs_list = s.query(table).filter(table.time_start >= start_utc).filter(table.time_end <= end_utc)\
-											.order_by(table.time_start.asc()).all()
-			file_response = (file_obj for obs in all_obs_list for file_obj in obs.files)
+			all_obs_list = s.query(file_table).join(obs_table).filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
 
-			entry_list = [paper_file.to_dict() for paper_file in file_response if paper_file.host == host and paper_file.filetype == filetype]
+			if host != 'all':
+				all_obs_list = all_obs_list.filter(file_table.host == host)
+			if filetype != 'all':
+				all_obs_list = all_obs_list.filter(file_table.filetype == filetype)
+
+			entry_list = [paper_file.to_dict() for paper_file in all_obs_list.order_by(obs_table.time_start.asc()).all()]
 	except:
 		entry_list = []
 
