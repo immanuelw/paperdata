@@ -8,5 +8,5 @@ author | Immanuel Washington
 from paper.data import dbi as pdbi
 
 if __name__ == '__main__':
-	dbi = pdbi.DataBaseInterface()
-	dbi.create_db()
+    dbi = pdbi.DataBaseInterface()
+    dbi.create_db()

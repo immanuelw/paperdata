@@ -17,61 +17,61 @@ from datetime import datetime
 
 @app.route('/get_all_comments')
 def get_all_comments():
-	'''
-	get all comments
+    '''
+    get all comments
 
-	Returns
-	-------
-	html: comments
-	'''
-	try:
-		threads = db_utils.query(database='search', table='Thread', sort_tuples=(('last_updated', 'desc'),))
-		for thread in threads:
-			thread.comments = db_utils.query(database='search', table='Comment', field_tuples=(('thread_id', '==', thread.id),))
-	except:
-		return make_response('Threads not found', 500)
+    Returns
+    -------
+    html: comments
+    '''
+    try:
+        threads = db_utils.query(database='search', table='Thread', sort_tuples=(('last_updated', 'desc'),))
+        for thread in threads:
+            thread.comments = db_utils.query(database='search', table='Comment', field_tuples=(('thread_id', '==', thread.id),))
+    except:
+        return make_response('Threads not found', 500)
 
-	return render_template('comments_list.html', threads=threads)
+    return render_template('comments_list.html', threads=threads)
 
 @app.route('/thread_reply', methods = ['POST'])
 def thread_reply():
-	'''
-	add thread reply
-	'''
-	if g.user is not None and g.user.is_authenticated():
-		thread_id = request.form['thread_id']
-		text = request.form['text']
+    '''
+    add thread reply
+    '''
+    if g.user is not None and g.user.is_authenticated():
+        thread_id = request.form['thread_id']
+        text = request.form['text']
 
-		new_comment = models.Comment(thread_id=thread_id, text=text, username=g.user.username)
-		db.session.add(new_comment)
+        new_comment = models.Comment(thread_id=thread_id, text=text, username=g.user.username)
+        db.session.add(new_comment)
 
-		thread = db_utils.query(database='search', table='Thread', field_tuples=(('id', '==', thread_id),))
-		thread.last_updated = datetime.utcnow()
-		db.session.add(thread)
-		db.session.commit()
+        thread = db_utils.query(database='search', table='Thread', field_tuples=(('id', '==', thread_id),))
+        thread.last_updated = datetime.utcnow()
+        db.session.add(thread)
+        db.session.commit()
 
-		return make_response('Success', 200)
-	else:
-		return make_response('You need to be logged in to post a comment.', 401)
+        return make_response('Success', 200)
+    else:
+        return make_response('You need to be logged in to post a comment.', 401)
 
 @app.route('/new_thread', methods = ['POST'])
 def new_thread():
-	'''
-	add new comment thread
-	'''
-	if g.user is not None and g.user.is_authenticated():
-		title = request.form['title']
-		text = request.form['text']
+    '''
+    add new comment thread
+    '''
+    if g.user is not None and g.user.is_authenticated():
+        title = request.form['title']
+        text = request.form['text']
 
-		new_thread = models.Thread(title=title, username=g.user.username)
-		db.session.add(new_thread)
-		db.session.flush()
-		db.session.refresh(new_thread) # So we can get the new thread's id
+        new_thread = models.Thread(title=title, username=g.user.username)
+        db.session.add(new_thread)
+        db.session.flush()
+        db.session.refresh(new_thread) # So we can get the new thread's id
 
-		first_comment = models.Comment(text=text, username=g.user.username, thread_id=new_thread.id)
-		db.session.add(first_comment)
-		db.session.commit()
+        first_comment = models.Comment(text=text, username=g.user.username, thread_id=new_thread.id)
+        db.session.add(first_comment)
+        db.session.commit()
 
-		return make_response('Success', 200)
-	else:
-		return make_response('You need to be logged in to create a thread.', 401)
+        return make_response('Success', 200)
+    else:
+        return make_response('You need to be logged in to create a thread.', 401)

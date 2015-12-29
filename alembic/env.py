@@ -37,9 +37,9 @@ from paper.ganglia import dbi as pyg
 from paper.dev import dbi as dev
 
 target_metadata = {
-		'paperdata':pdbi.Base.metadata,
-		'paperdev':dev.Base.metadata,
-		'ganglia':pyg.Base.metadata
+        'paperdata':pdbi.Base.metadata,
+        'paperdev':dev.Base.metadata,
+        'ganglia':pyg.Base.metadata
 }
 
 # other values from the config, defined by the needs of env.py,

@@ -13,78 +13,78 @@ Log | attributes of named table
 from __future__ import print_function
 
 class File(object):
-	def __init__(self):
-		self.table = 'File'
-		self.db_list = ('filenum',
-						'filename',
-						'host',
-						'obsnum',
-						'observation',
-						'md5sum')
-		self.db_descr = {'filenum': {'type': 'INTEGER', 'default': 'None', 'key': 'Primary', 'description': 'file id'},
-						'filename': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'full path of file'}, 
-						'host': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'host of system containing file'},
-						'obsnum': {'type': 'BIGINT', 'default': 'None', 'key': 'Foreign', 'description': 'foreign key to observation table'},
-						'md5sum': {'type': 'INTEGER', 'default': 'None', 'key': 'No', 'description': 'md5 checksum of file'}}
+    def __init__(self):
+        self.table = 'File'
+        self.db_list = ('filenum',
+                        'filename',
+                        'host',
+                        'obsnum',
+                        'observation',
+                        'md5sum')
+        self.db_descr = {'filenum': {'type': 'INTEGER', 'default': 'None', 'key': 'Primary', 'description': 'file id'},
+                        'filename': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'full path of file'}, 
+                        'host': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'host of system containing file'},
+                        'obsnum': {'type': 'BIGINT', 'default': 'None', 'key': 'Foreign', 'description': 'foreign key to observation table'},
+                        'md5sum': {'type': 'INTEGER', 'default': 'None', 'key': 'No', 'description': 'md5 checksum of file'}}
 
 class Observation(object):
-	def __init__(self):
-		self.table = 'Observation'
-		self.db_list = ('julian_date',
-						'pol',
-						'obsnum',
-						'status',
-						'length',
-						'currentpid',
-						'stillhost',
-						'stillpath',
-						'outputpath',
-						'outputhost')
-		self.db_descr = {'julian_date': {'type': 'DECIMAL(16, 8)', 'default': 'None', 'key': 'No', 'description': 'julian date of observation'},
-						'pol': {'type': 'VARCHAR(4)', 'default': 'None', 'key': 'No', 'description': 'polarization of observation'},
-						'obsnum': {'type': 'BIGINT', 'default': 'None', 'key': 'Primary', 'description': 'observation id'},
-						'status': {'type': 'ENUM', 'default': 'None', 'key': 'No', 'description': 'compression stage of file'},
-						'length': {'type': 'FLOAT', 'default': 'None', 'key': 'No', 'description': 'length of observation in fraction of a day'},
-						'currentpid': {'type': 'INTEGER', 'default': 'None', 'key': 'No', 'description': 'current id of compression process'},
-						'stillhost': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'host of file being compressed'},
-						'stillpath': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'path of file being comrpessed'},
-						'outputpath': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'path to outut file to'},
-						'outputhost': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'host to output file'}}
+    def __init__(self):
+        self.table = 'Observation'
+        self.db_list = ('julian_date',
+                        'pol',
+                        'obsnum',
+                        'status',
+                        'length',
+                        'currentpid',
+                        'stillhost',
+                        'stillpath',
+                        'outputpath',
+                        'outputhost')
+        self.db_descr = {'julian_date': {'type': 'DECIMAL(16, 8)', 'default': 'None', 'key': 'No', 'description': 'julian date of observation'},
+                        'pol': {'type': 'VARCHAR(4)', 'default': 'None', 'key': 'No', 'description': 'polarization of observation'},
+                        'obsnum': {'type': 'BIGINT', 'default': 'None', 'key': 'Primary', 'description': 'observation id'},
+                        'status': {'type': 'ENUM', 'default': 'None', 'key': 'No', 'description': 'compression stage of file'},
+                        'length': {'type': 'FLOAT', 'default': 'None', 'key': 'No', 'description': 'length of observation in fraction of a day'},
+                        'currentpid': {'type': 'INTEGER', 'default': 'None', 'key': 'No', 'description': 'current id of compression process'},
+                        'stillhost': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'host of file being compressed'},
+                        'stillpath': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'path of file being comrpessed'},
+                        'outputpath': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'path to outut file to'},
+                        'outputhost': {'type': 'VARCHAR(100)', 'default': 'None', 'key': 'No', 'description': 'host to output file'}}
 
 class Neighbors(object):
-	def __init__(self):
-		self.table = 'Neighbors'
-		self.db_list = ('low_neighbor_id',
-						'high_neighbor_id')
-		self.db_descr = {'low_neighbor_id': {'type': 'BIGINT', 'default': 'None',
-						'key': 'Foreign/Unique', 'description': 'obsnum for lower edge of some file'}
-						'high_neighbor_id': {'type': 'BIGINT', 'default': 'None',
-						'key': 'Foreign/Unique', 'description': 'obsnum for higher edge of some file'}}
+    def __init__(self):
+        self.table = 'Neighbors'
+        self.db_list = ('low_neighbor_id',
+                        'high_neighbor_id')
+        self.db_descr = {'low_neighbor_id': {'type': 'BIGINT', 'default': 'None',
+                        'key': 'Foreign/Unique', 'description': 'obsnum for lower edge of some file'}
+                        'high_neighbor_id': {'type': 'BIGINT', 'default': 'None',
+                        'key': 'Foreign/Unique', 'description': 'obsnum for higher edge of some file'}}
 
 class Log(object):
-	def __init__(self):
-		self.table = 'Log'
-		self.db_list = ('lognum',
-						'obsnum',
-						'stage',
-						'exit_status',
-						'timestamp',
-						'logtext')
-		self.db_descr = {'lognum': {'type': 'INTEGER', 'default': 'None', 'key': 'Primary', 'description': 'log id'},
-						'obsnum': {'type': 'BIGINT', 'default': 'None', 'key': 'Foreign', 'description': 'foreign key to observation table'},
-						'stage': {'type': 'ENUM', 'default': 'None', 'key': 'No', 'description': 'compression stage of file'},
-						'exit_status': {'type': 'INTEGER', 'default': 'None', 'key': 'No', 'description': 'status value generated by scheduler'},
-						'timestamp': {'type': 'DATETIME', 'default': 'current timestamp', 'key': 'No', 'description': 'timestamp of log'},
-						'logtext': {'type': 'TEXT', 'default': 'None', 'key': 'No', 'description': 'text of log -- the actual logging'}}
+    def __init__(self):
+        self.table = 'Log'
+        self.db_list = ('lognum',
+                        'obsnum',
+                        'stage',
+                        'exit_status',
+                        'timestamp',
+                        'logtext')
+        self.db_descr = {'lognum': {'type': 'INTEGER', 'default': 'None', 'key': 'Primary', 'description': 'log id'},
+                        'obsnum': {'type': 'BIGINT', 'default': 'None', 'key': 'Foreign', 'description': 'foreign key to observation table'},
+                        'stage': {'type': 'ENUM', 'default': 'None', 'key': 'No', 'description': 'compression stage of file'},
+                        'exit_status': {'type': 'INTEGER', 'default': 'None', 'key': 'No', 'description': 'status value generated by scheduler'},
+                        'timestamp': {'type': 'DATETIME', 'default': 'current timestamp', 'key': 'No', 'description': 'timestamp of log'},
+                        'logtext': {'type': 'TEXT', 'default': 'None', 'key': 'No', 'description': 'text of log -- the actual logging'}}
 
 #dictionary of instantiated classes
 instant_class = {'Observation': Observation(),
-				'Neighbors': Neighbors(),
-				'File' : File(),
-				'Log': Log()}
+                'Neighbors': Neighbors(),
+                'File' : File(),
+                'Log': Log()}
 classes = instant_class.keys()
 all_classes = instant_class.values()
 
 #Only do things if running this script, not importing
 if __name__ == '__main__':
-	print('Not a script file, just a module')
+    print('Not a script file, just a module')

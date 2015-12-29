@@ -15,13 +15,13 @@ from paper.data import uv_data, file_data
 from paper import convert
 
 def module_test():
-	'''
-	runs doctest on modules
-	'''
-	print('testing modules')
-	doctest.testmod(convert)
-	doctest.testmod(file_data)
-	doctest.testmod(uv_data)
+    '''
+    runs doctest on modules
+    '''
+    print('testing modules')
+    doctest.testmod(convert)
+    doctest.testmod(file_data)
+    doctest.testmod(uv_data)
 
 if __name__ == '__main__':
-	module_test()
+    module_test()
