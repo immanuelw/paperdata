@@ -5,7 +5,7 @@
         <tr class='rowClass'>
             <td class='cellClass cellTop'>
                 <div id='date_controls'>
-                    <input type='radio' name='date' value='0' checked> Date
+                    <input type='radio' onclick='setButton()' name='date' value='0' checked> Date
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;start:</span>
                     {% if the_set %}
                     <input type='text' id='datepicker_start' value='{{start_time_str_short}}'
@@ -33,7 +33,7 @@
                     </span>
                 </div>
                 <div>
-                    <input type='radio' name='date' value='1'> Julian Date
+                    <input type='radio' onclick='setButton()' name='date' value='1'> Julian Date
                     <span>&nbsp;&nbsp;start:</span>
                     <input type='text' id='jd_start'>
                     <span>end:</span>

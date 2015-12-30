@@ -226,8 +226,6 @@ function getObservations(loadTab) {
         return;
     }
 
-    setButton();
-
     $('#obs_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
     $('#file_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
