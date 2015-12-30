@@ -91,6 +91,12 @@ function getDateTimeString(now) {
     return now.getUTCFullYear() + '/' + month + '/' + date + ' ' + hours + ':' + minutes;
 };
 
+function convertDateTimesToJD(startDate, endDate){
+};
+
+function convertJDtoDateTimes(jdstart, jdend){
+};
+
 function abortRequestIfPending(request) {
     if (request) {
         request.abort();
@@ -188,7 +194,7 @@ function setButton(){
         document.getElementsByName('dateButton')[0].disabled = false;
         document.getElementsByName('jDateButton')[0].disabled = true;
     }
-}
+};
 
 function getObservations(loadTab) {
     window.dataSummaryTableRequest = abortRequestIfPending(window.dataSummaryTableRequest);
