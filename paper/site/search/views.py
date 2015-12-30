@@ -111,7 +111,7 @@ def obs_table():
     except:
         log_list = []
 
-    return render_template('obs_table.html', log_list=log_list, output_vars=output_vars, start_time=starttime, end_time=endtime)
+    return render_template('obs_table.html', log_list=log_list, output_vars=output_vars, start_time=start_utc, end_time=end_utc)
 
 @app.route('/save_obs', methods = ['POST'])
 def save_obs():
@@ -188,7 +188,7 @@ def file_table():
     except:
         log_list = []
 
-    return render_template('file_table.html', log_list=log_list, output_vars=output_vars, start_time=starttime, end_time=endtime)
+    return render_template('file_table.html', log_list=log_list, output_vars=output_vars, start_time=start_utc, end_time=end_utc)
 
 @app.route('/save_files', methods = ['POST'])
 def save_files():

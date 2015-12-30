@@ -1,97 +1,99 @@
 {% extends 'layout.html' %}
 {% block body %}
 <table style='width:100%' class='tableClass'>
-	<div id='main_content_div'>
-		<tr class='rowClass'>
-			<td class='cellClass cellTop'>
-				<div id='date_controls'>
-					<span>Range start:</span>
-					{% if the_set %}
-					<input type='text' id='datepicker_start' value='{{start_time_str_short}}'
-					{% else %}
-					<input type='text' id='datepicker_start'
-					{% endif %}
-					autocomplete='off'/>
-					<span>Range end:</span>
-					{% if the_set %}
-					<input type='text' id='datepicker_end' value='{{end_time_str_short}}'
-					{% else %}
-					<input type='text' id='datepicker_end'
-					{% endif %}
-					autocomplete='off'/>
-					<button onclick='getObservations(true)'>Get observations</button>
-					<span id = 'view_status_span'>
-					You are viewing a
-					<span id='set_or_date_range_label'>
-					{% if the_set %}
-					 set ({{the_set.name}})
-					{% else %}
-					 date range
-					{% endif %}
-					</span>
-					</span>
-				</div>
-				<div>
-					<span>JD Start:</span>
-					<input type='text' id='jd_start'>
-					<span>JD end:</span>
-					<input type='text' id='jd_end'>
-					<button onclick='getObservations(true)'>Get observations</button>
-				</div>
-				<div id='limiters'>
-					Polarization:
-					<select id='polarization_dropdown'>
-						{% for polarization, name in polarization_dropdown %}
-							{% if polarization == 'any' %}
-							<option value={{ polarization }} selected>{{ name }}</option>
-							{% else %}
-							<option value={{ polarization }}>{{ name }}</option>
-							{% endif %}
-						{% endfor %}
-					</select>
-					Era Type:
-					<select id='era_type_dropdown'>
-						{% for era_type, name in era_type_dropdown %}
-							{% if era_type == 'None' %}
-							<option value={{ era_type }} selected>{{ name }}</option>
-							{% else %}
-							<option value={{ era_type }}>{{ name }}</option>
-							{% endif %}
-						{% endfor %}
-					</select>
-					Host:
-					<select id='host_dropdown'>
-						{% for host, name in host_dropdown %}
-							{% if host == 'folio' %}
-							<option value={{ host }} selected>{{ name }}</option>
-							{% else %}
-							<option value={{ host }}>{{ name }}</option>
-							{% endif %}
-						{% endfor %}
-					</select>
-					Filetype:
-					<select id='filetype_dropdown'>
-						{% for filetype, name in filetype_dropdown %}
-							{% if filetype == 'uv' %}
-							<option value={{ filetype }} selected>{{ name }}</option>
-							{% else %}
-							<option value={{ filetype }}>{{ name }}</option>
-							{% endif %}
-						{% endfor %}
-					</select>
-				</div>
-				<div id='obs_table'></div>
-				<button type='button' onclick='saveTable("obs")' class='replyButton' style='margin-top:12px;'>Save Observations</button>
-				<div id='file_table'></div>
-				<button type='button' onclick='saveTable("files")' class='replyButton' style='margin-top:12px;'>Save Files</button>
-				<br>
-			</td>
-			<td class='right_cell cellClass cellTop'>
-				<div id='data_summary_table'></div>
-				<div id='day_summary_table'></div>
-			</td>
-		</tr>
-	</div>
+    <div id='main_content_div'>
+        <tr class='rowClass'>
+            <td class='cellClass cellTop'>
+                <div id='date_controls'>
+                    <input type='radio' name='date' value='0' checked> Date
+                    <span>&nbsp;&nbsp;start:</span>
+                    {% if the_set %}
+                    <input type='text' id='datepicker_start' value='{{start_time_str_short}}'
+                    {% else %}
+                    <input type='text' id='datepicker_start'
+                    {% endif %}
+                    autocomplete='off'/>
+                    <span>end:</span>
+                    {% if the_set %}
+                    <input type='text' id='datepicker_end' value='{{end_time_str_short}}'
+                    {% else %}
+                    <input type='text' id='datepicker_end'
+                    {% endif %}
+                    autocomplete='off'/>
+                    <button onclick='getObservations(true)' name='dateButton'>Get observations</button>
+                    <span id = 'view_status_span'>
+                    You are viewing a
+                    <span id='set_or_date_range_label'>
+                    {% if the_set %}
+                     set ({{the_set.name}})
+                    {% else %}
+                     date range
+                    {% endif %}
+                    </span>
+                    </span>
+                </div>
+                <div>
+                    <input type='radio' name='date' value='1'> Julian Date
+                    <span>&nbsp;&nbsp;start:</span>
+                    <input type='text' id='jd_start'>
+                    <span>end:</span>
+                    <input type='text' id='jd_end'>
+                    <button onclick='getObservations(true)' name='jDateButton'>Get observations</button>
+                </div>
+                <div id='limiters'>
+                    Polarization:
+                    <select id='polarization_dropdown'>
+                        {% for polarization, name in polarization_dropdown %}
+                            {% if polarization == 'any' %}
+                            <option value={{ polarization }} selected>{{ name }}</option>
+                            {% else %}
+                            <option value={{ polarization }}>{{ name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    Era Type:
+                    <select id='era_type_dropdown'>
+                        {% for era_type, name in era_type_dropdown %}
+                            {% if era_type == 'None' %}
+                            <option value={{ era_type }} selected>{{ name }}</option>
+                            {% else %}
+                            <option value={{ era_type }}>{{ name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    Host:
+                    <select id='host_dropdown'>
+                        {% for host, name in host_dropdown %}
+                            {% if host == 'folio' %}
+                            <option value={{ host }} selected>{{ name }}</option>
+                            {% else %}
+                            <option value={{ host }}>{{ name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    Filetype:
+                    <select id='filetype_dropdown'>
+                        {% for filetype, name in filetype_dropdown %}
+                            {% if filetype == 'uv' %}
+                            <option value={{ filetype }} selected>{{ name }}</option>
+                            {% else %}
+                            <option value={{ filetype }}>{{ name }}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                </div>
+                <div id='obs_table'></div>
+                <button type='button' onclick='saveTable("obs")' class='replyButton' style='margin-top:12px;'>Save Observations</button>
+                <div id='file_table'></div>
+                <button type='button' onclick='saveTable("files")' class='replyButton' style='margin-top:12px;'>Save Files</button>
+                <br>
+            </td>
+            <td class='right_cell cellClass cellTop'>
+                <div id='data_summary_table'></div>
+                <div id='day_summary_table'></div>
+            </td>
+        </tr>
+    </div>
 </table>
 <script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
 <script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js'></script>
