@@ -189,10 +189,18 @@ function setButton(){
     var checked_val = $("input[name='date']:checked").val();
     if (checked_val === '1') {
         document.getElementsByName('dateButton')[0].disabled = true;
+        document.getElementsByName('dateButton')[0].style.background = '#F4F4F4';
+        document.getElementsByName('dateButton')[0].style.color = '#F4F4F4';
         document.getElementsByName('jDateButton')[0].disabled = false;
+        document.getElementsByName('jDateButton')[0].style.background = '';
+        document.getElementsByName('jDateButton')[0].style.color = '';
     } else {
         document.getElementsByName('dateButton')[0].disabled = false;
+        document.getElementsByName('dateButton')[0].style.background = '';
+        document.getElementsByName('dateButton')[0].style.color = '';
         document.getElementsByName('jDateButton')[0].disabled = true;
+        document.getElementsByName('jDateButton')[0].style.background = '#F4F4F4';
+        document.getElementsByName('jDateButton')[0].style.color = '#F4F4F4';
     }
 };
 
