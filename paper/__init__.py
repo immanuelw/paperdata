@@ -65,7 +65,13 @@ def file_to_jd(path):
     >>> file_to_jd('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
     2456617.17386
     '''
-    return round(float(re.findall(r'\d+\.\d+', path)[0]), 5)
+    try:
+        jd = round(float(re.findall(r'\d+\.\d+', path)[0]), 5)
+    except:
+        jd = None
+
+    return jd
+
 
 def file_to_pol(path):
     '''

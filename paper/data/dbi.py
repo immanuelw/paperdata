@@ -40,7 +40,8 @@ str_to_pol = {  'I' :  1,   # Stokes Paremeters
                 'xx': -5,   # Linear Polarizations
                 'yy': -6,
                 'xy': -7,
-                'yx': -8}
+                'yx': -8,
+                'all': -6}
 
 pol_to_str = {v: k for k, v in str_to_pol.items()}
 

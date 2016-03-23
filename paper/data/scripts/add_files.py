@@ -86,7 +86,7 @@ def calc_obs_info(dbi, host, path):
 
     return obs_info, file_info, log_info
 
-def dupe_check(dbi, source_host, source_paths):
+def dupe_check(dbi, source_host, source_paths, verbose=False):
     '''
     checks for duplicate paths and removes to not waste time if possible
     checks for paths only on same host
@@ -96,6 +96,7 @@ def dupe_check(dbi, source_host, source_paths):
     dbi | object: database interface object
     source_host | str: host of uv* files
     source_paths | list[str]: paths of uv* files
+    verbose | bool: whether paths are printed or not
 
     Returns
     -------
@@ -106,11 +107,13 @@ def dupe_check(dbi, source_host, source_paths):
         FILEs = s.query(table).filter(table.host == source_host).all()
         paths = tuple(os.path.join(FILE.base_path, FILE.filename) for FILE in FILEs)
 
-    unique_paths = tuple(source_path for source_path in source_paths if source_path not in paths)
-        
+    unique_paths = set(source_paths) - set(paths)
+    if verbose:
+        print(len(unique_paths), 'unique paths')
+
     return unique_paths
 
-def add_files_to_db(dbi, source_host, source_paths):
+def add_files_to_db(dbi, source_host, source_paths, verbose=False):
     '''
     adds files to the database
 
@@ -119,10 +122,13 @@ def add_files_to_db(dbi, source_host, source_paths):
     dbi | object: database interface object
     source_host | str: host of files
     source_paths | list[str]: paths of uv* files
+    verbose | bool: whether paths are printed or not
     '''
     with dbi.session_scope() as s:
         for source_path in source_paths:
-            obs_info, file_info, log_info = calc_obs_info(source_host, source_path)
+            if verbose:
+                print(source_path)
+            obs_info, file_info, log_info = calc_obs_info(dbi, source_host, source_path)
             try:
                 dbi.add_entry_dict(s, 'Observation', obs_info)
             except:
@@ -131,10 +137,10 @@ def add_files_to_db(dbi, source_host, source_paths):
                 dbi.add_entry_dict(s, 'File', file_info)
             except:
                 print('Failed to load in file ', source_path)
-            try:
-                dbi.add_entry_dict(s, 'Log', log_info)
-            except:
-                print('Failed to load in log ', source_path)
+            #try:
+            #    dbi.add_entry_dict(s, 'Log', log_info)
+            #except:
+            #    print('Failed to load in log ', source_path)
 
 def add_files(dbi, source_host, source_paths):
     '''
@@ -148,8 +154,8 @@ def add_files(dbi, source_host, source_paths):
     '''
     source_paths = sorted(dupe_check(dbi, source_host, source_paths))
 
-    npz_paths = [npz_path for npz_path in source_paths if npz_path.endswith('.npz')]
     uv_paths = [uv_path for uv_path in source_paths if not uv_path.endswith('.npz')]
+    npz_paths = [npz_path for npz_path in source_paths if npz_path.endswith('.npz')]
     add_files_to_db(dbi, source_host, uv_paths)
     add_files_to_db(dbi, source_host, npz_paths)
     #refresh_db.refresh_db(dbi)

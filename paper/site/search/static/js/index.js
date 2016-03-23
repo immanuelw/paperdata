@@ -158,7 +158,7 @@ function saveTable(table) {
                 'era_type': era_type,
             },
             success: function(data) {
-                window.alert(JSON.stringify(data));
+                document.write(JSON.stringify(data));
             },
             dataType: 'json'
         });
@@ -175,7 +175,7 @@ function saveTable(table) {
                 'filetype': filetype,
             },
             success: function(data) {
-                window.alert(JSON.stringify(data));
+                document.write(JSON.stringify(data));
             },
             dataType: 'json'
         });

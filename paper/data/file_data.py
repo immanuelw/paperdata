@@ -103,7 +103,11 @@ def get_md5sum(path):
     '7d5ac942dd37c4ddfb99728359e42331'
     '''
     vis_file = os.path.join(path, 'visdata')
-    uv_file = path if os.path.isdir(path) else vis_file if os.path.isfile(visfile)
+    uv_file = path if os.path.isfile(path) else vis_file if os.path.isfile(vis_file) else None
+
+    if uv_file is None:
+        return None
+
     hasher = hashlib.md5()
 
     with open(uv_file, 'rb') as hash_file:

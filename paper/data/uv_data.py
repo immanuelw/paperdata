@@ -82,6 +82,9 @@ def date_info(julian_date):
     >>> date_info(2456604.16671)
     (128, 2456604, 20.8)
     '''
+    if julian_date is None:
+        return None, None, None
+
     era = 32 if julian_date < 2456100 else 64 if julian_date < 2456400 else 128
     julian_day = int(julian_date)
 
@@ -156,7 +159,10 @@ def calc_times(uv):
     except:
         return (None,) * 4
 
-    delta_time = -(time_start - time_end) / (n_times - 1)
+    if n_times <= 1:
+        delta_time = 0
+    else:
+        delta_time = -(time_start - time_end) / (n_times - 1)
 
     length = five_round(n_times * delta_time)
     time_start = five_round(time_start)
@@ -200,7 +206,9 @@ def calc_npz_data(dbi, filename):
     with dbi.session_scope() as s:
         polarization = filename.split('.')[3] if len(filename.split('.')) == 6 else 'all'
         table = pdbi.Observation
-        OBS = s.query(table).filter(table.julian_date == julian_date).filter(table.polarization == polarization).one()
+        OBS = s.query(table).filter(table.julian_date == julian_date).filter(table.polarization == polarization).one_or_none()
+        if OBS is None:
+            return (None,) * 7
 
         return OBS.time_start, OBS.time_end, OBS.delta_time, julian_date, polarization, OBS.length, OBS.obsnum
 
@@ -243,7 +251,7 @@ def calc_uv_data(host, path):
 
             time_start, time_end, delta_time, length = calc_times(uv)
             julian_date = five_round(uv['time'])
-            polarization = pdbi.pol_to_str[uv['pol']] if uv['npol'] == 4 else 'all' if uv['npol'] == 4
+            polarization = pdbi.pol_to_str[uv['pol']] if uv['npol'] == 4 else 'all' if uv['npol'] == 1 else None
 
             obsnum = jdpol_to_obsnum(julian_date, polarization, length) if length > 0 else None
 
