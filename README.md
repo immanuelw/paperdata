@@ -8,7 +8,8 @@ paper
 
 Main package for modules
 
-------------------------
+DESCRIPTION
+-----------
 
 data
 
@@ -21,7 +22,7 @@ test version of data module
 
 ganglia
 
-Contains scripts to record the state of each host at any time in the ganglia databasw
+Contains scripts to record the state of each host at any time in the ganglia database
 
 site
 
@@ -41,3 +42,19 @@ schema
 
 schema script function
 
+----------------------
+
+SETUP
+-----
+
+(1) git clone respository to user's root directory
+
+(2) Copy all .cfg files to root paperdata directory
+    replace fields within with correct credentials
+
+(3) Copy settings.py file from paper/site/*/configs/settings.py to paper/site/*/
+    replace SQLALCHEMY_DATABASE_URI with correct credentials
+
+(4) [In virtualenv if possible] Run python setup.py install (develop if altering package)
+
+(5) Further setup required if running docker container or rebuilding database
