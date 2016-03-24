@@ -13,6 +13,7 @@ move_files | parses list of files then moves them
 '''
 from __future__ import print_function
 import os
+import argparse
 import glob
 import socket
 import shutil
@@ -111,5 +112,11 @@ def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_pa
     print('Completed transfer')
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Move files, update database')
+    parser.add_argument('-t', '--host', type=str, help='output host')
+    parser.add_argument('-d', '--dir', type=str, help='output directory')
+
+    args = parser.parse_args()
+
     dbi = pdbi.DataBaseInterface()
-    move_files(dbi)
+    move_files(dbi, dest_host=args.host, dest_path=args.dir)
