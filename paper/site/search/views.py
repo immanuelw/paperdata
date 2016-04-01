@@ -62,11 +62,12 @@ def time_fix(jdstart, jdend, starttime=None, endtime=None):
 
     return start_utc, end_utc
 
-@app.route('/')
-@app.route('/index')
+@app.route('/', methods=['GET', 'POST'])
+@app.route('/index', methods=['GET', 'POST'])
 def index():
     '''
     start page of the website
+    grabs time data
 
     Returns
     -------
@@ -74,9 +75,24 @@ def index():
     '''
     polarization_dropdown, era_type_dropdown, host_dropdown, filetype_dropdown = misc_utils.get_dropdowns()
 
+    jdstart = request.args.get('jd_start', 2455903)
+    jdend = request.args.get('jd_end', 2455904)
+    starttime = request.args.get('starttime', None)
+    endtime = request.args.get('endtime', None)
+
+    polarization = request.args.get('polarization', 'all')
+    era_type = request.args.get('era_type', 'None')
+    host = request.args.get('host', 'folio')
+    filetype = request.args.get('filetype', 'uv')
+
+    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
+
     return render_template('index.html',
                             polarization_dropdown=polarization_dropdown, era_type_dropdown=era_type_dropdown,
-                            host_dropdown=host_dropdown, filetype_dropdown=filetype_dropdown)
+                            host_dropdown=host_dropdown, filetype_dropdown=filetype_dropdown,
+                            start_utc=start_utc, end_utc=end_utc,
+                            polarization=polarization, era_type=era_type,
+                            host=host, filetype=filetype)
 
 @app.route('/obs_table', methods = ['POST'])
 def obs_table():
@@ -113,7 +129,7 @@ def obs_table():
 
     return render_template('obs_table.html', log_list=log_list, output_vars=output_vars, start_time=start_utc, end_time=end_utc)
 
-@app.route('/save_obs', methods = ['POST'])
+@app.route('/save_obs', methods = ['GET'])
 def save_obs():
     '''
     saves observations as json
@@ -122,16 +138,12 @@ def save_obs():
     -------
     html: json file
     '''
-    starttime = request.form['starttime']
-    endtime = request.form['endtime']
+    print(tuple(request.args.items()))
+    start_utc = float(request.args['start_utc'])
+    end_utc = float(request.args['end_utc'])
 
-    jdstart = request.form['jd_start']
-    jdend = request.form['jd_end']
-
-    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
-
-    polarization = request.form['polarization']
-    era_type = request.form['era_type']
+    polarization = request.args['polarization']
+    era_type = request.args['era_type']
 
     fixed_et = None if era_type == 'None' else era_type
 
@@ -149,7 +161,7 @@ def save_obs():
     return Response(response=json.dumps(entry_list, sort_keys=True, indent=4, default=ppdata.decimal_default),
                     status=200, mimetype='application/json', headers={'Content-Disposition': 'attachment; filename=obs.json'})
 
-@app.route('/file_table', methods = ['POST'])
+@app.route('/file_table', methods = ['GET', 'POST'])
 def file_table():
     '''
     generate file table for histogram bar
@@ -190,7 +202,7 @@ def file_table():
 
     return render_template('file_table.html', log_list=log_list, output_vars=output_vars, start_time=start_utc, end_time=end_utc)
 
-@app.route('/save_files', methods = ['POST'])
+@app.route('/save_files', methods = ['GET'])
 def save_files():
     '''
     saves file metadata as json
@@ -199,13 +211,8 @@ def save_files():
     -------
     html: json file
     '''
-    starttime = request.form['starttime']
-    endtime = request.form['endtime']
-
-    jdstart = request.form['jd_start']
-    jdend = request.form['jd_end']
-
-    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
+    start_utc = float(request.form['start_utc'])
+    end_utc = float(request.form['end_utc'])
 
     host = request.form['host']
     filetype = request.form['filetype']

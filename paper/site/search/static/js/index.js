@@ -145,44 +145,63 @@ function saveTable(table) {
     var host = $('#host_dropdown').val();
     var filetype = $('#filetype_dropdown').val();
 
-    if (table === 'obs') {
-        window.saveTableRequest = $.ajax({
-            type: 'POST',
-            url: '/save_obs',
-            data: {
-                'starttime': startUTC,
-                'endtime': endUTC,
-                'jd_start': jd_start,
-                'jd_end': jd_end,
-                'polarization': polarization,
-                'era_type': era_type,
-            },
-            success: function(data) {
-                document.write(JSON.stringify(data));
-            },
-            dataType: 'json'
-        });
-    } else if (table === 'files') {
-        window.saveTableRequest = $.ajax({
-            type: 'POST',
-            url: '/save_files',
-            data: {
-                'starttime': startUTC,
-                'endtime': endUTC,
-                'jd_start': jd_start,
-                'jd_end': jd_end,
-                'host': host,
-                'filetype': filetype,
-            },
-            success: function(data) {
-                document.write(JSON.stringify(data));
-            },
-            dataType: 'json'
-        });
-    } else {
-        alert('Invalid json');
-        return;
-    }
+    //if (table === 'obs') {
+    //    window.saveTableRequest = $.ajax({
+    //        type: 'POST',
+    //        url: '/save_obs',
+    //        data: {
+    //            'starttime': startUTC,
+    //            'endtime': endUTC,
+    //            'jd_start': jd_start,
+    //            'jd_end': jd_end,
+    //            'polarization': polarization,
+    //            'era_type': era_type,
+    //        },
+    //        success: function(data) {
+    //            document.write(JSON.stringify(data));
+    //        },
+    //        dataType: 'json'
+    //    });
+    //} else if (table === 'files') {
+    //    window.saveTableRequest = $.ajax({
+    //        type: 'POST',
+    //        url: '/save_files',
+    //        data: {
+    //            'starttime': startUTC,
+    //            'endtime': endUTC,
+    //            'jd_start': jd_start,
+    //            'jd_end': jd_end,
+    //            'host': host,
+    //            'filetype': filetype,
+    //        },
+    //        success: function(data) {
+    //            document.write(JSON.stringify(data));
+    //        },
+    //        dataType: 'json'
+    //    });
+    //if (true) {
+    //    window.saveTableRequest = $.ajax({
+    //        type: 'POST',
+    //        url: '/index',
+    //        data: {
+    //            'starttime': startUTC,
+    //            'endtime': endUTC,
+    //            'jd_start': jd_start,
+    //            'jd_end': jd_end,
+    //            'host': host,
+    //            'filetype': filetype,
+    //            'polarization': polarization,
+    //            'era_type': era_type,
+    //        },
+    //        success: function(data) {
+    //            $('#index').html(data)
+    //        },
+    //        dataType: 'json'
+    //    });
+    //} else {
+    //    alert('Invalid json');
+    //    return;
+    //}
 };
 
 function setButton(){
@@ -209,6 +228,7 @@ function getObservations(loadTab) {
     window.daySummaryTableRequest = abortRequestIfPending(window.daySummaryTableRequest);
     window.obsTableRequest = abortRequestIfPending(window.obsTableRequest);
     window.fileTableRequest = abortRequestIfPending(window.fileTableRequest);
+    window.saveTableRequest = abortRequestIfPending(window.saveTableRequest);
 
     var start = $('#datepicker_start').val();
     var end = $('#datepicker_end').val();
@@ -335,6 +355,29 @@ function getObservations(loadTab) {
         },
         dataType: 'html'
     });
+
+    fullLink = '/?starttime=' + startUTC + '&endtime=' + endUTC + '&jd_start=' + jd_start + '&jd_end=' + jd_end + '&host=' + host + '&filetype=' + filetype + '&polarization=' + polarization + '&era_type=' + era_type
+
+    if (loadTab) {
+        window.saveTableRequest = $.ajax({
+            type: 'POST',
+            url: '/',
+            data: {
+                'starttime': startUTC,
+                'endtime': endUTC,
+                'jd_start': jd_start,
+                'jd_end': jd_end,
+                'host': host,
+                'filetype': filetype,
+                'polarization': polarization,
+                'era_type': era_type,
+            },
+            success: function(data) {
+                location.href = fullLink
+            },
+            dataType: 'html'
+        });
+    }
 };
 
 function getDate(datestr) {
