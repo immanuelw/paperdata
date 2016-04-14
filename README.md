@@ -5,8 +5,7 @@ Module for building, searching, and updating the PAPER database compression pipe
 ------------------------------------------------------------------------------------
 
 paper
-
-Main package for modules
+----Main package for modules
 
 -----------
 DESCRIPTION
