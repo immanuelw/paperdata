@@ -20,7 +20,7 @@ Contains scripts which bridges other databases to the paperdata and populates it
 
 dev
 ```
->test version of data module
+test version of data module
 ```
 
 ganglia
