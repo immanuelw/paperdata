@@ -5,8 +5,9 @@ Module for building, searching, and updating the PAPER database compression pipe
 ------------------------------------------------------------------------------------
 
 paper
->Main package for modules
-
+```
+Main package for modules
+```
 -----------
 DESCRIPTION
 -----------
@@ -23,24 +24,33 @@ test version of data module
 ```
 
 ganglia
->Contains scripts to record the state of each host at any time in the ganglia database
+```
+Contains scripts to record the state of each host at any time in the ganglia database
+```
 
 site
->module & scripts for instantiation of websites for paperdata
+```
+module & scripts for instantiation of websites for paperdata
+```
 
 calibration
->module & scripts for calibration of uv files
+```
+module & scripts for calibration of uv files
+```
 
 -------------
 EXTRA MODULES
 -------------
 
 convert
->time conversions module
+```
+time conversions module
+```
 
 schema
->schema script function
-
+```
+schema script function
+```
 -----
 SETUP
 -----
