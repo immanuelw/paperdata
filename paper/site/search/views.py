@@ -138,7 +138,6 @@ def save_obs():
     -------
     html: json file
     '''
-    print(tuple(request.args.items()))
     start_utc = float(request.args['start_utc'])
     end_utc = float(request.args['end_utc'])
 
