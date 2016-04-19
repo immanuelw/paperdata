@@ -210,11 +210,11 @@ def save_files():
     -------
     html: json file
     '''
-    start_utc = float(request.form['start_utc'])
-    end_utc = float(request.form['end_utc'])
+    start_utc = float(request.args['start_utc'])
+    end_utc = float(request.args['end_utc'])
 
-    host = request.form['host']
-    filetype = request.form['filetype']
+    host = request.args['host']
+    filetype = request.args['filetype']
 
     try:
         dbi = pdbi.DataBaseInterface()
