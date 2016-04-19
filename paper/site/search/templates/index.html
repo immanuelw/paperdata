@@ -82,10 +82,12 @@
                         {% endfor %}
                     </select>
                 </div>
-                <div id='obs_table'></div>
-                <button type='button' onclick='downloadObs()' class='replyButton' style='margin-top:12px;'>Save Observations</button>
-                <div id='file_table'></div>
-                <button type='button' onclick='downloadFiles()' class='replyButton' style='margin-top:12px;'>Save Files</button>
+                <div class='container'>
+                    <div class='floatLeft' id='obs_table'></div>
+                    <div id='file_table'></div>
+                </div>
+                <button type='button' onclick='downloadObs()' class='replyButtonL' style='margin-top:12px;'>Save Observations</button>
+                <button type='button' onclick='downloadFiles()' class='replyButtonR' style='margin-top:12px;'>Save Files</button>
                 <br>
             </td>
             <td class='right_cell cellClass cellTop'>

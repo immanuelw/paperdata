@@ -1,17 +1,13 @@
-#error_table, #obs_table, #file_table {
-	width: 100%;
-	max-width: 100%;
-	max-height: 400px;
-	overflow: auto;
-}
-
 #error_table, #obs_table, #file_table table {
 	table-layout: fixed;
-	float: left;
-	width: 100%;
+	width: 50%;
 	max-width: 100%;
 	word-wrap: break-word;
 	text-align: center;
+    display: inline-block;
+	max-height: 400px;
+	overflow: auto;
+    font-size: 0.8em;
 }
 
 #data_summary_table, #day_summary_table th {
@@ -24,6 +20,20 @@
 #data_summary_table, #day_summary_table table {
 	width: 100%;
 	text-align: center;
+}
+
+.floatLeft {
+    width: 50%;
+    float: left;
+}
+
+.floatRight {
+    width: 50%;
+    float: right;
+}
+
+.container {
+    overflow: hidden;
 }
 
 .scrolledList {
@@ -172,7 +182,20 @@ h2			  { font-size: 1.2em; }
 	color: #f9f9f9;
 }
 
-.replyButton {
+.replyButtonL {
+	background-color:#44c767;
+	border:1px solid #18ab29;
+	display:inline-block;
+	border-radius: 4px;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:arial;
+	text-decoration:none;
+	text-shadow:0px 1px 0px #2f6627;
+	float: left;
+}
+
+.replyButtonR {
 	background-color:#44c767;
 	border:1px solid #18ab29;
 	display:inline-block;
@@ -185,11 +208,20 @@ h2			  { font-size: 1.2em; }
 	float: right;
 }
 
-.replyButton:hover {
+.replyButtonL:hover {
 	background-color:#5cbf2a;
 }
 
-.replyButton:active {
+.replyButtonL:active {
+	position:relative;
+	top:1px;
+}
+
+.replyButtonR:hover {
+	background-color:#5cbf2a;
+}
+
+.replyButtonR:active {
 	position:relative;
 	top:1px;
 }
