@@ -140,6 +140,7 @@ h2 {
 	display: table;
 	border-spacing: 5px;
 	border-collapse: separate;
+    width: 80%;
 }
 
 .rowClass {
