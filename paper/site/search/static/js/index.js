@@ -223,11 +223,87 @@ function setButton(){
     }
 };
 
-function getObservations(loadTab) {
-    window.dataSummaryTableRequest = abortRequestIfPending(window.dataSummaryTableRequest);
-    window.daySummaryTableRequest = abortRequestIfPending(window.daySummaryTableRequest);
+function getObsTable(startUTC, endUTC, jd_start, jd_end, polarization, era_type) {
     window.obsTableRequest = abortRequestIfPending(window.obsTableRequest);
+
+    window.obsTableRequest = $.ajax({
+        type: 'POST',
+        url: '/obs_table',
+        data: {
+            'starttime': startUTC,
+            'endtime': endUTC,
+            'jd_start': jd_start,
+            'jd_end': jd_end,
+            'polarization': polarization,
+            'era_type': era_type,
+        },
+        success: function(data) {
+            $('#obs_table').html(data);
+        },
+        dataType: 'html'
+    });
+};
+
+function getFileTable(startUTC, endUTC, jd_start, jd_end, host, filetype) {
     window.fileTableRequest = abortRequestIfPending(window.fileTableRequest);
+
+    window.fileTableRequest = $.ajax({
+        type: 'POST',
+        url: '/file_table',
+        data: {
+            'starttime': startUTC,
+            'endtime': endUTC,
+            'jd_start': jd_start,
+            'jd_end': jd_end,
+            'host': host,
+            'filetype': filetype,
+        },
+        success: function(data) {
+            $('#file_table').html(data);
+        },
+        dataType: 'html'
+    });
+};
+
+function getDataTable(startUTC, endUTC, jd_start, jd_end) {
+    window.dataSummaryTableRequest = abortRequestIfPending(window.dataSummaryTableRequest);
+
+    window.dataSummaryTableRequest = $.ajax({
+        type: 'POST',
+        url: '/data_summary_table',
+        data: {
+            'starttime': startUTC,
+            'endtime': endUTC,
+            'jd_start': jd_start,
+            'jd_end': jd_end,
+        },
+        success: function(data) {
+            $('#data_summary_table').html(data);
+        },
+        dataType: 'html'
+    });
+};
+
+function getDayTable(startUTC, endUTC, jd_start, jd_end) {
+    window.daySummaryTableRequest = abortRequestIfPending(window.daySummaryTableRequest);
+
+    window.daySummaryTableRequest = $.ajax({
+        type: 'POST',
+        url: '/day_summary_table',
+        data: {
+            'starttime': startUTC,
+            'endtime': endUTC,
+            'jd_start': jd_start,
+            'jd_end': jd_end,
+        },
+        success: function(data) {
+            $('#day_summary_table').html(data);
+        },
+        dataType: 'html'
+    });
+};
+
+function getObservations(loadTab) {
     window.saveTableRequest = abortRequestIfPending(window.saveTableRequest);
 
     var start = $('#datepicker_start').val();
@@ -313,71 +389,12 @@ function getObservations(loadTab) {
             },
             dataType: 'html'
         });
+    } else {
+        getObsTable(startUTC, endUTC, jd_start, jd_end, polarization, era_type);
+        getFileTable(startUTC, endUTC, jd_start, jd_end, host, filetype);
+        getDataTable(startUTC, endUTC, jd_start, jd_end);
+        getDayTable(startUTC, endUTC, jd_start, jd_end);
     }
-
-    window.obsTableRequest = $.ajax({
-        type: 'POST',
-        url: '/obs_table',
-        data: {
-            'starttime': startUTC,
-            'endtime': endUTC,
-            'jd_start': jd_start,
-            'jd_end': jd_end,
-            'polarization': polarization,
-            'era_type': era_type,
-        },
-        success: function(data) {
-            $('#obs_table').html(data);
-        },
-        dataType: 'html'
-    });
-
-    window.fileTableRequest = $.ajax({
-        type: 'POST',
-        url: '/file_table',
-        data: {
-            'starttime': startUTC,
-            'endtime': endUTC,
-            'jd_start': jd_start,
-            'jd_end': jd_end,
-            'host': host,
-            'filetype': filetype,
-        },
-        success: function(data) {
-            $('#file_table').html(data);
-        },
-        dataType: 'html'
-    });
-
-    window.dataSummaryTableRequest = $.ajax({
-        type: 'POST',
-        url: '/data_summary_table',
-        data: {
-            'starttime': startUTC,
-            'endtime': endUTC,
-            'jd_start': jd_start,
-            'jd_end': jd_end,
-        },
-        success: function(data) {
-            $('#data_summary_table').html(data);
-        },
-        dataType: 'html'
-    });
-
-    window.daySummaryTableRequest = $.ajax({
-        type: 'POST',
-        url: '/day_summary_table',
-        data: {
-            'starttime': startUTC,
-            'endtime': endUTC,
-            'jd_start': jd_start,
-            'jd_end': jd_end,
-        },
-        success: function(data) {
-            $('#day_summary_table').html(data);
-        },
-        dataType: 'html'
-    });
 };
 
 function getDate(datestr) {
