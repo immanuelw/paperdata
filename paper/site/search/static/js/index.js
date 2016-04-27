@@ -166,6 +166,29 @@ function setButton(){
     }
 };
 
+function getDataHist(startUTC, endUTC, jd_start, jd_end, polarization, era_type, host, filetype) {
+    window.dataHistRequest = abortRequestIfPending(window.HistRequest);
+
+    window.dataHistRequest = $.ajax({
+        type: 'POST',
+        url: '/data_hist',
+        data: {
+            'starttime': startUTC,
+            'endtime': endUTC,
+            'jd_start': jd_start,
+            'jd_end': jd_end,
+            'polarization': polarization,
+            'era_type': era_type,
+            'host': host,
+            'filetype': filetype,
+        },
+        success: function(data) {
+            $('#data_hist').html(data);
+        },
+        dataType: 'html'
+    });
+};
+
 function getObsTable(startUTC, endUTC, jd_start, jd_end, polarization, era_type) {
     window.obsTableRequest = abortRequestIfPending(window.obsTableRequest);
 
@@ -332,6 +355,7 @@ function getObservations(loadTab) {
     } else {
         getObsTable(startUTC, endUTC, jd_start, jd_end, polarization, era_type);
         getFileTable(startUTC, endUTC, jd_start, jd_end, host, filetype);
+        //getDataHist(startUTC, endUTC, jd_start, jd_end, polarization, era_type, host, filetype);
         getDataTable(startUTC, endUTC, jd_start, jd_end);
         getDayTable(startUTC, endUTC, jd_start, jd_end);
     }
