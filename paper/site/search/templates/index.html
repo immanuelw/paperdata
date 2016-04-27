@@ -7,29 +7,12 @@
                 <div id='date_controls'>
                     <input type='radio' onclick='setButton()' name='date' value='0' checked> Date
                     <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;start:</span>
-                    {% if the_set %}
-                    <input type='text' id='datepicker_start' value='{{start_time_str_short}}'
-                    {% else %}
-                    <input type='text' id='datepicker_start'
-                    {% endif %}
-                    autocomplete='off'/>
+                    <input type='text' id='datepicker_start' autocomplete='off'/>
                     <span>end:</span>
-                    {% if the_set %}
-                    <input type='text' id='datepicker_end' value='{{end_time_str_short}}'
-                    {% else %}
-                    <input type='text' id='datepicker_end'
-                    {% endif %}
-                    autocomplete='off'/>
+                    <input type='text' id='datepicker_end' autocomplete='off'/>
                     <button onclick='getObservations(true)' name='dateButton'>Get observations</button>
-                    <span id = 'view_status_span'>
-                    You are viewing a
-                    <span id='set_or_date_range_label'>
-                    {% if the_set %}
-                     set ({{the_set.name}})
-                    {% else %}
-                     date range
-                    {% endif %}
-                    </span>
+                    <span id='view_status_span'>
+                        You are viewing a date range
                     </span>
                 </div>
                 <div>

@@ -145,63 +145,6 @@ function saveTable(table) {
     var host = $('#host_dropdown').val();
     var filetype = $('#filetype_dropdown').val();
 
-    //if (table === 'obs') {
-    //    window.saveTableRequest = $.ajax({
-    //        type: 'POST',
-    //        url: '/save_obs',
-    //        data: {
-    //            'starttime': startUTC,
-    //            'endtime': endUTC,
-    //            'jd_start': jd_start,
-    //            'jd_end': jd_end,
-    //            'polarization': polarization,
-    //            'era_type': era_type,
-    //        },
-    //        success: function(data) {
-    //            document.write(JSON.stringify(data));
-    //        },
-    //        dataType: 'json'
-    //    });
-    //} else if (table === 'files') {
-    //    window.saveTableRequest = $.ajax({
-    //        type: 'POST',
-    //        url: '/save_files',
-    //        data: {
-    //            'starttime': startUTC,
-    //            'endtime': endUTC,
-    //            'jd_start': jd_start,
-    //            'jd_end': jd_end,
-    //            'host': host,
-    //            'filetype': filetype,
-    //        },
-    //        success: function(data) {
-    //            document.write(JSON.stringify(data));
-    //        },
-    //        dataType: 'json'
-    //    });
-    //if (true) {
-    //    window.saveTableRequest = $.ajax({
-    //        type: 'POST',
-    //        url: '/index',
-    //        data: {
-    //            'starttime': startUTC,
-    //            'endtime': endUTC,
-    //            'jd_start': jd_start,
-    //            'jd_end': jd_end,
-    //            'host': host,
-    //            'filetype': filetype,
-    //            'polarization': polarization,
-    //            'era_type': era_type,
-    //        },
-    //        success: function(data) {
-    //            $('#index').html(data)
-    //        },
-    //        dataType: 'json'
-    //    });
-    //} else {
-    //    alert('Invalid json');
-    //    return;
-    //}
 };
 
 function setButton(){
@@ -352,9 +295,6 @@ function getObservations(loadTab) {
         $('#tabs').tabs('load', $('#tabs').tabs('option', 'active'));
     }
 
-    if (loadTab) { // The user pressed the 'Get observations' button, so they're viewing a date range now.
-        $('#set_or_date_range_label').html('date range');
-    }
 
     $('#data_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
     $('#day_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
