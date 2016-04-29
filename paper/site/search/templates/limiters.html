@@ -2,7 +2,7 @@
     Polarization:
     <select id='polarization_dropdown'>
         {% for polarization_, name in polarization_dropdown %}
-            {% if polarization_ == 'any' %}
+            {% if polarization_ == d_pol %}
             <option value={{ polarization_ }} selected>{{ name }}</option>
             {% else %}
             <option value={{ polarization_ }}>{{ name }}</option>
@@ -12,7 +12,7 @@
     Era Type:
     <select id='era_type_dropdown'>
         {% for era_type_, name in era_type_dropdown %}
-            {% if era_type_ == 'None' %}
+            {% if era_type_ == d_et %}
             <option value={{ era_type_ }} selected>{{ name }}</option>
             {% else %}
             <option value={{ era_type_ }}>{{ name }}</option>
@@ -22,7 +22,7 @@
     Host:
     <select id='host_dropdown'>
         {% for host_, name in host_dropdown %}
-            {% if host_ == 'folio' %}
+            {% if host_ == d_host %}
             <option value={{ host_ }} selected>{{ name }}</option>
             {% else %}
             <option value={{ host_ }}>{{ name }}</option>
@@ -32,7 +32,7 @@
     Filetype:
     <select id='filetype_dropdown'>
         {% for filetype_, name in filetype_dropdown %}
-            {% if filetype_ == 'uv' %}
+            {% if filetype_ == d_ft %}
             <option value={{ filetype_ }} selected>{{ name }}</option>
             {% else %}
             <option value={{ filetype_ }}>{{ name }}</option>

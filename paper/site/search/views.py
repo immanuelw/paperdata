@@ -94,8 +94,10 @@ def index():
                             polarization_dropdown=polarization_dropdown, era_type_dropdown=era_type_dropdown,
                             host_dropdown=host_dropdown, filetype_dropdown=filetype_dropdown,
                             start_utc=start_utc, end_utc=end_utc,
-                            polarization=polarization, era_type=era_type,
-                            host=host, filetype=filetype)
+                            polarization=polarization, d_pol=polarization,
+                            era_type=era_type, d_et=era_type,
+                            host=host, d_host=host,
+                            filetype=filetype, d_ft=filetype)
 
 @app.route('/data_hist', methods = ['POST'])
 def data_hist():
