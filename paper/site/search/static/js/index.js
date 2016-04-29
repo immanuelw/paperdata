@@ -289,7 +289,14 @@ function getObservations(loadTab) {
     var host = $('#host_dropdown').val();
     var filetype = $('#filetype_dropdown').val();
 
-    fullLink = '/?starttime=' + startUTC + '&endtime=' + endUTC + '&jd_start=' + jd_start + '&jd_end=' + jd_end + '&host=' + host + '&filetype=' + filetype + '&polarization=' + polarization + '&era_type=' + era_type
+    fullLink = '/?starttime=' + startUTC +
+               '&endtime=' + endUTC +
+               '&jd_start=' + jd_start +
+               '&jd_end=' + jd_end +
+               '&host=' + host +
+               '&filetype=' + filetype +
+               '&polarization=' + polarization +
+               '&era_type=' + era_type
 
     if (loadTab) {
         window.saveTableRequest = $.ajax({
