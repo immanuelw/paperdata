@@ -4,65 +4,8 @@
     <div id='main_content_div'>
         <tr class='rowClass'>
             <td class='cellClass cellTop'>
-                <div id='date_controls'>
-                    <input type='radio' onclick='setButton()' name='date' value='0' checked> Date
-                    <span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;start:</span>
-                    <input type='text' id='datepicker_start' autocomplete='off'/>
-                    <span>end:</span>
-                    <input type='text' id='datepicker_end' autocomplete='off'/>
-                    <button onclick='getObservations(true)' name='dateButton'>Get observations</button>
-                    <span id='view_status_span'> You are viewing a date range </span>
-                </div>
-                <div>
-                    <input type='radio' onclick='setButton()' name='date' value='1'> Julian Date
-                    <span>&nbsp;&nbsp;start:</span>
-                    <input type='text' id='jd_start'>
-                    <span>end:</span>
-                    <input type='text' id='jd_end'>
-                    <button onclick='getObservations(true)' name='jDateButton'>Get observations</button>
-                </div>
-                <div id='limiters'>
-                    Polarization:
-                    <select id='polarization_dropdown'>
-                        {% for polarization_, name in polarization_dropdown %}
-                            {% if polarization_ == 'any' %}
-                            <option value={{ polarization_ }} selected>{{ name }}</option>
-                            {% else %}
-                            <option value={{ polarization_ }}>{{ name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    Era Type:
-                    <select id='era_type_dropdown'>
-                        {% for era_type_, name in era_type_dropdown %}
-                            {% if era_type_ == 'None' %}
-                            <option value={{ era_type_ }} selected>{{ name }}</option>
-                            {% else %}
-                            <option value={{ era_type_ }}>{{ name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    Host:
-                    <select id='host_dropdown'>
-                        {% for host_, name in host_dropdown %}
-                            {% if host_ == 'folio' %}
-                            <option value={{ host_ }} selected>{{ name }}</option>
-                            {% else %}
-                            <option value={{ host_ }}>{{ name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                    Filetype:
-                    <select id='filetype_dropdown'>
-                        {% for filetype_, name in filetype_dropdown %}
-                            {% if filetype_ == 'uv' %}
-                            <option value={{ filetype_ }} selected>{{ name }}</option>
-                            {% else %}
-                            <option value={{ filetype_ }}>{{ name }}</option>
-                            {% endif %}
-                        {% endfor %}
-                    </select>
-                </div>
+                {% include 'date_controls.html' %}
+                {% include 'limiters.html' %}
                 <div class='container'>
                     <div class='floatLeft' id='obs_table'></div>
                     <div id='file_table'></div>
