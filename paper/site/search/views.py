@@ -28,6 +28,9 @@ from paper.site import db_utils, misc_utils
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 from sqlalchemy import func
+import plotly.plotly as py
+import plotly.graph_objs as go
+import numpy as np
 
 def time_fix(jdstart, jdend, starttime=None, endtime=None):
     '''
@@ -94,6 +97,13 @@ def index():
                             polarization=polarization, era_type=era_type,
                             host=host, filetype=filetype)
 
+@app.route('/data_hist', methods = ['POST'])
+def data_hist():
+    y = np.random.randn(500)
+
+    data = [go.Histogram(y=y)]
+    plot_url = py.plot(data, filename='horizontal-histogram')
+
 @app.route('/obs_table', methods = ['POST'])
 def obs_table():
     '''
@@ -127,7 +137,10 @@ def obs_table():
     except:
         log_list = []
 
-    return render_template('obs_table.html', log_list=log_list, output_vars=output_vars, start_time=start_utc, end_time=end_utc)
+    return render_template('obs_table.html',
+                           log_list=log_list, output_vars=output_vars,
+                           start_time=start_utc, end_time=end_utc,
+                           polarization=polarization, era_type=era_type)
 
 @app.route('/save_obs', methods = ['GET'])
 def save_obs():
@@ -199,7 +212,10 @@ def file_table():
     except:
         log_list = []
 
-    return render_template('file_table.html', log_list=log_list, output_vars=output_vars, start_time=start_utc, end_time=end_utc)
+    return render_template('file_table.html',
+                           log_list=log_list, output_vars=output_vars,
+                           start_time=start_utc, end_time=end_utc,
+                           host=host, filetype=filetype)
 
 @app.route('/save_files', methods = ['GET'])
 def save_files():
