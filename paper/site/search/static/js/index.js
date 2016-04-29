@@ -105,48 +105,6 @@ function abortRequestIfPending(request) {
     return request;
 };
 
-function saveTable(table) {
-    window.saveTableRequest = abortRequestIfPending(window.saveTableRequest);
-    var start = $('#datepicker_start').val();
-    var end = $('#datepicker_end').val();
-    re = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
-
-    var jd_start = $('#jd_start').val();
-    var jd_end = $('#jd_end').val();
-
-    // Update the sessionStorage
-    sessionStorage.startDate = start;
-    sessionStorage.endDate = end;
-
-    sessionStorage.jd_start = jd_start;
-    sessionStorage.jd_end = jd_end;
-
-    var startDate, endDate;
-
-    if (start.match(re)) {
-        startDate = getDate(start);
-    } else {
-        alert('Invalid datetime format: ' + start);
-        return;
-    }
-
-    if (end.match(re)) {
-        endDate = getDate(end);
-    } else {
-        alert('Invalid datetime format: ' + end);
-        return;
-    }
-
-    var startUTC = startDate.toISOString().slice(0, 19) + 'Z';
-    var endUTC = endDate.toISOString().slice(0, 19) + 'Z';
-
-    var polarization = $('#polarization_dropdown').val();
-    var era_type = $('#era_type_dropdown').val();
-    var host = $('#host_dropdown').val();
-    var filetype = $('#filetype_dropdown').val();
-
-};
-
 function setButton(){
     var checked_val = $("input[name='date']:checked").val();
     if (checked_val === '1') {
