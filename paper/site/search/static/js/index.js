@@ -227,6 +227,20 @@ function getDayTable(startUTC, endUTC, jd_start, jd_end) {
     });
 };
 
+function parseQuery() {
+    var polarization = $('#polarization_dropdown').val();
+    var era_type = $('#era_type_dropdown').val();
+    var host = $('#host_dropdown').val();
+    var filetype = $('#filetype_dropdown').val();
+
+    return {
+        polarization: polarization,
+        era_type: era_type,
+        host: host,
+        filetype: filetype
+    };
+};
+
 function getObservations(loadTab) {
     window.saveTableRequest = abortRequestIfPending(window.saveTableRequest);
 
@@ -262,6 +276,8 @@ function getObservations(loadTab) {
 
     $('#obs_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
     $('#file_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+    $('#data_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
+    $('#day_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
     // Load the currently selected tab if it's not already being loaded.
     if (loadTab) {
@@ -276,27 +292,24 @@ function getObservations(loadTab) {
         $('#tabs').tabs('load', $('#tabs').tabs('option', 'active'));
     }
 
-
-    $('#data_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
-    $('#day_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
-
     // Make each date into a string of the format 'YYYY-mm-ddTHH:MM:SSZ', which is the format used in the local database.
     var startUTC = startDate.toISOString().slice(0, 19) + 'Z';
     var endUTC = endDate.toISOString().slice(0, 19) + 'Z';
 
-    var polarization = $('#polarization_dropdown').val();
-    var era_type = $('#era_type_dropdown').val();
-    var host = $('#host_dropdown').val();
-    var filetype = $('#filetype_dropdown').val();
+    var query = parseQuery();
+    var polarization = query.polarization;
+    var era_type = query.era_type;
+    var host = query.host;
+    var filetype = query.filetype;
 
-    fullLink = '/?starttime=' + startUTC +
-               '&endtime=' + endUTC +
-               '&jd_start=' + jd_start +
-               '&jd_end=' + jd_end +
-               '&host=' + host +
-               '&filetype=' + filetype +
-               '&polarization=' + polarization +
-               '&era_type=' + era_type
+    var fullLink = '/?starttime=' + startUTC +
+                   '&endtime=' + endUTC +
+                   '&jd_start=' + jd_start +
+                   '&jd_end=' + jd_end +
+                   '&host=' + host +
+                   '&filetype=' + filetype +
+                   '&polarization=' + polarization +
+                   '&era_type=' + era_type;
 
     if (loadTab) {
         window.saveTableRequest = $.ajax({
