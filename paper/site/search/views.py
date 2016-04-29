@@ -113,16 +113,15 @@ def obs_table():
     -------
     html: observation table
     '''
-    starttime = request.form['starttime']
-    endtime = request.form['endtime']
-
-    jdstart = request.form['jd_start']
-    jdend = request.form['jd_end']
+    jdstart = request.args.get('jd_start', 2455903)
+    jdend = request.args.get('jd_end', 2455904)
+    starttime = request.args.get('starttime', None)
+    endtime = request.args.get('endtime', None)
 
     start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
 
-    polarization = request.form['polarization']
-    era_type = request.form['era_type']
+    polarization = request.args.get('polarization', 'all')
+    era_type = request.args.get('era_type', 'None')
 
     fixed_et = None if era_type == 'None' else era_type
     output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
@@ -182,16 +181,15 @@ def file_table():
     -------
     html: file table
     '''
-    starttime = request.form['starttime']
-    endtime = request.form['endtime']
+    jdstart = request.args.get('jd_start', 2455903)
+    jdend = request.args.get('jd_end', 2455904)
+    starttime = request.args.get('starttime', None)
+    endtime = request.args.get('endtime', None)
 
-    jdstart = request.form['jd_start']
-    jdend = request.form['jd_end']
+    host = request.args.get('host', 'folio')
+    filetype = request.args.get('filetype', 'uv')
 
     start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
-
-    host = request.form['host']
-    filetype = request.form['filetype']
 
     output_vars = ('host', 'source', 'obsnum', 'filesize')
 
@@ -292,11 +290,10 @@ def data_summary_table():
     -------
     html: data summary table
     '''
-    starttime = request.form['starttime']
-    endtime = request.form['endtime']
-
-    jdstart = request.form['jd_start']
-    jdend = request.form['jd_end']
+    jdstart = request.args.get('jd_start', 2455903)
+    jdend = request.args.get('jd_end', 2455904)
+    starttime = request.args.get('starttime', None)
+    endtime = request.args.get('endtime', None)
 
     start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
 
@@ -359,11 +356,10 @@ def day_summary_table():
     -------
     html: day summary table
     '''
-    starttime = request.form['starttime']
-    endtime = request.form['endtime']
-
-    jdstart = request.form['jd_start']
-    jdend = request.form['jd_end']
+    jdstart = request.args.get('jd_start', 2455903)
+    jdend = request.args.get('jd_end', 2455904)
+    starttime = request.args.get('starttime', None)
+    endtime = request.args.get('endtime', None)
 
     start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
 
