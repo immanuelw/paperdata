@@ -5,6 +5,50 @@ String.prototype.replaceAll = function (find, replace) {
 };
 
 $(function() {
+    setTime();
+    setButton();
+
+    //global ajax vars
+    window.dataSummaryTableRequest = null;
+    window.daySummaryTableRequest = null;
+    window.obsTableRequest = null;
+    window.fileTableRequest = null;
+
+    getObservations(false);
+});
+
+function getDateTimeString(now) {
+    var month = ('0' + (now.getUTCMonth() + 1)).slice(-2);
+    var date = ('0' + now.getUTCDate()).slice(-2);
+    var hours = ('0' + now.getUTCHours()).slice(-2);
+    var minutes = ('0' + now.getUTCMinutes()).slice(-2);
+    return now.getUTCFullYear() + '/' + month + '/' + date + ' ' + hours + ':' + minutes;
+};
+
+function getDate(datestr) {
+    var year = datestr.substring(0, 4);
+    var month = datestr.substring(5, 7);
+    var day = datestr.substring(8, 10);
+    var hour = datestr.substring(11, 13);
+    var minute = datestr.substring(14, 16);
+    return new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
+};
+
+function convertDateTimesToJD(startDate, endDate){
+};
+
+function convertJDtoDateTimes(jdstart, jdend){
+};
+
+function abortRequestIfPending(request) {
+    if (request) {
+        request.abort();
+        return null;
+    }
+    return request;
+};
+
+function setTime() {
     var startDatePicker = $('#datepicker_start');
     var endDatePicker = $('#datepicker_end');
     startDatePicker.datetimepicker();
@@ -48,61 +92,6 @@ $(function() {
         sessionStorage.jd_start = nothing;
         sessionStorage.jd_end = nothing;
     }
-
-    setButton();
-
-    //global ajax vars
-    window.setRequest = null;
-    window.dataSummaryTableRequest = null;
-    window.daySummaryTableRequest = null;
-    window.obsTableRequest = null;
-    window.fileTableRequest = null;
-
-    // Set up the tabs.
-    $('#tabs').tabs({
-        beforeLoad: function(event, ui) {
-            if (ui.tab.data('loaded')) {
-                event.preventDefault();
-                return;
-            }
-
-            ui.panel.html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
-
-            if (ui.ajaxSettings.url.search('&set=') === -1) { // There is no set, so we need to add the date range.
-                var startTimeStr = $('#datepicker_start').val().replaceAll('/', '-').replaceAll(' ', 'T') + ':00Z';
-                var endTimeStr = $('#datepicker_end').val().replaceAll('/', '-').replaceAll(' ', 'T') + ':00Z';
-                ui.ajaxSettings.url += '&start=' + startTimeStr + '&end=' + endTimeStr;
-            }
-
-            ui.jqXHR.success(function() {
-                ui.tab.data('loaded', true);
-            });
-        }
-    });
-
-    getObservations(false /* Don't load the first tab, it's already being loaded */);
-});
-
-function getDateTimeString(now) {
-    var month = ('0' + (now.getUTCMonth() + 1)).slice(-2);
-    var date = ('0' + now.getUTCDate()).slice(-2);
-    var hours = ('0' + now.getUTCHours()).slice(-2);
-    var minutes = ('0' + now.getUTCMinutes()).slice(-2);
-    return now.getUTCFullYear() + '/' + month + '/' + date + ' ' + hours + ':' + minutes;
-};
-
-function convertDateTimesToJD(startDate, endDate){
-};
-
-function convertJDtoDateTimes(jdstart, jdend){
-};
-
-function abortRequestIfPending(request) {
-    if (request) {
-        request.abort();
-        return null;
-    }
-    return request;
 };
 
 function setButton(){
@@ -227,23 +216,7 @@ function getDayTable(startUTC, endUTC, jd_start, jd_end) {
     });
 };
 
-function parseQuery() {
-    var polarization = $('#polarization_dropdown').val();
-    var era_type = $('#era_type_dropdown').val();
-    var host = $('#host_dropdown').val();
-    var filetype = $('#filetype_dropdown').val();
-
-    return {
-        polarization: polarization,
-        era_type: era_type,
-        host: host,
-        filetype: filetype
-    };
-};
-
-function getObservations(loadTab) {
-    window.saveTableRequest = abortRequestIfPending(window.saveTableRequest);
-
+function parseDate() {
     var start = $('#datepicker_start').val();
     var end = $('#datepicker_end').val();
     re = /^\d{4}\/\d{2}\/\d{2} \d{2}:\d{2}$/;
@@ -274,27 +247,45 @@ function getObservations(loadTab) {
         return;
     }
 
+    // Make each date into a string of the format 'YYYY-mm-ddTHH:MM:SSZ', which is the format used in the local database.
+    var startUTC = startDate.toISOString().slice(0, 19) + 'Z';
+    var endUTC = endDate.toISOString().slice(0, 19) + 'Z';
+
+    return {
+        startUTC: startUTC,
+        endUTC: endUTC,
+        jd_start: jd_start,
+        jd_end: jd_end
+    };
+};
+
+function parseQuery() {
+    var polarization = $('#polarization_dropdown').val();
+    var era_type = $('#era_type_dropdown').val();
+    var host = $('#host_dropdown').val();
+    var filetype = $('#filetype_dropdown').val();
+
+    return {
+        polarization: polarization,
+        era_type: era_type,
+        host: host,
+        filetype: filetype
+    };
+};
+
+function getObservations(loadTab) {
+    window.saveTableRequest = abortRequestIfPending(window.saveTableRequest);
+
     $('#obs_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
     $('#file_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
     $('#data_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
     $('#day_summary_table').html('<img src="/static/images/ajax-loader.gif" class="loading"/>');
 
-    // Load the currently selected tab if it's not already being loaded.
-    if (loadTab) {
-        $('#tabs > ul > li').each(function(index) {
-            $(this).data('loaded', false);
-        });
-        $('#tabs > ul > li > a').each(function(index) {
-            var url = $(this).attr('href');
-            var shortUrl = url.split('&').slice(0, 2).join('&');
-            $(this).attr('href', shortUrl);
-        });
-        $('#tabs').tabs('load', $('#tabs').tabs('option', 'active'));
-    }
-
-    // Make each date into a string of the format 'YYYY-mm-ddTHH:MM:SSZ', which is the format used in the local database.
-    var startUTC = startDate.toISOString().slice(0, 19) + 'Z';
-    var endUTC = endDate.toISOString().slice(0, 19) + 'Z';
+    var dateTime = parseDate();
+    var jd_start = dateTime.jd_start;
+    var jd_end = dateTime.jd_end;
+    var startUTC = dateTime.startUTC;
+    var endUTC = dateTime.endUTC;
 
     var query = parseQuery();
     var polarization = query.polarization;
@@ -337,13 +328,4 @@ function getObservations(loadTab) {
         getDataTable(startUTC, endUTC, jd_start, jd_end);
         getDayTable(startUTC, endUTC, jd_start, jd_end);
     }
-};
-
-function getDate(datestr) {
-    var year = datestr.substring(0, 4);
-    var month = datestr.substring(5, 7);
-    var day = datestr.substring(8, 10);
-    var hour = datestr.substring(11, 13);
-    var minute = datestr.substring(14, 16);
-    return new Date(Date.UTC(year, month - 1, day, hour, minute, 0));
 };
