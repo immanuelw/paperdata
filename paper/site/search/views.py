@@ -101,10 +101,47 @@ def index():
 
 @app.route('/data_hist', methods = ['POST'])
 def data_hist():
-    y = np.random.randn(500)
+    pass
 
-    data = [go.Histogram(y=y)]
-    plot_url = py.plot(data, filename='horizontal-histogram')
+#    jdstart = request.form.get('jd_start', 2455903)
+#    jdend = request.form.get('jd_end', 2455904)
+#    starttime = request.form.get('starttime', None)
+#    endtime = request.form.get('endtime', None)
+
+#    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
+
+#    polarization = request.form.get('polarization', 'all')
+#    era_type = request.form.get('era_type', 'None')
+#    host = request.form.get('host', 'folio')
+#    filetype = request.form.get('filetype', 'uv')
+#
+#    dbi = pdbi.DataBaseInterface()
+#    obs_table = pdbi.Observation
+#    file_table = pdbi.File
+#    with dbi.session_scope() as s:
+#       #get julian_day, count for files, split by raw/compressed
+#        file_query = s.query(file_table.observation.julian_day, func.count(file_table))\
+#                      .join(obs_table)\
+#                      .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
+#                      .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
+#        f_days, f_day_counts = zip(*file_query)
+#
+#        #get julian_day, count for observation
+#        obs_query = s.query(obs_table.julian_day, func.count(obs_table))\
+#                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
+#                     .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
+#        j_days, j_day_counts = zip(*obs_query)
+#
+#        #split by polarization
+#        pol_query = s.query(obs_table.julian_day, obs_table.polarization, func.count(obs_table))\
+#                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
+#                     .group_by(obs_table.julian_day, obs_table.polarization).order_by(obs_table.julian_day.asc()).all()
+#        p_days, pols, p_day_counts = zip(*response)
+#
+#    return render_template('data_hist.html',
+#                            f_days=j_days, f_day_counts=f_day_counts,
+#                            j_days=j_days, j_day_counts=j_day_counts,
+#                            p_days=p_days, p_day_counts=p_day_counts, pols=pols)
 
 @app.route('/obs_table', methods = ['POST'])
 def obs_table():
