@@ -23,7 +23,7 @@
 }
 
 #obs_hist, #data_hist {
-    min-width: 310px;
+    width: 100%;
     height: 400px;
     margin 0;
 }
