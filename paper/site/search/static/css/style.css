@@ -22,6 +22,11 @@
 	text-align: center;
 }
 
+#obs_hist, #data_hist {
+    min-width: 310px;
+    height: 400px;
+    margin 0;
+}
 .floatLeft {
     width: 50%;
     float: left;
