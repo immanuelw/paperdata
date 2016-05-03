@@ -95,16 +95,12 @@ def index():
     file_table = pdbi.File
     with dbi.session_scope() as s:
         #get julian_day, count for files, split by raw/compressed
-        print(1)
         file_query = s.query(file_table, func.count(file_table))\
                       .join(obs_table)\
                       .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
                       .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
-        print(2)
         file_query = ((q.observation.julian_day, count) for q, count in file_query)
-        print(3)
         f_days, f_day_counts = zip(*file_query)
-        print(f_days)
 
         #get julian_day, count for observation
         obs_query = s.query(obs_table.julian_day, func.count(obs_table))\
