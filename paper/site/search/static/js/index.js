@@ -157,7 +157,7 @@ function getObsTable(startUTC, endUTC, jd_start, jd_end, polarization, era_type)
     });
 };
 
-function getFileTable(startUTC, endUTC, jd_start, jd_end, host, filetype) {
+function getFileTable(startUTC, endUTC, jd_start, jd_end, host, filetype, polarization, era_type) {
     window.fileTableRequest = abortRequestIfPending(window.fileTableRequest);
 
     window.fileTableRequest = $.ajax({
@@ -170,6 +170,8 @@ function getFileTable(startUTC, endUTC, jd_start, jd_end, host, filetype) {
             'jd_end': jd_end,
             'host': host,
             'filetype': filetype,
+            'polarization': polarization,
+            'era_type': era_type,
         },
         success: function(data) {
             $('#file_table').html(data);
@@ -197,7 +199,7 @@ function getDataTable(startUTC, endUTC, jd_start, jd_end) {
     });
 };
 
-function getDayTable(startUTC, endUTC, jd_start, jd_end) {
+function getDayTable(startUTC, endUTC, jd_start, jd_end, polarization, era_type) {
     window.daySummaryTableRequest = abortRequestIfPending(window.daySummaryTableRequest);
 
     window.daySummaryTableRequest = $.ajax({
@@ -208,6 +210,8 @@ function getDayTable(startUTC, endUTC, jd_start, jd_end) {
             'endtime': endUTC,
             'jd_start': jd_start,
             'jd_end': jd_end,
+            'polarization': polarization,
+            'era_type': era_type,
         },
         success: function(data) {
             $('#day_summary_table').html(data);
@@ -323,9 +327,9 @@ function getObservations(loadTab) {
         });
     } else {
         getObsTable(startUTC, endUTC, jd_start, jd_end, polarization, era_type);
-        getFileTable(startUTC, endUTC, jd_start, jd_end, host, filetype);
+        getFileTable(startUTC, endUTC, jd_start, jd_end, host, filetype, polarization, era_type);
         //getDataHist(startUTC, endUTC, jd_start, jd_end, polarization, era_type, host, filetype);
         getDataTable(startUTC, endUTC, jd_start, jd_end);
-        getDayTable(startUTC, endUTC, jd_start, jd_end);
+        getDayTable(startUTC, endUTC, jd_start, jd_end, polarization, era_type);
     }
 };

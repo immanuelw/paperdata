@@ -28,9 +28,11 @@ from paper.site import db_utils, misc_utils
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 from sqlalchemy import func
-import plotly.plotly as py
-import plotly.graph_objs as go
 import numpy as np
+#import plotly
+#import plotly.plotly as py
+#import plotly.graph_objs as go
+#import pandas as pd
 
 def time_fix(jdstart, jdend, starttime=None, endtime=None):
     '''
@@ -132,12 +134,6 @@ def index():
             j_days = days
             j_day_counts = [0] * len(days)
 
-        #split by polarization
-        pol_query = s.query(obs_table.julian_day, obs_table.polarization, func.count(obs_table))\
-                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                     .group_by(obs_table.julian_day, obs_table.polarization).order_by(obs_table.julian_day.asc()).all()
-        p_days, pols, p_day_counts = zip(*pol_query)
-
     return render_template('index.html',
                             polarization_dropdown=polarization_dropdown, era_type_dropdown=era_type_dropdown,
                             host_dropdown=host_dropdown, filetype_dropdown=filetype_dropdown,
@@ -148,8 +144,7 @@ def index():
                             filetype=filetype, d_ft=filetype,
                             days=days,
                             f_days=f_days, f_day_counts=f_day_counts,
-                            j_days=j_days, j_day_counts=j_day_counts,
-                            p_days=p_days, p_day_counts=p_day_counts, pols=pols)
+                            j_days=j_days, j_day_counts=j_day_counts)
 
 @app.route('/data_hist', methods = ['POST'])
 def data_hist():
@@ -289,6 +284,8 @@ def file_table():
 
     host = request.form.get('host', 'folio')
     filetype = request.form.get('filetype', 'uv')
+    polarization = request.form.get('polarization', 'all')
+    era_type = request.form.get('era_type', 'None')
 
     start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
 
@@ -299,15 +296,19 @@ def file_table():
         obs_table = pdbi.Observation
         file_table = pdbi.File
         with dbi.session_scope() as s:
-            all_obs_list = s.query(file_table).join(obs_table).filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
+            file_query = s.query(file_table).join(obs_table).filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
 
             if host != 'all':
-                all_obs_list = all_obs_list.filter(file_table.host == host)
+                file_query = file_query.filter(file_table.host == host)
             if filetype != 'all':
-                all_obs_list = all_obs_list.filter(file_table.filetype == filetype)
+                file_query = file_query.filter(file_table.filetype == filetype)
+            if polarization != 'any':
+                file_query = file_query.filter(obs_table.polarization == polarization)
+            if era_type not in ('all', 'None'):
+                file_query = file_query.filter(obs_table.era_type == era_type)
 
             log_list = [{var: getattr(paper_file, var) for var in output_vars}
-                        for paper_file in all_obs_list.order_by(obs_table.time_start.asc()).all()]
+                        for paper_file in file_query.order_by(obs_table.time_start.asc()).all()]
     except:
         log_list = []
 
@@ -330,20 +331,26 @@ def save_files():
 
     host = request.args['host']
     filetype = request.args['filetype']
+    polarization = request.args['polarization']
+    era_type = request.args['era_type']
 
     try:
         dbi = pdbi.DataBaseInterface()
         obs_table = pdbi.Observation
         file_table = pdbi.File
         with dbi.session_scope() as s:
-            all_obs_list = s.query(file_table).join(obs_table).filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
+            file_query = s.query(file_table).join(obs_table).filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
 
             if host != 'all':
-                all_obs_list = all_obs_list.filter(file_table.host == host)
+                file_query = file_query.filter(file_table.host == host)
             if filetype != 'all':
-                all_obs_list = all_obs_list.filter(file_table.filetype == filetype)
+                file_query = file_query.filter(file_table.filetype == filetype)
+            if polarization != 'any':
+                file_query = file_query.filter(obs_table.polarization == polarization)
+            if era_type not in ('all', 'None'):
+                file_query = file_query.filter(obs_table.era_type == era_type)
 
-            entry_list = [paper_file.to_dict() for paper_file in all_obs_list.order_by(obs_table.time_start.asc()).all()]
+            entry_list = [paper_file.to_dict() for paper_file in file_query.order_by(obs_table.time_start.asc()).all()]
     except:
         entry_list = []
 
@@ -466,12 +473,22 @@ def day_summary_table():
 
     start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
 
+    polarization = request.form.get('polarization', 'all')
+    era_type = request.form.get('era_type', 'None')
+
     dbi = pdbi.DataBaseInterface()
     with dbi.session_scope() as s:
         obs_table = pdbi.Observation
-        response = s.query(obs_table.julian_day, func.count(obs_table))\
-                    .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                    .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
-        day_map = tuple((julian_day, count) for julian_day, count in response)
+        pol_query = s.query(obs_table.julian_day, obs_table.polarization, func.count(obs_table))\
+                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
 
-    return render_template('day_summary_table.html', day_map=day_map)
+        if polarization != 'any':
+            pol_query = pol_query.filter(obs_table.polarization == polarization)
+        if era_type not in ('all', 'None'):
+            pol_query = pol_query.filter(obs_table.era_type == era_type)
+
+        pol_query = pol_query.group_by(obs_table.julian_day, obs_table.polarization).order_by(obs_table.julian_day.asc()).all()
+
+        pol_map = tuple((julian_day, pol, count) for julian_day, pol, count in pol_query)
+
+    return render_template('day_summary_table.html', pol_map=pol_map)

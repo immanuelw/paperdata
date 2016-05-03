@@ -4,13 +4,15 @@
     <thead>
         <tr>
             <th>Julian Day</th>
+            <th>Polarization</th>
             <th>Amount</th>
         </tr>
     </thead>
     <tbody>
-        {% for julian_day, count in day_map %}
+        {% for julian_day, pol, count in pol_map %}
             <tr>
                 <td>{{ julian_day }}</td>
+                <td>{{ pol }}</td>
                 <td>{{ count }}</td>
             </tr>
             {% endfor %}
