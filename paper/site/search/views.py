@@ -94,19 +94,43 @@ def index():
     obs_table = pdbi.Observation
     file_table = pdbi.File
     with dbi.session_scope() as s:
+        days = list(range(int(start_utc), int(end_utc) + 1))
         #get julian_day, count for files, split by raw/compressed
         file_query = s.query(file_table, func.count(file_table))\
                       .join(obs_table)\
-                      .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                      .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
+                      .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
+
+        if host != 'all':
+            file_query = file_query.filter(file_table.host == host)
+        if filetype != 'all':
+            file_query = file_query.filter(file_table.filetype == filetype)
+        if polarization != 'any':
+            file_query = file_query.filter(obs_table.polarization == polarization)
+        if era_type not in ('all', 'None'):
+            file_query = file_query.filter(obs_table.era_type == era_type)
+
+        file_query = file_query.group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
         file_query = ((q.observation.julian_day, count) for q, count in file_query)
-        f_days, f_day_counts = zip(*file_query)
+        try:
+            f_days, f_day_counts = zip(*file_query)
+        except:
+            f_days = days
+            f_day_counts = [0] * len(days)
 
         #get julian_day, count for observation
         obs_query = s.query(obs_table.julian_day, func.count(obs_table))\
-                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                     .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
-        j_days, j_day_counts = zip(*obs_query)
+                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
+        if polarization != 'any':
+            obs_query = obs_query.filter(obs_table.polarization == polarization)
+        if era_type not in ('all', 'None'):
+            obs_query = obs_query.filter(obs_table.era_type == era_type)
+
+        obs_query = obs_query.group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
+        try:
+            j_days, j_day_counts = zip(*obs_query)
+        except:
+            j_days = days
+            j_day_counts = [0] * len(days)
 
         #split by polarization
         pol_query = s.query(obs_table.julian_day, obs_table.polarization, func.count(obs_table))\
@@ -122,6 +146,7 @@ def index():
                             era_type=era_type, d_et=era_type,
                             host=host, d_host=host,
                             filetype=filetype, d_ft=filetype,
+                            days=days,
                             f_days=f_days, f_day_counts=f_day_counts,
                             j_days=j_days, j_day_counts=j_day_counts,
                             p_days=p_days, p_day_counts=p_day_counts, pols=pols)
