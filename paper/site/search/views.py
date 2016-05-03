@@ -99,7 +99,7 @@ def index():
                             host=host, d_host=host,
                             filetype=filetype, d_ft=filetype)
 
-@app.route('/data_hist', methods = ['GET', 'POST'])
+@app.route('/data_hist', methods = ['POST'])
 def data_hist():
     '''
     generate histogram for data
