@@ -354,8 +354,8 @@ def data_summary_table():
     with dbi.session_scope() as s:
         obs_table = pdbi.Observation
         response = s.query(obs_table.polarization, obs_table.era_type, func.sum(obs_table.length), func.count(obs_table))\
-                            .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                            .group_by(obs_table.polarization, obs_table.era_type).all()
+                    .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
+                    .group_by(obs_table.polarization, obs_table.era_type).all()
         for polarization, era_type, length, count in response:
             obs_map[polarization][str(era_type)].update({'obs_count': count , 'obs_hours': length})
 
@@ -418,8 +418,8 @@ def day_summary_table():
     with dbi.session_scope() as s:
         obs_table = pdbi.Observation
         response = s.query(obs_table.julian_day, func.count(obs_table))\
-                           .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                           .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
+                    .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
+                    .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
         day_map = tuple((julian_day, count) for julian_day, count in response)
 
     return render_template('day_summary_table.html', day_map=day_map)
