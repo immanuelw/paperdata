@@ -16,7 +16,7 @@ teardown_request | exits database
 data_summary_table | shows data summary table
 day_summary_table | shows day summary table
 '''
-from flask import render_template, flash, redirect, url_for, request, g, make_response, Response
+from flask import render_template, flash, redirect, url_for, request, g, make_response, Response, jsonify
 from flask.ext.login import current_user
 import json
 import time
@@ -145,6 +145,39 @@ def index():
                             days=days,
                             f_days=f_days, f_day_counts=f_day_counts,
                             j_days=j_days, j_day_counts=j_day_counts)
+
+@app.route('/stream_plot', methods = ['GET', 'POST'])
+def stream_plot():
+    '''
+    generate streaming data
+
+    Returns
+    -------
+    '''
+    jdstart = request.form.get('jd_start', 2455903)
+    jdend = request.form.get('jd_end', 2455904)
+    starttime = request.form.get('starttime', None)
+    endtime = request.form.get('endtime', None)
+
+    host = request.form.get('host', 'folio')
+    filetype = request.form.get('filetype', 'uv')
+    polarization = request.form.get('polarization', 'all')
+    era_type = request.form.get('era_type', 'None')
+
+    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
+
+    dbi = pdbi.DataBaseInterface()
+    obs_table = pdbi.Observation
+    file_table = pdbi.File
+    with dbi.session_scope() as s:
+        file_query = s.query(file_table, func.count(file_table))\
+                      .join(obs_table)\
+                      .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
+                      .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).limit(1)
+
+        file_count = [count for q, count in file_query]
+
+    return jsonify({'count': file_count})
 
 @app.route('/data_hist', methods = ['POST'])
 def data_hist():
