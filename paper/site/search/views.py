@@ -9,6 +9,8 @@ db_objs | gathers database objects for use
 time_fix | fixes times for observation input
 page_args | gathers page arguments for use
 page_form | gathers page form info for use
+obs_filter | filters observation query
+file_filter | filters file query
 index | shows main page
 stream_plot | streaming plot example
 data_hist | creates histogram
@@ -145,6 +147,54 @@ def page_form():
 
     return start_utc, end_utc, polarization, era_type, host, filetype
 
+def obs_filter(obs_query, obs_table, start_utc, end_utc, polarization, era_type):
+    '''
+    filters observation query
+
+    Parameters
+    ----------
+    obs_query | object: SQLalchemy observation table query object
+    obs_table | object: SQLalchemy observation table object
+    start_utc | float: starting julian date
+    end_utc | float: ending julian date
+    polarization | str: polarization to limit
+    era_type | str: era type to limit
+
+    Returns
+    -------
+    object: observation query
+    '''
+    obs_query = obs_query.filter(obs_table.time_start >= start_utc)\
+                         .filter(obs_table.time_end <= end_utc)
+    if polarization != 'any':
+        obs_query = obs_query.filter(obs_table.polarization == polarization)
+    if era_type not in ('all', 'None'):
+        obs_query = obs_query.filter(obs_table.era_type == era_type)
+
+    return obs_query
+
+def file_filter(file_query, file_table, host, filetype):
+    '''
+    filters file query
+
+    Parameters
+    ----------
+    file_query | object: SQLalchemy file table query object
+    file_table | object: SQLalchemy file table object
+    host | str: host to limit
+    filetype | str: era type to limit
+
+    Returns
+    -------
+    object: file query
+    '''
+    if host != 'all':
+        file_query = file_query.filter(file_table.host == host)
+    if filetype != 'all':
+        file_query = file_query.filter(file_table.filetype == filetype)
+
+    return file_query
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -166,17 +216,9 @@ def index():
         days = list(range(int(start_utc), int(end_utc) + 1))
         #get julian_day, count for files, split by raw/compressed
         file_query = s.query(file_table, func.count(file_table))\
-                      .join(obs_table)\
-                      .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
-
-        if host != 'all':
-            file_query = file_query.filter(file_table.host == host)
-        if filetype != 'all':
-            file_query = file_query.filter(file_table.filetype == filetype)
-        if polarization != 'any':
-            file_query = file_query.filter(obs_table.polarization == polarization)
-        if era_type not in ('all', 'None'):
-            file_query = file_query.filter(obs_table.era_type == era_type)
+                      .join(obs_table)
+        file_query = obs_filter(file_query, obs_table, start_utc, end_utc, polarization, era_type)
+        file_query = file_filter(file_query, file_table, host, filetype)
 
         file_query = file_query.group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
         file_query = ((q.observation.julian_day, count) for q, count in file_query)
@@ -187,12 +229,8 @@ def index():
             f_day_counts = [0] * len(days)
 
         #get julian_day, count for observation
-        obs_query = s.query(obs_table.julian_day, func.count(obs_table))\
-                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
-        if polarization != 'any':
-            obs_query = obs_query.filter(obs_table.polarization == polarization)
-        if era_type not in ('all', 'None'):
-            obs_query = obs_query.filter(obs_table.era_type == era_type)
+        obs_query = s.query(obs_table.julian_day, func.count(obs_table))
+        obs_query = obs_filter(obs_query, obs_table, start_utc, end_utc, polarization, era_type)
 
         obs_query = obs_query.group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
         try:
@@ -227,9 +265,10 @@ def stream_plot():
 
     with dbi.session_scope() as s:
         file_query = s.query(file_table, func.count(file_table))\
-                      .join(obs_table)\
-                      .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                      .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).limit(1)
+                      .join(obs_table)
+        file_query = obs_filter(file_query, obs_table, start_utc, end_utc, polarization, era_type)
+        file_query = file_filter(file_query, file_table, host, filetype)
+        file_query = file_query.group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).limit(1)
 
         file_count = [count for q, count in file_query]
 
@@ -249,30 +288,35 @@ def data_hist():
     dbi, obs_table, file_table = db_objs()
 
     with dbi.session_scope() as s:
+        days = list(range(int(start_utc), int(end_utc) + 1))
         #get julian_day, count for files, split by raw/compressed
         file_query = s.query(file_table, func.count(file_table))\
-                      .join(obs_table)\
-                      .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                      .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
+                      .join(obs_table)
+        file_query = obs_filter(file_query, obs_table, start_utc, end_utc, polarization, era_type)
+        file_query = file_filter(file_query, file_table, host, filetype)
+
+        file_query = file_query.group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
         file_query = ((q.observation.julian_day, count) for q, count in file_query)
-        f_days, f_day_counts = zip(*file_query)
+        try:
+            f_days, f_day_counts = zip(*file_query)
+        except:
+            f_days = days
+            f_day_counts = [0] * len(days)
 
         #get julian_day, count for observation
-        obs_query = s.query(obs_table.julian_day, func.count(obs_table))\
-                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                     .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
-        j_days, j_day_counts = zip(*obs_query)
+        obs_query = s.query(obs_table.julian_day, func.count(obs_table))
+        obs_query = obs_filter(obs_query, obs_table, start_utc, end_utc, polarization, era_type)
 
-        #split by polarization
-        pol_query = s.query(obs_table.julian_day, obs_table.polarization, func.count(obs_table))\
-                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                     .group_by(obs_table.julian_day, obs_table.polarization).order_by(obs_table.julian_day.asc()).all()
-        p_days, pols, p_day_counts = zip(*pol_query)
+        obs_query = obs_query.group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
+        try:
+            j_days, j_day_counts = zip(*obs_query)
+        except:
+            j_days = days
+            j_day_counts = [0] * len(days)
 
     return render_template('data_hist.html',
                             f_days=f_days, f_day_counts=f_day_counts,
-                            j_days=j_days, j_day_counts=j_day_counts,
-                            p_days=p_days, p_day_counts=p_day_counts, pols=pols)
+                            j_days=j_days, j_day_counts=j_day_counts)
 
 @app.route('/obs_table', methods = ['POST'])
 def obs_table():
@@ -285,23 +329,20 @@ def obs_table():
     '''
     start_utc, end_utc, polarization, era_type, host, filetype = page_form()
 
-    fixed_et = None if era_type == 'None' else era_type
     output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
 
-    try:
-        response = db_utils.query(database='paperdata', table='Observation', 
-                                    field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
-                                    ('polarization', None if polarization == 'any' else '==', polarization),
-                                    ('era_type', None if era_type in ('all', 'None') else '==', era_type)),
-                                    sort_tuples=(('time_start', 'asc'),))
-        log_list = [{var: getattr(obs, var) for var in output_vars} for obs in response]
-    except:
-        log_list = []
+    dbi, obs_table, file_table = db_objs()
+    with dbi.session_scope() as s:
+        obs_query = s.query(obs_table)
+        obs_query = obs_filter(obs_query, obs_table, start_utc, end_utc, polarization, era_type)
+        obs_query = obs_query.order_by(obs_table.julian_date.asc()).all()
+
+        log_list = [{var: getattr(obs, var) for var in output_vars} for obs in obs_query]
 
     return render_template('obs_table.html',
-                           log_list=log_list, output_vars=output_vars,
-                           start_time=start_utc, end_time=end_utc,
-                           polarization=polarization, era_type=era_type)
+                            log_list=log_list, output_vars=output_vars,
+                            start_time=start_utc, end_time=end_utc,
+                            polarization=polarization, era_type=era_type)
 
 @app.route('/save_obs', methods = ['GET'])
 def save_obs():
@@ -312,24 +353,14 @@ def save_obs():
     -------
     html: json file
     '''
-    start_utc = float(request.args['start_utc'])
-    end_utc = float(request.args['end_utc'])
+    start_utc, end_utc, polarization, era_type, host, filetype = page_args()
 
-    polarization = request.args['polarization']
-    era_type = request.args['era_type']
+    with dbi.session_scope() as s:
+        obs_query = s.query(obs_table)
+        obs_query = obs_filter(obs_query, obs_table, start_utc, end_utc, polarization, era_type)
+        obs_query = obs_query.order_by(obs_table.julian_date.asc()).all()
 
-    fixed_et = None if era_type == 'None' else era_type
-
-    try:
-        response = db_utils.query(database='paperdata', table='Observation', 
-                                    field_tuples=(('time_start', '>=', start_utc), ('time_end', '<=', end_utc),
-                                    ('polarization', None if polarization == 'any' else '==', polarization),
-                                    ('era_type', None if era_type in ('all', 'None') else '==', era_type)),
-                                    sort_tuples=(('time_start', 'asc'),))
-
-        entry_list = [obs.to_dict() for obs in response]
-    except:
-        entry_list = []
+        entry_list = [obs.to_dict() for obs in obs_query]
 
     return Response(response=json.dumps(entry_list, sort_keys=True, indent=4, default=ppdata.decimal_default),
                     status=200, mimetype='application/json', headers={'Content-Disposition': 'attachment; filename=obs.json'})
@@ -347,29 +378,19 @@ def file_table():
 
     output_vars = ('host', 'source', 'obsnum', 'filesize')
 
-    try:
-        dbi, obs_table, file_table = db_objs()
-        with dbi.session_scope() as s:
-            file_query = s.query(file_table).join(obs_table).filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
-
-            if host != 'all':
-                file_query = file_query.filter(file_table.host == host)
-            if filetype != 'all':
-                file_query = file_query.filter(file_table.filetype == filetype)
-            if polarization != 'any':
-                file_query = file_query.filter(obs_table.polarization == polarization)
-            if era_type not in ('all', 'None'):
-                file_query = file_query.filter(obs_table.era_type == era_type)
-
-            log_list = [{var: getattr(paper_file, var) for var in output_vars}
-                        for paper_file in file_query.order_by(obs_table.time_start.asc()).all()]
-    except:
-        log_list = []
+    dbi, obs_table, file_table = db_objs()
+    with dbi.session_scope() as s:
+        file_query = s.query(file_table).join(obs_table)
+        file_query = obs_filter(file_query, obs_table, start_utc, end_utc, polarization, era_type)
+        file_query = file_filter(file_query, file_table, host, filetype)
+        
+        log_list = [{var: getattr(paper_file, var) for var in output_vars}
+                    for paper_file in file_query.order_by(obs_table.time_start.asc()).all()]
 
     return render_template('file_table.html',
-                           log_list=log_list, output_vars=output_vars,
-                           start_time=start_utc, end_time=end_utc,
-                           host=host, filetype=filetype)
+                            log_list=log_list, output_vars=output_vars,
+                            start_time=start_utc, end_time=end_utc,
+                            host=host, filetype=filetype)
 
 @app.route('/save_files', methods = ['GET'])
 def save_files():
@@ -380,31 +401,15 @@ def save_files():
     -------
     html: json file
     '''
-    start_utc = float(request.args['start_utc'])
-    end_utc = float(request.args['end_utc'])
+    start_utc, end_utc, polarization, era_type, host, filetype = page_args()
 
-    host = request.args['host']
-    filetype = request.args['filetype']
-    polarization = request.args['polarization']
-    era_type = request.args['era_type']
+    dbi, obs_table, file_table = db_objs()
+    with dbi.session_scope() as s:
+        file_query = s.query(file_table).join(obs_table)
+        file_query = obs_filter(file_query, obs_table, start_utc, end_utc, polarization, era_type)
+        file_query = file_filter(file_query, file_table, host, filetype)
 
-    try:
-        dbi, obs_table, file_table = db_objs()
-        with dbi.session_scope() as s:
-            file_query = s.query(file_table).join(obs_table).filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
-
-            if host != 'all':
-                file_query = file_query.filter(file_table.host == host)
-            if filetype != 'all':
-                file_query = file_query.filter(file_table.filetype == filetype)
-            if polarization != 'any':
-                file_query = file_query.filter(obs_table.polarization == polarization)
-            if era_type not in ('all', 'None'):
-                file_query = file_query.filter(obs_table.era_type == era_type)
-
-            entry_list = [paper_file.to_dict() for paper_file in file_query.order_by(obs_table.time_start.asc()).all()]
-    except:
-        entry_list = []
+        entry_list = [paper_file.to_dict() for paper_file in file_query.order_by(obs_table.time_start.asc()).all()]
 
     return Response(response=json.dumps(entry_list, sort_keys=True, indent=4, default=ppdata.decimal_default),
                     status=200, mimetype='application/json', headers={'Content-Disposition': 'attachment; filename=file.json'})
@@ -458,15 +463,14 @@ def data_summary_table():
 
     dbi, obs_table, file_table = db_objs()
     with dbi.session_scope() as s:
-        response = s.query(obs_table.polarization, obs_table.era_type, func.sum(obs_table.length), func.count(obs_table))\
-                    .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-                    .group_by(obs_table.polarization, obs_table.era_type).all()
-        for polarization, era_type, length, count in response:
+        obs_query = s.query(obs_table.polarization, obs_table.era_type, func.sum(obs_table.length), func.count(obs_table))
+        obs_query = obs_filter(obs_query, obs_table, start_utc, end_utc, polarization, era_type)
+        obs_query = obs_query.group_by(obs_table.polarization, obs_table.era_type).all()
+        for polarization, era_type, length, count in obs_query:
             obs_map[polarization][str(era_type)].update({'obs_count': count , 'obs_hours': length})
 
-        file_table = pdbi.File
-        response = s.query(file_table.host, file_table.filetype, func.count(file_table)).group_by(file_table.host, file_table.filetype).all()
-        for host, filetype, count in response:
+        file_query = s.query(file_table.host, file_table.filetype, func.count(file_table)).group_by(file_table.host, file_table.filetype).all()
+        for host, filetype, count in file_query:
             file_map[host][filetype].update({'file_count': count})
 
     all_obs_strs = pol_strs + era_type_strs
@@ -517,14 +521,8 @@ def day_summary_table():
     dbi, obs_table, file_table = db_objs()
 
     with dbi.session_scope() as s:
-        pol_query = s.query(obs_table.julian_day, obs_table.polarization, func.count(obs_table))\
-                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
-
-        if polarization != 'any':
-            pol_query = pol_query.filter(obs_table.polarization == polarization)
-        if era_type not in ('all', 'None'):
-            pol_query = pol_query.filter(obs_table.era_type == era_type)
-
+        pol_query = s.query(obs_table.julian_day, obs_table.polarization, func.count(obs_table))
+        pol_query = obs_filter(pol_query, obs_table, start_utc, end_utc, polarization, era_type)
         pol_query = pol_query.group_by(obs_table.julian_day, obs_table.polarization).order_by(obs_table.julian_day.asc()).all()
 
         pol_map = tuple((julian_day, pol, count) for julian_day, pol, count in pol_query)
