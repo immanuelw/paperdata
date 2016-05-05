@@ -30,8 +30,7 @@ import time
 from datetime import datetime
 import paper as ppdata
 from paper.site.flask_app import search_app as app, search_db as db
-from paper.site.search import models
-from paper.site import db_utils, misc_utils
+from paper.site import misc_utils
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
 from sqlalchemy import func
