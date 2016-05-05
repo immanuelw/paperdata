@@ -5,8 +5,13 @@ author | Immanuel Washington
 
 Functions
 ---------
+db_objs | gathers database objects for use
 time_fix | fixes times for observation input
+page_args | gathers page arguments for use
+page_form | gathers page form info for use
 index | shows main page
+stream_plot | streaming plot example
+data_hist | creates histogram
 obs_table | shows observation table
 save_obs | generates observation json file
 file_table | shows file table
@@ -33,6 +38,23 @@ import numpy as np
 #import plotly.plotly as py
 #import plotly.graph_objs as go
 #import pandas as pd
+
+def db_objs():
+    '''
+    outputs database objects
+
+    Returns
+    -------
+    tuple:
+        object: database interface object
+        object: observation table object
+        object: file table object
+    '''
+    dbi = pdbi.DataBaseInterface()
+    obs_table = pdbi.Observation
+    file_table = pdbi.File
+
+    return dbi, obs_table, file_table
 
 def time_fix(jdstart, jdend, starttime=None, endtime=None):
     '''
@@ -67,6 +89,62 @@ def time_fix(jdstart, jdend, starttime=None, endtime=None):
 
     return start_utc, end_utc
 
+def page_args():
+    '''
+    outputs relevant page argument info
+
+    Returns
+    -------
+    tuple:
+        float: julian start date
+        float: julian end date
+        str: polarization
+        str: era type
+        str: host
+        str: filetype
+    '''
+    jdstart = request.args.get('jd_start', 2455903)
+    jdend = request.args.get('jd_end', 2455904)
+    starttime = request.args.get('starttime', None)
+    endtime = request.args.get('endtime', None)
+
+    polarization = request.args.get('polarization', 'all')
+    era_type = request.args.get('era_type', 'None')
+    host = request.args.get('host', 'folio')
+    filetype = request.args.get('filetype', 'uv')
+
+    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
+
+    return start_utc, end_utc, polarization, era_type, host, filetype
+
+def page_form():
+    '''
+    outputs relevant page form info
+
+    Returns
+    -------
+    tuple:
+        float: julian start date
+        float: julian end date
+        str: polarization
+        str: era type
+        str: host
+        str: filetype
+    '''
+    jdstart = request.form.get('jd_start', 2455903)
+    jdend = request.form.get('jd_end', 2455904)
+    starttime = request.form.get('starttime', None)
+    endtime = request.form.get('endtime', None)
+
+    polarization = request.form.get('polarization', 'all')
+    era_type = request.form.get('era_type', 'None')
+    host = request.form.get('host', 'folio')
+    filetype = request.form.get('filetype', 'uv')
+
+    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
+
+    return start_utc, end_utc, polarization, era_type, host, filetype
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/index', methods=['GET', 'POST'])
 def index():
@@ -80,21 +158,10 @@ def index():
     '''
     polarization_dropdown, era_type_dropdown, host_dropdown, filetype_dropdown = misc_utils.get_dropdowns()
 
-    jdstart = request.args.get('jd_start', 2455903)
-    jdend = request.args.get('jd_end', 2455904)
-    starttime = request.args.get('starttime', None)
-    endtime = request.args.get('endtime', None)
+    start_utc, end_utc, polarization, era_type, host, filetype = page_args()
 
-    polarization = request.args.get('polarization', 'all')
-    era_type = request.args.get('era_type', 'None')
-    host = request.args.get('host', 'folio')
-    filetype = request.args.get('filetype', 'uv')
+    dbi, obs_table, file_table = db_objs()
 
-    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
-
-    dbi = pdbi.DataBaseInterface()
-    obs_table = pdbi.Observation
-    file_table = pdbi.File
     with dbi.session_scope() as s:
         days = list(range(int(start_utc), int(end_utc) + 1))
         #get julian_day, count for files, split by raw/compressed
@@ -154,21 +221,10 @@ def stream_plot():
     Returns
     -------
     '''
-    jdstart = request.form.get('jd_start', 2455903)
-    jdend = request.form.get('jd_end', 2455904)
-    starttime = request.form.get('starttime', None)
-    endtime = request.form.get('endtime', None)
+    start_utc, end_utc, polarization, era_type, host, filetype = page_form()
 
-    host = request.form.get('host', 'folio')
-    filetype = request.form.get('filetype', 'uv')
-    polarization = request.form.get('polarization', 'all')
-    era_type = request.form.get('era_type', 'None')
+    dbi, obs_table, file_table = db_objs()
 
-    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
-
-    dbi = pdbi.DataBaseInterface()
-    obs_table = pdbi.Observation
-    file_table = pdbi.File
     with dbi.session_scope() as s:
         file_query = s.query(file_table, func.count(file_table))\
                       .join(obs_table)\
@@ -188,33 +244,18 @@ def data_hist():
     -------
     html: histogram
     '''
-    print(1)
-    jdstart = request.form.get('jd_start', 2455903)
-    jdend = request.form.get('jd_end', 2455904)
-    starttime = request.form.get('starttime', None)
-    endtime = request.form.get('endtime', None)
+    start_utc, end_utc, polarization, era_type, host, filetype = page_form()
 
-    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
-    polarization = request.form.get('polarization', 'all')
-    era_type = request.form.get('era_type', 'None')
-    host = request.form.get('host', 'folio')
-    filetype = request.form.get('filetype', 'uv')
+    dbi, obs_table, file_table = db_objs()
 
-    dbi = pdbi.DataBaseInterface()
-    obs_table = pdbi.Observation
-    file_table = pdbi.File
     with dbi.session_scope() as s:
         #get julian_day, count for files, split by raw/compressed
-        print(1)
         file_query = s.query(file_table, func.count(file_table))\
                       .join(obs_table)\
                       .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
                       .group_by(obs_table.julian_day).order_by(obs_table.julian_day.asc()).all()
-        print(2)
         file_query = ((q.observation.julian_day, count) for q, count in file_query)
-        print(3)
         f_days, f_day_counts = zip(*file_query)
-        print(f_days)
 
         #get julian_day, count for observation
         obs_query = s.query(obs_table.julian_day, func.count(obs_table))\
@@ -242,15 +283,7 @@ def obs_table():
     -------
     html: observation table
     '''
-    jdstart = request.form.get('jd_start', 2455903)
-    jdend = request.form.get('jd_end', 2455904)
-    starttime = request.form.get('starttime', None)
-    endtime = request.form.get('endtime', None)
-
-    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
-
-    polarization = request.form.get('polarization', 'all')
-    era_type = request.form.get('era_type', 'None')
+    start_utc, end_utc, polarization, era_type, host, filetype = page_form()
 
     fixed_et = None if era_type == 'None' else era_type
     output_vars = ('obsnum', 'julian_date', 'polarization', 'length')
@@ -310,24 +343,12 @@ def file_table():
     -------
     html: file table
     '''
-    jdstart = request.form.get('jd_start', 2455903)
-    jdend = request.form.get('jd_end', 2455904)
-    starttime = request.form.get('starttime', None)
-    endtime = request.form.get('endtime', None)
-
-    host = request.form.get('host', 'folio')
-    filetype = request.form.get('filetype', 'uv')
-    polarization = request.form.get('polarization', 'all')
-    era_type = request.form.get('era_type', 'None')
-
-    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
+    start_utc, end_utc, polarization, era_type, host, filetype = page_form()
 
     output_vars = ('host', 'source', 'obsnum', 'filesize')
 
     try:
-        dbi = pdbi.DataBaseInterface()
-        obs_table = pdbi.Observation
-        file_table = pdbi.File
+        dbi, obs_table, file_table = db_objs()
         with dbi.session_scope() as s:
             file_query = s.query(file_table).join(obs_table).filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
 
@@ -368,9 +389,7 @@ def save_files():
     era_type = request.args['era_type']
 
     try:
-        dbi = pdbi.DataBaseInterface()
-        obs_table = pdbi.Observation
-        file_table = pdbi.File
+        dbi, obs_table, file_table = db_objs()
         with dbi.session_scope() as s:
             file_query = s.query(file_table).join(obs_table).filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)
 
@@ -431,20 +450,14 @@ def data_summary_table():
     -------
     html: data summary table
     '''
-    jdstart = request.form.get('jd_start', 2455903)
-    jdend = request.form.get('jd_end', 2455904)
-    starttime = request.form.get('starttime', None)
-    endtime = request.form.get('endtime', None)
-
-    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
+    start_utc, end_utc, polarization, era_type, host, filetype = page_form()
 
     pol_strs, era_type_strs, host_strs, filetype_strs = misc_utils.get_set_strings()
     obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
     file_map = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
 
-    dbi = pdbi.DataBaseInterface()
+    dbi, obs_table, file_table = db_objs()
     with dbi.session_scope() as s:
-        obs_table = pdbi.Observation
         response = s.query(obs_table.polarization, obs_table.era_type, func.sum(obs_table.length), func.count(obs_table))\
                     .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
                     .group_by(obs_table.polarization, obs_table.era_type).all()
@@ -499,19 +512,11 @@ def day_summary_table():
     -------
     html: day summary table
     '''
-    jdstart = request.form.get('jd_start', 2455903)
-    jdend = request.form.get('jd_end', 2455904)
-    starttime = request.form.get('starttime', None)
-    endtime = request.form.get('endtime', None)
+    start_utc, end_utc, polarization, era_type, host, filetype = page_form()
 
-    start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
+    dbi, obs_table, file_table = db_objs()
 
-    polarization = request.form.get('polarization', 'all')
-    era_type = request.form.get('era_type', 'None')
-
-    dbi = pdbi.DataBaseInterface()
     with dbi.session_scope() as s:
-        obs_table = pdbi.Observation
         pol_query = s.query(obs_table.julian_day, obs_table.polarization, func.count(obs_table))\
                      .filter(obs_table.time_start >= start_utc).filter(obs_table.time_end <= end_utc)\
 
