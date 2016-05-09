@@ -85,12 +85,13 @@ function setTime() {
         jd_startPicker.val(sessionStorage.jd_start);
         jd_endPicker.val(sessionStorage.jd_end);
     } else {
-        var nothing = '';
-        jd_startPicker.val(nothing);
-        jd_endPicker.val(nothing);
+        var jd_head = '2455903';
+        var jd_tail = '2455904';
+        jd_startPicker.val(jd_head);
+        jd_endPicker.val(jd_tail);
 
-        sessionStorage.jd_start = nothing;
-        sessionStorage.jd_end = nothing;
+        sessionStorage.jd_start = jd_head;
+        sessionStorage.jd_end = jd_tail;
     }
 };
 
