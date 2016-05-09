@@ -457,32 +457,13 @@ def data_summary_table():
     start_utc, end_utc, polarization, era_type, host, filetype = page_form()
 
     pol_strs, era_type_strs, host_strs, filetype_strs = misc_utils.get_set_strings()
-    obs_map = {pol_str: {era_type_str: {'obs_count': 0, 'obs_hours': 0} for era_type_str in era_type_strs} for pol_str in pol_strs}
     file_map = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
 
     dbi, obs_table, file_table = db_objs()
     with dbi.session_scope() as s:
-        obs_query = s.query(obs_table.polarization, obs_table.era_type, func.sum(obs_table.length), func.count(obs_table))
-        obs_query = obs_filter(obs_query, obs_table, start_utc, end_utc, polarization, era_type)
-        obs_query = obs_query.group_by(obs_table.polarization, obs_table.era_type).all()
-        for polarization, era_type, length, count in obs_query:
-            obs_map[polarization][str(era_type)].update({'obs_count': count , 'obs_hours': length})
-
         file_query = s.query(file_table.host, file_table.filetype, func.count(file_table)).group_by(file_table.host, file_table.filetype).all()
         for host, filetype, count in file_query:
             file_map[host][filetype].update({'file_count': count})
-
-    all_obs_strs = pol_strs + era_type_strs
-    obs_total = {all_obs_str: {'count': 0, 'hours': 0} for all_obs_str in all_obs_strs}
-
-    for pol in pol_strs:
-        for era_type in era_type_strs:
-            obs_count = obs_map[pol][era_type]['obs_count']
-            obs_hours = obs_map[pol][era_type]['obs_hours']
-            obs_total[era_type]['count'] += obs_count
-            obs_total[era_type]['hours'] += obs_hours
-            obs_total[pol]['count'] += obs_count
-            obs_total[pol]['hours'] += obs_hours
 
     all_file_strs = host_strs + filetype_strs
     file_total = {all_file_str: {'count': 0} for all_file_str in all_file_strs}
@@ -493,17 +474,11 @@ def data_summary_table():
             file_total[filetype]['count'] += file_count
             file_total[host]['count'] += file_count
 
-    #gets rid of useless columns
-    no_obs = {era_type: {'obs_count': 0, 'obs_hours': 0} for era_type in era_type_strs}
-    pol_strs = tuple(pol for pol, era_type_dict in obs_map.items() if era_type_dict != no_obs)
-
     no_files = {filetype: {'file_count': 0} for filetype in filetype_strs}
     host_strs = tuple(host for host, filetype_dict in file_map.items() if filetype_dict != no_files)
 
     return render_template('data_summary_table.html',
-                            pol_strs=pol_strs, era_type_strs=era_type_strs,
                             host_strs=host_strs, filetype_strs=filetype_strs,
-                            obs_map=obs_map, obs_total=obs_total,
                             file_map=file_map, file_total=file_total)
 
 @app.route('/day_summary_table', methods=['POST'])

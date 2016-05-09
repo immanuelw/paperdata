@@ -1,35 +1,5 @@
 {% block content %}
 <table class='table-bordered table-striped'>
-    <b>Current observations summary</b>
-    <thead>
-        <tr>
-            <th>Hours (#)</th>
-            {% for pol in pol_strs %}
-                <th>{{ pol }}</th>
-            {% endfor %}
-            <th>Total</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for era_type in era_type_strs %}
-            <tr>
-                <th>{{ era_type }}</th>
-                    {% for pol in pol_strs %}
-                        <td>{{ obs_map[pol][era_type]['obs_hours'] | round(1) }} ({{ obs_map[pol][era_type]['obs_count'] }})</td>
-                    {% endfor %}
-                <td>{{ obs_total[era_type]['hours'] | round(1) }} ({{ obs_total[era_type]['count'] }})</td>
-            {% endfor %}
-            </tr>
-        <tr>
-            <th>Total</th>
-            {% for pol in pol_strs %}
-                <td>{{ obs_total[pol]['hours'] | round(1) }} ({{ obs_total[pol]['count'] }})</td>
-            {% endfor %}
-        </tr>
-    </tbody>
-</table>
-<div><br></div>
-<table class='table-bordered table-striped'>
     <b>All Files summary</b>
     <thead>
         <tr>
