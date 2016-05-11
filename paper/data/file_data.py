@@ -17,6 +17,7 @@ parse_sources | pulls list of paths from source paths str
 from __future__ import print_function
 import os
 import sys
+import getpass
 import glob
 import hashlib
 import socket
@@ -61,7 +62,7 @@ def human_size(num):
     '''
     return round(num / 1024. / 1024., 1)
 
-def calc_size(host, path):
+def calc_size(host, path, username=None, password=None):
     '''
     calculates size of directory or file on any host
     logins into host if necessary
@@ -70,6 +71,8 @@ def calc_size(host, path):
     ----------
     host | str: host of file
     path | str: path of directory or file
+    username | str: username --defaults to None
+    password | str: password --defaults to None
 
     Returns
     -------
@@ -81,7 +84,7 @@ def calc_size(host, path):
     if host == socket.gethostname():
         size_bytes = byte_size(path)
     else:
-        with ppdata.ssh_scope(host) as ssh:
+        with ppdata.ssh_scope(host, username, password) as ssh:
             with ssh.open_sftp() as sftp:
                 size_bytes = sftp.stat(path).st_size
 
@@ -119,7 +122,7 @@ def get_md5sum(path):
 
     return hasher.hexdigest()
 
-def calc_md5sum(host, path):
+def calc_md5sum(host, path, username=None, password=None):
     '''
     calculates md5 checksum of directory or file on any host
     logins into host if necessary
@@ -128,6 +131,8 @@ def calc_md5sum(host, path):
     ----------
     host | str: host of file
     path | str: path of directory or file
+    username | str: username --defaults to None
+    password | str: password --defaults to None
 
     Returns
     -------
@@ -139,7 +144,7 @@ def calc_md5sum(host, path):
     if host == socket.gethostname():
         md5 = get_md5sum(path)
     else:
-        with ppdata.ssh_scope(host) as ssh:
+        with ppdata.ssh_scope(host, username, password) as ssh:
             try:
                 with ssh.open_sftp() as sftp:
                     with sftp.file(path, mode='r') as remote_path:
@@ -173,7 +178,7 @@ def file_names(path):
 
     return base_path, filename, filetype
 
-def parse_sources(source_host, source_paths_str):
+def parse_sources(source_host, source_paths_str, username=None, password=None):
     '''
     parses source path string and gets list of sources
 
@@ -181,6 +186,8 @@ def parse_sources(source_host, source_paths_str):
     ----------
     source_host | str: host of files
     source_paths_str | str: string to indicate paths of uv* files
+    username | str: username --defaults to None
+    password | str: password --defaults to None
 
     Returns
     -------
@@ -189,7 +196,7 @@ def parse_sources(source_host, source_paths_str):
     if source_host == socket.gethostname():
         source_paths = glob.glob(source_paths_str)
     else:
-        with ppdata.ssh_scope(source_host) as ssh:
+        with ppdata.ssh_scope(source_host, username, password) as ssh:
             _, path_out, _ = ssh.exec_command('ls -d {source_paths_str}'.format(source_paths_str=source_paths_str))
             source_paths = path_out.read().splitlines()[:-1]
 
@@ -223,7 +230,10 @@ def source_info(ask=True):
             print('Wrong format for host and paths')
             return (None,) * 2
 
-    source_paths = parse_sources(source_host, source_paths_str)
+    username = raw_input('Username: ')
+    password = getpass.getpass('Password: ')
+
+    source_paths = parse_sources(source_host, source_paths_str, username, password)
 
     return source_host, source_paths
 

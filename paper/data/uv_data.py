@@ -16,6 +16,7 @@ calc_uv_data | pulls all relevant information from any uv* file
 from __future__ import print_function
 import os
 import sys
+import getpass
 import socket
 import paper as ppdata
 from paper.data import dbi as pdbi
@@ -212,7 +213,7 @@ def calc_npz_data(dbi, filename):
 
         return OBS.time_start, OBS.time_end, OBS.delta_time, julian_date, polarization, OBS.length, OBS.obsnum
 
-def calc_uv_data(host, path):
+def calc_uv_data(host, path, username=None, password=None):
     '''
     takes in uv* files and pulls data about observation
 
@@ -220,6 +221,8 @@ def calc_uv_data(host, path):
     ----------
     host | str: host of system
     path | str: path of uv* file
+    username | str: username --defaults to None
+    password | str: password --defaults to None
 
     Returns
     -------
@@ -259,7 +262,9 @@ def calc_uv_data(host, path):
         uv_data_script = os.path.expanduser('~/paperdata/paper/data/uv_data.py')
         moved_script = './uv_data.py'
         uv_comm = 'python {moved_script} {host} {path}'.format(moved_script=moved_script, host=host, path=path)
-        with ppdata.ssh_scope(host) as ssh:
+        username = raw_input('Username: ')
+        password = getpass.getpass('Password: ')
+        with ppdata.ssh_scope(host, username, password) as ssh:
             with ssh.open_sftp() as sftp:
                 try:
                     filestat = sftp.stat(uv_data_script)
@@ -270,10 +275,12 @@ def calc_uv_data(host, path):
                         sftp.put(uv_data_script, moved_script)
 
             _, uv_dat, _ = ssh.exec_command(uv_comm)
-            time_start, time_end, delta_time, julian_date, polarization, length, obsnum = [five_round(info) if key in (0, 1, 2, 3, 5)
-                                                                                            else int(info) if key in (6,)
-                                                                                            else info
-                                                                                            for key, info in enumerate(uv_dat.read().split(','))]
+            uv_get = uv_dat.read()
+        time_start, time_end, delta_time,\
+        julian_date, polarization, length, obsnum = [five_round(float(info)) if key in (0, 1, 2, 3, 5)
+                                                     else int(info) if key in (6,)
+                                                     else info
+                                                     for key, info in enumerate(uv_get.split(','))]
 
     return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 

@@ -135,7 +135,7 @@ def rsync_copy(source, destination):
     return None
 
 @contextmanager
-def ssh_scope(host, username=None):
+def ssh_scope(host, username=None, password=None):
     '''
     creates a ssh scope
     can use 'with'
@@ -145,6 +145,7 @@ def ssh_scope(host, username=None):
     ----------
     host | str: remote host
     username | str: username --defaults to None
+    password | str: password --defaults to None
 
     Returns
     -------
@@ -162,7 +163,11 @@ def ssh_scope(host, username=None):
             ssh.connect(host, key_filename=key_filename)
             yield ssh
         except:
-            yield None
+            try:
+                ssh.connect(host, username=username, password=password, key_filename=key_filename)
+                yield ssh
+            except:
+                yield None
     finally:
         ssh.close()
 
