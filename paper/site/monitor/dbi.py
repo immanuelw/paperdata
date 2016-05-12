@@ -14,7 +14,7 @@ neighbors = Table("neighbors", Base.metadata,
                   )
 
 
-class Observation(Base):
+class Observation(Base, ppdata.DictFix):
     __tablename__ = 'observation'
     # date = Column(BigInteger)  # Jon: Changed this to a biginteger for now... Though I can probably just pad my date
     date = Column(String(100))  # Jon: Changed this to a biginteger for now... Though I can probably just pad my date
@@ -45,7 +45,7 @@ class Observation(Base):
                                   single_parent=True)
 
 
-class File(Base):
+class File(Base, ppdata.DictFix):
     __tablename__ = 'file'
     filenum = Column(Integer, primary_key=True)
     filename = Column(String(200))
@@ -58,7 +58,7 @@ class File(Base):
     md5sum = Column(Integer)
 
 
-class Log(Base):
+class Log(Base, ppdata.DictFix):
     __tablename__ = 'log'
     lognum = Column(BigInteger, primary_key=True)
 #    obsnum = Column(BigInteger, ForeignKey('observation.obsnum'))
@@ -75,7 +75,7 @@ class Log(Base):
     # observation = relationship(Observation, backref=backref('logs', uselist=True), cascade="all, delete-orphan", single_parent=True)
 
 
-class Still(Base):
+class Still(Base, ppdata.DictFix):
     __tablename__ = 'still'
     hostname = Column(String(100), primary_key=True)
     ip_addr = Column(String(50))
