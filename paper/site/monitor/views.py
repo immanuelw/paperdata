@@ -163,6 +163,8 @@ def file_table():
     '''
     dbi, obs_table, file_table, log_table = db_objs()
     with dbi.session_scope() as s:
+        #              .filter(obs_table.current_stage_in_progress != 'FAILED')\
+        #              .filter(obs_table.current_stage_in_progress != 'KILLED')\
         file_query = s.query(file_table).join(obs_table)\
                       .filter((obs_table.current_stage_in_progress != 'FAILED') | (obs_table.current_stage_in_progress.is_(None)))\
                       .filter((obs_table.current_stage_in_progress != 'KILLED') | (obs_table.current_stage_in_progress.is_(None)))\
