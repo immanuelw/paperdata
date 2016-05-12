@@ -181,7 +181,7 @@ def file_filter(file_query, file_table, host, filetype):
     file_query | object: SQLalchemy file table query object
     file_table | object: SQLalchemy file table object
     host | str: host to limit
-    filetype | str: era type to limit
+    filetype | str: file type to limit
 
     Returns
     -------
