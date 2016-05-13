@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.add_files
+paper.data.scripts.parse_files
 
 pulls info about files and their related observations, then adds to the paperdata database
 
@@ -18,7 +18,6 @@ import time
 import uuid
 import paper as ppdata
 from paper.data import dbi as pdbi, uv_data, file_data
-import refresh_db
 
 def calc_obs_info(dbi, host, path):
     '''
