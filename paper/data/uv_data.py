@@ -262,6 +262,7 @@ def calc_uv_data(host, path, username=None, password=None):
         uv_data_script = os.path.expanduser('~/paperdata/paper/data/uv_data.py')
         moved_script = './uv_data.py'
         uv_comm = 'python {moved_script} {host} {path}'.format(moved_script=moved_script, host=host, path=path)
+        virt_env = 'source /usr/global/paper/CanopyVirtualEnvs/PAPER_Distiller/bin/activate'
         username = raw_input('Username: ')
         password = getpass.getpass('Password: ')
         with ppdata.ssh_scope(host, username, password) as ssh:
@@ -274,6 +275,7 @@ def calc_uv_data(host, path, username=None, password=None):
                     except(IOError):
                         sftp.put(uv_data_script, moved_script)
 
+            _, _, _ = ssh.exec_command(virt_env)
             _, uv_dat, _ = ssh.exec_command(uv_comm)
             uv_get = uv_dat.read()
         time_start, time_end, delta_time,\
