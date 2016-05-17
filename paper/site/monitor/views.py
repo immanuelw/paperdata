@@ -108,7 +108,7 @@ def prog_hist():
     '''
     dbi, obs_table, file_table, log_table = db_objs()
 
-    statuses = ('NEW','UV_POT', 'UV', 'UVC', 'CLEAN_UV', 'UVCR', 'CLEAN_UVC',
+    statuses = ('NEW','UV_POT', 'UV_NFS', 'UV', 'UVC', 'CLEAN_UV', 'UVCR', 'CLEAN_UVC',
                 'ACQUIRE_NEIGHBORS', 'UVCRE', 'NPZ', 'UVCRR', 'NPZ_POT',
                 'CLEAN_UVCRE', 'UVCRRE', 'CLEAN_UVCRR', 'CLEAN_NPZ',
                 'CLEAN_NEIGHBORS', 'UVCRRE_POT', 'CLEAN_UVCRRE', 'CLEAN_UVCR',
@@ -174,8 +174,7 @@ def file_table():
                       .order_by(obs_table.current_stage_start_time)
         working_FILEs = file_query.all()
 
-        working_FILEs = [(wf.to_dict(), wf.observation.current_stage_start_time) for wf in working_FILEs]
-    #need some way to include time subtraction from current stage start time and current time
-    utc = datetime.datetime.now()
+        utc = datetime.datetime.now()
+        working_FILEs = [(wf.to_dict(), int((utc - wf.observation.current_stage_start_time).total_seconds())) for wf in working_FILEs]
 
-    return render_template('file_table.html', working_FILEs=working_FILEs, utc=utc)
+    return render_template('file_table.html', working_FILEs=working_FILEs)

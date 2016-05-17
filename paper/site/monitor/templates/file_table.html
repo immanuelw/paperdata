@@ -11,13 +11,13 @@
         <th style='width:10%'>Amount of time since stage start</th>
     </tr>
     <tbody>
-        {% for file, start_time in working_FILEs %}
+        {% for file, run_time in working_FILEs %}
         <tr>
             <td>{{ file['filename'] }}</td>
             <td>{{ file['current_stage_in_progress'] }}</td>
             <td>{{ file['host'] }}</td>
             <td>{{ file['obsnum'] }}</td>
-            <td>{{ (utc - start_time).total_seconds | int }}</td>
+            <td>{{ run_time }}</td>
         </tr>
         {% endfor %}
     </tbody>
