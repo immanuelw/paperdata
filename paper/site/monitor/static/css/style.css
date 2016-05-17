@@ -23,10 +23,12 @@
 }
 
 #obs_hist, #prog_hist {
-    width: 100%;
+    /*width: 100%;*/
     height: 400px;
     margin: 0;
+    display: inline;
 }
+
 .floatLeft {
     width: 50%;
     float: left;

@@ -82,18 +82,18 @@ def obs_hist():
     dbi, obs_table, file_table, log_table = db_objs()
 
     with dbi.session_scope() as s:
-        file_query = s.query(obs_table, func.count(obs_table))\
+        obs_query = s.query(obs_table, func.count(obs_table))\
                       .filter(obs_table.status == 'COMPLETE')\
                       .group_by(func.substr(obs_table.date, 1, 7))
-        file_query = ((int(float(q.date)), count) for q, count in file_query.all())
-        file_days, file_counts = zip(*file_query)
+        obs_query = ((int(float(q.date)), count) for q, count in obs_query.all())
+        obs_days, obs_counts = zip(*obs_query)
         all_query = s.query(obs_table, func.count(obs_table))\
                       .group_by(func.substr(obs_table.date, 1, 7))
         all_query = ((q, count) for q, count in all_query.all())
         all_days, all_counts = zip(*all_query)
 
     return render_template('obs_hist.html',
-                            file_days=file_days, file_counts=file_counts,
+                            obs_days=obs_days, obs_counts=obs_counts,
                             all_counts=all_counts)
 
 @app.route('/prog_hist', methods = ['POST'])
