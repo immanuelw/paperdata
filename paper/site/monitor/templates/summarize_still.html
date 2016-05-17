@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+{% block body %}
+<script src='https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js'></script>
+<script src='https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js'></script>
+<script src='../static/js/jquery.datetimepicker.js'></script>
+<script src='../static/js/collapsible.min.js'></script>
+<script src='http://code.highcharts.com/stock/highstock.js'></script>
+<script src='http://code.highcharts.com/stock/highcharts-more.js'></script>
+<script src='http://code.highcharts.com/modules/no-data-to-display.js'></script>
+<!--script src='../static/js/summarize.js'></script-->
+<table style='width:100%' class='tableClass'>
+    <div id='main_content_div'>
+        <tr class='rowClass'>
+            <td class='cellClass cellTop'>
+                {#% include 'refr_table.html' %#}
+                {% include 'full_summary.html' %}
+                {% include 'night_hist.html' %}
+                {% include 'failed_hist.html' %}
+                {% include 'failed_table.html' %}
+                {% include 'completeness.html' %}
+                <th style='width:100%'>{{ good_obscount }}</th>
+            </td>
+        </tr>
+    </div>
+</table>
+{% endblock %}

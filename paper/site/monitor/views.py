@@ -174,6 +174,164 @@ def file_table():
         working_FILEs = file_query.all()
 
         utc = datetime.datetime.now()
-        working_FILEs = [(wf.to_dict(), wf.observation.current_stage_in_progress, int((utc - wf.observation.current_stage_start_time).total_seconds())) for wf in working_FILEs]
+        working_FILEs = [(wf.to_dict(),
+                          wf.observation.current_stage_in_progress,
+                          int((utc - wf.observation.current_stage_start_time).total_seconds())) for wf in working_FILEs]
 
     return render_template('file_table.html', working_FILEs=working_FILEs)
+
+@app.route('/summarize_still', methods = ['GET', 'POST'])
+def summarize_still():
+    '''
+    generate summarize still page
+
+    Returns
+    -------
+    html: summarize still page
+    '''
+
+    dbi, obs_table, file_table, log_table = db_objs()
+    with dbi.session_scope() as s:
+        OBSs = s.query(obs_table).order_by(obs_table.date)
+        #JDs = (int(float(OBS.date)) for OBS in OBSs.all())
+        nights = [int(float(OBS.date)) for OBS in OBSs.all()]
+
+        num_obs = s.query(obs_table)\
+                   .count()
+        num_progress = s.query(obs_table)
+                        .filter(obs_table.status != 'NEW')\
+                        .filter(obs_table.status != 'COMPLETE')\
+                        .count()
+        num_complete = s.query(obs_table)
+                        .filter(obs_table.status == 'COMPLETE')\
+                        .count()
+
+        # TABLE #1: small table at top with:
+        #total amount of observations, amount in progress, and amount complete
+
+        all_complete = []
+        all_total = []
+        all_pending = []
+        pending = 0
+
+        completeness = []
+
+
+        for night in nights:
+            night_complete = s.query(obs_table)\
+                              .filter(obs_table.date.like(str(night) + '%'))\
+                              .filter(obs_table.status == 'COMPLETE')\
+                              .count()
+            night_total = s.query(obs_table)\
+                           .filter(obs_table.date.like(str(night) + '%'))\
+                           .count()
+            OBSs = s.query(obs_table)\
+                    .filter(obs_table.date.like(str(night) + '%'))\
+                    .all()
+            obsnums = [OBS.obsnum for OBS in OBSs]
+
+            pending = s.query(log_table)\
+                       .filter(log_table.obsnum.in_(obsnums))\
+                       .filter(obs_table.status != 'COMPLETE')\
+                       .count()
+
+            all_complete.append(night_complete)
+            all_total.append(night_total)
+            all_pending.append(pending)
+
+            # TABLE #3:
+            #night_table: nights, complete, total, pending: histogram for each JD vs amount
+
+            if s.query(log_table)\
+                .filter(log_table.obsnum.in_(obsnums))\
+                .count() < 1:
+                completeness.append((night, 0, night_total, 'Pending'))
+            #    print(night, ':', 'completeness', 0, '/', night_total, '[Pending]')
+
+            # TABLE #2a:
+            #night completeness table
+
+            try:
+                LOG = s.query(log_table)\
+                       .filter(log_table.obsnum.in_(obsnums))\
+                       .order_by(log_table.timestamp.desc())\
+                       .one()
+
+                if LOG.timestamp > (datetime.datetime.utcnow() - datetime.timedelta(5.0)):
+                    completeness.append((night, night_complete, night_total, LOG.timestamp))
+                #    print(night, ':', 'completeness', night_complete, '/', night_total, LOG.timestamp)
+
+                # TABLE #2b:
+                #night completeness table with log timestamp for last entry
+
+                FAIL_LOGs = s.query(log_table)\
+                             .filter(log_table.exit_status > 0)
+                             .filter(log_table.timestamp > (datetime.datetime.utcnow() - datetime.timedelta(0.5)))\
+                             .all()
+                fail_obsnums = [LOG_ENTRY.obsnum for LOG_ENTRY in FAIL_LOGs]
+            except:
+                #print('No entries in LOG table')
+                fail_obsnums = []
+
+
+        # find all obses that have failed in the last 12 hours
+        #print('observations pending: %s') % pending
+
+        # break it down by stillhost
+        #print('fails in the last 12 hours')
+
+        fails = []
+        f_obs = []
+
+        if len(fail_obsnums) < 1:
+            print('None')
+        else:
+            FAIL_OBSs = s.query(obs_table)\
+                         .filter(obs_table.obsnum.in_(fail_obsnums))\
+                         .all()
+            fail_stills = list(set([OBS.stillhost for OBS in FAIL_OBSs]))  # list of stills with fails
+
+            for fail_still in fail_stills:
+                # get failed obsnums broken down by still
+                fail_count = s.query(obs_table)\
+                              .filter(obs_table.obsnum.in_(fail_obsnums))\
+                              .filter(obs_table.stillhost == fail_still)\
+                              .count()
+                #print('Fail Still : %s , Fail Count %s') % (fail_still, fail_count)
+                fails.append((fail_still, fail_count))
+
+            f_stills, f_counts = zip(*f_stills)
+
+            # TABLE #4:
+            # histogram with Still# and Failing Count
+
+
+            #print('most recent fails')
+            for FAIL_OBS in FAIL_OBSs:
+            #    print(FAIL_OBS.obsnum, FAIL_OBS.status, FAIL_OBS.stillhost)
+                f_obs.append((FAIL_OBS.obsnum, FAIL_OBS.status, FAIL_OBS.stillhost))
+
+        # TABLE #5:
+        #fail table with obsnum, status, and stillhost for each failed obs
+
+
+        #print('Number of observations completed in the last 24 hours')
+
+        good_obscount = s.query(log_table)\
+                         .filter(log_table.exit_status == 0)\
+                         .filter(log_table.timestamp > (datetime.datetime.utcnow() - datetime.timedelta(1.0))\
+                         .filter(log_table.stage == 'CLEAN_UVCRE')\
+                         .count()  # HARDWF
+        #print('Good count: %s') % good_obscount
+
+
+        # TABLE #6:
+        #Label at bottom with Good Observations #, i.e. number of obs completed within the last 24 hours
+
+    return render_template('summarize_still.html',
+                            num_obs=num_obs, num_progress=num_progress, num_complete=num_complete,
+                            nights=nights,
+                            all_complete=all_complete, all_total=all_total, all_pending=all_pending,
+                            completeness=completeness,
+                            f_stills=f_stills, f_counts=f_counts,
+                            f_obs=f_obs, good_obscount=good_obscount)
