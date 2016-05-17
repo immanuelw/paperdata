@@ -174,6 +174,6 @@ def file_table():
         working_FILEs = file_query.all()
 
         utc = datetime.datetime.now()
-        working_FILEs = [(wf.to_dict(), int((utc - wf.observation.current_stage_start_time).total_seconds())) for wf in working_FILEs]
+        working_FILEs = [(wf.to_dict(), wf.observation.current_stage_in_progress, int((utc - wf.observation.current_stage_start_time).total_seconds())) for wf in working_FILEs]
 
     return render_template('file_table.html', working_FILEs=working_FILEs)
