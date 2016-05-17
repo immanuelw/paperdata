@@ -82,14 +82,13 @@ def file_hist():
     dbi, obs_table, file_table, log_table = db_objs()
 
     with dbi.session_scope() as s:
-        file_query = s.query(file_table, func.count(file_table))\
-                      .join(obs_table)\
-                      .filter(obs_table.status != 'COMPLETE')\
-                      .group_by(func.substr(file_table.filename, 5, 7))
-        file_query = ((q.filename.split('.')[1], count) for q, count in file_query.all())
+        file_query = s.query(obs_table, func.count(obs_table))\
+                      .filter(obs_table.status == 'COMPLETE')\
+                      .group_by(func.substr(obs_table.date, 1, 7))
+        file_query = ((int(float(q.date)), count) for q, count in file_query.all())
         file_days, file_counts = zip(*file_query)
-        all_query = s.query(file_table, func.count(file_table))\
-                      .group_by(func.substr(file_table.filename, 5, 7))
+        all_query = s.query(obs_table, func.count(obs_table))\
+                      .group_by(func.substr(obs_table.date, 1, 7))
         all_query = ((q, count) for q, count in all_query.all())
         all_days, all_counts = zip(*all_query)
 
