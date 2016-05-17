@@ -8,7 +8,7 @@ Functions
 db_objs | gathers database objects for use
 index | shows main page
 stream_plot | streaming plot example
-file_hist | creates histogram
+obs_hist | creates histogram
 obs_table | shows observation table
 file_table | shows file table
 '''
@@ -70,8 +70,8 @@ def stream_plot():
 
     return jsonify({'count': file_count})
 
-@app.route('/file_hist', methods = ['POST'])
-def file_hist():
+@app.route('/obs_hist', methods = ['POST'])
+def obs_hist():
     '''
     generate histogram for data
 
@@ -92,7 +92,7 @@ def file_hist():
         all_query = ((q, count) for q, count in all_query.all())
         all_days, all_counts = zip(*all_query)
 
-    return render_template('file_hist.html',
+    return render_template('obs_hist.html',
                             file_days=file_days, file_counts=file_counts,
                             all_counts=all_counts)
 
