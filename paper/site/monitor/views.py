@@ -267,7 +267,6 @@ def summarize_still():
                        #I think this was an error, gets most recent log rather than
                        #making sure there is only one
 
-                print(LOG.timestamp)
                 if LOG.timestamp > (datetime.datetime.utcnow() - datetime.timedelta(5.0)):
                     completeness.append((night, night_complete, night_total, LOG.timestamp))
                     #print(night, ':', 'completeness', night_complete, '/', night_total, LOG.timestamp)

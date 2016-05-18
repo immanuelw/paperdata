@@ -34,6 +34,11 @@
     float: left;
 }
 
+.floatLeftF {
+    width: 100%;
+    float: left;
+}
+
 .floatRight {
     width: 50%;
     float: right;
