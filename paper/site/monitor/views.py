@@ -194,15 +194,15 @@ def summarize_still():
     with dbi.session_scope() as s:
         OBSs = s.query(obs_table).order_by(obs_table.date)
         #JDs = (int(float(OBS.date)) for OBS in OBSs.all())
-        nights = [int(float(OBS.date)) for OBS in OBSs.all()]
+        nights = list(set(int(float(OBS.date)) for OBS in OBSs.all()))
 
         num_obs = s.query(obs_table)\
                    .count()
-        num_progress = s.query(obs_table)
+        num_progress = s.query(obs_table)\
                         .filter(obs_table.status != 'NEW')\
                         .filter(obs_table.status != 'COMPLETE')\
                         .count()
-        num_complete = s.query(obs_table)
+        num_complete = s.query(obs_table)\
                         .filter(obs_table.status == 'COMPLETE')\
                         .count()
 
@@ -226,14 +226,21 @@ def summarize_still():
                            .filter(obs_table.date.like(str(night) + '%'))\
                            .count()
             OBSs = s.query(obs_table)\
-                    .filter(obs_table.date.like(str(night) + '%'))\
-                    .all()
-            obsnums = [OBS.obsnum for OBS in OBSs]
+                    .filter(obs_table.date.like(str(night) + '%'))
+            obsnums = [OBS.obsnum for OBS in OBSs.all()]
+            complete_obsnums = [OBS.obsnum for OBS in OBSs.all() if OBS.status != 'COMPLETE']
 
-            pending = s.query(log_table)\
-                       .filter(log_table.obsnum.in_(obsnums))\
+            pending = s.query(obs_table)\
+                       .filter(obs_table.date.like(str(night) + '%'))\
                        .filter(obs_table.status != 'COMPLETE')\
                        .count()
+
+            #pending = s.query(log_table)\
+            #           .filter(log_table.obsnum.in_(complete_obsnums))\
+            #           .count()
+                       #.filter(log_table.obsnum.in_(obsnums))\
+                       #.filter(log_table.stage != 'COMPLETE')\
+                       #.filter(obs_table.status != 'COMPLETE')\
 
             all_complete.append(night_complete)
             all_total.append(night_total)
@@ -246,7 +253,7 @@ def summarize_still():
                 .filter(log_table.obsnum.in_(obsnums))\
                 .count() < 1:
                 completeness.append((night, 0, night_total, 'Pending'))
-            #    print(night, ':', 'completeness', 0, '/', night_total, '[Pending]')
+                #print(night, ':', 'completeness', 0, '/', night_total, '[Pending]')
 
             # TABLE #2a:
             #night completeness table
@@ -255,17 +262,21 @@ def summarize_still():
                 LOG = s.query(log_table)\
                        .filter(log_table.obsnum.in_(obsnums))\
                        .order_by(log_table.timestamp.desc())\
-                       .one()
+                       .first()
+                       #.one()
+                       #I think this was an error, gets most recent log rather than
+                       #making sure there is only one
 
+                print(LOG.timestamp)
                 if LOG.timestamp > (datetime.datetime.utcnow() - datetime.timedelta(5.0)):
                     completeness.append((night, night_complete, night_total, LOG.timestamp))
-                #    print(night, ':', 'completeness', night_complete, '/', night_total, LOG.timestamp)
+                    #print(night, ':', 'completeness', night_complete, '/', night_total, LOG.timestamp)
 
                 # TABLE #2b:
                 #night completeness table with log timestamp for last entry
 
                 FAIL_LOGs = s.query(log_table)\
-                             .filter(log_table.exit_status > 0)
+                             .filter(log_table.exit_status > 0)\
                              .filter(log_table.timestamp > (datetime.datetime.utcnow() - datetime.timedelta(0.5)))\
                              .all()
                 fail_obsnums = [LOG_ENTRY.obsnum for LOG_ENTRY in FAIL_LOGs]
@@ -282,6 +293,9 @@ def summarize_still():
 
         fails = []
         f_obs = []
+
+        f_stills = []
+        f_counts = []
 
         if len(fail_obsnums) < 1:
             print('None')
@@ -300,7 +314,7 @@ def summarize_still():
                 #print('Fail Still : %s , Fail Count %s') % (fail_still, fail_count)
                 fails.append((fail_still, fail_count))
 
-            f_stills, f_counts = zip(*f_stills)
+            f_stills, f_counts = zip(*fails)
 
             # TABLE #4:
             # histogram with Still# and Failing Count
@@ -319,7 +333,7 @@ def summarize_still():
 
         good_obscount = s.query(log_table)\
                          .filter(log_table.exit_status == 0)\
-                         .filter(log_table.timestamp > (datetime.datetime.utcnow() - datetime.timedelta(1.0))\
+                         .filter(log_table.timestamp > (datetime.datetime.utcnow() - datetime.timedelta(1.0)))\
                          .filter(log_table.stage == 'CLEAN_UVCRE')\
                          .count()  # HARDWF
         #print('Good count: %s') % good_obscount

@@ -12,13 +12,13 @@
     <div id='main_content_div'>
         <tr class='rowClass'>
             <td class='cellClass cellTop'>
+                <th>{{ good_obscount }} Observations processed in the past day</th>
                 {#% include 'refr_table.html' %#}
                 {% include 'full_summary.html' %}
                 {% include 'night_hist.html' %}
                 {% include 'failed_hist.html' %}
                 {% include 'failed_table.html' %}
                 {% include 'completeness.html' %}
-                <th style='width:100%'>{{ good_obscount }}</th>
             </td>
         </tr>
     </div>

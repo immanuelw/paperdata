@@ -1,4 +1,4 @@
-#error_table, #obs_table, #file_table, #failed_table, #completeness, #full_summary table {
+#error_table, #obs_table, #file_table table {
 	table-layout: fixed;
 	width: 50%;
 	max-width: 100%;
