@@ -20,7 +20,9 @@ add_files | parses list of files and adds data to database
 from __future__ import print_function
 import os
 import decimal
+import glob
 import hashlib
+import json
 import re
 import socket
 import time
