@@ -27,6 +27,7 @@ import re
 import socket
 import time
 import uuid
+import aipy as A
 
 str_to_pol = {  'I' :  1,   # Stokes Paremeters
                 'Q' :  2,
@@ -196,7 +197,7 @@ def file_names(path):
 
     '''
     base_path, filename = os.path.split(path)
-    filetype = filename.split('.')[-1]
+    filetype = filename.split('.')[-1].strip('/')
 
     return base_path, filename, filetype
 
@@ -407,7 +408,7 @@ def calc_npz_data(filename):
     tuple:
         None for every field if no corresponding observation found
     '''
-    filetype = filename.split('.')[-1]
+    filetype = filename.split('.')[-1].strip('/')
     if filetype not in ('npz',):
         return (None,) * 7
     
@@ -438,7 +439,7 @@ def calc_uv_data(path):
     tuple:
         None for every field if no corresponding observation found
     '''
-    filetype = path.split('.')[-1]
+    filetype = path.split('.')[-1].strip('/')
     if filetype not in ('uv', 'uvcRRE'):
         return (None,) * 7
     else:
