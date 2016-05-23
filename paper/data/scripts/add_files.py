@@ -65,18 +65,18 @@ def calc_obs_info(dbi, host, path):
                 'timestamp': timestamp}
 
     file_info = {'host': host,
-                'base_path': base_path,
-                'filename': filename,
-                'filetype': filetype,
-                'source': source,
-                'obsnum': obsnum,
-                'filesize': file_data.calc_size(host, path),
-                'md5sum': file_data.calc_md5sum(host, path),
-                'tape_index': None,
-                'init_host': host,
-                'is_tapeable': False,
-                'is_deletable': False,
-                'timestamp': timestamp}
+                 'base_path': base_path,
+                 'filename': filename,
+                 'filetype': filetype,
+                 'source': source,
+                 'obsnum': obsnum,
+                 'filesize': file_data.calc_size(host, path),
+                 'md5sum': file_data.calc_md5sum(host, path),
+                 'tape_index': None,
+                 'init_host': host,
+                 'is_tapeable': False,
+                 'is_deletable': False,
+                 'timestamp': timestamp}
 
     log_info = {'action': 'add by scan',
                 'table': None,
