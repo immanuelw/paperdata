@@ -25,10 +25,8 @@ $(function() {
             '#91e8e1'
         ],
         tooltip: {
-            headerFormat: '<span style="font-size:10px">{point.key}</span><table>',
-            pointFormat: '<tr><td style="color:{series.color};padding:0">{series.name}: </td>' +
-                         '<td style="padding:0"><b>{point.y}</b></td></tr>',
-            footerFormat: '</table>',
+            headerFormat: '<b>{series.name}</b><br/>',
+            pointFormat: '{series.name}: {point.y}<br/>Total: {point.stackTotal}',
             //shared: true,
             useHTML: true
         },
@@ -40,6 +38,14 @@ $(function() {
         },
         plotOptions: {
             column: {
+                stacking: 'normal',
+                dataLabels: {
+                    enabled: true,
+                    color: (Highcharts.theme && Highcharts.theme.dataLabelsColor) || 'white',
+                    style: {
+                        textShadow: '0 0 3px black'
+                    }
+                },
                 dataGrouping: {
                     groupPixelWidth: 80,
                     forced: true
@@ -66,23 +72,29 @@ $(function() {
                 text: 'Number of Observations'
             },
             min: 0,
-            allowDecimals: false
+            allowDecimals: false,
+            stackLabels: {
+                enabled: true,
+                style: {
+                    fontWeight: 'bold',
+                    color: (Highcharts.theme && Highcharts.theme.textColor) || 'gray'
+                }
+            }
         },
         series: [{
-            type: 'column',
             name: 'pending',
             data: all_pending
         },
         {
-            type: 'column',
             name: 'complete',
             data: all_complete
         },
-        {
+        /*{
             type: 'column',
             name: 'total',
             data: all_total
-        }]
+        }*/
+        ]
     });
 }(jQuery));
 </script>
