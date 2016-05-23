@@ -72,7 +72,6 @@ def file_to_jd(path):
 
     return jd
 
-
 def file_to_pol(path):
     '''
     pulls polarization from filename using regex
