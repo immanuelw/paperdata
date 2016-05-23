@@ -102,7 +102,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
     add_entry_dict | adds entry to database using dict as kwarg
     get_entry | gets database object
     '''
-    def __init__(self, configfile='~/paperdata/rtp.cfg'):
+    def __init__(self, configfile='~/paperdata/still_shredder.cfg'):
         '''
         Unique Interface for the paperdata database
 
@@ -110,5 +110,29 @@ class DataBaseInterface(ppdata.DataBaseInterface):
         ----------
         configfile | str: paperdata database configuration file
         '''
-        super(DataBaseInterface, self).__init__(configfile=configfile)
+        if configfile is not None:
+            config = configparser.ConfigParser()
+            configfile = os.path.expanduser(configfile)
+            if os.path.exists(configfile):
+                logger.info(' '.join(('loading file', configfile)))
+                config.read(configfile)
+                try:
+                    self.dbinfo = config._sections['dbinfo']
+                except:
+                    self.dbinfo = config['dbinfo']
+                try:
+                    self.dbinfo['dbpasswd'] = self.dbinfo['dbpasswd'].decode('string-escape')
+                except:
+                    self.dbinfo['dbpasswd'] = bytes(self.dbinfo['dbpasswd'], 'ascii').decode('unicode_escape')
+            else:
+                logging.info(' '.join((configfile, 'Not Found')))
+        try:
+            connect_string = 'mysql://{dbuser}:{dbpasswd}@{dbhost}:{dbport}/{dbname}'
+            self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
+        except:
+            connect_string = 'mysql+mysqldb://{dbuser}:{dbpasswd}@{dbhost}:{dbport}/{dbname}'
+            self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
+
+        self.Session = sessionmaker(bind=self.engine)
+
 
