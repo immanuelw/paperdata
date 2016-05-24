@@ -12,10 +12,16 @@ obs_hist | creates histogram
 obs_table | shows observation table
 file_table | shows file table
 '''
+import os
+import sys
+base_dir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.dirname(base_dir))
+from flask_app import monitor_app as app
+import dbi as rdbi
 import datetime
 from flask import render_template, flash, redirect, url_for, request, g, make_response, Response, jsonify
-from paper.site.flask_app import monitor_app as app, monitor_db as db
-from paper.site.monitor import dbi as rdbi
+#from paper.site.flask_app import monitor_app as app, monitor_db as db
+#from paper.site.monitor import dbi as rdbi
 from sqlalchemy import func
 
 def db_objs():
@@ -83,8 +89,8 @@ def obs_hist():
 
     with dbi.session_scope() as s:
         obs_query = s.query(obs_table, func.count(obs_table))\
-                      .filter(obs_table.status == 'COMPLETE')\
-                      .group_by(func.substr(obs_table.date, 1, 7))
+                     .filter(obs_table.status == 'COMPLETE')\
+                     .group_by(func.substr(obs_table.date, 1, 7))
         obs_query = ((int(float(q.date)), count) for q, count in obs_query.all())
         obs_days, obs_counts = zip(*obs_query)
         all_query = s.query(obs_table, func.count(obs_table))\
@@ -301,6 +307,7 @@ def summarize_still():
         else:
             FAIL_OBSs = s.query(obs_table)\
                          .filter(obs_table.obsnum.in_(fail_obsnums))\
+                         .order_by(obs_table.stillhost)\
                          .all()
             fail_stills = list(set([OBS.stillhost for OBS in FAIL_OBSs]))  # list of stills with fails
 

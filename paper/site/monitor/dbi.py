@@ -1,9 +1,25 @@
+from __future__ import print_function
+import os
+import sys
+base_dir = os.path.dirname(os.path.realpath(__file__))
+sys.path.append(os.path.dirname(base_dir))
+rtp_dir = os.path.dirname(os.path.dirname(base_dir))
+lib_dir = os.path.join(rtp_dir, 'lib')
+sys.path.append(lib_dir)
+import dbi
+import os
+import datetime
+import logging
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
 from sqlalchemy import event, DDL
 from sqlalchemy.orm import relationship, backref
-import datetime
-import logging
+from sqlalchemy.orm import sessionmaker
+from sqlalchemy import create_engine
 import paper as ppdata
+try:
+    import configparser
+except:
+    import ConfigParser as configparser
 
 Base = ppdata.Base
 logger = logging.getLogger('monitor')
@@ -133,6 +149,5 @@ class DataBaseInterface(ppdata.DataBaseInterface):
             connect_string = 'mysql+mysqldb://{dbuser}:{dbpasswd}@{dbhost}:{dbport}/{dbname}'
             self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
 
+        print(connect_string.format(**self.dbinfo))
         self.Session = sessionmaker(bind=self.engine)
-
-
