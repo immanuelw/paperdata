@@ -157,7 +157,7 @@ def calc_times(uv):
             if c_time != t:
                 c_time = t
                 n_times += 1
-    except:
+    except AttributeError:
         return (None,) * 4
 
     if n_times <= 1:
@@ -269,10 +269,10 @@ def calc_uv_data(host, path, username=None, password=None):
             with ssh.open_sftp() as sftp:
                 try:
                     filestat = sftp.stat(uv_data_script)
-                except(IOError):
+                except IOError:
                     try:
                         filestat = sftp.stat(moved_script)
-                    except(IOError):
+                    except IOError:
                         sftp.put(uv_data_script, moved_script)
 
             _, _, _ = ssh.exec_command(virt_env)

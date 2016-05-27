@@ -149,7 +149,7 @@ def calc_md5sum(host, path, username=None, password=None):
                 with ssh.open_sftp() as sftp:
                     with sftp.file(path, mode='r') as remote_path:
                         md5 = remote_path.check('md5', block_size=65536)
-            except(IOError):
+            except IOError:
                 _, md5_out, _ = ssh.exec_command('md5sum {vis_path}'.format(vis_path=os.path.join(path, 'visdata')))
                 md5 = md5_out.read().split()[0]
 
@@ -226,8 +226,8 @@ def source_info(ask=True):
     else:
         try:
             source_host, source_paths_str = sys.argv[1].split(':')
-        except:
-            print('Wrong format for host and paths')
+        except ValueError as e:
+            print(e, ':', 'Wrong format for host and paths')
             return (None,) * 2
 
     username = raw_input('Username: ')

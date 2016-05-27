@@ -32,6 +32,7 @@ distiller | access to paperdistiller database and its features
 ganglia | logging of and access to host information
 site | websites built on flask for accessing the paperdata database
 '''
+from __future__ import print_function
 import os
 import sys
 import decimal
@@ -47,7 +48,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 try:
     import configparser
-except:
+except ImportError as e:
     import ConfigParser as configparser
 
 def file_to_jd(path):
@@ -67,7 +68,7 @@ def file_to_jd(path):
     '''
     try:
         jd = round(float(re.findall(r'\d+\.\d+', path)[0]), 5)
-    except:
+    except IndexError as e:
         jd = None
 
     return jd
@@ -87,8 +88,11 @@ def file_to_pol(path):
     >>> file_to_pol('/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
     'xx'
     '''
-    pol = re.findall(r'\.(.{2})\.', path)
-    polarization = 'all' if len(pol) == 0 else pol[0]
+    try:
+        polarization = re.findall(r'\.(.{2})\.', path)[0]
+        #polarization = re.findall(r'\.([xy][xy])\.', path)[0]
+    except IndexError as e:
+        polarization = 'all'
 
     return polarization
 
@@ -225,26 +229,29 @@ class DataBaseInterface(object):
             config = configparser.ConfigParser()
             configfile = os.path.expanduser(configfile)
             if os.path.exists(configfile):
-                logger.info(' '.join(('loading file', configfile)))
                 config.read(configfile)
+                logger.info(' '.join(('loading file', configfile)))
                 try:
                     self.dbinfo = config._sections['dbinfo']
-                except:
-                    self.dbinfo = config['dbinfo']
+                except AttributeError as e:
+                    print(e, ':', 'Config file has wrong format')
+                    raise 
                 try:
                     self.dbinfo['password'] = self.dbinfo['password'].decode('string-escape')
-                except:
+                except AttributeError as e:
                     self.dbinfo['password'] = bytes(self.dbinfo['password'], 'ascii').decode('unicode_escape')
             else:
                 logging.info(' '.join((configfile, 'Not Found')))
-        try:
-            connect_string = 'mysql://{username}:{password}@{hostip}:{port}/{dbname}'
-            self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
-        except:
-            connect_string = 'mysql+mysqldb://{username}:{password}@{hostip}:{port}/{dbname}'
-            self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
+                print('Config file does not exist')
+                raise FileNotFoundError
+            try:
+                connect_string = 'mysql://{username}:{password}@{hostip}:{port}/{dbname}'
+                self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
+            except:
+                connect_string = 'mysql+mysqldb://{username}:{password}@{hostip}:{port}/{dbname}'
+                self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
 
-        self.Session = sessionmaker(bind=self.engine)
+            self.Session = sessionmaker(bind=self.engine)
 
     @contextmanager
     def session_scope(self):
@@ -339,7 +346,7 @@ class DataBaseInterface(object):
         table = getattr(sys.modules[mod_name], TABLE)
         try:
             ENTRY = s.query(table).get(unique_value)
-        except:
+        except(exc.InvalidRequestError):
             return None
 
         return ENTRY

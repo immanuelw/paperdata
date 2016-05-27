@@ -110,43 +110,6 @@ class Log(Base, ppdata.DictFix):
     log_id = Column(String(36), primary_key=True)
     timestamp = Column(BigInteger)
 
-#def RTPFile(Base, ppdata.DictFix):
-#   __tablename__ = 'RTPFile'
-#   host = Column(String(100), nullable=False)
-#   base_path = Column(String(100), nullable=False) #directory
-#   filename = Column(String(100), nullable=False) #zen.*.*.uv/uvcRRE/uvcRREzx...
-#   filetype = Column(String(20), nullable=False) #uv, uvcRRE, etc.
-#   source = Column(String(200), primary_key=True)
-#   obsnum = Column(BigInteger, ForeignKey('RTPObservation.obsnum'))
-#   filesize = Column(Numeric(7,2))
-#   md5sum = Column(String(32))
-#   is_transferred = Column(Boolean)
-#   julian_day = Column(Integer)
-#   new_host = Column(String(100))
-#   new_path = Column(String(100))
-#   timestamp = Column(BigInteger)
-#   observation = relationship(RTPObservation, backref=backref('files', uselist=True))
-
-#class RTPObservation(Base, ppdata.DictFix):
-#   __tablename__ = 'RTPObservation'
-#   obsnum = Column(BigInteger, primary_key=True)
-#   julian_date = Column(Numeric(12,5))
-#   polarization = Column(String(4))
-#   julian_day = Column(Integer)
-#   era = Column(Integer)
-#   length = Column(Numeric(6,5)) #length of RTPObservation in fraction of a day
-#   prev_obs = Column(BigInteger, unique=True)
-#   next_obs = Column(BigInteger, unique=True)
-#   timestamp = Column(BigInteger)
-
-#class RTPLog(Base, ppdata.DictFix):
-#   __tablename__ = 'RTPLog'
-#   action = Column(String(100), nullable=False)
-#   table = Column(String(100))
-#   identifier = Column(String(200)) #the primary key that is used in other tables of the object being acted on
-#   log_id = Column(String(36), primary_key=True)
-#   timestamp = Column(BigInteger)
-
 class DataBaseInterface(ppdata.DataBaseInterface):
     '''
     Database Interface
