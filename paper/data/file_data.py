@@ -106,7 +106,9 @@ def get_md5sum(path):
     '7d5ac942dd37c4ddfb99728359e42331'
     '''
     vis_file = os.path.join(path, 'visdata')
-    uv_file = path if os.path.isfile(path) else vis_file if os.path.isfile(vis_file) else None
+    uv_file = path if os.path.isfile(path)\
+                   else vis_file if os.path.isfile(vis_file)\
+                   else None
 
     if uv_file is None:
         return None
@@ -196,8 +198,9 @@ def parse_sources(source_host, source_paths_str, username=None, password=None):
     if source_host == socket.gethostname():
         source_paths = glob.glob(source_paths_str)
     else:
+        ls_comm = 'ls -d {source_paths_str}'.format(source_paths_str=source_paths_str)
         with ppdata.ssh_scope(source_host, username, password) as ssh:
-            _, path_out, _ = ssh.exec_command('ls -d {source_paths_str}'.format(source_paths_str=source_paths_str))
+            _, path_out, _ = ssh.exec_command(ls_comm)
             source_paths = path_out.read().splitlines()[:-1]
 
     return source_paths

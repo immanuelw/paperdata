@@ -126,7 +126,8 @@ def json_data(backup_path, dump_objects):
 
 def rsync_copy(source, destination):
     '''
-    uses rsync to copy files and make sure they have not changed by using md5 (c option)
+    uses rsync to copy files
+    make sure they have not changed by using md5 (c option)
 
     Parameters
     ----------
@@ -329,8 +330,8 @@ class DataBaseInterface(object):
     def get_entry(self, mod_name, s, TABLE, unique_value):
         '''
         retrieves any object.
-        Errors if there are more than one of the same object in the db. This is bad and should
-        never happen
+        Errors if there are more than one of the same object in the db
+        This is bad and should never happen
 
         Parameters
         ----------

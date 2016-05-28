@@ -84,7 +84,7 @@ def date_info(julian_date):
     (128, 2456604, 20.8)
     '''
     if julian_date is None:
-        return None, None, None
+        return (None,) * 3
 
     era = 32 if julian_date < 2456100 else 64 if julian_date < 2456400 else 128
     julian_day = int(julian_date)
@@ -207,7 +207,10 @@ def calc_npz_data(dbi, filename):
     with dbi.session_scope() as s:
         polarization = filename.split('.')[3] if len(filename.split('.')) == 6 else 'all'
         table = pdbi.Observation
-        OBS = s.query(table).filter(table.julian_date == julian_date).filter(table.polarization == polarization).one_or_none()
+        OBS = s.query(table)\
+               .filter(table.julian_date == julian_date)\
+               .filter(table.polarization == polarization)\
+               .one_or_none()
         if OBS is None:
             return (None,) * 7
 
