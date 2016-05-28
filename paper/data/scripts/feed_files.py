@@ -46,13 +46,13 @@ def gen_feed_data(host, path):
     timestamp = int(time.time())
 
     feed_data = {'host': host,
-                'base_path': base_path,
-                'filename': filename,
-                'source': source,
-                'julian_day': int(uv['time']),
-                'is_movable': False,
-                'is_moved': False,
-                'timestamp': timestamp}
+                 'base_path': base_path,
+                 'filename': filename,
+                 'source': source,
+                 'julian_day': int(uv['time']),
+                 'is_movable': False,
+                 'is_moved': False,
+                 'timestamp': timestamp}
 
     log_data = {'action': 'add by feed',
                 'table': 'Feed',

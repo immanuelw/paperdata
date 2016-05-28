@@ -60,8 +60,8 @@ def set_move_table(s, dbi, source_host, source_path, dest_host, dest_path):
     timestamp = int(time.time())
     FILE = dbi.get_entry(s, 'File', source)
     move_dict = {'host': dest_host,
-                'base_path': dest_path,
-                'timestamp': timestamp}
+                 'base_path': dest_path,
+                 'timestamp': timestamp}
     dbi.set_entry_dict(s, FILE, move_dict)
 
     log_data = {'action': 'move',

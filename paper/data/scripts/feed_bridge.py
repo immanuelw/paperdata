@@ -43,9 +43,9 @@ def set_feed_table(s, dbi, source_host, source_path, dest_host, dest_path, is_mo
     source = ':'.join((source_host, source_path))
     FEED = dbi.get_entry(s, 'Feed', source)
     feed_dict = {'host': dest_host,
-                'base_path': dest_path,
-                'is_moved': is_moved,
-                'timestamp': int(time.time())}
+                 'base_path': dest_path,
+                 'is_moved': is_moved,
+                 'timestamp': int(time.time())}
     dbi.set_entry_dict(s, FEED, feed_dict)
 
 def move_feed_files(dbi, source_host, source_paths, dest_host, dest_path):
