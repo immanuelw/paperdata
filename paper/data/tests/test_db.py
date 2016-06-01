@@ -16,11 +16,8 @@ import doctest
 import glob
 import shutil
 from paper.data import dbi as pdbi
-import add_files
-import backup_db
-import restore_db
-import move_files
-import delete_files
+from paper.data.scripts import add_files, backup_db, restore_db,\
+                               move_files, delete_files
 
 def script_test():
     '''
