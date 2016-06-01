@@ -10,6 +10,7 @@ Functions
 exist_check | checks to see if files to be moved all exist in database
 set_move_table | updates database with moved file status
 move_files | parses list of files then moves them
+parse | parse command line input
 '''
 from __future__ import print_function
 import os
@@ -71,23 +72,22 @@ def set_move_table(s, dbi, source_host, source_path, dest_host, dest_path):
                 'timestamp': timestamp}
     dbi.add_entry_dict(s, 'Log', log_data)
 
-def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_path=None):
+def move_files(dbi, source_host, source_paths_str, dest_host, dest_path, username, password):
     '''
     move files by rsyncing them and checking md5sum through rsync option
 
     Parameters
     ----------
     dbi | object: database interface object
-    source_host | str: file host --defaults to None
-    source_paths | list[str]: file paths --defaults to None
-    dest_host | str: output host --defaults to None
-    dest_path | str: output directory --defaults to None
+    source_host | str: file host
+    source_paths_str | str: file paths 
+    dest_host | str: output host 
+    dest_path | str: output directory 
+    username | str: username 
+    password | str: password 
     '''
-    dest_host = raw_input('Destination directory host: ') if dest_host is None else dest_host
-    dest_path = raw_input('Destination directory: ') if dest_path is None else dest_path
-
-    if source_host is None or source_paths is None:
-        source_host, source_paths = file_data.source_info()
+    source_host, source_paths = file_data.parse_sources(source_host, source_paths_str,
+                                                        username, password)
 
     is_existent = exist_check(source_host, source_paths)
     if not is_existent:
@@ -102,7 +102,7 @@ def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_pa
                 set_move_table(s, dbi, source_host, source_path, dest_host, dest_path)
                 shutil.rmtree(source_path)
         else:
-            with ppdata.ssh_scope(source_host) as ssh:
+            with ppdata.ssh_scope(source_host, username, password) as ssh:
                 for source_path in source_paths:
                     rsync_copy_command = '''rsync -ac {source_path} {destination}'''.format(source_path=source_path, destination=destination)
                     rsync_del_command = '''rm -r {source_path}'''.format(source_path=source_path)
@@ -111,12 +111,46 @@ def move_files(dbi, source_host=None, source_paths=None, dest_host=None, dest_pa
                     ssh.exec_command(rsync_del_command)
     print('Completed transfer')
 
-if __name__ == '__main__':
+def parse():
+    '''
+    parses command line input to get source, destination, username and password
+
+    Returns
+    -------
+    str: source host
+    str: source paths str
+    str: destination host
+    str: destination path
+    str: username
+    str: password
+    '''
     parser = argparse.ArgumentParser(description='Move files, update database')
-    parser.add_argument('-t', '--host', type=str, help='output host')
-    parser.add_argument('-d', '--dir', type=str, help='output directory')
+    parser.add_argument('--source', type=str, help='source')
+    parser.add_argument('--dest', type=str, help='destination')
+    parser.add_argument('-u', '--uname', type=str, help='host username')
+    parser.add_argument('-p', '--pword', type=str, help='host password')
 
     args = parser.parse_args()
 
+    try:
+        source_host, source_paths_str = args.source.split(':')
+        dest_host, dest_path = args.dest.split(':')
+        username = args.uname
+        password = args.pword
+    except AttributeError as e:
+        raise #'Include all arguments'
+    except ValueError as e:
+        raise #'Include both the host and the path'
+
+    return source_host, source_paths_str, dest_host, dest_path, username, password
+
+if __name__ == '__main__':
+    source_host, source_paths_str,\
+    dest_host, dest_path,\
+    username, password = parse()
+
     dbi = pdbi.DataBaseInterface()
-    move_files(dbi, dest_host=args.host, dest_path=args.dir)
+    move_files(dbi,
+               source_host=source_host, source_paths_str=source_paths_str,
+               dest_host=dest_host, dest_path=dest_path,
+               username=username, password=password)

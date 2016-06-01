@@ -16,7 +16,6 @@ calc_uv_data | pulls all relevant information from any uv* file
 from __future__ import print_function
 import os
 import sys
-import getpass
 import socket
 import paper as ppdata
 from paper.data import dbi as pdbi
@@ -264,10 +263,8 @@ def calc_uv_data(host, path, username=None, password=None):
     else:
         uv_data_script = os.path.expanduser('~/paperdata/paper/data/uv_data.py')
         moved_script = './uv_data.py'
-        uv_comm = 'python {moved_script} {host} {path}'.format(moved_script=moved_script, host=host, path=path)
+        uv_comm = 'python {moved_script} {host}:{path}'.format(moved_script=moved_script, host=host, path=path)
         virt_env = 'source /usr/global/paper/CanopyVirtualEnvs/PAPER_Distiller/bin/activate'
-        username = raw_input('Username: ')
-        password = getpass.getpass('Password: ')
         with ppdata.ssh_scope(host, username, password) as ssh:
             with ssh.open_sftp() as sftp:
                 try:
@@ -290,8 +287,7 @@ def calc_uv_data(host, path, username=None, password=None):
     return time_start, time_end, delta_time, julian_date, polarization, length, obsnum
 
 if __name__ == '__main__':
-    source_host = sys.argv[1]
-    source_path = sys.argv[2]
+    source_host, source_path = sys.argv[1].split(':')
 
     uv_data = calc_uv_data(source_host, source_path)
     if uv_data is None:

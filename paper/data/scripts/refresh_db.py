@@ -148,7 +148,9 @@ def update_sources(dbi):
     hosts = ('folio', 'node16', 'nas1', 'nas2', 'pot1', 'pot2', 'pot3', 'pot4', 'pot8')
     with dbi.session_scope() as s:
         for host in hosts:
-            FILEs = s.query(table).filter(table.host == host).all()
+            FILEs = s.query(table)\
+                     .filter(table.host == host)\
+                     .all()
             if source_host == host:
                 for FILE in FILEs:
                     if not os.path.exists(FILE.source):

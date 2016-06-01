@@ -11,13 +11,11 @@ calc_size | gets human readable size of any directory or file
 get_md5sum | generates md5 checksum of file
 calc_md5sum | gets md5 checksum of any file
 file_names | breaks path into base directory, filename, and filetype
-source_info | gets source host and paths string from command line or user input
 parse_sources | pulls list of paths from source paths str
 '''
 from __future__ import print_function
 import os
 import sys
-import getpass
 import glob
 import hashlib
 import socket
@@ -202,43 +200,8 @@ def parse_sources(source_host, source_paths_str, username=None, password=None):
         with ppdata.ssh_scope(source_host, username, password) as ssh:
             _, path_out, _ = ssh.exec_command(ls_comm)
             source_paths = path_out.read().splitlines()[:-1]
-
+            
     return source_paths
-
-def source_info(ask=True):
-    '''
-    gets source information including host and paths from command line
-    if None, asks user to supply
-
-    Parameters
-    ----------
-    ask | bool: get host and paths string from user or not
-
-    Returns
-    -------
-    tuple:
-        str: source host
-        list[str]: list of source paths
-    OR
-    tuple:
-        None for every field if no corresponding observation found
-    '''
-    if ask:
-        source_host = raw_input('Source directory host: ')
-        source_paths_str = raw_input('Source directory path: ')
-    else:
-        try:
-            source_host, source_paths_str = sys.argv[1].split(':')
-        except ValueError as e:
-            print(e, ':', 'Wrong format for host and paths')
-            return (None,) * 2
-
-    username = raw_input('Username: ')
-    password = getpass.getpass('Password: ')
-
-    source_paths = parse_sources(source_host, source_paths_str, username, password)
-
-    return source_host, source_paths
 
 if __name__ == '__main__':
     print('Not a script file, just a module')

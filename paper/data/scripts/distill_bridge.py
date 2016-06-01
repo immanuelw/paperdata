@@ -10,8 +10,10 @@ Functions
 get_observations | pulls observation objects from paperdistiller to be added to paperdata
 add_data | adds info from paperdistiller to paperdata
 paperbridge | moves files that have completed compression to preferred directory
+parse | parse command line input
 '''
 import os
+import argparse
 import copy
 import time
 import socket
@@ -188,7 +190,8 @@ def paperbridge(dbi, data_dbi, auto=False):
     memory_path = '/data4/paper/raw_to_tape/'
 
     if memory.enough_memory(required_memory, memory_path):
-        source_host = raw_input('Source directory host: ')
+        source_host, username, password = parse()
+
         #Add observations and paths from paperdistiller
         movable_paths = add_data(dbi, data_dbi)
         filetypes = movable_paths.keys()
@@ -198,13 +201,43 @@ def paperbridge(dbi, data_dbi, auto=False):
             host_dirs[filetype]['dir'] = raw_input('{filetype} destination directory: '.format(filetype=filetype))
 
         for filetype, source_paths in movable_paths:
-            move_files.move_files(dbi, source_host, source_paths, host_dirs[filetype]['host'], host_dirs[filetype]['dir'])
+            move_files.move_files(dbi, source_host, source_paths,
+                                  host_dirs[filetype]['host'], host_dirs[filetype]['dir'],
+                                  username=username, password=password)
 
     else:
         table = 'paperdistiller'
         memory.email_memory(table)
         if auto:
             time.sleep(14400)
+
+def parse():
+    '''
+    parses command line input to get source host, username and password
+
+    Returns
+    -------
+    str: source host
+    str: username
+    str: password
+    '''
+    parser = argparse.ArgumentParser(description='Move files, update database')
+    parser.add_argument('--source', type=str, help='source')
+    parser.add_argument('-u', '--uname', type=str, help='host username')
+    parser.add_argument('-p', '--pword', type=str, help='host password')
+
+    args = parser.parse_args()
+
+    try:
+        source_host = args.source
+        username = args.uname
+        password = args.pword
+    except AttributeError as e:
+        raise #'Include all arguments'
+    except ValueError as e:
+        raise #'Include both the host and the path'
+
+    return source_host, username, password
 
 if __name__ == '__main__':
     dbi = ddbi.DataBaseInterface()

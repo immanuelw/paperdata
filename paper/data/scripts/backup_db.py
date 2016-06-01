@@ -33,9 +33,9 @@ def paperbackup(dbi, db):
     #tables = ('Observation', 'File', 'Feed', 'Log')
     tables = ('Observation', 'File', 'Log')
     table_sorts = {'Observation': {'first': 'julian_date', 'second': 'polarization'},
-                    'File': {'first': 'obsnum', 'second': 'filename'},
-                    'Feed': {'first': 'julian_day', 'second': 'filename'},
-                    'Log': {'first': 'timestamp', 'second': 'action'}}
+                   'File': {'first': 'obsnum', 'second': 'filename'},
+                   'Feed': {'first': 'julian_day', 'second': 'filename'},
+                   'Log': {'first': 'timestamp', 'second': 'action'}}
     with dbi.session_scope() as s:
         print(timestamp)
         for table in tables:

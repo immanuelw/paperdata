@@ -11,9 +11,12 @@ calc_obs_info | pulls observation and file data from files
 dupe_check | checks database for duplicate files
 add_files_to_db | pulls file and observation data and adds to database
 add_files | parses list of files and adds data to database
+parse | parse command line input
 '''
 from __future__ import print_function
 import os
+import argparse
+import glob
 import time
 import uuid
 from paper.data import dbi as pdbi, uv_data, file_data
@@ -160,7 +163,32 @@ def add_files(dbi, source_host, source_paths):
     add_files_to_db(dbi, source_host, npz_paths)
     #refresh_db.refresh_db(dbi)
 
+def parse():
+    '''
+    parses command line input to get source host and paths
+
+    Returns
+    -------
+    str: source host
+    str: source paths str
+    '''
+    parser = argparse.ArgumentParser(description='Add files to the database')
+    parser.add_argument('--source', type=str, help='source')
+
+    args = parser.parse_args()
+
+    try:
+        source_host, source_paths_str = args.source.split(':')
+    except AttributeError as e:
+        raise #'Include all arguments'
+    except ValueError as e:
+        raise #'Include both the host and the path'
+
+    source_paths = glob.glob(source_paths_str)
+
+    return source_host, source_paths
+
 if __name__ == '__main__':
-    source_host, source_paths = file_data.source_info()
+    source_host, source_paths = parse()
     dbi = pdbi.DataBaseInterface()
     add_files(dbi, source_host, source_paths)

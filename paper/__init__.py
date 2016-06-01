@@ -171,7 +171,7 @@ def ssh_scope(host, username=None, password=None):
                 ssh.connect(host, username=username, password=password, key_filename=key_filename)
                 yield ssh
             except:
-                yield None
+                raise #'Did not connect through ssh'
     finally:
         ssh.close()
 

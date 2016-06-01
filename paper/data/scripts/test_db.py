@@ -11,6 +11,7 @@ script_test | runs script functions on test uv files
 '''
 from __future__ import print_function
 import os
+import argparse
 import doctest
 import glob
 import shutil
@@ -25,6 +26,18 @@ def script_test():
     '''
     runs tests of scripts
     '''
+    parser = argparse.ArgumentParser(description='Move files, update database')
+    parser.add_argument('-u', '--uname', type=str, help='host username')
+    parser.add_argument('-p', '--pword', type=str, help='host password')
+
+    args = parser.parse_args()
+
+    try:
+        username = args.uname
+        password = args.pword
+    except AttributeError as e:
+        raise #'Include all arguments'
+
     print('instantiating database interface object...')
     dbi = pdbi.DataBaseInterface(configfile=os.path.expanduser('~/paperdata/test.cfg'))
     
@@ -61,7 +74,7 @@ def script_test():
     #copy files first?
     dest_host = 'node16'
     dest_path = os.path.expanduser('~/test_data/')
-    move_files.move_files(dbi, source_host, source_paths, dest_host, dest_path)
+    move_files.move_files(dbi, source_host, source_paths, dest_host, dest_path, username, password)
 
     print('deleting files...')
     source_host = dest_host

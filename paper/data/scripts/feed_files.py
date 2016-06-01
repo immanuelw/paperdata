@@ -18,7 +18,8 @@ import time
 import uuid
 import aipy as A
 import paper as ppdata
-from paper.data import dbi as pdbi, file_data
+from paper.data import dbi as pdbi
+import add_files
 
 def gen_feed_data(host, path):
     '''
@@ -115,6 +116,6 @@ def add_feeds(dbi, source_host, source_paths):
     add_feeds_to_db(dbi, source_host, source_paths)
 
 if __name__ == '__main__':
-    source_host, source_paths = file_data.source_info()
+    source_host, source_paths = add_files.parse()
     dbi = pdbi.DataBaseInterface()
     add_feeds(dbi, source_host, source_paths_str)
