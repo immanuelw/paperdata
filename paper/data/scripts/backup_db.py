@@ -45,7 +45,7 @@ def paperbackup(dbi, db):
 
             DB_table = getattr(pdbi, table)
             DB_dump = s.query(DB_table).order_by(getattr(DB_table, table_sorts[table]['first']).asc(),
-                                                getattr(DB_table, table_sorts[table]['second']).asc())
+                                                 getattr(DB_table, table_sorts[table]['second']).asc())
             ppdata.json_data(backup_path, DB_dump)
             print('Table data backup saved')
 

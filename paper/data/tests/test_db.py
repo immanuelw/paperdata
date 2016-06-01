@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.test_db
+paper.data.tests.test_db
 
 runs tests for most relevant functions of paper pipeline
 

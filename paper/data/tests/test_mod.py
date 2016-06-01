@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.test_mod
+paper.data.tests.test_mod
 
 runs tests for doctests of paper pipeline
 
