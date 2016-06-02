@@ -256,7 +256,7 @@ def calc_uv_data(host, path, username=None, password=None):
 
             time_start, time_end, delta_time, length = calc_times(uv)
             julian_date = five_round(uv['time'])
-            polarization = pdbi.pol_to_str[uv['pol']] if uv['npol'] == 4 else 'all' if uv['npol'] == 1 else None
+            polarization = pdbi.pol_to_str[uv['pol']] if uv['npol'] == 1 else 'all' if uv['npol'] == 4 else None
 
             obsnum = jdpol_to_obsnum(julian_date, polarization, length) if length > 0 else None
 

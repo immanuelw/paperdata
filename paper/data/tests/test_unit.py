@@ -55,6 +55,7 @@ class TestDBI(unittest.TestCase):
 
 class TestUVData(unittest.TestCase):
     def setUp(self):
+        self.dbi = pdbi.DataBaseInterface()
         self.uv_file = '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'
         self.npz_file = '/home/immwa/test_data/zen.2455906.53332.uvcRE.npz'
 
@@ -69,7 +70,7 @@ class TestUVData(unittest.TestCase):
         self.assertEqual(obsnum, 21480810617, msg='Issue with obsnum generation')
 
         jd_info = uv_data.date_info(2456604.16671)
-        self.assertEqual(jd_info, (128, 2456604, 20.8), msg='Issue with pulling relevant info from julian date')
+        self.assertSequenceEqual(jd_info, (128, 2456604, 20.8), msg='Issue with pulling relevant info from julian date')
 
     def test_edge(self):
         edge_1 = uv_data.is_edge(None, None)
@@ -81,35 +82,34 @@ class TestUVData(unittest.TestCase):
         self.assertFalse(edge_3)
 
     def test_times(self):
-        uv = A.miriad.UV(self.test_file)
+        uv = A.miriad.UV(self.uv_file)
 
         times = (2456617.17386, 2456617.18032, 0.0005, 0.00696)
         c_times = uv_data.calc_times(uv)
-        self.assertEqual(c_times, times, msg='Calculated times differ from expected')
+        self.assertSequenceEqual(c_times, times, msg='Calculated times differ from expected')
 
     def test_npz(self):
         c_data = uv_data.calc_npz_data(self.dbi, self.npz_file)
         npz_data = (Decimal('2455906.53332'), Decimal('2455906.54015'), Decimal('0.00012'),
                     2455906.53332, 'all', Decimal('0.00696'), 17185743685L)
-        self.assertEqual(c_data, npz_data, msg='Calculated information differ from expected')
+        self.assertSequenceEqual(c_data, npz_data, msg='Calculated information differ from expected')
 
     def test_uv(self):
         c_data = uv_data.calc_uv_data('folio', self.uv_file)
-        uv_data = (2456617.17386, 2456617.18032, 0.0005, 2456617.18069, 'xx', 0.00696, 21480813086)
-        self.assertEqual(c_data, uv_data, msg='Calculated information differ from expected')
+        UV_data = (2456617.17386, 2456617.18032, 0.0005, 2456617.18069, 'xx', 0.00696, 21480813086)
+        self.assertSequenceEqual(c_data, UV_data, msg='Calculated information differ from expected')
 
 class TestFileData(unittest.TestCase):
     def setUp(self):
         self.uv_file = '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'
-        pass
 
     def tearDown(self):
         pass
 
     def test_names(self):
-        c_names = file_names(self.uv_file)
+        c_names = file_data.file_names(self.uv_file)
         names = ('/home/immwa/test_data', 'zen.2456617.17386.xx.uvcRRE', 'uvcRRE')
-        self.assertEqual(c_names, names, msg='Names seperated incorrectly')
+        self.assertSequenceEqual(c_names, names, msg='Names seperated incorrectly')
 
     def test_filesize(self):
         byte_sz = file_data.byte_size(self.uv_file)
