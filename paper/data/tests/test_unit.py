@@ -29,10 +29,26 @@ class TestDBI(unittest.TestCase):
         pass
 
     def test_get_entry(self):
-        #self.assertTrue(self.dbi.get_entry(self.sess, 'Observation', VALUE).obsnum == OBSNUM,
-        #                msg= 'Observation not in database')
-        #self.assertTrue(self.dbi.get_entry(self.sess, 'File', VALUE).source == SOURCE,
-        #                msg= 'File not in database')
+        #obsnum = self.dbi.get_entry(self.sess, 'Observation', VALUE).obsnum
+        #self.assertEqual(obsnum, OBSNUM, msg='Observation not in database')
+
+        #source = self.dbi.get_entry(self.sess, 'File', VALUE).source
+        #self.assertEqual(source, SOURCE, msg='File not in database')
+        pass
+
+    def test_query(self):
+        #obsnum = self.sess.query(self.obs_table)\
+        #                  .filter(self.obs_table.julian_date == JULIANDATE)\
+        #                  .filter(self.obs_table.polarization == POLARIZATION)\
+        #                  .first().obsnum
+        #self.assertEqual(obsnum, OBSNUM, msg='Observation entry not found)
+
+        #file_query = self.sess.query(self.file_table)\
+        #                      .filter(self.file_table.host == HOST)\
+        #                      .filter(self.file_table.base_path == BASEPATH)\
+        #                      .order_by(file_table.filename)
+        #source = file_query.first().source
+        #self.assertEqual(source, SOURCE), msg='File entry not found)
         pass
 
 class TestUVData(unittest.TestCase):
