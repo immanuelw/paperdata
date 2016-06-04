@@ -19,39 +19,52 @@ from paper.data import dbi as pdbi, uv_data, file_data
 
 class TestDBI(unittest.TestCase):
     def setUp(self):
+        self.source = 'folio:/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'
+        self.host = 'folio'
+        self.base_path = '/home/immwa/test_data/'
+        self.jd = 2456600
+        self.pol = 'xx'
+        self.obsnum = 21480810617
         self.dbi = pdbi.DataBaseInterface()
         self.obs_table = pdbi.Observation
         self.file_table = pdbi.File
         self.log_table = pdbi.Log
         #self.feed_table = pdbi.Feed
-        #self.sess = dbi.Session
+        self.sess = dbi.Session
 
     def tearDown(self):
-        #self.sess.close()
-        pass
+        self.sess.close()
 
     def test_get_entry(self):
-        #obsnum = self.dbi.get_entry(self.sess, 'Observation', VALUE).obsnum
-        #self.assertEqual(obsnum, OBSNUM, msg='Observation not in database')
-
-        #source = self.dbi.get_entry(self.sess, 'File', VALUE).source
-        #self.assertEqual(source, SOURCE, msg='File not in database')
-        pass
+        obsnum = self.dbi.get_entry(self.sess, 'Observation', self.obsnum).obsnum
+        self.assertEqual(obsnum, self.obsnum, msg='Observation not in database')
+        
+        source = self.dbi.get_entry(self.sess, 'File', self.source).source
+        self.assertEqual(source, self.source, msg='File not in database')
 
     def test_query(self):
-        #obsnum = self.sess.query(self.obs_table)\
-        #                  .filter(self.obs_table.julian_date == JULIANDATE)\
-        #                  .filter(self.obs_table.polarization == POLARIZATION)\
-        #                  .first().obsnum
-        #self.assertEqual(obsnum, OBSNUM, msg='Observation entry not found)
+        obs_query = self.sess.query(self.obs_table)\
+                             .filter(self.obs_table.julian_date == self.jd)\
+                             .filter(self.obs_table.polarization == self.pol)
+        obsnum = obs_query.first().obsnum
+        self.assertEqual(obsnum, self.obsnum, msg='Observation entry not found')
 
-        #file_query = self.sess.query(self.file_table)\
-        #                      .filter(self.file_table.host == HOST)\
-        #                      .filter(self.file_table.base_path == BASEPATH)\
-        #                      .order_by(file_table.filename)
-        #source = file_query.first().source
-        #self.assertEqual(source, SOURCE), msg='File entry not found)
-        pass
+        file_query = self.sess.query(self.file_table)\
+                              .filter(self.file_table.host == self.host)\
+                              .filter(self.file_table.base_path == self.base_path)\
+                              .order_by(self.file_table.filename)
+        source = file_query.first().source
+        self.assertEqual(source, self.source, msg='File entry not found')
+
+        joined_query = self.sess.query(self.file_table)\
+                                .join(self.obs_table)\
+                                .filter(self.obs_table.julian_date == self.jd)\
+                                .filter(self.obs_table.polarization == self.pol)
+                                .filter(self.file_table.host == self.host)\
+                                .filter(self.file_table.base_path == self.base_path)\
+                                .order_by(self.file_table.filename)
+        obsnum = joined_query.first().obsnum
+        self.assertEqual(obsnum, self.obsnum, msg='Joined observation entry not found')
 
 class TestUVData(unittest.TestCase):
     def setUp(self):
@@ -91,7 +104,7 @@ class TestUVData(unittest.TestCase):
     def test_npz(self):
         c_data = uv_data.calc_npz_data(self.dbi, self.npz_file)
         npz_data = (Decimal('2455906.53332'), Decimal('2455906.54015'), Decimal('0.00012'),
-                    2455906.53332, 'all', Decimal('0.00696'), 17185743685L)
+                    2455906.53332, 'all', Decimal('0.00696'), 17185743685)#L?
         self.assertSequenceEqual(c_data, npz_data, msg='Calculated information differ from expected')
 
     def test_uv(self):
@@ -131,6 +144,13 @@ class TestFileData(unittest.TestCase):
 
         nc_md5 = file_data.calc_md5sum('folio', self.uv_file)
         self.assertEqual(nc_md5, md5, msg='md5sum generated is wrong')
+
+    def test_parse_sources(self):
+        source_paths_str = '/home/immwa/test_data/zen.*.uv*'
+        source_paths = file_data.parse_sources('folio', source_paths_str)
+        file_paths = ('/home/immwa/test_data/zen.2455906.53332.uvcRE.npz',
+                      '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
+        self.assertSequenceEqual(source_paths, file_paths, msg='list of paths differ from expected')
 
 if __name__ == '__main__':
     unittest.main()

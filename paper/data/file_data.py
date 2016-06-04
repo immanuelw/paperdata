@@ -191,7 +191,7 @@ def parse_sources(source_host, source_paths_str, username=None, password=None):
 
     Returns
     -------
-    list[str]: list of source paths
+    list[str]: sorted list of source paths
     '''
     if source_host == socket.gethostname():
         source_paths = glob.glob(source_paths_str)
@@ -201,7 +201,7 @@ def parse_sources(source_host, source_paths_str, username=None, password=None):
             _, path_out, _ = ssh.exec_command(ls_comm)
             source_paths = path_out.read().splitlines()[:-1]
             
-    return source_paths
+    return sorted(source_paths)
 
 if __name__ == '__main__':
     print('Not a script file, just a module')
