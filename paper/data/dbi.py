@@ -45,6 +45,18 @@ str_to_pol = {'I' :  1,   # Stokes Paremeters
 
 pol_to_str = {v: k for k, v in str_to_pol.items()}
 
+hostnames = {'folio': 'folio.sas.upenn.edu',
+             'pot0': 'pot0.physics.upenn.edu',
+             'pot1': 'pot1.physics.upenn.edu',
+             'pot2': 'pot2.physics.upenn.edu',
+             'pot3': 'pot3.physics.upenn.edu',
+             'pot4': 'pot4.physics.upenn.edu',
+             'pot5': 'pot5.physics.upenn.edu',
+             'pot6': 'pot6.physics.upenn.edu',
+             'node16': 'node16.physics.upenn.edu',
+             'nas1': 'nas1.physics.upenn.edu',
+             'nas2': 'nas2.physics.upenn.edu'}
+
 #############
 #
 #   The basic definition of our database

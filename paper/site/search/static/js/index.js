@@ -115,7 +115,7 @@ function setButton(){
 };
 
 function getDataHist(startUTC, endUTC, jd_start, jd_end, polarization, era_type, host, filetype) {
-    window.dataHistRequest = abortRequestIfPending(window.HistRequest);
+    window.dataHistRequest = abortRequestIfPending(window.dataHistRequest);
 
     window.dataHistRequest = $.ajax({
         type: 'POST',

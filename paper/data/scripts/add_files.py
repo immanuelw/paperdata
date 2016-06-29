@@ -39,6 +39,7 @@ def calc_obs_info(dbi, host, path):
         dict: file values
         dict: log values
     '''
+    host = dbi.hostnames.get(host, host)
     base_path, filename, filetype = file_data.file_names(path)
     source = ':'.join((host, path))
 
