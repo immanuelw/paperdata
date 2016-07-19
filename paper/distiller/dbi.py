@@ -78,8 +78,8 @@ class DataBaseInterface(ppdata.DataBaseInterface):
 
     Methods
     -------
-    add_entry_dict | adds entry to database using dict as kwarg
-    get_entry | gets database object
+    create_db | creates all defined tables
+    drop_db | drops all tables from database
     '''
     def __init__(self, Base=Base, configfile=ppdata.osj(ppdata.root_dir, 'config', 'paperdistiller.cfg')):
         '''
