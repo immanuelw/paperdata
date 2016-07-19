@@ -52,7 +52,7 @@ def backup_db(db):
 
             DB_table = getattr(xdbi, table)
             DB_dump = s.query(DB_table).order_by(getattr(DB_table, primary_key).asc())
-            ew.json_data(backup_path, DB_dump)
+            ppdata.json_data(backup_path, DB_dump)
             print('Table data backup saved')
 
 if __name__ == '__main__':
