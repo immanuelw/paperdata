@@ -1,7 +1,0 @@
-build
-output
-*pyc
-.*.swp
-.*.swo
-*.cfg
-*.sh
