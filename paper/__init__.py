@@ -51,6 +51,9 @@ try:
 except ImportError as e:
     import ConfigParser as configparser
 
+root_dir = os.path.realpath(os.path.join(os.path.dirname(__file__), '..'))
+osj = os.path.join
+
 def file_to_jd(path):
     '''
     pulls julian date from filename using regex
@@ -211,19 +214,15 @@ class DataBaseInterface(object):
     session_scope | context manager for session connection to database
     drop_db | drops all tables from database
     create_table | creates individual table in database
-    add_entry | adds entry object to database
-    add_entry_dict | adds entry to database using dict as kwarg
-    get_entry | gets database object
-    set_entry | updates database entry field with new value
-    set_entry_dict | updates database entry fields with new values using input dict
     '''
-    def __init__(self, configfile='~/paperdata/paperdata.cfg'):
+    def __init__(self, Base=Base, configfile=osj(root_dir, 'config/paperdata.cfg')):
         '''
         Connect to the database and make a session creator
         superclass of DBI for paperdata, paperdev, and ganglia databases
 
         Parameters
         ----------
+        Base | object: declarative database base
         configfile | Optional[str]: configuration file --defaults to ~/paperdata.cfg
         '''
         if configfile is not None:
@@ -253,6 +252,7 @@ class DataBaseInterface(object):
                 self.engine = create_engine(connect_string.format(**self.dbinfo), pool_size=20, max_overflow=40)
 
             self.Session = sessionmaker(bind=self.engine)
+            self.Base = Base
 
     @contextmanager
     def session_scope(self):
@@ -274,7 +274,7 @@ class DataBaseInterface(object):
         finally:
             session.close()
 
-    def drop_db(self, Base):
+    def drop_db(self):
         '''
         drops the tables in the database.
 
@@ -282,100 +282,5 @@ class DataBaseInterface(object):
         ----------
         Base | object: base object for database
         '''
-        Base.metadata.bind = self.engine
-        Base.metadata.drop_all()
-
-    def create_table(Table):
-        '''
-        creates a table in the database.
-
-        Parameters
-        ----------
-        Table | object: table object
-        '''
-        Table.__table__.create(bind=self.engine)
-
-    def add_entry(self, s, ENTRY):
-        '''
-        adds entry to database and commits
-        does not add if duplicate found
-
-        Parameters
-        ----------
-        s | object: session object
-        ENTRY | object: entry object
-        '''
-        try:
-            s.add(ENTRY)
-            s.commit()
-        except (exc.IntegrityError):
-            s.rollback()
-            print('Duplicate entry found ... skipping entry')
-
-    def add_entry_dict(self, mod_name, s, TABLE, entry_dict):
-        '''
-        create a new entry.
-
-        Parameters
-        ----------
-        mod_name | str: name of module to access models
-        s | object: session object
-        TABLE | str: table name
-        entry_dict | dict: dict of attributes for object
-        '''
-        table = getattr(sys.modules[mod_name], TABLE)
-        ENTRY = table(**entry_dict)
-        self.add_entry(s, ENTRY)
-
-    def get_entry(self, mod_name, s, TABLE, unique_value):
-        '''
-        retrieves any object.
-        Errors if there are more than one of the same object in the db
-        This is bad and should never happen
-
-        Parameters
-        ----------
-        mod_name | str: name of module to access models
-        s | object: session object
-        TABLE | str: table name
-        unique_value | int/float/str: primary key value of row
-
-        Returns
-        -------
-        object: table object
-        '''
-        table = getattr(sys.modules[mod_name], TABLE)
-        try:
-            ENTRY = s.query(table).get(unique_value)
-        except(exc.InvalidRequestError):
-            return None
-
-        return ENTRY
-
-    def set_entry(self, s, ENTRY, field, new_value):
-        '''
-        sets the value of any entry
-
-        Parameters
-        ----------
-        s | object: session object
-        ENTRY | object: entry object
-        field | str: field to be changed
-        new_value | int/float/str: value to change field in entry to
-        '''
-        setattr(ENTRY, field, new_value)
-        self.add_entry(s, ENTRY)
-
-    def set_entry_dict(self, s, ENTRY, entry_dict):
-        '''
-        sets values of any entry
-
-        Parameters
-        ----------
-        s | object: session object
-        ENTRY | object: entry object
-        entry_dict | dict: dict of attributes for object
-        '''
-        for field, new_value in entry_dict.items():
-            setattr(ENTRY, field, new_value)
-        self.add_entry(s, ENTRY)
+        self.Base.metadata.bind = self.engine
+        self.Base.metadata.drop_all()

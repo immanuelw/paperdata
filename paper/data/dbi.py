@@ -17,10 +17,13 @@ DataBaseInterface | interface to data database
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
 from sqlalchemy import event, DDL
 from sqlalchemy.orm import relationship, backref
+from sqlalchemy.ext.declarative import declarative_base
+import os
+import datetime
 import logging
 import paper as ppdata
 
-Base = ppdata.Base
+Base = declarative_base()
 logger = logging.getLogger('paper.data')
 
 #########
@@ -45,17 +48,13 @@ str_to_pol = {'I' :  1,   # Stokes Paremeters
 
 pol_to_str = {v: k for k, v in str_to_pol.items()}
 
-hostnames = {'folio': 'folio.sas.upenn.edu',
-             'pot0': 'pot0.physics.upenn.edu',
-             'pot1': 'pot1.physics.upenn.edu',
-             'pot2': 'pot2.physics.upenn.edu',
-             'pot3': 'pot3.physics.upenn.edu',
-             'pot4': 'pot4.physics.upenn.edu',
-             'pot5': 'pot5.physics.upenn.edu',
-             'pot6': 'pot6.physics.upenn.edu',
-             'node16': 'node16.physics.upenn.edu',
-             'nas1': 'nas1.physics.upenn.edu',
-             'nas2': 'nas2.physics.upenn.edu'}
+filetypes = ('uv', 'uvcRRE', 'npz')
+eras = (32, 64, 128)
+
+hosts_file = ppdata.osj(ppdata.root_dir, 'config', 'hostnames.txt')
+with open(hosts_file, 'r') as hf:
+    hosts = (host.strip().split('|') for host in hf)
+    hostnames = {abbr: full_name for abbr, full_name in hosts}
 
 #############
 #
@@ -65,62 +64,59 @@ hostnames = {'folio': 'folio.sas.upenn.edu',
 
 class Observation(Base, ppdata.DictFix):
     __tablename__ = 'Observation'
-    obsnum = Column(BigInteger, primary_key=True)
-    julian_date = Column(Numeric(12,5))
-    polarization = Column(String(4))
-    julian_day = Column(Integer)
-    lst = Column(Numeric(3,1))
-    era = Column(Integer)
-    era_type = Column(String(20))
-    length = Column(Numeric(6,5)) #length of observation in fraction of a day
-    ###
-    time_start = Column(Numeric(12,5))
-    time_end = Column(Numeric(12,5))
-    delta_time = Column(Numeric(12,5))
-    prev_obs = Column(BigInteger, unique=True)
-    next_obs = Column(BigInteger, unique=True)
-    is_edge = Column(Boolean)
-    timestamp = Column(BigInteger)
+    obsnum = Column(BigInteger, primary_key=True, doc='observation number, unique through algorithm')
+    julian_date = Column(Numeric(12,5), doc='julian date of observation')
+    polarization = Column(Enum(*str_to_pol.keys(), name='polarizations'), doc='polarization of observation')
+    julian_day = Column(Integer, doc='integer part of julian date')
+    lst = Column(Numeric(3,1), doc='local sidereal time for South Africa at julian date')
+    era = Column(Enum(*eras, name='eras'), doc='era of observation')
+    era_type = Column(String(20), doc='type of observation taken, ex:dual pol')
+    length = Column(Numeric(6,5), doc='length of observation in fraction of days')
+    time_start = Column(Numeric(12,5), doc='start time of observation')
+    time_end = Column(Numeric(12,5), doc='end time of observation')
+    delta_time = Column(Numeric(12,5), doc='time step of observation')
+    prev_obs = Column(BigInteger, unique=True, doc='observation number of previous observation')
+    next_obs = Column(BigInteger, unique=True, doc='observation number of next observation')
+    is_edge = Column(Boolean, doc='is observation at beginning or end of session')
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, doc='Time entry was last updated')
 
 class File(Base, ppdata.DictFix):
     __tablename__ = 'File'
-    host = Column(String(100))
-    base_path = Column(String(100)) #directory
-    filename = Column(String(100)) #zen.*.*.uv/uvcRRE/uvcRREzx...
-    filetype = Column(String(20)) #uv, uvcRRE, etc.
-    source = Column(String(200), primary_key=True)
-    ###
-    obsnum = Column(BigInteger, ForeignKey('Observation.obsnum'))
-    filesize = Column(Numeric(7,2))
-    md5sum = Column(String(32))
-    tape_index = Column(String(100))
-    ### maybe unnecessary fields
-    init_host = Column(String(100))
-    is_tapeable = Column(Boolean)
-    is_deletable = Column(Boolean)
-    timestamp = Column(BigInteger)
+    host = Column(Enum(*hostnames.values(), name='hostnames'), doc='hostname of resident filesystem')
+    base_path = Column(String(100), doc='directory file is located in')
+    filename = Column(String(100), doc='filename')
+    filetype = Column(Enum(*filetypes, name='filetypes'), doc='filetype')
+    source = Column(String(200), primary_key=True, doc='full path of file')
+    obsnum = Column(BigInteger, ForeignKey('Observation.obsnum'), doc='Foreign Key to Observation table')
+    filesize = Column(Numeric(7,2), doc='size of file in megabytes')
+    md5sum = Column(String(32), doc='md5 checksum of visdata or file')
+    tape_index = Column(String(100), doc='indexed location of file on tape')
+    init_host = Column(String(100), doc='original host of file')
+    is_tapeable = Column(Boolean, doc='is file written to tape')
+    is_deletable = Column(Boolean, doc='can file be deleted from disk')
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, doc='Time entry was last updated')
     #this next line creates an attribute Observation.files which is the list of all
     #  files associated with this observation
     observation = relationship(Observation, backref=backref('files', uselist=True))
 
 class Feed(Base, ppdata.DictFix):
     __tablename__ = 'Feed'
-    host = Column(String(100))
-    base_path = Column(String(100)) #directory
-    filename = Column(String(100)) #zen.*.*.uv
-    source = Column(String(200), primary_key=True)
-    julian_day = Column(Integer)
-    is_movable = Column(Boolean)
-    is_moved = Column(Boolean)
-    timestamp = Column(BigInteger)
+    host = Column(Enum(*hostnames.values(), name='hostnames'), doc='hostname of resident filesystem')
+    base_path = Column(String(100), doc='directory file is located in')
+    filename = Column(String(100), doc='filename')
+    source = Column(String(200), primary_key=True, doc='full path of file')
+    julian_day = Column(Integer, doc='integer value of julian date')
+    is_movable = Column(Boolean, doc='can file be moved to different location')
+    is_moved = Column(Boolean, doc='has file been moved to different location')
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, doc='Time entry was last updated')
 
 class Log(Base, ppdata.DictFix):
     __tablename__ = 'Log'
-    action = Column(String(100), nullable=False)
-    table = Column(String(100))
-    identifier = Column(String(200)) #the primary key that is used in other tables of the object being acted on
-    log_id = Column(String(36), primary_key=True)
-    timestamp = Column(BigInteger)
+    action = Column(String(100), nullable=False, doc='action taken by script')
+    table = Column(String(100), doc='table script is acting on')
+    identifier = Column(String(200), doc='key of item that was changed')
+    log_id = Column(String(36), primary_key=True, doc='UUID generated id')
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, doc='Time entry was last updated')
 
 class DataBaseInterface(ppdata.DataBaseInterface):
     '''
@@ -130,32 +126,31 @@ class DataBaseInterface(ppdata.DataBaseInterface):
     -------
     create_db | creates all defined tables
     drop_db | drops all tables from database
-    add_entry_dict | adds entry to database using dict as kwarg
-    get_entry | gets database object
     '''
-    def __init__(self, configfile='~/paperdata/paperdata.cfg'):
+    def __init__(self, Base=Base, configfile=ppdata.osj(ppdata.root_dir, 'config', 'paperdata.cfg'):
         '''
         Unique Interface for the paperdata database
 
         Parameters
         ----------
+        Base | object: declarative database base
         configfile | str: paperdata database configuration file
         '''
-        super(DataBaseInterface, self).__init__(configfile=configfile)
+        super(DataBaseInterface, self).__init__(Base=Base, configfile=configfile)
 
     def create_db(self):
         '''
         creates the tables in the database
         '''
-        Base.metadata.bind = self.engine
+        self.Base.metadata.bind = self.engine
         insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
                                         after INSERT or UPDATE on file \
                                         FOR EACH ROW \
                                         SET NEW.source = concat(NEW.host, ':', NEW.base_path, '/', NEW.filename)''')
         event.listen(File.__table__, 'after_create', insert_update_trigger)
-        Base.metadata.create_all()
+        self.Base.metadata.create_all()
 
-    def drop_db(self, Base):
+    def drop_db(self):
         '''
         drops tables in the database
 
@@ -163,34 +158,4 @@ class DataBaseInterface(ppdata.DataBaseInterface):
         ----------
         Base | object: Base database object
         '''
-        super(DataBaseInterface, self).drop_db(Base)
-
-    def add_entry_dict(self, s, TABLE, entry_dict):
-        '''
-        create a new entry.
-
-        Parameters
-        ----------
-        s | object: session object
-        TABLE | str: table name
-        entry_dict | dict: dict of attributes for object
-        '''
-        super(DataBaseInterface, self).add_entry_dict(__name__, s, TABLE, entry_dict)
-
-    def get_entry(self, s, TABLE, unique_value):
-        '''
-        retrieves any object.
-        Errors if there are more than one of the same object in the db. This is bad and should
-        never happen
-
-        Parameters
-        ----------
-        s | object: session object
-        TABLE | str: table name
-        unique_value | int/float/str: primary key value of row
-
-        Returns
-        -------
-        object: table object
-        '''
-        super(DataBaseInterface, self).get_entry(__name__, s, TABLE, unique_value)
+        super(DataBaseInterface, self).drop_db()
