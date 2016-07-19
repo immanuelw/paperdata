@@ -10,6 +10,7 @@ from __future__ import print_function
 import os
 import copy
 import curses
+import datetime
 import time
 from paper.distiller import dbi as ddbi
 from paper.ganglia import dbi as pyg
@@ -40,7 +41,7 @@ if __name__ == '__main__':
     try:
         table = ddbi.Observation
         while True:
-            timestamp = int(time.time())
+            timestamp = datetime.datetime.utcnow()
             #creates base list
             file_log = []
             #get the screen dimensions
@@ -55,14 +56,14 @@ if __name__ == '__main__':
                 curline += 1
                 OBSs = s.query(table).filter(table.status != 'NEW').filter(table.status != 'COMPLETE').all()
                 #OBSs = s.query(table).all()
-                stdscr.addstr(curline, 0, 'Number of observations currently being processed {num}'.format(num=len(OBSs))
+                stdscr.addstr(curline, 0, 'Number of observations currently being processed {num}'.format(num=len(OBSs)))
                 curline += 1
                 statusscr.erase()
                 statusscr.addstr(0, 0 ,'  ----  Still Idle  ----   ')
                 for j, OBS in enumerate(OBSs):
                     try:
                         obsnum = OBS.obsnum
-                        FILE = dbi.get_entry(ddbi, s, 'file', obsnum)
+                        FILE = s.query(ddbi.File).get(obsnum)
                         host = FILE.host
                         base_path, filename = os.path.split(FILE.filename)
                         status = OBS.status
@@ -89,57 +90,57 @@ if __name__ == '__main__':
                     source = ':'.join((still_host, os.path.join(base_path, filename)))
                     full_stats = '&'.join((source, status))
                     entry_dict = {'host': still_host,
-                                    'base_path': base_path,
-                                    'filename': filename,
-                                    'source': source,
-                                    'status': status,
-                                    'full_stats': full_stats,
-                                    'del_time': None,
-                                    'time_start': None,
-                                    'time_end': None,
-                                    'timestamp': timestamp}
+                                  'base_path': base_path,
+                                  'filename': filename,
+                                  'source': source,
+                                  'status': status,
+                                  'full_stats': full_stats,
+                                  'del_time': None,
+                                  'time_start': None,
+                                  'time_end': None,
+                                  'timestamp': timestamp}
 
                     if filename not in file_dict['pid'].keys():
                         file_dict['pid'].update({filename: current_pid})
-                        file_dict['start'].update({filename: int(time.time())})
+                        file_dict['start'].update({filename: datetime.datetime.utcnow()})
                         file_dict['end'].update({filename: -1})
 
                     if file_dict['pid'][filename] != current_pid:
-                        file_dict['end'].update({filename: int(time.time())})
+                        file_dict['end'].update({filename: datetime.datetime.utcnow()})
                         pid_entry = copy.deepcopy(entry_dict)
                         change_pid = {'del_time': -1,
-                                        'time_start': file_dict['start'][filename],
-                                        'time_end': file_dict['end'][filename]}
+                                      'time_start': file_dict['start'][filename],
+                                      'time_end': file_dict['end'][filename]}
                         pid_entry.update(change_pid)
 
                         file_log.append(pid_entry)
                         file_dict['pid'].update({filename: current_pid})
-                        file_dict['start'].update({filename: int(time.time())})
+                        file_dict['start'].update({filename: datetime.datetime.utcnow()})
                         file_dict['end'].update({filename: -1})
 
                     if filename not in file_dict['status'].keys():
                         file_dict['status'].update({filename: status})
                         status_entry = copy.deepcopy(entry_dict)
                         change_status = {'del_time': 0,
-                                        'time_start': file_dict['start'][filename],
-                                        'time_end': file_dict['end'][filename]}
+                                         'time_start': file_dict['start'][filename],
+                                         'time_end': file_dict['end'][filename]}
                         status_entry.update(change_status)
                         file_log.append(status_entry)
-                        file_dict['time'].update({filename: int(time.time())})
+                        file_dict['time'].update({filename: datetime.datetime.utcnow()})
 
                     if file_dict['status'][filename] != status:
                         status_entry = copy.deepcopy(entry_dict)
                         change_status = {'del_time': int(time.time() - file_dict['time'][filename]),
-                                        'time_start': file_dict['start'][filename],
-                                        'time_end': file_dict['end'][filename]}
+                                         'time_start': file_dict['start'][filename],
+                                         'time_end': file_dict['end'][filename]}
                         status_entry.update(change_status)
                         file_log.append(status_entry)
                         file_dict['status'].update({filename: status})
-                        file_dict['time'].update({filename: int(time.time())})
+                        file_dict['time'].update({filename: datetime.datetime.utcnow()})
 
                 with pyg_dbi.session_scope() as sess:
                     for monitor_data in file_log:
-                        pyg_dbi.add_entry_dict(sess, 'Monitor', monitor_data)
+                        sess.add(pyg_dbi.Monitor(**monitor_data))
 
                 statusscr.refresh()
                 c = stdscr.getch()

@@ -16,10 +16,11 @@ from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, 
 from sqlalchemy import event, DDL
 from sqlalchemy.orm import relationship, backref
 from sqlalchemy.ext.declarative import declarative_base
+import datetime
 import logging
 import paper as ppdata
 
-Base = ppdata.Base
+Base = declarative_base()
 logger = logging.getLogger('paper.ganglia')
 
 #############
@@ -30,68 +31,68 @@ logger = logging.getLogger('paper.ganglia')
 
 class Filesystem(Base, ppdata.DictFix):
     __tablename__ = 'Filesystem'
-    host = Column(String(100)) #folio
-    system = Column(String(100)) #/data4
-    total_space = Column(BigInteger)
-    used_space = Column(BigInteger)
-    free_space = Column(BigInteger)
-    percent_space = Column(Numeric(4,1))
-    filesystem_id = Column(String(36), primary_key=True)
-    timestamp = Column(BigInteger) #seconds since 1970
+    host = Column(String(100), doc='host of system that is being monitored')
+    system = Column(String(100), doc='segment of filesystem') #/data4
+    total_space = Column(BigInteger, doc='total space in system in bytes')
+    used_space = Column(BigInteger, doc='used space in system in bytes')
+    free_space = Column(BigInteger, doc='free space in system in bytes')
+    percent_space = Column(Numeric(4,1), doc='perecent of used space in system')
+    filesystem_id = Column(String(36), primary_key=True, doc='system id')
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, doc='Time entry was last updated')
 
 class Monitor(Base, ppdata.DictFix):
     __tablename__ = 'Monitor'
-    host = Column(String(100))
-    base_path = Column(String(100))
-    filename = Column(String(100))
-    source = Column(String(200))
-    status = Column(String(100))
-    full_stats = Column(String(200), primary_key=True)
-    del_time = Column(BigInteger)
-    time_start = Column(BigInteger)
-    time_end = Column(BigInteger)
-    timestamp = Column(BigInteger)
+    host = Column(String(100), doc='node that uv file is being comrpessed on')
+    base_path = Column(String(100), doc='directory that file is located in')
+    filename = Column(String(100), doc='name of uv file being compressed')
+    source = Column(String(200), doc='combination of host, path, and filename')
+    status = Column(String(100), doc='state of compression file is currently on')
+    full_stats = Column(String(200), primary_key=True, doc='unique id of host, full path, and status')
+    del_time = Column(BigInteger, doc='time taken to finish step -- status transition')
+    time_start = Column(DateTime, doc='time process started')
+    time_end = Column(DateTime, doc='time process ended')
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, doc='Time entry was last updated')
 
 class Ram(Base, ppdata.DictFix):
     __tablename__ = 'Ram'
-    host = Column(String(100))
-    total = Column(BigInteger)
-    used = Column(BigInteger)
-    free = Column(BigInteger)
-    shared = Column(BigInteger)
-    buffers = Column(BigInteger)
-    cached = Column(BigInteger)
+    host = Column(String(100), doc='host of system that is being monitored')
+    total = Column(BigInteger, doc='total ram')
+    used = Column(BigInteger, doc='used ram')
+    free = Column(BigInteger, doc='free ram')
+    shared = Column(BigInteger, doc='shared ram')
+    buffers = Column(BigInteger, doc='buffers')
+    cached = Column(BigInteger, doc='cached ram')
     bc_used = Column(BigInteger)
     bc_free = Column(BigInteger)
     swap_total = Column(BigInteger)
     swap_used = Column(BigInteger)
     swap_free = Column(BigInteger)
-    ram_id = Column(String(36), primary_key=True)
-    timestamp = Column(BigInteger)
+    ram_id = Column(String(36), primary_key=True, doc='ram id')
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, doc='Time entry was last updated')
 
 class Iostat(Base, ppdata.DictFix):
     __tablename__ = 'Iostat'
-    host = Column(String(100))
+    host = Column(String(100), doc='host of system that is being monitored')
     device = Column(String(100))
     tps = Column(Numeric(7,2))
-    read_s = Column(Numeric(7,2))
-    write_s = Column(Numeric(7,2))
-    bl_reads = Column(BigInteger)
-    bl_writes = Column(BigInteger)
-    iostat_id = Column(String(36), primary_key=True)
-    timestamp = Column(BigInteger)
+    read_s = Column(Numeric(7,2), doc='reads per second')
+    write_s = Column(Numeric(7,2), doc='writes per second')
+    bl_reads = Column(BigInteger, doc='block reads')
+    bl_writes = Column(BigInteger, doc='block writes')
+    iostat_id = Column(String(36), primary_key=True, doc='iostat id')
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, doc='Time entry was last updated')
 
 class Cpu(Base, ppdata.DictFix):
     __tablename__ = 'Cpu'
-    host = Column(String(100))
-    cpu = Column(Integer)
-    user_perc = Column(Numeric(5,2))
-    sys_perc = Column(Numeric(5,2))
-    iowait_perc = Column(Numeric(5,2))
-    idle_perc = Column(Numeric(5,2))
-    intr_s = Column(Integer)
-    cpu_id = Column(String(36), primary_key=True)
-    timestamp = Column(BigInteger)
+    host = Column(String(100), doc='host of system that is being monitored')
+    cpu = Column(Integer, doc='number of cpu/processor being monitored')
+    user_perc = Column(Numeric(5,2), doc='percent of cpu being used by user')
+    sys_perc = Column(Numeric(5,2), doc='percent of cpu being used by system')
+    iowait_perc = Column(Numeric(5,2), doc='percent of cpu waiting')
+    idle_perc = Column(Numeric(5,2), doc='percent of cpu that is idle')
+    intr_s = Column(Integer, doc='instructions (per second)?')
+    cpu_id = Column(String(36), primary_key=True, doc='cpu id')
+    timestamp = Column(DateTime, default=datetime.datetime.utcnow, onupdate=datetime.datetime.utcnow, doc='Time entry was last updated')
 
 class DataBaseInterface(ppdata.DataBaseInterface):
     '''
@@ -101,24 +102,23 @@ class DataBaseInterface(ppdata.DataBaseInterface):
     -------
     create_db | creates all defined tables
     drop_db | drops all tables from database
-    add_entry_dict | adds entry to database using dict as kwarg
-    get_entry | gets database object
     '''
-    def __init__(self, configfile='~/paperdata/ganglia.cfg'):
+    def __init__(self, Base=Base, configfile=ppdata.osj(ppsdata.root_dir, 'config', 'ganglia.cfg')):
         '''
         Unique Interface for the ganglia database
 
         Parameters
         ----------
+        Base | object declarative database base
         configfile | Optional[str]: ganglia database configuration file --defaults to ~/ganglia.cfg
         '''
-        super(DataBaseInterface, self).__init__(configfile=configfile)
+        super(DataBaseInterface, self).__init__(Base=Base, configfile=configfile)
 
     def create_db(self):
         '''
         creates the tables in the database.
         '''
-        Base.metadata.bind = self.engine
+        self.Base.metadata.bind = self.engine
         table = Monitor.__table__
         insert_update_trigger = DDL('''CREATE TRIGGER insert_update_trigger \
                                         after INSERT or UPDATE on Monitor \
@@ -130,9 +130,9 @@ class DataBaseInterface(ppdata.DataBaseInterface):
                                         FOR EACH ROW \
                                         SET NEW.full_stats = concat(NEW.source, '&', NEW.status)''')
         event.listen(table, 'after_create', insert_update_trigger_2)
-        Base.metadata.create_all()
+        self.Base.metadata.create_all()
 
-    def drop_db(self, Base):
+    def drop_db(self):
         '''
         drops tables in the database
 
@@ -140,34 +140,4 @@ class DataBaseInterface(ppdata.DataBaseInterface):
         ----------
         Base | object: Base database object
         '''
-        super(DataBaseInterface, self).drop_db(Base)
-
-    def add_entry_dict(self, s, TABLE, entry_dict):
-        '''
-        create a new entry.
-
-        Parameters
-        ----------
-        s | object: session object
-        TABLE | str: table name
-        entry_dict | dict: dict of attributes for object
-        '''
-        super(DataBaseInterface, self).add_entry_dict(__name__, s, TABLE, entry_dict)
-
-    def get_entry(self, s, TABLE, unique_value):
-        '''
-        retrieves any object.
-        Errors if there are more than one of the same object in the db. This is bad and should
-        never happen
-
-        Parameters
-        ----------
-        s | object: session object
-        TABLE | str: table name
-        unique_value | int/float/str: primary key value of row
-
-        Returns
-        -------
-        object: table object
-        '''
-        super(DataBaseInterface, self).get_entry(__name__, s, TABLE, unique_value)
+        super(DataBaseInterface, self).drop_db()

@@ -17,11 +17,12 @@ add_data | adds data to ganglia database
 from __future__ import division
 import os
 import sys
+import datetime
 import psutil
-import time
 import uuid
 import paper as ppdata
 from paper.ganglia import dbi as pyg
+from paper.data import dbi as pdbi
 
 def two_round(num):
     '''
@@ -69,13 +70,13 @@ def filesystem(ssh, host, path):
                 percent = int(output.split()[-1].split('%')[-1])
 
     system_data = {'host': host,
-                    'system': path,
-                    'total_space': total,
-                    'used_space': used,
-                    'free_space': free,
-                    'percent_space': percent,
-                    'filesystem_id': str(uuid.uuid4()),
-                    'timestamp': int(time.time())}
+                   'system': path,
+                   'total_space': total,
+                   'used_space': used,
+                   'free_space': free,
+                   'percent_space': percent,
+                   'filesystem_id': str(uuid.uuid4()),
+                   'timestamp': datetime.datetime.utcnow()}
 
     return system_data
 
@@ -92,7 +93,7 @@ def iostat(ssh, host):
     -------
     dict: iostat information
     '''
-    timestamp = int(time.time())
+    timestamp = datetime.datetime.utcnow()
     iostat_data = {}
     if ssh is None:
         io = psutil.disk_io_counters(perdisk=True)
@@ -105,14 +106,14 @@ def iostat(ssh, host):
             bl_writes = value.write_bytes
 
             iostat_data[device] = {'host': host,
-                                    'device': device,
-                                    'tps': tps,
-                                    'read_s': read_s,
-                                    'write_s': write_s,
-                                    'bl_reads': bl_reads,
-                                    'bl_writes': bl_writes,
-                                    'iostat_id': str(uuid.uuid4()),
-                                    'timestamp': timestamp}
+                                   'device': device,
+                                   'tps': tps,
+                                   'read_s': read_s,
+                                   'write_s': write_s,
+                                   'bl_reads': bl_reads,
+                                   'bl_writes': bl_writes,
+                                   'iostat_id': str(uuid.uuid4()),
+                                   'timestamp': timestamp}
 
     else:
         _, folio, _ = ssh.exec_command('iostat')
@@ -215,7 +216,7 @@ def ram_free(ssh, host):
                 'swap_used': swap_used,
                 'swap_free': swap_free,
                 'ram_id': str(uuid.uuid4()),
-                'timestamp': int(time.time())}
+                'timestamp': datetime.datetime.utcnow()}
 
     return ram_data
 
@@ -233,7 +234,7 @@ def cpu_perc(ssh, host):
     dict: cpu usage information
     '''
     #Calculates cpu usage on folio
-    timestamp = int(time.time())
+    timestamp = datetime.datetime.utcnow()
     cpu_data = {}
     if ssh is None:
         cpu_all = psutil.cpu_times_percent(interval=1, percpu=True)
@@ -273,37 +274,36 @@ def cpu_perc(ssh, host):
 
     return cpu_data
 
-def add_data(host):
+def add_data(s, host):
     '''
     generates table information for all tables
 
     Parameters
     ----------
-    ssh | object: ssh object
+    s | object: session object
     host | str: host of filesystem
     '''
     with ppdata.ssh_scope(host) as ssh:
-        dbi = pyg.DataBaseInterface()
-        with dbi.session_scope() as s:
-            iostat_all_data = iostat(ssh, host)
-            for name, iostat_data in iostat_all_data.items():
-                dbi.add_entry_dict(s, 'Iostat', iostat_data)
+        iostat_all_data = iostat(ssh, host)
+        for name, iostat_data in iostat_all_data.items():
+            s.add(pdbi.Iostat(**iostat_data))
 
-            ram_data = ram_free(ssh, host)
-            dbi.add_entry_dict(s, 'Ram', ram_data)
+        ram_data = ram_free(ssh, host)
+        s.add(pdbi.Ram(**ram_data))
 
-            cpu_all_data = cpu_perc(ssh, host)
-            for key, cpu_data in cpu_all_data.items():
-                dbi.add_entry_dict(s, 'Cpu', cpu_data)
+        cpu_all_data = cpu_perc(ssh, host)
+        for key, cpu_data in cpu_all_data.items():
+            s.add(pdbi.Cpu(**cpu_data))
 
-            if host in ('folio',):
-                paths = ('/data3', '/data4')
-                for path in paths:
-                    system_data = filesystem(ssh, path)
-                    dbi.add_entry_dict(s, 'Filesystem', system_data)
+        if host in ('folio',):
+            paths = ('/data3', '/data4')
+            for path in paths:
+                system_data = filesystem(ssh, path)
+                s.add(pdbi.Filesystem(**system_data))
 
 if __name__ == '__main__':
-    hosts = ('folio', 'node01', 'node02', 'node03', 'node04', 'node05', 'node06', 'node07', 'node08', 'node09', 'node10')
-    named_host = socket.gethostname()
-    for host in hosts:
-        add_data(host)
+    hosts = pdbi.hostnames.keys()
+    dbi = pyg.DataBaseInterface()
+    with dbi.session_scope() as s:
+        for host in hosts:
+            add_data(s, host)
