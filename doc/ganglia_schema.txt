@@ -1,0 +1,75 @@
+Cpu
++-------------+---------------+------------------+---------+-----------------------------------------+
+|    Field    |      Type     |     Default      |   Key   |               Description               |
++-------------+---------------+------------------+---------+-----------------------------------------+
+|     host    |  VARCHAR(100) |                  |         |  host of system that is being monitored |
+|     cpu     |    INTEGER    |                  |         | number of cpu/processor being monitored |
+|  user_perc  | NUMERIC(5, 2) |                  |         |    percent of cpu being used by user    |
+|   sys_perc  | NUMERIC(5, 2) |                  |         |   percent of cpu being used by system   |
+| iowait_perc | NUMERIC(5, 2) |                  |         |          percent of cpu waiting         |
+|  idle_perc  | NUMERIC(5, 2) |                  |         |       percent of cpu that is idle       |
+|    intr_s   |    INTEGER    |                  |         |        instructions (per second)?       |
+|    cpu_id   |  VARCHAR(36)  |                  | PRIMARY |                  cpu id                 |
+|  timestamp  |    DATETIME   | FUNCTION DEFAULT |         |       Time entry was last updated       |
++-------------+---------------+------------------+---------+-----------------------------------------+
+Filesystem
++---------------+---------------+------------------+---------+----------------------------------------+
+|     Field     |      Type     |     Default      |   Key   |              Description               |
++---------------+---------------+------------------+---------+----------------------------------------+
+|      host     |  VARCHAR(100) |                  |         | host of system that is being monitored |
+|     system    |  VARCHAR(100) |                  |         |         segment of filesystem          |
+|  total_space  |     BIGINT    |                  |         |     total space in system in bytes     |
+|   used_space  |     BIGINT    |                  |         |     used space in system in bytes      |
+|   free_space  |     BIGINT    |                  |         |     free space in system in bytes      |
+| percent_space | NUMERIC(4, 1) |                  |         |    perecent of used space in system    |
+| filesystem_id |  VARCHAR(36)  |                  | PRIMARY |               system id                |
+|   timestamp   |    DATETIME   | FUNCTION DEFAULT |         |      Time entry was last updated       |
++---------------+---------------+------------------+---------+----------------------------------------+
+Iostat
++-----------+---------------+------------------+---------+----------------------------------------+
+|   Field   |      Type     |     Default      |   Key   |              Description               |
++-----------+---------------+------------------+---------+----------------------------------------+
+|    host   |  VARCHAR(100) |                  |         | host of system that is being monitored |
+|   device  |  VARCHAR(100) |                  |         |                                        |
+|    tps    | NUMERIC(7, 2) |                  |         |                                        |
+|   read_s  | NUMERIC(7, 2) |                  |         |            reads per second            |
+|  write_s  | NUMERIC(7, 2) |                  |         |           writes per second            |
+|  bl_reads |     BIGINT    |                  |         |              block reads               |
+| bl_writes |     BIGINT    |                  |         |              block writes              |
+| iostat_id |  VARCHAR(36)  |                  | PRIMARY |               iostat id                |
+| timestamp |    DATETIME   | FUNCTION DEFAULT |         |      Time entry was last updated       |
++-----------+---------------+------------------+---------+----------------------------------------+
+Monitor
++------------+--------------+------------------+---------+------------------------------------------------+
+|   Field    |     Type     |     Default      |   Key   |                  Description                   |
++------------+--------------+------------------+---------+------------------------------------------------+
+|    host    | VARCHAR(100) |                  |         |    node that uv file is being comrpessed on    |
+| base_path  | VARCHAR(100) |                  |         |       directory that file is located in        |
+|  filename  | VARCHAR(100) |                  |         |        name of uv file being compressed        |
+|   source   | VARCHAR(200) |                  |         |    combination of host, path, and filename     |
+|   status   | VARCHAR(100) |                  |         |   state of compression file is currently on    |
+| full_stats | VARCHAR(200) |                  | PRIMARY |    unique id of host, full path, and status    |
+|  del_time  |    BIGINT    |                  |         | time taken to finish step -- status transition |
+| time_start |   DATETIME   |                  |         |              time process started              |
+|  time_end  |   DATETIME   |                  |         |               time process ended               |
+| timestamp  |   DATETIME   | FUNCTION DEFAULT |         |          Time entry was last updated           |
++------------+--------------+------------------+---------+------------------------------------------------+
+Ram
++------------+--------------+------------------+---------+----------------------------------------+
+|   Field    |     Type     |     Default      |   Key   |              Description               |
++------------+--------------+------------------+---------+----------------------------------------+
+|    host    | VARCHAR(100) |                  |         | host of system that is being monitored |
+|   total    |    BIGINT    |                  |         |               total ram                |
+|    used    |    BIGINT    |                  |         |                used ram                |
+|    free    |    BIGINT    |                  |         |                free ram                |
+|   shared   |    BIGINT    |                  |         |               shared ram               |
+|  buffers   |    BIGINT    |                  |         |                buffers                 |
+|   cached   |    BIGINT    |                  |         |               cached ram               |
+|  bc_used   |    BIGINT    |                  |         |                                        |
+|  bc_free   |    BIGINT    |                  |         |                                        |
+| swap_total |    BIGINT    |                  |         |                                        |
+| swap_used  |    BIGINT    |                  |         |                                        |
+| swap_free  |    BIGINT    |                  |         |                                        |
+|   ram_id   | VARCHAR(36)  |                  | PRIMARY |                 ram id                 |
+| timestamp  |   DATETIME   | FUNCTION DEFAULT |         |      Time entry was last updated       |
++------------+--------------+------------------+---------+----------------------------------------+

@@ -1,0 +1,6 @@
+[dbinfo]
+username = USERNAME
+password = PASSWORD
+hostip   = localhost
+port     = 3306
+dbname   = paperdistiller

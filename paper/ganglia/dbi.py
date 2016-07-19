@@ -103,7 +103,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
     create_db | creates all defined tables
     drop_db | drops all tables from database
     '''
-    def __init__(self, Base=Base, configfile=ppdata.osj(ppsdata.root_dir, 'config', 'ganglia.cfg')):
+    def __init__(self, Base=Base, configfile=ppdata.osj(ppdata.root_dir, 'config', 'ganglia.cfg')):
         '''
         Unique Interface for the ganglia database
 

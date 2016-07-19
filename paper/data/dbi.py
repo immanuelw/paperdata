@@ -46,7 +46,6 @@ str_to_pol = {'I' :  1,   # Stokes Paremeters
 pol_to_str = {v: k for k, v in str_to_pol.items()}
 
 filetypes = ('uv', 'uvcRRE', 'npz')
-eras = (32, 64, 128)
 
 hosts_file = ppdata.osj(ppdata.root_dir, 'config', 'hostnames.txt')
 with open(hosts_file, 'r') as hf:
@@ -66,7 +65,7 @@ class Observation(Base, ppdata.DictFix):
     polarization = Column(Enum(*str_to_pol.keys(), name='polarizations'), doc='polarization of observation')
     julian_day = Column(Integer, doc='integer part of julian date')
     lst = Column(Numeric(3,1), doc='local sidereal time for South Africa at julian date')
-    era = Column(Enum(*eras, name='eras'), doc='era of observation')
+    era = Column(Integer, doc='era of observation')
     era_type = Column(String(20), doc='type of observation taken, ex:dual pol')
     length = Column(Numeric(6,5), doc='length of observation in fraction of days')
     time_start = Column(Numeric(12,5), doc='start time of observation')

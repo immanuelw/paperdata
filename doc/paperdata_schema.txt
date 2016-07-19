@@ -1,0 +1,61 @@
+Feed
++------------+--------------+------------------+---------+-------------------------------------------+
+|   Field    |     Type     |     Default      |   Key   |                Description                |
++------------+--------------+------------------+---------+-------------------------------------------+
+|    host    |     Enum     |                  |         |      hostname of resident filesystem      |
+| base_path  | VARCHAR(100) |                  |         |        directory file is located in       |
+|  filename  | VARCHAR(100) |                  |         |                  filename                 |
+|   source   | VARCHAR(200) |                  | PRIMARY |             full path of file             |
+| julian_day |   INTEGER    |                  |         |        integer value of julian date       |
+| is_movable |   BOOLEAN    |                  |         |  can file be moved to different location  |
+|  is_moved  |   BOOLEAN    |                  |         | has file been moved to different location |
+| timestamp  |   DATETIME   | FUNCTION DEFAULT |         |        Time entry was last updated        |
++------------+--------------+------------------+---------+-------------------------------------------+
+Log
++------------+--------------+------------------+---------+------------------------------+
+|   Field    |     Type     |     Default      |   Key   |         Description          |
++------------+--------------+------------------+---------+------------------------------+
+|   action   | VARCHAR(100) |                  |         |    action taken by script    |
+|   table    | VARCHAR(100) |                  |         |  table script is acting on   |
+| identifier | VARCHAR(200) |                  |         | key of item that was changed |
+|   log_id   | VARCHAR(36)  |                  | PRIMARY |      UUID generated id       |
+| timestamp  |   DATETIME   | FUNCTION DEFAULT |         | Time entry was last updated  |
++------------+--------------+------------------+---------+------------------------------+
+Observation
++--------------+----------------+------------------+---------+-----------------------------------------------------+
+|    Field     |      Type      |     Default      |   Key   |                     Description                     |
++--------------+----------------+------------------+---------+-----------------------------------------------------+
+|    obsnum    |     BIGINT     |                  | PRIMARY |     observation number, unique through algorithm    |
+| julian_date  | NUMERIC(12, 5) |                  |         |              julian date of observation             |
+| polarization |      Enum      |                  |         |             polarization of observation             |
+|  julian_day  |    INTEGER     |                  |         |             integer part of julian date             |
+|     lst      | NUMERIC(3, 1)  |                  |         | local sidereal time for South Africa at julian date |
+|     era      |    INTEGER     |                  |         |                  era of observation                 |
+|   era_type   |  VARCHAR(20)   |                  |         |        type of observation taken, ex:dual pol       |
+|    length    | NUMERIC(6, 5)  |                  |         |      length of observation in fraction of days      |
+|  time_start  | NUMERIC(12, 5) |                  |         |              start time of observation              |
+|   time_end   | NUMERIC(12, 5) |                  |         |               end time of observation               |
+|  delta_time  | NUMERIC(12, 5) |                  |         |               time step of observation              |
+|   prev_obs   |     BIGINT     |                  |  UNIQUE |      observation number of previous observation     |
+|   next_obs   |     BIGINT     |                  |  UNIQUE |        observation number of next observation       |
+|   is_edge    |    BOOLEAN     |                  |         |    is observation at beginning or end of session    |
+|  timestamp   |    DATETIME    | FUNCTION DEFAULT |         |             Time entry was last updated             |
++--------------+----------------+------------------+---------+-----------------------------------------------------+
+File
++--------------+---------------+------------------+---------+----------------------------------+
+|    Field     |      Type     |     Default      |   Key   |           Description            |
++--------------+---------------+------------------+---------+----------------------------------+
+|     host     |      Enum     |                  |         | hostname of resident filesystem  |
+|  base_path   |  VARCHAR(100) |                  |         |   directory file is located in   |
+|   filename   |  VARCHAR(100) |                  |         |             filename             |
+|   filetype   |      Enum     |                  |         |             filetype             |
+|    source    |  VARCHAR(200) |                  | PRIMARY |        full path of file         |
+|    obsnum    |     BIGINT    |                  | FOREIGN | Foreign Key to Observation table |
+|   filesize   | NUMERIC(7, 2) |                  |         |    size of file in megabytes     |
+|    md5sum    |  VARCHAR(32)  |                  |         | md5 checksum of visdata or file  |
+|  tape_index  |  VARCHAR(100) |                  |         | indexed location of file on tape |
+|  init_host   |  VARCHAR(100) |                  |         |      original host of file       |
+| is_tapeable  |    BOOLEAN    |                  |         |     is file written to tape      |
+| is_deletable |    BOOLEAN    |                  |         |  can file be deleted from disk   |
+|  timestamp   |    DATETIME   | FUNCTION DEFAULT |         |   Time entry was last updated    |
++--------------+---------------+------------------+---------+----------------------------------+

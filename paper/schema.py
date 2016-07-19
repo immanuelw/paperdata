@@ -23,7 +23,7 @@ def make_schema(db):
         xdbi = pdbi
     elif db == 'paperdistiller':
         xdbi = ddbi
-    elif db == 'ganglia'
+    elif db == 'ganglia':
         xdbi = pyg
 
     meta = xdbi.Base.metadata
