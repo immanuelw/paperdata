@@ -1,5 +1,5 @@
 '''
-paper.distiller.scripts.md5
+paper.distiller.scripts.update_md5
 
 updates md5sums of uv files without them
 
@@ -12,20 +12,20 @@ update_md5 | updates md5sums of uv files
 from paper.data import file_data
 from paper.distiller import dbi as ddbi
 
-def update_md5(dbi):
+def update_md5(s):
     '''
     updates md5sums for all files without in database
 
     Parameters
     ----------
-    dbi | object: distiller database interface object
+    s | object: session object
     '''
-    with dbi.session_scope() as s:
-        table = ddbi.File
-        FILEs = s.query(table).filter(table.md5sum == None).all()
-        for FILE in FILEs:
-            dbi.set_entry(s, FILE, 'md5sum', file_data.calc_md5sum(FILE.host, FILE.filename))
+    table = ddbi.File
+    FILEs = s.query(table).filter_by(md5sum=None).all()
+    for FILE in FILEs:
+        FILE.md5sum = file_data.calc_md5sum(FILE.host, FILE.filename)
 
 if __name__ == '__main__':
     dbi = ddbi.DataBaseInterface()
-    update_md5(dbi)
+    with dbi.session_scope() as s:
+        update_md5(s)
