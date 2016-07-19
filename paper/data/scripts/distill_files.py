@@ -12,6 +12,7 @@ add_files_to_distill | adds files to paperdistiller database after pulling some 
 from __future__ import print_function
 import os
 import sys
+import argparse
 import glob
 import socket
 import numpy as n
@@ -62,8 +63,7 @@ def add_files_to_distill(source_paths):
             with dbi.session_scope() as s:
                 for source_path in paths:
                     try:
-                        dbi.get_entry(ddbi, s, 'observation',
-                                        uv_data.jdpol_to_obsnum(ppdata.file_to_jd(source_path), ppdata.file_to_pol(source_path), djd))
+                        s.query(ddbi.Observation).get(uv_data.jdpol_to_obsnum(ppdata.file_to_jd(source_path), ppdata.file_to_pol(source_path), djd))
                         print(source_path, 'found in db, skipping')
                     except:
                         obsinfo.append({'julian_date': ppdata.file_to_jd(source_path),
@@ -85,15 +85,16 @@ def add_files_to_distill(source_paths):
         try:
             with dbi.session_scope() as s:
                 for info_dict in obsinfo:
-                    dbi.add_entry_dict(ddbi, s, 'observation', info_dict)
+                    s.add(ddbi.Observation(**info_dict))
         except:
             print('problem!')
     print('done')
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        path_str = sys.argv[1]
-    else:
-        path_str = raw_input('Input [wildcard included] paths for observations to add: ')
-    source_paths = glob.glob(path_str)
+    parser = argparse.ArgumentParser(description='Move files, update database')
+    parser.add_argument('--path', type=str, help='paths')
+
+    args = parser.parse_args()
+
+    source_paths = glob.glob(args.path)
     add_files_to_distill(source_paths)

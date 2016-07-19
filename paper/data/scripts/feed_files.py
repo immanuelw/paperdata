@@ -14,7 +14,8 @@ add_feeds | parses list of files then adds them to paperdata database
 '''
 from __future__ import print_function
 import os
-import time
+import argparse
+import datetime
 import uuid
 import aipy as A
 import paper as ppdata
@@ -44,7 +45,7 @@ def gen_feed_data(host, path):
     base_path, filename = os.path.split(path)
     source = ':'.join((host, path))
 
-    timestamp = int(time.time())
+    timestamp = datetime.datetime.utcnow()
 
     feed_data = {'host': host,
                  'base_path': base_path,
@@ -63,13 +64,13 @@ def gen_feed_data(host, path):
 
     return feed_data, log_data
 
-def dupe_check(dbi, source_host, source_paths):
+def dupe_check(s, source_host, source_paths):
     '''
     checks for files already in feed table on the same host
 
     Parameters
     ----------
-    dbi | object: database interface object
+    s | object: session object
     source_host | str: file host
     source_paths | list[str]: file paths
 
@@ -77,45 +78,52 @@ def dupe_check(dbi, source_host, source_paths):
     -------
     list[str]: files not in feed table
     '''
-    with dbi.session_scope() as s:
-        table = pdbi.Feed
-        FEEDs = s.query(table).filter(table.host == source_host).all()
-        all_paths = tuple(os.path.join(FEED.base_path, FEED.filename) for FEED in FEEDs)
+    table = pdbi.Feed
+    FEEDs = s.query(table).filter_by(host=source_host).all()
+    all_paths = tuple(os.path.join(FEED.base_path, FEED.filename) for FEED in FEEDs)
 
     unique_paths = tuple(source_path for source_path in source_paths if source_path not in all_paths)
         
     return unique_paths
 
-def add_feeds_to_db(dbi, source_host, source_paths):
+def add_feeds_to_db(s, source_host, source_paths):
     '''
     adds feed file data to table
 
     Parameters
     ----------
-    dbi | object: database interface object
+    s | object: session object
     source_host | str: file host
     source_paths | list[str]: file paths
     '''
-    with dbi.session_scope() as s:
-        for source_path in source_paths:
-            feed_data, log_data = gen_feed_data(source_host, source_path)
-            dbi.add_entry_dict(s, 'Feed', feed_data)
-            dbi.add_entry_dict(s, 'Log', log_data)
+    for source_path in source_paths:
+        feed_data, log_data = gen_feed_data(source_host, source_path)
+        s.add(pdbi.Feed(**feed_data))
+        s.add(pdbi.Log(**log_data))
 
-def add_feeds(dbi, source_host, source_paths):
+def add_feeds(s, source_host, source_paths):
     '''
     generates list of input files, check for duplicates, add information to database
 
     Parameters
     ----------
-    dbi | object: database interface object
+    s | object: session object
     source_host | str: file host
     source_paths | list[str]: list of file paths
     '''
-    source_paths = dupe_check(dbi, source_host, source_paths)
-    add_feeds_to_db(dbi, source_host, source_paths)
+    source_paths = dupe_check(s, source_host, source_paths)
+    add_feeds_to_db(s, source_host, source_paths)
 
 if __name__ == '__main__':
-    source_host, source_paths = add_files.parse()
+    parser = argparse.ArgumentParser(description='Add files to the database')
+    parser.add_argument('--source_host', type=str, help='source host')
+    parser.add_argument('--source_paths', type=str, help='source paths')
+
+    args = parser.parse_args()
+
+    source_host = pdbi.hostnames.get(args.source_host, args.source_host)
+    source_paths = glob.glob(args.source_paths)
+
     dbi = pdbi.DataBaseInterface()
-    add_feeds(dbi, source_host, source_paths_str)
+    with dbi.session_scope() as s:
+        add_feeds(s, source_host, source_paths_str)

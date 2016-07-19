@@ -11,13 +11,12 @@ calc_obs_info | pulls observation and file data from files
 dupe_check | checks database for duplicate files
 add_files_to_db | pulls file and observation data and adds to database
 add_files | parses list of files and adds data to database
-parse | parse command line input
 '''
 from __future__ import print_function
 import os
 import argparse
+import datetime
 import glob
-import time
 import uuid
 from paper.data import dbi as pdbi, uv_data, file_data
 import refresh_db
@@ -39,7 +38,6 @@ def calc_obs_info(dbi, host, path):
         dict: file values
         dict: log values
     '''
-    host = dbi.hostnames.get(host, host)
     base_path, filename, filetype = file_data.file_names(path)
     source = ':'.join((host, path))
 
@@ -50,7 +48,7 @@ def calc_obs_info(dbi, host, path):
 
     era, julian_day, lst = uv_data.date_info(julian_date)
 
-    timestamp = int(time.time())
+    timestamp = datetime.datetime.utcnow()
 
     obs_info = {'obsnum': obsnum,
                 'julian_date': julian_date,
@@ -90,14 +88,14 @@ def calc_obs_info(dbi, host, path):
 
     return obs_info, file_info, log_info
 
-def dupe_check(dbi, source_host, source_paths, verbose=False):
+def dupe_check(s, source_host, source_paths, verbose=False):
     '''
     checks for duplicate paths and removes to not waste time if possible
     checks for paths only on same host
 
     Parameters
     ----------
-    dbi | object: database interface object
+    s | object: session object
     source_host | str: host of uv* files
     source_paths | list[str]: paths of uv* files
     verbose | bool: whether paths are printed or not
@@ -108,7 +106,7 @@ def dupe_check(dbi, source_host, source_paths, verbose=False):
     '''
     with dbi.session_scope() as s:
         table = pdbi.File
-        FILEs = s.query(table).filter(table.host == source_host).all()
+        FILEs = s.query(table).filter_by(host=source_host).all()
         paths = tuple(os.path.join(FILE.base_path, FILE.filename) for FILE in FILEs)
 
     unique_paths = set(source_paths) - set(paths)
@@ -117,79 +115,61 @@ def dupe_check(dbi, source_host, source_paths, verbose=False):
 
     return unique_paths
 
-def add_files_to_db(dbi, source_host, source_paths, verbose=False):
+def add_files_to_db(s, source_host, source_paths, verbose=False):
     '''
     adds files to the database
 
     Parameters
     ----------
-    dbi | object: database interface object
+    s | object: session object
     source_host | str: host of files
     source_paths | list[str]: paths of uv* files
     verbose | bool: whether paths are printed or not
     '''
-    with dbi.session_scope() as s:
-        for source_path in source_paths:
-            if verbose:
-                print(source_path)
-            obs_info, file_info, log_info = calc_obs_info(dbi, source_host, source_path)
-            try:
-                dbi.add_entry_dict(s, 'Observation', obs_info)
-            except:
-                print('Failed to load in obs ', source_path)
-            try:
-                dbi.add_entry_dict(s, 'File', file_info)
-            except:
-                print('Failed to load in file ', source_path)
-            #try:
-            #    dbi.add_entry_dict(s, 'Log', log_info)
-            #except:
-            #    print('Failed to load in log ', source_path)
+    for source_path in source_paths:
+        if verbose:
+            print(source_path)
+        obs_info, file_info, log_info = calc_obs_info(dbi, source_host, source_path)
+        try:
+            s.add(pdbi.Observation(**obs_info))
+        except:
+            print('Failed to load in obs ', source_path)
+        try:
+            s.add(pdbi.File(**file_info))
+        except:
+            print('Failed to load in file ', source_path)
+        #try:
+        #    s.add(pdbi.Log(**log_info))
+        #except:
+        #    print('Failed to load in log ', source_path)
 
-def add_files(dbi, source_host, source_paths):
+def add_files(source_host, source_paths):
     '''
     generates list of input files, check for duplicates, add information to database
 
     Parameters
     ----------
-    dbi | object: database interface object
     source_host | str: host of files
     source_paths | list[str]: list of paths of uv* files
     '''
-    source_paths = sorted(dupe_check(dbi, source_host, source_paths))
+    dbi = pdbi.DataBaseInterface()
+    with dbi.session_scope() as s:
+        source_paths = sorted(dupe_check(s, source_host, source_paths))
 
-    uv_paths = [uv_path for uv_path in source_paths if not uv_path.endswith('.npz')]
-    npz_paths = [npz_path for npz_path in source_paths if npz_path.endswith('.npz')]
-    add_files_to_db(dbi, source_host, uv_paths)
-    add_files_to_db(dbi, source_host, npz_paths)
-    #refresh_db.refresh_db(dbi)
+        uv_paths = [uv_path for uv_path in source_paths if not uv_path.endswith('.npz')]
+        npz_paths = [npz_path for npz_path in source_paths if npz_path.endswith('.npz')]
+        add_files_to_db(s, source_host, uv_paths)
+        add_files_to_db(s, source_host, npz_paths)
+    #refresh_db.refresh_db()
 
-def parse():
-    '''
-    parses command line input to get source host and paths
-
-    Returns
-    -------
-    str: source host
-    str: source paths str
-    '''
+if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Add files to the database')
-    parser.add_argument('--source', type=str, help='source')
+    parser.add_argument('--source_host', type=str, help='source host')
+    parser.add_argument('--source_paths', type=str, help='source paths')
 
     args = parser.parse_args()
 
-    try:
-        source_host, source_paths_str = args.source.split(':')
-    except AttributeError as e:
-        raise #'Include all arguments'
-    except ValueError as e:
-        raise #'Include both the host and the path'
+    source_host = pdbi.hostnames.get(args.source_host, args.source_host)
+    source_paths = glob.glob(args.source_paths)
 
-    source_paths = glob.glob(source_paths_str)
-
-    return source_host, source_paths
-
-if __name__ == '__main__':
-    source_host, source_paths = parse()
-    dbi = pdbi.DataBaseInterface()
-    add_files(dbi, source_host, source_paths)
+    add_files(source_host, source_paths)

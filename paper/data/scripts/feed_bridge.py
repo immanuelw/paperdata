@@ -15,9 +15,10 @@ feed_bridge | finds files to move, adds to paperdistiller after move
 '''
 from __future__ import print_function
 import os
-import time
+import datetime
 import shutil
 import socket
+import time
 import paper as ppdata
 from paper.data import dbi as pdbi
 import paper.memory as memory
@@ -41,12 +42,13 @@ def set_feed_table(s, dbi, source_host, source_path, dest_host, dest_path, is_mo
     is_moved | bool: checks whether to move to paperdistiller --defaults to True
     '''
     source = ':'.join((source_host, source_path))
-    FEED = dbi.get_entry(s, 'Feed', source)
+    FEED = s.query(pdbi.Feed).get(source)
     feed_dict = {'host': dest_host,
                  'base_path': dest_path,
                  'is_moved': is_moved,
-                 'timestamp': int(time.time())}
-    dbi.set_entry_dict(s, FEED, feed_dict)
+                 'timestamp': datetime.datetime.utcnow()}
+    for field, value in feed_dict.items():
+        setattr(FEED, field, value)
 
 def move_feed_files(dbi, source_host, source_paths, dest_host, dest_path):
     '''
@@ -97,8 +99,8 @@ def count_days(dbi):
         to_move = (FEED.source for FEED in all_FEEDs if FEED.julian_day in good_days)
 
         for source in to_move:
-            FEED = dbi.get_entry(s, 'Feed', source)
-            dbi.set_entry(s, FEED, 'is_movable', True)
+            FEED = s.query(table).get(source)
+            FEED.is_movable = True
 
 def find_data(dbi):
     '''
@@ -117,7 +119,7 @@ def find_data(dbi):
     '''
     with dbi.session_scope() as s:
         table = pdbi.Feed
-        FEEDs = s.query(table).filter(table.is_moved == False).filter(table.is_movable == True).all()
+        FEEDs = s.query(table).filter_by(is_moved=False, is_movable=True).all()
 
         feed_host = FEEDs[0].host
         feed_paths = tuple(os.path.join(FEED.base_path, FEED.filename) for FEED in FEEDs if FEED.julian_day == FEEDs[0].julian_day)

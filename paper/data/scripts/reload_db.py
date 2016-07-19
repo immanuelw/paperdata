@@ -12,6 +12,7 @@ find_paths | finds all possible uv* files to be added
 from __future__ import print_function
 import os
 import sys
+import argparse
 import socket
 import paper as ppdata
 from paper.data import dbi as pdbi
@@ -75,15 +76,20 @@ def write_paths_to_file(file_path, all_paths):
                 f.write(''.join((path, '\n')))
 
 if __name__ == '__main__':
-    if len(sys.argv) == 2:
-        input_host = sys.argv[1]
-    else:
-        input_host = raw_input('Source directory host: ')
+    parser = argparse.ArgumentParser(description='Add files to the database')
+    parser.add_argument('--source_host', type=str, help='source host')
+    parser.add_argument('--source_dir', type=str, help='source directory')
 
-    all_paths = find_paths(input_host, base_dir='/data3/paper')
+    args = parser.parse_args()
+
+    source_host = args.source_host
+    source_dir = glob.glob(args.source_dir)
+
+    all_paths = find_paths(input_host, base_dir=source_dir)
+    #all_paths = find_paths(input_host, base_dir='/data3/paper')
     file_path = os.path.expanduser('~/paperdata/paper/data/src/')
     write_paths_to_file(file_path, all_paths)
 
     dbi = pdbi.DataBaseInterface()
     for paths in all_paths:
-        add_files.add_files(dbi, input_host, paths)
+        add_files.add_files(s, input_host, paths)
