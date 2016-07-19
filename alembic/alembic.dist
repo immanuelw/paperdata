@@ -29,13 +29,13 @@ script_location = ./alembic
 # are written from script.py.mako
 # output_encoding = utf-8
 
-databases = paperdata, ganglia
+databases = paperdata, paperdistiller, ganglia
 
 [paperdata]
 sqlalchemy.url = mysql://user:pass@shredder/paperdata
 
-[paperdev]
-sqlalchemy.url = mysql://user:pass@shredder/paperdev
+[paperdistiller]
+sqlalchemy.url = mysql://user:pass@shredder/paperdistiller
 
 [ganglia]
 sqlalchemy.url = mysql://user:pass@shredder/ganglia

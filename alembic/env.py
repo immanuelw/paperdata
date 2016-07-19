@@ -34,11 +34,11 @@ db_names = config.get_main_option('databases')
 #}
 from paper.data import dbi as pdbi
 from paper.ganglia import dbi as pyg
-from paper.dev import dbi as dev
+from paper.distiller import dbi as ddbi
 
 target_metadata = {
         'paperdata':pdbi.Base.metadata,
-        'paperdev':dev.Base.metadata,
+        'paperdistiller':ddbi.Base.metadata,
         'ganglia':pyg.Base.metadata
 }
 
