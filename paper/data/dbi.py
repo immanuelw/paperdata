@@ -9,9 +9,6 @@ Observation | sqlalchemy table
 File | sqlalchemy table
 Feed | sqlalchemy table
 Log | sqlalchemy table
-RTPFile | sqlalchemy table
-RTPObservation | sqlalchemy table
-RTPLog | sqlalchemy table
 DataBaseInterface | interface to data database
 '''
 from sqlalchemy import Table, Column, String, Integer, ForeignKey, Float, func, Boolean, DateTime, Enum, BigInteger, Numeric, Text
@@ -127,7 +124,7 @@ class DataBaseInterface(ppdata.DataBaseInterface):
     create_db | creates all defined tables
     drop_db | drops all tables from database
     '''
-    def __init__(self, Base=Base, configfile=ppdata.osj(ppdata.root_dir, 'config', 'paperdata.cfg'):
+    def __init__(self, Base=Base, configfile=ppdata.osj(ppdata.root_dir, 'config', 'paperdata.cfg')):
         '''
         Unique Interface for the paperdata database
 

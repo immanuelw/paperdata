@@ -21,11 +21,11 @@ distill_bridge | pull information about files from paperdistiller database into 
 distill_files | adds files to paperdistiller database
 feed_bridge | pulls information about files from feed table into paperdistiller database
 feed_files | adds files to feed table
+make_schema | schema file generation
 move_files | moves files contained in database and update entries
 refresh_db | refreshes database by removing and updating entries to be correct to current status of hosts
 reload_db | crawls folio for all uv files in case of catastrophic database failure
 restore_db | restores database from backup
-schema_db | schema file generation
 test_db | tests most scripts for pipeline
 test_mod | runs tests for doctests of paper pipeline
 '''
