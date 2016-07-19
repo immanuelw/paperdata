@@ -1,5 +1,7 @@
 *.idea*
 build
+config
+data
 dist
 output
 *pyc
