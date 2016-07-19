@@ -14,17 +14,19 @@ import prettytable
 from sqlalchemy import func
 from paper.data import dbi as pdbi
 
-def current_db(dbi):
+def current_db(s):
     '''
     writes table summary of paperdata database into file
     summary contraining information about julian days, hosts, etc.
 
-    dbi | object: database interface object
+    Parameters
+    ----------
+    s | object: session object
     '''
     obs_table = pdbi.Observation
     file_table = pdbi.File
     count = {}
-    with dbi.session_scope() as s, open(os.path.expanduser('~/paperdata/paper/data/src/table_descr.txt'), 'wb') as df:
+    with open(os.path.join(ppdata.root_dir, 'config', 'table_descr.txt'), 'w') as df:
         count['era'] = s.query(obs_table.era, func.count(obs_table)).group_by(obs_table.era).all()
         count['julian day'] = s.query(obs_table.julian_day, func.count(obs_table)).group_by(obs_table.julian_day).all()
         count['host'] = s.query(file_table.host, func.count(file_table)).group_by(file_table.host).all()
@@ -40,4 +42,5 @@ def current_db(dbi):
 
 if __name__ == "__main__":
     dbi = pdbi.DataBaseInterface()
-    current_db(dbi)
+    with dbi.session_scope() as s:
+        current_db(s)

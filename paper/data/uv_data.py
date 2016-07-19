@@ -171,13 +171,13 @@ def calc_times(uv):
 
     return time_start, time_end, delta_time, length
 
-def calc_npz_data(dbi, filename):
+def calc_npz_data(s, filename):
     '''
     takes in npz files and pulls data about observation
 
     Parameters
     ----------
-    dbi | object: database interface object
+    s | object: session object
     filename | str: filename of npz file
 
     Returns
@@ -203,17 +203,16 @@ def calc_npz_data(dbi, filename):
     
     julian_date = ppdata.file_to_jd(filename)
 
-    with dbi.session_scope() as s:
-        polarization = filename.split('.')[3] if len(filename.split('.')) == 6 else 'all'
-        table = pdbi.Observation
-        OBS = s.query(table)\
-               .filter(table.julian_date == julian_date)\
-               .filter(table.polarization == polarization)\
-               .one_or_none()
-        if OBS is None:
-            return (None,) * 7
+    polarization = filename.split('.')[3] if len(filename.split('.')) == 6 else 'all'
+    table = pdbi.Observation
+    OBS = s.query(table)\
+           .filter(table.julian_date == julian_date)\
+           .filter(table.polarization == polarization)\
+           .one_or_none()
+    if OBS is None:
+        return (None,) * 7
 
-        return OBS.time_start, OBS.time_end, OBS.delta_time, julian_date, polarization, OBS.length, OBS.obsnum
+    return OBS.time_start, OBS.time_end, OBS.delta_time, julian_date, polarization, OBS.length, OBS.obsnum
 
 def calc_uv_data(host, path, username=None, password=None):
     '''
