@@ -29,15 +29,14 @@ def backup_db(db):
         xdbi = pdbi
     elif db == 'paperdistiller':
         xdbi = ddbi
-    elif db == 'ganglia'
+    elif db == 'ganglia':
         xdbi = pyg
 
     meta = xdbi.Base.metadata
     dbi = xdbi.DataBaseInterface()
 
     timestamp = int(time.time())
-    file_dir = os.path.dirname(__file__)
-    backup_dir = os.path.realpath(os.path.join(file_dir, '../../../data/{db}/{timestamp}'.format(db=db, timestamp=timestamp)))
+    backup_dir = os.path.join(ppdata.root_dir, 'data/{db}/{timestamp}'.format(db=db, timestamp=timestamp))
     if not os.path.isdir(backup_dir):
         os.mkdir(backup_dir)
 

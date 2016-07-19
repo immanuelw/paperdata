@@ -49,8 +49,8 @@ class Observation(Base, ppdata.DictFix):
     stillpath = Column(String(100), doc='path of file being compressed')
     outputpath = Column(String(100), doc='path to output file to')
     outputhost = Column(String(100), doc='host to output file to')
-    low_neighbor = relationship(Neighbors, backref=backref('observations', uselist=True))
-    high_neighbor = relationship(Neighbors, backref=backref('observations', uselist=True))
+    low_neighbor = relationship(Neighbors, foreign_keys='Neighbors.low_neighbor_id')
+    high_neighbor = relationship(Neighbors, foreign_keys='Neighbors.high_neighbor_id')
 
 class File(Base, ppdata.DictFix):
     __tablename__ = 'file'
