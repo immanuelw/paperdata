@@ -18,27 +18,20 @@ obs_table | shows observation table
 save_obs | generates observation json file
 file_table | shows file table
 save_files | generates file json file
-before_request | accesses database
-teardown_request | exits database
 data_summary_table | shows data summary table
 day_summary_table | shows day summary table
 '''
-from flask import render_template, flash, redirect, url_for, request, g, make_response, Response, jsonify
-from flask.ext.login import current_user
+from datetime import datetime
 import json
 import time
-from datetime import datetime
+from flask import render_template, flash, redirect, url_for, request, g, make_response, Response, jsonify
+from flask.ext.login import current_user
+import numpy as np
+from sqlalchemy import func
 import paper as ppdata
-from paper.site.flask_app import search_app as app, search_db as db
+from paper.site.flask_app import search_app as app
 from paper.site import misc_utils
 from paper.data import dbi as pdbi
-from paper.ganglia import dbi as pyg
-from sqlalchemy import func
-import numpy as np
-#import plotly
-#import plotly.plotly as py
-#import plotly.graph_objs as go
-#import pandas as pd
 
 def db_objs():
     '''
@@ -166,9 +159,9 @@ def obs_filter(obs_query, obs_table, start_utc, end_utc, polarization, era_type)
     obs_query = obs_query.filter(obs_table.time_start >= start_utc)\
                          .filter(obs_table.time_end <= end_utc)
     if polarization != 'any':
-        obs_query = obs_query.filter(obs_table.polarization == polarization)
+        obs_query = obs_query.filter_by(polarization=polarization)
     if era_type not in ('all', 'None'):
-        obs_query = obs_query.filter(obs_table.era_type == era_type)
+        obs_query = obs_query.filter_by(era_type=era_type)
 
     return obs_query
 
@@ -188,9 +181,9 @@ def file_filter(file_query, file_table, host, filetype):
     object: file query
     '''
     if host != 'all':
-        file_query = file_query.filter(file_table.host == host)
+        file_query = file_query.filter_by(host=host)
     if filetype != 'all':
-        file_query = file_query.filter(file_table.filetype == filetype)
+        file_query = file_query.filter_by(filetype=filetype)
 
     return file_query
 
@@ -412,38 +405,6 @@ def save_files():
 
     return Response(response=json.dumps(entry_list, sort_keys=True, indent=4, default=ppdata.decimal_default),
                     status=200, mimetype='application/json', headers={'Content-Disposition': 'attachment; filename=file.json'})
-
-@app.before_request
-def before_request():
-    '''
-    access database as user before request
-    '''
-    g.user = current_user
-    paper_dbi = pdbi.DataBaseInterface()
-    pyg_dbi = pyg.DataBaseInterface()
-    try :
-        g.paper_session = paper_dbi.Session()
-        g.pyg_session = pyg_dbi.Session()
-        g.search_session = db.session
-    except Exception as e:
-        print('Cannot connect to database - {e}'.format(e))
-
-@app.teardown_request
-def teardown_request(exception):
-    '''
-    exit database after request
-
-    Parameters
-    ----------
-    exception (exception): exception
-    '''
-    paper_db = getattr(g, 'paper_session', None)
-    pyg_db = getattr(g, 'pyg_session', None)
-    search_db = getattr(g, 'search_session', None)
-    db_list = (paper_db, pyg_db, search_db)
-    for open_db in db_list:
-        if open_db is not None:
-            open_db.close()
 
 @app.route('/data_summary_table', methods=['POST'])
 def data_summary_table():
