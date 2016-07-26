@@ -14,13 +14,13 @@ replace fields within with correct credentials
 
 (3) [In virtualenv if possible] Run python setup.py install (develop if altering package)
 
-## Install
+### Install
 
 ```js
 python setup.py install
 ```
 
-## Dev Install
+### Dev Install
 ```js
 python setup.py develop
 ```
@@ -31,27 +31,27 @@ python setup.py develop
 DESCRIPTION
 -----------
 
-# paper
+### paper
 ```
 Main package for modules
 ```
 
-# data
+### data
 ```
 Contains modules which directly interact with the paperdata database
 ```
 
-# ganglia
+### ganglia
 ```
 Contains modules to record the state of each host at any time in the ganglia database
 ```
 
-# heralive
+### heralive
 ```
 module & scripts for instantiation of websites for paperdata
 ```
 
-# calibration
+### calibration
 ```
 module & scripts for calibration of uv files
 ```
