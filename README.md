@@ -69,9 +69,9 @@ EXAMPLE QUERY
 ```js
 from paper.data import dbi as pdbi
 
-dbi = pdbi.DataBaseInterface() #instantiate DBI object
+dbi = pdbi.DataBaseInterface() <!--instantiate DBI object-->
 with dbi.session_scope() as s: #instantiate session object as context manager
-	FILE_query = s.query(pdbi.File).join(pdbi.Observation) #grabs base query object
+	FILE_query = s.query(pdbi.File).join(pdbi.Observation) #grabs base query object and joins table
 	#filters query to look for particular range of dates and a file type
 	filtered_query = FILE_query.filter(pdbi.File.filetype == 'uvcRRE')\
 							   .filter(pdbi.Observation.julian_day >= 2455903)
