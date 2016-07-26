@@ -1,5 +1,5 @@
 '''
-paper.site.search.views
+heralive.search.views
 
 author | Immanuel Washington
 
@@ -24,12 +24,12 @@ day_summary_table | shows day summary table
 from datetime import datetime
 import json
 import time
-from flask import render_template, flash, redirect, url_for, request, g, make_response, Response, jsonify
+from flask import render_template, request, Response, jsonify
 import numpy as np
 from sqlalchemy import func
 import paper as ppdata
-from paper.site.flask_app import search_app as app
-from paper.site import misc_utils as mu
+from flask_app import search_app as app
+import misc_utils as mu
 from paper.data import dbi as pdbi
 
 def db_objs():
@@ -158,9 +158,9 @@ def obs_filter(obs_query, obs_table, start_utc, end_utc, polarization, era_type)
     obs_query = obs_query.filter(obs_table.time_start >= start_utc)\
                          .filter(obs_table.time_end <= end_utc)
     if polarization != 'any':
-        obs_query = obs_query.filter_by(polarization=polarization)
+        obs_query = obs_query.filter(obs_table.polarization == polarization)
     if era_type not in ('all', 'None'):
-        obs_query = obs_query.filter_by(era_type=era_type)
+        obs_query = obs_query.filter(obs_table.era_type == era_type)
 
     return obs_query
 
@@ -180,9 +180,9 @@ def file_filter(file_query, file_table, host, filetype):
     object: file query
     '''
     if host != 'all':
-        file_query = file_query.filter_by(host=host)
+        file_query = file_query.filter(file_table.host == host)
     if filetype != 'all':
-        file_query = file_query.filter_by(filetype=filetype)
+        file_query = file_query.filter(file_table.filetype == filetype)
 
     return file_query
 
@@ -229,7 +229,7 @@ def index():
             j_day_counts = [0] * len(days)
 
     return render_template('index.html',
-                            polarization_dropdown=mu.polarization_dropdown, era_type_dropdown=mu.era_type_dropdown,
+                            polarization_dropdown=mu.pol_dropdown, era_type_dropdown=mu.era_type_dropdown,
                             host_dropdown=mu.host_dropdown, filetype_dropdown=mu.filetype_dropdown,
                             start_utc=start_utc, end_utc=end_utc,
                             polarization=polarization, d_pol=polarization,

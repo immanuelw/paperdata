@@ -1,5 +1,5 @@
 '''
-paper.site.misc_utils
+heralive.search.misc_utils
 
 author | Immanuel Washington
 
