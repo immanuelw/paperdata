@@ -10,7 +10,7 @@ SETUP
 
 (2) Rename all .cfg.test files .cfg inside config directory
 
-replace fields within with correct credentials
+	replace fields within with correct credentials
 
 (3) [In virtualenv if possible] Run python setup.py install (develop if altering package)
 
@@ -39,6 +39,11 @@ Main package for modules
 ### data
 ```
 Contains modules which directly interact with the paperdata database
+```
+
+### distiller
+```
+Contains modules which directly interact with the paperdistiller database
 ```
 
 ### ganglia
