@@ -1,5 +1,5 @@
-paperdata v1.0
-==============
+paperdata
+=========
 
 Module for building, searching, and updating the PAPER database compression pipeline
 ------------------------------------------------------------------------------------

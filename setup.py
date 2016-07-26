@@ -1,5 +1,5 @@
 from setuptools import find_packages
-__version__ = '1.0.1-dev'
+__version__ = '1.0.2-dev'
 
 setup_args = {
     'name': 'paperdata',
@@ -7,7 +7,7 @@ setup_args = {
     'author_email': 'immwa at sas.upenn.edu',
     'description': 'package for maintaining the PAPER project',
     'url': 'https://github.com/immanuelw/paperdata',
-    'license': '?',
+    'license': 'GPL',
     'package_dir' : {'paperdata': ''},
     'packages' : find_packages(),
     'version': __version__,
