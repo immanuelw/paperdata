@@ -1,68 +1,57 @@
-paperdata
-=========
+## paperdata
 
-Module for building, searching, and updating the PAPER database compression pipeline
-------------------------------------------------------------------------------------
+*Module for building, searching, and updating the PAPER database compression pipeline*
 
-paper
-```
-Main package for modules
-```
------------
-DESCRIPTION
------------
-
-data
-```
-Contains various scripts which crawl certain hosts and build paperdata database.
-Contains scripts which bridges other databases to the paperdata and populates it
-```
-
-dev
-```
-test version of data module
-```
-
-ganglia
-```
-Contains scripts to record the state of each host at any time in the ganglia database
-```
-
-site
-```
-module & scripts for instantiation of websites for paperdata
-```
-
-calibration
-```
-module & scripts for calibration of uv files
-```
-
--------------
-EXTRA MODULES
--------------
-
-convert
-```
-time conversions module
-```
-
-schema
-```
-schema script function
-```
 -----
 SETUP
 -----
 
-(1) git clone respository to user's root directory
+(1) git clone respository
 
-(2) Copy all .cfg files to root paperdata directory
-    replace fields within with correct credentials
+(2) Rename all .cfg.test files .cfg inside config directory
 
-(3) Copy settings.py file from paper/site/*/configs/settings.py to paper/site/*/
-    replace SQLALCHEMY_DATABASE_URI with correct credentials
+replace fields within with correct credentials
 
-(4) [In virtualenv if possible] Run python setup.py install (develop if altering package)
+(3) [In virtualenv if possible] Run python setup.py install (develop if altering package)
 
-(5) Further setup required if running docker container or rebuilding database
+## Install
+
+```js
+python setup.py install
+```
+
+## Dev Install
+```js
+python setup.py develop
+```
+
+(4) Further setup required if running docker container or rebuilding database
+
+-----------
+DESCRIPTION
+-----------
+
+# paper
+```
+Main package for modules
+```
+
+# data
+```
+Contains modules which directly interact with the paperdata database
+```
+
+# ganglia
+```
+Contains modules to record the state of each host at any time in the ganglia database
+```
+
+# heralive
+```
+module & scripts for instantiation of websites for paperdata
+```
+
+# calibration
+```
+module & scripts for calibration of uv files
+```
