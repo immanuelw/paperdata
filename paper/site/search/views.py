@@ -25,12 +25,11 @@ from datetime import datetime
 import json
 import time
 from flask import render_template, flash, redirect, url_for, request, g, make_response, Response, jsonify
-from flask.ext.login import current_user
 import numpy as np
 from sqlalchemy import func
 import paper as ppdata
 from paper.site.flask_app import search_app as app
-from paper.site import misc_utils
+from paper.site import misc_utils as mu
 from paper.data import dbi as pdbi
 
 def db_objs():
@@ -77,7 +76,7 @@ def time_fix(jdstart, jdend, starttime=None, endtime=None):
     if jd_start == None:
         startdatetime = datetime.strptime(starttime, '%Y-%m-%dT%H:%M:%SZ')
         enddatetime = datetime.strptime(endtime, '%Y-%m-%dT%H:%M:%SZ')
-        start_utc, end_utc = misc_utils.get_jd_from_datetime(startdatetime, enddatetime)
+        start_utc, end_utc = mu.get_jd_from_datetime(startdatetime, enddatetime)
     else:
         start_utc, end_utc = jd_start, jd_end
 
@@ -198,8 +197,6 @@ def index():
     -------
     html: index
     '''
-    polarization_dropdown, era_type_dropdown, host_dropdown, filetype_dropdown = misc_utils.get_dropdowns()
-
     start_utc, end_utc, polarization, era_type, host, filetype = page_args()
 
     dbi, obs_table, file_table = db_objs()
@@ -232,8 +229,8 @@ def index():
             j_day_counts = [0] * len(days)
 
     return render_template('index.html',
-                            polarization_dropdown=polarization_dropdown, era_type_dropdown=era_type_dropdown,
-                            host_dropdown=host_dropdown, filetype_dropdown=filetype_dropdown,
+                            polarization_dropdown=mu.polarization_dropdown, era_type_dropdown=mu.era_type_dropdown,
+                            host_dropdown=mu.host_dropdown, filetype_dropdown=mu.filetype_dropdown,
                             start_utc=start_utc, end_utc=end_utc,
                             polarization=polarization, d_pol=polarization,
                             era_type=era_type, d_et=era_type,
@@ -417,7 +414,8 @@ def data_summary_table():
     '''
     start_utc, end_utc, polarization, era_type, host, filetype = page_form()
 
-    pol_strs, era_type_strs, host_strs, filetype_strs = misc_utils.get_set_strings()
+    host_strs = mu.host_strs
+    filetype_strs = mu.filetype_strs
     file_map = {host_str: {filetype_str: {'file_count': 0} for filetype_str in filetype_strs} for host_str in host_strs}
 
     dbi, obs_table, file_table = db_objs()
