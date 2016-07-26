@@ -1,5 +1,5 @@
 '''
-paper.ganglia.scripts.add_data
+scripts.ganglia add_data
 
 adds data to ganglia database by polling host machines
 

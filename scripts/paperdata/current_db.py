@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.current_db
+scripts.paperdata.current_db
 
 creates table depicting current summary of paperdata database
 

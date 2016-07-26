@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.create_db
+scripts.paperdata.create_db
 
 creates tables outlined in database
 

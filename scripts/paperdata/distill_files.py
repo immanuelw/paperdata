@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.distill_files
+scripts.paperdata.distill_files
 
 adds files to paperdistiller database
 

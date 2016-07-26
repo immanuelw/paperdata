@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.restore_db
+scripts.paperdata.restore_db
 
 restores paperdata database from backup json file
 

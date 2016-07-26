@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.parse_files
+scripts.paperdata.parse_files
 
 pulls info about files and their related observations, then adds to the paperdata database
 

@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.refresh_db
+scripts.paperdata.refresh_db
 
 refreshes database by fixing possible issues due to moved files or wrong values for observations
 

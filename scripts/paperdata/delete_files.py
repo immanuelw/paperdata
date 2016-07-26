@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.delete_files
+scripts.paperdata.delete_files
 
 copies files to cold storage and then deletes from main host
 

@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.backup_db
+scripts.paperdata.backup_db
 
 backups paperdata database into json files
 

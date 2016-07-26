@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.feed_files
+scripts.paperdata.feed_files
 
 adds files to feed table in paperdata database
 

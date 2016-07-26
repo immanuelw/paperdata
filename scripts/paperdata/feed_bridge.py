@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.feed_bridge
+scripts.paperdata.feed_bridge
 
 adds files to the paperdistiller database and updates the feed table
 

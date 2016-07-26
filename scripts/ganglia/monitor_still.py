@@ -1,5 +1,5 @@
 '''
-paper.ganglia.scripts.monitor_still
+scripts.ganglia.monitor_still
 
 monitors still of paperdistiller database
 shows compression progress of uv* files

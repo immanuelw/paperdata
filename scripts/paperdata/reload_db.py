@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.reload_db
+scripts.paperdata.reload_db
 
 crawls host for all files that should/can be loaded into the paperdata database, then adds them
 

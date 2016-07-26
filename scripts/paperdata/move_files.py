@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.move_files
+scripts.paperdata.move_files
 
 moves files and updates database with new host and path
 

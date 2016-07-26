@@ -1,5 +1,5 @@
 '''
-paper.data.scripts.make_schema
+scripts.paperdata.make_schema
 
 generates schema file of paperdata database
 

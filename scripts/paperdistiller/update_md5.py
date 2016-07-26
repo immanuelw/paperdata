@@ -1,5 +1,5 @@
 '''
-paper.distiller.scripts.update_md5
+scripts.paperdistiller.update_md5
 
 updates md5sums of uv files without them
 
