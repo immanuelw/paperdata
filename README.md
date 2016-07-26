@@ -31,7 +31,7 @@ python setup.py develop
 DESCRIPTION
 -----------
 
-### paper
+## paper
 ```
 Main package for modules
 ```
@@ -54,4 +54,11 @@ module & scripts for instantiation of websites for paperdata
 ### calibration
 ```
 module & scripts for calibration of uv files
+```
+
+-------
+LICENSE
+-------
+```
+GPL. Inside LICENSE file
 ```
