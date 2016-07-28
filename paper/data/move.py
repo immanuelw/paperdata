@@ -1,7 +1,7 @@
 '''
 paper.data.move
 
-move files
+purpose | move files
 
 author | Immanuel Washington
 
@@ -37,7 +37,7 @@ def exist_check(s, source_host, source_paths):
     '''
     table = pdbi.File
     FILEs = s.query(table).filter_by(host=source_host).all()
-    paths = tuple(os.path.join(FILE.path, FILE.filename) for FILE in FILEs)
+    paths = tuple(os.path.join(FILE.base_path, FILE.filename) for FILE in FILEs)
 
     return all(source_path in paths for source_path in source_paths)
 
@@ -58,6 +58,7 @@ def set_move_table(s, source_host, source_path, dest_host, dest_path):
     FILE = s.query(pdbi.File).get(source)
     move_dict = {'host': dest_host,
                  'base_path': dest_path,
+                 'source': ':'.join((dest_host, dest_path))
                  'timestamp': timestamp}
     for field, value in move_dict.items():
         setattr(FILE, field, value)
@@ -83,17 +84,18 @@ def move_files(s, source_host, source_paths_str, dest_host, dest_path, username,
     username | str: username 
     password | str: password 
     '''
-    source_host, source_paths = file_data.parse_sources(source_host, source_paths_str,
-                                                        username, password)
+    source_paths = file_data.parse_sources(source_host, source_paths_str,
+                                           username, password)
 
-    is_existent = exist_check(source_host, source_paths)
+    is_existent = exist_check(s, source_host, source_paths)
     if not is_existent:
         print('File(s) not in database')
         return
 
-    destination = ':'.join((dest_host, dest_path))
+    dest = ':'.join((dest_host, dest_path))
+    destination = '@'.join((username, dest))
     out_host = socket.gethostname()
-    if source_host == pdbi.hostnames(out_host, out_host):
+    if source_host == pdbi.hostnames.get(out_host, out_host):
         for source_path in source_paths:
             ppdata.rsync_copy(source_path, destination)
             set_move_table(s, source_host, source_path, dest_host, dest_path)

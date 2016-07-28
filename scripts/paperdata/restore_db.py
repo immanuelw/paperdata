@@ -36,12 +36,13 @@ def restore_db(backup_file=None, table=None):
 
     dbi = pdbi.DataBaseInterface()
     meta = pdbi.Base.metadata
+    load_table = meta.sorted_tables[table]
     with dbi.session_scope() as s, open(backup, 'r') as backup_db:
         entry_list = json.load(backup_db)
         for entry_dict in entry_list:
             print(entry_dict.items())
             try:
-                s.add(meta.sorted_tables[table](**entry_dict))
+                s.add(load_table(**entry_dict))
             except KeyboardInterrupt:
                 raise
             except:

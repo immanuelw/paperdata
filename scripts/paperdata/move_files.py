@@ -24,7 +24,8 @@ if __name__ == '__main__':
     dest_host = pdbi.hostnames.get(args.dest_host, args.dest_host)
 
     dbi = pdbi.DataBaseInterface()
-    move.move_files(s,
-                    source_host=source_host, source_paths_str=args.source_path,
-                    dest_host=dest_host, dest_path=args.dest_path,
-                    username=args.uname, password=args.pword)
+    with dbi.session_scope() as s:
+        move.move_files(s,
+                        source_host=source_host, source_paths_str=args.source_path,
+                        dest_host=dest_host, dest_path=args.dest_path,
+                        username=args.uname, password=args.pword)
