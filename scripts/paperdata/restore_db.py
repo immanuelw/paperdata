@@ -36,8 +36,8 @@ def restore_db(backup_file=None, table=None):
 
     dbi = pdbi.DataBaseInterface()
     meta = pdbi.Base.metadata
-    load_table = meta.sorted_tables[table]
-    
+    load_table = meta.tables[table]
+
     with dbi.session_scope() as s, open(backup, 'r') as backup_db:
         entry_list = json.load(backup_db)
         for entry_dict in entry_list:

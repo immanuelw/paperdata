@@ -12,20 +12,19 @@ SETUP
 
 	replace fields within with correct credentials
 
-(3) [In virtualenv if possible] Run python setup.py install (develop if altering package)
-
-### Install
-
+(3) Install necessary packages through pip
 ```js
-python setup.py install
+pip install -r requirements.txt
 ```
+
+(4) [In virtualenv if possible] Run python setup.py develop (for altering package)
 
 ### Dev Install
 ```js
 python setup.py develop
 ```
 
-(4) Further setup required if running docker container or rebuilding database
+(5) Further setup required if running docker container or rebuilding database
 
 -----------
 DESCRIPTION
