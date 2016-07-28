@@ -38,7 +38,7 @@ def backup_db(db):
     timestamp = int(time.time())
     backup_dir = os.path.join(ppdata.root_dir, 'data/{db}/{timestamp}'.format(db=db, timestamp=timestamp))
     if not os.path.isdir(backup_dir):
-        os.mkdir(backup_dir)
+        os.makedirs(backup_dir)
 
     tables = {table.name: table.primary_key.columns.keys()[0] for table in meta.tables.values()}
 
