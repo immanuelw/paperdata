@@ -18,9 +18,10 @@ import aipy as A
 from paper.data import dbi as pdbi, uv_data, file_data
 
 class TestDBI(unittest.TestCase):
-    def setUp(self):
-        self.source = 'folio:/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'
-        self.host = 'folio'
+    def __init__(self, *args, **kwargs):
+        super(TestDBI, self).__init__(*args, **kwargs)
+        self.source = 'folio.sas.upenn.edu:/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'
+        self.host = 'folio.sas.upenn.edu'
         self.base_path = '/home/immwa/test_data/'
         self.jd = 2456600
         self.pol = 'xx'
@@ -29,51 +30,38 @@ class TestDBI(unittest.TestCase):
         self.obs_table = pdbi.Observation
         self.file_table = pdbi.File
         self.log_table = pdbi.Log
-        #self.feed_table = pdbi.Feed
-        self.sess = dbi.Session
-
-    def tearDown(self):
-        self.sess.close()
-
-    def test_get_entry(self):
-        obsnum = self.dbi.get_entry(self.sess, 'Observation', self.obsnum).obsnum
-        self.assertEqual(obsnum, self.obsnum, msg='Observation not in database')
-        
-        source = self.dbi.get_entry(self.sess, 'File', self.source).source
-        self.assertEqual(source, self.source, msg='File not in database')
 
     def test_query(self):
-        obs_query = self.sess.query(self.obs_table)\
-                             .filter(self.obs_table.julian_date == self.jd)\
-                             .filter(self.obs_table.polarization == self.pol)
-        obsnum = obs_query.first().obsnum
-        self.assertEqual(obsnum, self.obsnum, msg='Observation entry not found')
+        with self.dbi.session_scope() as s:
+            obs_query = s.query(self.obs_table)\
+                                 .filter(self.obs_table.julian_date == self.jd)\
+                                 .filter(self.obs_table.polarization == self.pol)
+            obsnum = obs_query.first().obsnum
+            self.assertEqual(obsnum, self.obsnum, msg='Observation entry not found')
 
-        file_query = self.sess.query(self.file_table)\
-                              .filter(self.file_table.host == self.host)\
-                              .filter(self.file_table.base_path == self.base_path)\
-                              .order_by(self.file_table.filename)
-        source = file_query.first().source
-        self.assertEqual(source, self.source, msg='File entry not found')
+            file_query = s.query(self.file_table)\
+                                  .filter(self.file_table.host == self.host)\
+                                  .filter(self.file_table.base_path == self.base_path)\
+                                  .order_by(self.file_table.filename)
+            source = file_query.first().source
+            self.assertEqual(source, self.source, msg='File entry not found')
 
-        joined_query = self.sess.query(self.file_table)\
-                                .join(self.obs_table)\
-                                .filter(self.obs_table.julian_date == self.jd)\
-                                .filter(self.obs_table.polarization == self.pol)
-                                .filter(self.file_table.host == self.host)\
-                                .filter(self.file_table.base_path == self.base_path)\
-                                .order_by(self.file_table.filename)
-        obsnum = joined_query.first().obsnum
-        self.assertEqual(obsnum, self.obsnum, msg='Joined observation entry not found')
+            joined_query = s.query(self.file_table)\
+                                    .join(self.obs_table)\
+                                    .filter(self.obs_table.julian_date == self.jd)\
+                                    .filter(self.obs_table.polarization == self.pol)
+                                    .filter(self.file_table.host == self.host)\
+                                    .filter(self.file_table.base_path == self.base_path)\
+                                    .order_by(self.file_table.filename)
+            obsnum = joined_query.first().obsnum
+            self.assertEqual(obsnum, self.obsnum, msg='Joined observation entry not found')
 
 class TestUVData(unittest.TestCase):
-    def setUp(self):
+    def __init__(self, *args, **kwargs):
+        super(TestUVData, self).__init__(*args, **kwargs)
         self.dbi = pdbi.DataBaseInterface()
         self.uv_file = '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'
         self.npz_file = '/home/immwa/test_data/zen.2455906.53332.uvcRE.npz'
-
-    def tearDown(self):
-        pass
 
     def test_jd(self):
         j_date = uv_data.five_round(2455903.1667113231)
@@ -113,11 +101,9 @@ class TestUVData(unittest.TestCase):
         self.assertSequenceEqual(c_data, UV_data, msg='Calculated information differ from expected')
 
 class TestFileData(unittest.TestCase):
-    def setUp(self):
+    def __init__(self, *args, **kwargs):
+        super(TestFileData, self).__init__(*args, **kwargs)
         self.uv_file = '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'
-
-    def tearDown(self):
-        pass
 
     def test_names(self):
         c_names = file_data.file_names(self.uv_file)
