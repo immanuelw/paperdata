@@ -185,7 +185,7 @@ def parse_sources(source_host, source_paths_str, username=None, password=None):
     Parameters
     ----------
     source_host | str: host of files
-    source_paths_str | str: string to indicate paths of uv* files
+    source_paths_str | str: string to indicate paths of uv* files, expands like unix filesystem syntax
     username | str: username --defaults to None
     password | str: password --defaults to None
 
