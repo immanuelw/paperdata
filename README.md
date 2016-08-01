@@ -18,6 +18,7 @@ pip install -r requirements.txt
 ```
 
 (4) [In virtualenv if possible] Run python setup.py develop (for altering package)
+    Due to path setup, package MUST be installed in development mode
 
 ### Dev Install
 ```js
