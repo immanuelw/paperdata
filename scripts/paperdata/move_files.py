@@ -12,7 +12,7 @@ from paper.data import dbi as pdbi, move
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Move files, update database')
     parser.add_argument('--source_host', type=str, help='source host')
-    parser.add_argument('--source_path', type=str, help='source path')
+    parser.add_argument('--source_path', type=str, help='source paths, parsed alike unix filesytem syntax')
     parser.add_argument('--dest_host', type=str, help='destination host')
     parser.add_argument('--dest_path', type=str, help='destination path')
     parser.add_argument('--uname', type=str, help='host username')

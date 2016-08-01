@@ -78,7 +78,7 @@ def move_files(s, source_host, source_paths_str, dest_host, dest_path, username,
     ----------
     s | object: session object
     source_host | str: file host
-    source_paths_str | str: file paths 
+    source_paths_str | str: file paths -- can include wildcard, expanded alike unix filesystem syntax
     dest_host | str: output host 
     dest_path | str: output directory 
     username | str: username 
