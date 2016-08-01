@@ -10,17 +10,18 @@ get_utc_from_datetime | calculates utc time from datetime
 '''
 from datetime import datetime
 from paper.convert import gcal_to_jd
+from paper.data import dbi as pdbi
 
 pol_strs = ('all', 'xx', 'xy', 'yx', 'yy')
 era_type_strs = ('all', 'None')
 host_strs = ('all', 'pot1', 'pot2', 'pot3', 'pot4', 'pot5', 
              'folio', 'pot8', 'nas1', 'nas2', 'nas5', 'node16')
+host_strs = tuple(pdbi.hostnames.get(host, host) for host in host_strs)
 filetype_strs = ('uv', 'uvcRRE', 'npz')
 
 pol_dropdown = (('all', 'all'), ('xx', 'xx'), ('xy', 'xy'), ('yx', 'yx'), ('yy', 'yy'), ('any', 'any'))
 era_type_dropdown = (('None', 'None'), ('all', 'all'),)
-host_dropdown = (('folio', 'folio'), ('all', 'all'), ('pot1', 'pot1'), ('pot2', 'pot2'),
-                    ('pot3', 'pot3'), ('pot8', 'pot8'), ('nas1', 'nas1'), ('node16', 'node16'))
+host_dropdown = tuple((pdbi.hostnames.get(host, host), host) for host in host_strs)
 filetype_dropdown = (('uv', 'raw'), ('all', 'all'), ('uvcRRE', 'compressed'), ('npz', 'flags'))
 
 def get_jd_from_datetime(start_time=None, end_time=None):

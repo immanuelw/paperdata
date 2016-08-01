@@ -103,7 +103,7 @@ def page_args():
 
     polarization = request.args.get('polarization', 'all')
     era_type = request.args.get('era_type', 'None')
-    host = request.args.get('host', 'folio')
+    host = request.args.get('host', 'folio.sas.upenn.edu')
     filetype = request.args.get('filetype', 'uv')
 
     start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
@@ -131,7 +131,7 @@ def page_form():
 
     polarization = request.form.get('polarization', 'all')
     era_type = request.form.get('era_type', 'None')
-    host = request.form.get('host', 'folio')
+    host = request.form.get('host', 'folio.sas.upenn.edu')
     filetype = request.form.get('filetype', 'uv')
 
     start_utc, end_utc = time_fix(jdstart, jdend, starttime, endtime)
@@ -344,6 +344,7 @@ def save_obs():
     '''
     start_utc, end_utc, polarization, era_type, host, filetype = page_args()
 
+    dbi, obs_table, file_table = db_objs()
     with dbi.session_scope() as s:
         obs_query = s.query(obs_table)
         obs_query = obs_filter(obs_query, obs_table, start_utc, end_utc, polarization, era_type)
