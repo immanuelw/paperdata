@@ -1,0 +1,5 @@
+CORR-DACQ: created file.
+CORRECT: correct_psa819_SK.py zen.2455819.80211.uv
+/usr/global/paper/CanopyVirtualEnvs/PAPER_Distiller/bin/xrfi_simple.py -a 1 --df=6 -c 0_130,755_777,1540,1704,1827,1868,1885_2047 --combine -t 20 zen.2455819.80211.uvc
+/usr/global/paper/CanopyVirtualEnvs/PAPER_Distiller/bin/xrfi_simple.py -a all --combine -t 20 --from_npz=zen.2455819.80211.uvcRE.npz zen.2455819.80211.uvcR
+DDR FILTER, DDR:/usr/global/paper/CanopyVirtualEnvs/PAPER_Distiller/bin/ddr_filter_coarse.py -a all -p xx,xy,yx,yy --clean=1e-3 --maxbl=301 --output=ddr --nsections=10 zen.2455819.79515.uvcR zen.2455819.80211.uvcRR zen.2455819.81602.uvcR
