@@ -9,7 +9,7 @@ Functions
 ---------
 delete_check | checks for which files should and can be deleted
 set_delete_table | updates database with deleted file status
-delete_files | parses list of files then copies and deletes them
+delete_files | parses list of files then moves them to a directory to be scheduled for deletion
 '''
 from __future__ import print_function
 import os
@@ -70,7 +70,9 @@ def set_delete_table(s, source_host, source_path, dest_host, dest_path):
 
 def delete_files(s, source_host, source_paths, dest_host, dest_path):
     '''
-    delete files
+    copies files to new directory and deletes old file
+    destination path should be periodically deleted manually
+    NO deletion of files UNLESS manually
 
     Parameters
     ----------

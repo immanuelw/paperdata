@@ -1,7 +1,8 @@
 '''
 scripts.paperdata.delete_files
 
-copies files to cold storage and then deletes from main host
+copies files to directory which should be periodically manually deleted
+no files are deleted purely by the script
 
 author | Immanuel Washington
 '''
