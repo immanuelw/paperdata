@@ -20,6 +20,7 @@ import glob
 import hashlib
 import socket
 import paper as ppdata
+from paper.data import dbi as pdbi
 
 def byte_size(path):
     '''
@@ -79,7 +80,7 @@ def calc_size(host, path, username=None, password=None):
     >>> calc_size('folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
     205.2
     '''
-    if host == socket.gethostname():
+    if host == pdbi.hostnames.get(socket.gethostname(), socket.gethostname()):
         size_bytes = byte_size(path)
     else:
         with ppdata.ssh_scope(host, username, password) as ssh:
@@ -141,7 +142,7 @@ def calc_md5sum(host, path, username=None, password=None):
     >>> calc_md5sum('folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
     '7d5ac942dd37c4ddfb99728359e42331'
     '''
-    if host == socket.gethostname():
+    if host == pdbi.hostnames.get(socket.gethostname(), socket.gethostname()):
         md5 = get_md5sum(path)
     else:
         with ppdata.ssh_scope(host, username, password) as ssh:
@@ -193,7 +194,7 @@ def parse_sources(source_host, source_paths_str, username=None, password=None):
     -------
     list[str]: sorted list of source paths
     '''
-    if source_host == socket.gethostname():
+    if source_host == pdbi.hostnames.get(socket.gethostname(), socket.gethostname()):
         source_paths = glob.glob(source_paths_str)
     else:
         ls_comm = 'ls -d {source_paths_str}'.format(source_paths_str=source_paths_str)

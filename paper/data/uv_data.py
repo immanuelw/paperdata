@@ -242,7 +242,7 @@ def calc_uv_data(host, path, username=None, password=None):
     >>> calc_uv_data('folio', '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
     (2456617.17386, 2456617.18032, 0.0005, 2456617.18069, 'xx', 0.00696, 21480813086)
     '''
-    named_host = socket.gethostname()
+    named_host = pdbi.hostnames.get(socket.gethostname(), socket.gethostname())
     if named_host == host:
         filetype = path.split('.')[-1]
         if filetype not in ('uv', 'uvcRRE'):
