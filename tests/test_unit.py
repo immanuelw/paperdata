@@ -12,17 +12,19 @@ TestUVData | tests uv data module
 TestFileData | tests file data module
 '''
 from __future__ import print_function
+import os
 from decimal import Decimal
 import unittest
 import aipy as A
+import paper as ppdata
 from paper.data import dbi as pdbi, uv_data, file_data
 
 class TestDBI(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestDBI, self).__init__(*args, **kwargs)
-        self.source = 'folio.sas.upenn.edu:/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'
+        self.source = os.path.join('folio.sas.upenn.edu:', ppdata.root_dir, 'data/test', 'zen.2456617.22257.yx.uvcRRE')
         self.host = 'folio.sas.upenn.edu'
-        self.base_path = '/home/immwa/test_data/'
+        self.base_path = os.path.join(ppdata.root_dir, 'data/test')
         self.jd = 2456600
         self.pol = 'xx'
         self.obsnum = 21480810617
@@ -60,8 +62,8 @@ class TestUVData(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestUVData, self).__init__(*args, **kwargs)
         self.dbi = pdbi.DataBaseInterface()
-        self.uv_file = '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'
-        self.npz_file = '/home/immwa/test_data/zen.2455906.53332.uvcRE.npz'
+        self.uv_file = os.path.join(ppdata.root_dir, 'data/test', 'zen.2456617.22257.yx.uvcRRE')
+        self.npz_file = os.path.join(ppdata.root_dir, 'data/test', 'zen.2455906.53332.uvcRE.npz')
 
     def test_jd(self):
         j_date = uv_data.five_round(2455903.1667113231)
@@ -103,11 +105,11 @@ class TestUVData(unittest.TestCase):
 class TestFileData(unittest.TestCase):
     def __init__(self, *args, **kwargs):
         super(TestFileData, self).__init__(*args, **kwargs)
-        self.uv_file = '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE'
+        self.uv_file = os.path.join(ppdata.root_dir, 'data/test', 'zen.2456617.22257.yx.uvcRRE')
 
     def test_names(self):
         c_names = file_data.file_names(self.uv_file)
-        names = ('/home/immwa/test_data', 'zen.2456617.17386.xx.uvcRRE', 'uvcRRE')
+        names = ('/home/immwa/test_data', 'zen.2456617.22257.yx.uvcRRE', 'uvcRRE')
         self.assertSequenceEqual(c_names, names, msg='Names seperated incorrectly')
 
     def test_filesize(self):
@@ -132,10 +134,10 @@ class TestFileData(unittest.TestCase):
         self.assertEqual(nc_md5, md5, msg='md5sum generated is wrong')
 
     def test_parse_sources(self):
-        source_paths_str = '/home/immwa/test_data/zen.*.uv*'
+        source_paths_str = os.path.join(ppdata.root_dir, 'data/test', 'zen.*.uv*')
         source_paths = file_data.parse_sources('folio', source_paths_str)
-        file_paths = ('/home/immwa/test_data/zen.2455906.53332.uvcRE.npz',
-                      '/home/immwa/test_data/zen.2456617.17386.xx.uvcRRE')
+        file_paths = (os.path.join(ppdata.root_dir, 'data/test', 'zen.2455906.53332.uvcRE.npz'),
+                      os.path.join(ppdata.root_dir, 'data/test', 'zen.2456617.22257.yx.uvcRRE'))
         self.assertSequenceEqual(source_paths, file_paths, msg='list of paths differ from expected')
 
 if __name__ == '__main__':
