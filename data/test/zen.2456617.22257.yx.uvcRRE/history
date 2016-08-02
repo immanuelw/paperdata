@@ -1,0 +1,4 @@
+CORR-DACQ: created file.
+/usr/local/bin/correct_and_XRFI.py -a 1 -t 40 -n 4 -c 0_65,377_388,770,852,913,934,942_1023 /home/obs/Scratch/zen.2456617.22257.yx.uv
+/usr/local/bin/xrfi_simple.py -a all --combine -t 40 --from_npz=/home/obs/Scratch/zen.2456617.22257.yx.uvcRE.npz /home/obs/Scratch/zen.2456617.22257.yx.uvcR
+DDR: /usr/local/bin/ddr_filter_coarse5.py -a all -p xx,xy,yx,yy --clean=1e-3 --maxbl=300 --nsections=20 /home/obs/Scratch/zen.2456617.19474.yx.uvcR /home/obs/Scratch/zen.2456617.22257.yx.uvcRR /home/obs/Scratch/zen.2456617.22953.yx.uvcR
