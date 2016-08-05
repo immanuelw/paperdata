@@ -1,0 +1,8 @@
+better unittests
+removal of doctests and doctesting script
+fix parsing of off host files -- copy to host, parse and load to database, delete copy from user host
+designate directory (possibly by hardcoding) that should contain the files scheduled for deletion
+add ipython/jupyter examples
+include a copy of database for development in a docker container
+uv to hdf5 conversion
+pythonify aipy/pyuvdata completely by using numpy instead of C/C++

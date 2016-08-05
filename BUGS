@@ -1,0 +1,3 @@
+need to run setup.py develop due to how paths are defined
+issue with error in data included for use in unittest, find better file
+parsing of host files is incomplete and fails

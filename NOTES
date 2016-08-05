@@ -1,0 +1,5 @@
+db_update.sh simply shows how to run alembic (which is used to automatically update the database through python), unclear why it doesn't work on command line
+**certain files have observations discrepancies -- julian date or start time don't match filename, polarization in filename differs from database entry and possibly value in file**
+jd_count.py and jdpol_count.py on pot4 count the amount of files in each day and polarization on pot4 from the kroll disks, output files already on there
+parsing of off host files incomplete, explained in BUGS file
+pot4:/mnt/ThomasJefferson/data/psa*, pot4:/mnt/WilliamHenryHarrison/data/psa* both have some empty directories -- is this intentional?
